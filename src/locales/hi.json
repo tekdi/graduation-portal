@@ -1,0 +1,39 @@
+{
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "close": "बंद करें",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "submit": "जमा करें",
+    "back": "वापस",
+    "next": "अगला",
+    "error": "त्रुटि",
+    "success": "सफल",
+    "confirm": "पुष्टि करें",
+    "offline": "ऑफ़लाइन मोड",
+    "online": "ऑनलाइन"
+  },
+  "navigation": {
+    "menu": "मेनू",
+    "closeMenu": "✕ मेनू बंद करें"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "language": "भाषा",
+    "selectLanguage": "भाषा चुनें",
+    "selectLanguagePlaceholder": "कृपया अपनी पसंदीदा भाषा चुनकर जारी रखें",
+    "theme": "थीम",
+    "notifications": "सूचनाएं",
+    "about": "के बारे में"
+  },
+  "languages": {
+    "en": "English",
+    "ar": "العربية",
+    "es": "Español",
+    "hi": "हिन्दी"
+  }
+}

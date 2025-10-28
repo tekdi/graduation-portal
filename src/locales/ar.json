@@ -1,0 +1,39 @@
+{
+  "common": {
+    "loading": "جار التحميل...",
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "close": "إغلاق",
+    "search": "بحث",
+    "filter": "تصفية",
+    "submit": "إرسال",
+    "back": "رجوع",
+    "next": "التالي",
+    "error": "خطأ",
+    "success": "نجح",
+    "confirm": "تأكيد",
+    "offline": "وضع عدم الاتصال",
+    "online": "متصل"
+  },
+  "navigation": {
+    "menu": "القائمة",
+    "closeMenu": "✕ إغلاق القائمة"
+  },
+  "settings": {
+    "title": "الإعدادات",
+    "language": "اللغة",
+    "selectLanguage": "اختر اللغة",
+    "selectLanguagePlaceholder": "يرجى اختيار اللغة المفضلة للاستمرار",
+    "theme": "السمة",
+    "notifications": "الإشعارات",
+    "about": "حول"
+  },
+  "languages": {
+    "en": "English",
+    "ar": "العربية",
+    "es": "Español",
+    "hi": "हिन्दी"
+  }
+}

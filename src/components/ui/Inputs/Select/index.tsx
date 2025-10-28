@@ -1,0 +1,77 @@
+import React from 'react';
+import { Platform } from 'react-native';
+import {
+  SelectItem,
+  SelectDragIndicatorWrapper,
+  SelectDragIndicator,
+  SelectContent,
+  SelectBackdrop,
+  Select as GluestackSelect,
+  SelectIcon,
+  SelectInput,
+  SelectTrigger,
+  ChevronDownIcon,
+  SelectPortal,
+} from '@gluestack-ui/themed';
+
+type Option = {
+  value: string;
+  name?: string;
+  nativeName?: string;
+  isRTL?: boolean;
+};
+
+type SelectProps = {
+  options: Option[];
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+};
+
+export default function Select({
+  options,
+  value,
+  onChange,
+  placeholder,
+}: SelectProps) {
+  // For mobile, we need to ensure the Select component is properly configured
+  const selectedOption = options.find(opt => opt.value === value);
+  const displayValue =
+    selectedOption?.nativeName ||
+    selectedOption?.name ||
+    selectedOption?.value ||
+    '';
+
+  return (
+    <GluestackSelect
+      selectedValue={value}
+      onValueChange={onChange}
+      {...(Platform.OS === 'web' ? { defaultValue: value } : {})}
+    >
+      <SelectTrigger variant="outline" size="md" width="$full">
+        <SelectInput
+          placeholder={placeholder ?? 'Select an option'}
+          value={displayValue}
+        />
+        <SelectIcon mr="$3">
+          <ChevronDownIcon />
+        </SelectIcon>
+      </SelectTrigger>
+      <SelectPortal>
+        <SelectBackdrop />
+        <SelectContent>
+          <SelectDragIndicatorWrapper>
+            <SelectDragIndicator />
+          </SelectDragIndicatorWrapper>
+          {options.map((option: Option) => (
+            <SelectItem
+              key={option?.value ?? option?.name}
+              label={option?.nativeName || option?.name || option?.value}
+              value={option?.value ?? option?.name}
+            />
+          ))}
+        </SelectContent>
+      </SelectPortal>
+    </GluestackSelect>
+  );
+}

@@ -1,0 +1,39 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "submit": "Enviar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "error": "Error",
+    "success": "Éxito",
+    "confirm": "Confirmar",
+    "offline": "Modo sin conexión",
+    "online": "En línea"
+  },
+  "navigation": {
+    "menu": "Menú",
+    "closeMenu": "✕ Cerrar Menú"
+  },
+  "settings": {
+    "title": "Configuración",
+    "language": "Idioma",
+    "selectLanguage": "Seleccionar Idioma",
+    "selectLanguagePlaceholder": "Por favor, elija su idioma preferido para continuar",
+    "theme": "Tema",
+    "notifications": "Notificaciones",
+    "about": "Acerca de"
+  },
+  "languages": {
+    "en": "English",
+    "ar": "العربية",
+    "es": "Español",
+    "hi": "हिन्दी"
+  }
+}

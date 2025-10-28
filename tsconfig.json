@@ -1,0 +1,16 @@
+{
+  "extends": "@react-native/typescript-config",
+  "compilerOptions": {
+    "jsx": "react-native",
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "lib": ["ES2020", "DOM"],
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ui": ["./src/components/ui"],
+      "@ui/*": ["./src/components/ui/*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx", "src/components/ui/index.js"],
+  "exclude": ["**/node_modules", "**/Pods"]
+}
