@@ -73,11 +73,11 @@ export default function Select({
           <SelectDragIndicatorWrapper>
             <SelectDragIndicator />
           </SelectDragIndicatorWrapper>
-          {options.map((option: Option) => (
+          {options.map((option: Option, index: number) => (
             <SelectItem
-              key={option?.value ?? option?.name}
+              key={option?.value ?? option?.name ?? index.toString()}
               label={option?.nativeName || option?.name || option?.value}
-              value={option?.value ?? option?.name}
+              value={option?.value ?? option?.name ?? ''}
             />
           ))}
         </SelectContent>

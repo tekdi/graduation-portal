@@ -38,11 +38,23 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
   const [isRTL, setIsRTL] = useState<boolean>(I18nManager.isRTL);
 
   useEffect(() => {
+    let mounted = true;
     // Initialize language on mount
-    initializeLanguage().then(() => {
-      setCurrentLanguage(i18n.language);
-      setIsRTL(checkIsRTL(i18n.language));
-    });
+    initializeLanguage()
+      .then(() => {
+        if (mounted) {
+          setCurrentLanguage(i18n.language);
+          setIsRTL(checkIsRTL(i18n.language));
+        }
+      })
+      .catch(error => {
+        console.error('Failed to initialize language:', error);
+      });
+
+    return () => {
+      mounted = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const changeLanguage = async (languageCode: string) => {
@@ -50,18 +62,6 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
       await changeI18nLanguage(languageCode);
       setCurrentLanguage(languageCode);
       setIsRTL(checkIsRTL(languageCode));
-
-      // For web, we can change direction immediately
-      if (Platform.OS === 'web') {
-        const htmlElement = document.documentElement;
-        if (checkIsRTL(languageCode)) {
-          htmlElement.setAttribute('dir', 'rtl');
-          htmlElement.setAttribute('lang', languageCode);
-        } else {
-          htmlElement.setAttribute('dir', 'ltr');
-          htmlElement.setAttribute('lang', languageCode);
-        }
-      }
     } catch (error) {
       console.error('Error changing language:', error);
     }

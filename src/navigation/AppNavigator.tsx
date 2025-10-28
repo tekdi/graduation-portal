@@ -61,14 +61,17 @@ const AppNavigator: React.FC = () => {
         initialRouteName="select-language"
         screenOptions={{
           headerShown: false,
-          cardStyle: { width: '100%', height: '100vh' },
+          cardStyle:
+            Platform.OS === 'web'
+              ? ({ width: '100%', height: '100vh' } as any)
+              : ({ width: '100%' } as any),
         }}
       >
         <Stack.Screen
           name="select-language"
           component={SelectLanguageScreen}
           options={{
-            title: t('navigation.selectLanguage'),
+            title: t('settings.selectLanguage'),
           }}
         />
       </Stack.Navigator>
