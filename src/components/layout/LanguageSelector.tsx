@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Platform } from 'react-native';
 import {
-  Box,
   Text,
   Pressable,
   Menu,
@@ -61,12 +60,8 @@ const LanguageSelector: React.FC = () => {
               bg="transparent"
               _hover={{ bg: '$backgroundLight100' }}
             >
-              <Text fontSize="$sm" color="$textDark800">
-                {currentLang.code.toUpperCase()}
-              </Text>
-              <Text fontSize="$xs" color="$textDark600">
-                ▼
-              </Text>
+              <Text fontSize="$sm">{currentLang.code.toUpperCase()}</Text>
+              <Text fontSize="$xs">▼</Text>
             </Pressable>
           )}
         >
@@ -78,7 +73,6 @@ const LanguageSelector: React.FC = () => {
                 onPress={() => handleLanguageChange(language.code)}
                 px="$3"
                 py="$2"
-                $hover={{ bg: '$backgroundLight100' }}
               >
                 <HStack
                   justifyContent="space-between"
@@ -86,13 +80,12 @@ const LanguageSelector: React.FC = () => {
                   w="$full"
                 >
                   <MenuItemLabel
-                    color={isSelected ? '$textDark800' : '$textDark700'}
                     fontWeight={isSelected ? '$semibold' : '$normal'}
                     fontSize="$sm"
                   >
                     {language.code.toUpperCase()}
                   </MenuItemLabel>
-                  {isSelected && <Text color="$primary600">✓</Text>}
+                  {isSelected && <Text>✓</Text>}
                 </HStack>
               </MenuItem>
             );
@@ -118,12 +111,8 @@ const LanguageSelector: React.FC = () => {
                 bg="transparent"
                 _hover={{ bg: '$backgroundLight100' }}
               >
-                <Text fontSize="$sm" color="$textDark800">
-                  {currentLang.code.toUpperCase()}
-                </Text>
-                <Text fontSize="$xs" color="$textDark600">
-                  ▼
-                </Text>
+                <Text fontSize="$sm">{currentLang.code.toUpperCase()}</Text>
+                <Text fontSize="$xs">▼</Text>
               </Pressable>
             )}
           />

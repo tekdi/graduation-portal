@@ -14,18 +14,14 @@ export default function App() {
   const { currentLanguage, changeLanguage, t } = useLanguage();
 
   return (
-    <Layout
-      title={t('settings.selectLanguage')}
-      statusBarStyle="dark-content"
-      statusBarBackgroundColor="$backgroundLight0"
-    >
+    <Layout title={t('settings.selectLanguage')}>
       <Box flex={1} justifyContent="center" alignItems="center">
         <VStack width={350} borderRadius="$2xl" alignItems="center" gap="$1">
           <Text fontSize="$xl" fontWeight="$bold" color="$primary" mb="$3">
             {t('settings.selectLanguage')}
           </Text>
 
-          <Text color="$textLight700" mb="$6" textAlign="center">
+          <Text mb="$6" textAlign="center">
             {t('settings.selectLanguagePlaceholder')}
           </Text>
 

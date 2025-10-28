@@ -11,8 +11,9 @@ import { GluestackUIProvider } from '@gluestack-ui/themed';
 import { theme } from './src/config/theme';
 
 function App() {
+  const mode = localStorage.getItem('colorMode') || 'light';
   return (
-    <GluestackUIProvider config={theme} colorMode="light">
+    <GluestackUIProvider config={theme} colorMode={mode as any}>
       <LanguageProvider>
         <AppNavigator />
       </LanguageProvider>
