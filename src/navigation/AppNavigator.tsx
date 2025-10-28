@@ -10,7 +10,6 @@ import {
 } from 'react-native';
 import { useLanguage } from '../contexts/LanguageContext';
 import SelectLanguageScreen from '../screens/SelectLanguageScreen';
-import LoginScreen from '../screens/LoginScreen';
 
 const Stack = createStackNavigator();
 
@@ -38,13 +37,13 @@ const AppNavigator: React.FC = () => {
     }
   }, [isRTL]);
 
-  // Log current URL on web for debugging
+  // Sync document direction on web when RTL state changes
   useEffect(() => {
-    if (Platform.OS === 'web') {
-      console.log('Current URL:', window.location.href);
-      console.log('Pathname:', window.location.pathname);
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+      console.log('Document direction synced to:', isRTL ? 'rtl' : 'ltr');
     }
-  }, []);
+  }, [isRTL]);
 
   return (
     <NavigationContainer
@@ -70,13 +69,6 @@ const AppNavigator: React.FC = () => {
           component={SelectLanguageScreen}
           options={{
             title: t('navigation.selectLanguage'),
-          }}
-        />
-        <Stack.Screen
-          name="login"
-          component={LoginScreen}
-          options={{
-            title: t('navigation.login'),
           }}
         />
       </Stack.Navigator>

@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from 'react';
 import { I18nManager, Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
@@ -14,15 +20,21 @@ interface LanguageContextType {
   t: (key: string, options?: any) => string;
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | undefined>(
+  undefined,
+);
 
 interface LanguageProviderProps {
   children: ReactNode;
 }
 
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({
+  children,
+}) => {
   const { i18n, t } = useTranslation();
-  const [currentLanguage, setCurrentLanguage] = useState<string>(i18n.language || 'en');
+  const [currentLanguage, setCurrentLanguage] = useState<string>(
+    i18n.language || 'en',
+  );
   const [isRTL, setIsRTL] = useState<boolean>(I18nManager.isRTL);
 
   useEffect(() => {
@@ -38,7 +50,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
       await changeI18nLanguage(languageCode);
       setCurrentLanguage(languageCode);
       setIsRTL(checkIsRTL(languageCode));
-      
+
       // For web, we can change direction immediately
       if (Platform.OS === 'web') {
         const htmlElement = document.documentElement;
@@ -78,4 +90,3 @@ export const useLanguage = (): LanguageContextType => {
 };
 
 export default LanguageContext;
-

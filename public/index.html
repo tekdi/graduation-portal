@@ -1,11 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" dir="ltr">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="React Native Web App" />
     <title>MyApp</title>
+    <script>
+      // Set lang and dir attributes before React loads to prevent flash
+      (function () {
+        try {
+          // RTL languages list (must match the one in src/config/i18n.ts)
+          const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
+
+          // Get saved language from localStorage
+          const savedLanguage = localStorage.getItem('@app_language');
+          const language = savedLanguage || 'en';
+
+          // Determine if language is RTL
+          const isRTL = RTL_LANGUAGES.includes(language);
+
+          // Set HTML attributes
+          document.documentElement.setAttribute('lang', language);
+          document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
+        } catch (error) {
+          console.error('Error setting initial language/direction:', error);
+        }
+      })();
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

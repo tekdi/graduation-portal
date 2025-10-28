@@ -1,6 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { Platform, I18nManager } from 'react-native';
+import { I18nManager, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Import translations
@@ -85,6 +85,14 @@ export const changeLanguage = async (languageCode: string): Promise<void> => {
       // You might want to show a message to the user about this
       console.log(
         `RTL mode changed to ${isRTLLanguage}. App restart may be required.`,
+      );
+    }
+
+    // Update document direction for web
+    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+      document.documentElement.dir = isRTLLanguage ? 'rtl' : 'ltr';
+      console.log(
+        `Document direction set to: ${isRTLLanguage ? 'rtl' : 'ltr'}`,
       );
     }
   } catch (error) {

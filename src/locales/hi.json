@@ -15,7 +15,8 @@
     "success": "सफल",
     "confirm": "पुष्टि करें",
     "offline": "ऑफ़लाइन मोड",
-    "online": "ऑनलाइन"
+    "online": "ऑनलाइन",
+    "selectOption": "एक विकल्प चुनें"
   },
   "navigation": {
     "menu": "मेनू",

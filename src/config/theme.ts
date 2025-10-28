@@ -14,11 +14,11 @@ export const theme = {
       error: '#d32f2f',
       text: '#212121',
     },
-    components: {
-      ...gluestackConfig.components,
-      Button: {
-        ...gluestackConfig.components.Button,
-      },
+  },
+  components: {
+    ...gluestackConfig.components,
+    Button: {
+      ...gluestackConfig.components.Button,
     },
   },
 } as const;

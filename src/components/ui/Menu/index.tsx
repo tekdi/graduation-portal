@@ -14,7 +14,6 @@ export interface MenuItemData {
   textValue: string;
   icon?: any;
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  iconClassName?: string;
 }
 
 export interface CustomMenuProps {
@@ -102,11 +101,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
           onPress={() => handleMenuItemPress(item.key)}
         >
           {item.icon && (
-            <Icon
-              as={item.icon}
-              size={item.iconSize || 'sm'}
-              className={item.iconClassName || 'mr-2'}
-            />
+            <Icon as={item.icon} size={item.iconSize || 'sm'} me="$2" />
           )}
           <MenuItemLabel size="sm">{item.label}</MenuItemLabel>
         </MenuItem>

@@ -11,6 +11,6 @@
       "@ui/*": ["./src/components/ui/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "src/components/ui/index.js"],
+  "include": ["**/*.ts", "**/*.tsx", "src/components/ui/index.ts"],
   "exclude": ["**/node_modules", "**/Pods"]
 }

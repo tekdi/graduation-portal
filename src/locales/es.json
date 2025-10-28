@@ -15,7 +15,8 @@
     "success": "Éxito",
     "confirm": "Confirmar",
     "offline": "Modo sin conexión",
-    "online": "En línea"
+    "online": "En línea",
+    "selectOption": "Selecciona una opción"
   },
   "navigation": {
     "menu": "Menú",

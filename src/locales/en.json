@@ -15,7 +15,8 @@
     "success": "Success",
     "confirm": "Confirm",
     "offline": "Offline Mode",
-    "online": "Online"
+    "online": "Online",
+    "selectOption": "Select an option"
   },
   "navigation": {
     "menu": "Menu",

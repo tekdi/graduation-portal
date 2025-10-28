@@ -1,5 +1,6 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, I18nManager } from 'react-native';
+import i18n from '../../../../config/i18n';
 import {
   SelectItem,
   SelectDragIndicatorWrapper,
@@ -42,6 +43,13 @@ export default function Select({
     selectedOption?.value ||
     '';
 
+  // Get localized placeholder with fallback
+  const localizedPlaceholder =
+    placeholder ?? i18n.t('common.selectOption', 'Select an option');
+
+  // Determine writing direction for RTL support
+  const writingDirection = I18nManager.isRTL ? 'rtl' : 'ltr';
+
   return (
     <GluestackSelect
       selectedValue={value}
@@ -50,8 +58,10 @@ export default function Select({
     >
       <SelectTrigger variant="outline" size="md" width="$full">
         <SelectInput
-          placeholder={placeholder ?? 'Select an option'}
+          placeholder={localizedPlaceholder}
           value={displayValue}
+          // @ts-ignore - writingDirection is a valid style prop but may not be in types
+          style={{ writingDirection }}
         />
         <SelectIcon mr="$3">
           <ChevronDownIcon />

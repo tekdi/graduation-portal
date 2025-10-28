@@ -21,14 +21,14 @@ module.exports = {
         context: ['/api'],
         target: 'https://qa-lap.prathamdigital.org',
         changeOrigin: true,
-        secure: false,
+        secure: true,
         logLevel: 'debug',
       },
       {
         context: ['/assets'],
         target: 'https://qa-lap.prathamdigital.org',
         changeOrigin: true,
-        secure: false,
+        secure: true,
         logLevel: 'debug',
         onProxyReq: function (proxyReq, req, res) {
           // Set proper headers for the proxied request

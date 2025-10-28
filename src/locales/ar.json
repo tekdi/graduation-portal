@@ -15,7 +15,8 @@
     "success": "نجح",
     "confirm": "تأكيد",
     "offline": "وضع عدم الاتصال",
-    "online": "متصل"
+    "online": "متصل",
+    "selectOption": "اختر خياراً"
   },
   "navigation": {
     "menu": "القائمة",
