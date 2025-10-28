@@ -5,7 +5,7 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { I18nManager, Platform } from 'react-native';
+import { I18nManager } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import {
   changeLanguage as changeI18nLanguage,
