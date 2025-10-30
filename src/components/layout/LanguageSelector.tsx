@@ -1,40 +1,25 @@
 import React, { useState } from 'react';
 import { Platform } from 'react-native';
-import {
-  Text,
-  Pressable,
-  Menu,
-  MenuItem,
-  MenuItemLabel,
-  VStack,
-  Modal,
-  HStack,
-} from '@gluestack-ui/themed';
+import { Text, Pressable, Menu, VStack, Modal, HStack } from '@ui';
 import { useLanguage } from '../../contexts/LanguageContext';
-
-interface Language {
-  code: string;
-  name: string;
-  nativeName: string;
-  isRTL: boolean;
-}
-
-const AVAILABLE_LANGUAGES: Language[] = [
-  { code: 'en', name: 'English', nativeName: 'English', isRTL: false },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', isRTL: false },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', isRTL: true },
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', isRTL: false },
-];
+import AVAILABLE_LANGUAGES from '../../constant/LANGUAGE_OPTIONS';
 
 const LanguageSelector: React.FC = () => {
-  const { currentLanguage, changeLanguage } = useLanguage();
+  const { currentLanguage, changeLanguage, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
-
   const currentLang =
-    AVAILABLE_LANGUAGES.find(lang => lang.code === currentLanguage) ||
+    AVAILABLE_LANGUAGES.find(lang => lang.value === currentLanguage) ||
     AVAILABLE_LANGUAGES[0];
 
-  const handleLanguageChange = async (languageCode: string) => {
+  const handleLanguageChange = async (languageCode: string | undefined) => {
+    if (
+      !languageCode ||
+      typeof languageCode !== 'string' ||
+      languageCode.trim() === ''
+    ) {
+      console.warn('Invalid language code provided:', languageCode);
+      return;
+    }
     await changeLanguage(languageCode);
     setMenuOpen(false);
   };
@@ -44,10 +29,14 @@ const LanguageSelector: React.FC = () => {
       {/* Web: Dropdown menu */}
       {Platform.OS === 'web' ? (
         <Menu
-          placement="bottom right"
-          isOpen={menuOpen}
-          onOpen={() => setMenuOpen(true)}
-          onClose={() => setMenuOpen(false)}
+          items={AVAILABLE_LANGUAGES.map(language => ({
+            key: language.value,
+            label: language.nativeName,
+            textValue: language.value,
+          }))}
+          placement="bottom"
+          offset={5}
+          disabledKeys={[]}
           trigger={triggerProps => (
             <Pressable
               {...triggerProps}
@@ -60,83 +49,52 @@ const LanguageSelector: React.FC = () => {
               bg="transparent"
               _hover={{ bg: '$backgroundLight100' }}
             >
-              <Text fontSize="$sm">{currentLang.code.toUpperCase()}</Text>
+              <Text fontSize="$sm">{currentLang.value.toUpperCase()}</Text>
               <Text fontSize="$xs">▼</Text>
             </Pressable>
           )}
-        >
-          {AVAILABLE_LANGUAGES.map(language => {
-            const isSelected = language.code === currentLanguage;
-            return (
-              <MenuItem
-                key={language.code}
-                onPress={() => handleLanguageChange(language.code)}
-                px="$3"
-                py="$2"
-              >
-                <HStack
-                  justifyContent="space-between"
-                  alignItems="center"
-                  w="$full"
-                >
-                  <MenuItemLabel
-                    fontWeight={isSelected ? '$semibold' : '$normal'}
-                    fontSize="$sm"
-                  >
-                    {language.code.toUpperCase()}
-                  </MenuItemLabel>
-                  {isSelected && <Text>✓</Text>}
-                </HStack>
-              </MenuItem>
-            );
-          })}
-        </Menu>
+          onSelect={handleLanguageChange}
+          menuProps={{}}
+          triggerProps={{}}
+        />
       ) : (
         // ... keep your Modal version for mobile here
         <>
-          <Menu
-            placement="bottom right"
-            isOpen={menuOpen}
-            onOpen={() => setMenuOpen(true)}
-            onClose={() => setMenuOpen(false)}
-            trigger={triggerProps => (
-              <Pressable
-                {...triggerProps}
-                flexDirection="row"
-                alignItems="center"
-                gap="$1"
-                px="$2"
-                py="$1"
-                rounded="$lg"
-                bg="transparent"
-                _hover={{ bg: '$backgroundLight100' }}
-              >
-                <Text fontSize="$sm">{currentLang.code.toUpperCase()}</Text>
-                <Text fontSize="$xs">▼</Text>
-              </Pressable>
-            )}
-          />
+          <Pressable
+            flexDirection="row"
+            alignItems="center"
+            gap="$1"
+            px="$2"
+            py="$1"
+            rounded="$lg"
+            bg="transparent"
+            onPress={() => setMenuOpen(true)}
+          >
+            <Text fontSize="$sm">{currentLang.value.toUpperCase()}</Text>
+            <Text fontSize="$xs">▼</Text>
+          </Pressable>
+
           <Modal isOpen={menuOpen} onClose={() => setMenuOpen(false)}>
             <Modal.Backdrop />
             <Modal.Content rounded="$2xl" maxHeight="70%">
               <Modal.Header>
                 <Text fontSize="$lg" fontWeight="$bold">
-                  Select Language
+                  {t('settings.selectLanguage')}
                 </Text>
                 <Modal.CloseButton />
               </Modal.Header>
 
               <Modal.Body>
-                <VStack space="sm">
+                <VStack>
                   {AVAILABLE_LANGUAGES.map(language => {
-                    const isSelected = language.code === currentLanguage;
+                    const isSelected = language.value === currentLanguage;
                     return (
                       <Pressable
-                        key={language.code}
-                        bg={isSelected ? '$primary100' : '$backgroundLight100'}
+                        key={language.value}
+                        bg={isSelected ? '$primary100' : ''}
                         rounded="$lg"
                         p="$3"
-                        onPress={() => handleLanguageChange(language.code)}
+                        onPress={() => handleLanguageChange(language.value)}
                       >
                         <HStack
                           justifyContent="space-between"

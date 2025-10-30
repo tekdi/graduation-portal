@@ -20,7 +20,7 @@ export const isRTL = (): boolean => {
  */
 export const getDirectionalStyle = (
   property: 'marginStart' | 'marginEnd' | 'paddingStart' | 'paddingEnd',
-  value: number | string
+  value: number | string,
 ): object => {
   const rtl = isRTL();
   const isStart = property.includes('Start');
@@ -32,7 +32,13 @@ export const getDirectionalStyle = (
   }
 
   // For React Native
-  const direction = rtl ? (isStart ? 'Right' : 'Left') : (isStart ? 'Left' : 'Right');
+  const direction = rtl
+    ? isStart
+      ? 'Right'
+      : 'Left'
+    : isStart
+    ? 'Left'
+    : 'Right';
   const propertyName = isMargin ? `margin${direction}` : `padding${direction}`;
   return { [propertyName]: value };
 };
@@ -40,7 +46,9 @@ export const getDirectionalStyle = (
 /**
  * Get RTL-aware flex direction
  */
-export const getFlexDirection = (direction: 'row' | 'row-reverse' | 'column' | 'column-reverse'): any => {
+export const getFlexDirection = (
+  direction: 'row' | 'row-reverse' | 'column' | 'column-reverse',
+): any => {
   if (direction === 'row' || direction === 'row-reverse') {
     const rtl = isRTL();
     if (rtl) {
@@ -53,7 +61,9 @@ export const getFlexDirection = (direction: 'row' | 'row-reverse' | 'column' | '
 /**
  * Get RTL-aware text alignment
  */
-export const getTextAlign = (align: 'left' | 'right' | 'center' | 'auto'): 'left' | 'right' | 'center' | 'auto' => {
+export const getTextAlign = (
+  align: 'left' | 'right' | 'center' | 'auto',
+): 'left' | 'right' | 'center' | 'auto' => {
   if (align === 'left' || align === 'right') {
     const rtl = isRTL();
     if (rtl) {
@@ -132,20 +142,25 @@ export const createRTLStyle = (styles: any): any => {
 /**
  * A StyleSheet creator that applies RTL transformations
  */
-export const createRTLStyleSheet = (styles: { [key: string]: any }): { [key: string]: any } => {
+export const createRTLStyleSheet = (styles: {
+  [key: string]: any;
+}): { [key: string]: any } => {
   const rtlStyles: { [key: string]: any } = {};
-  
+
   for (const key in styles) {
     rtlStyles[key] = createRTLStyle(styles[key]);
   }
-  
+
   return rtlStyles;
 };
 
 /**
  * Flip horizontal position for RTL
  */
-export const flipPosition = (position: number, containerWidth: number): number => {
+export const flipPosition = (
+  position: number,
+  containerWidth: number,
+): number => {
   return isRTL() ? containerWidth - position : position;
 };
 
@@ -167,4 +182,3 @@ export default {
   flipPosition,
   getWritingDirection,
 };
-

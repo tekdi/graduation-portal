@@ -5,8 +5,8 @@ import {
   MenuItemLabel,
   Icon,
   ButtonText,
+  Button,
 } from '@gluestack-ui/themed';
-import Button from '../Button';
 
 export interface MenuItemData {
   key: string;
@@ -34,7 +34,7 @@ export interface CustomMenuProps {
   offset?: number;
   disabledKeys?: string[];
   triggerLabel?: string;
-  triggerComponent?: React.ReactElement;
+  trigger?: (triggerProps: any) => React.ReactElement;
   onSelect?: (key: string) => void;
   menuProps?: any;
   triggerProps?: any;
@@ -57,10 +57,9 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
   offset = 5,
   disabledKeys = [],
   triggerLabel = 'Menu',
-  triggerComponent,
-  onSelect,
-  menuProps = {},
   triggerProps = {},
+  onSelect,
+  ...menuProps
 }) => {
   const handleMenuItemPress = (key: string) => {
     if (onSelect) {
@@ -70,12 +69,6 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
 
   const renderTrigger = React.useCallback(
     (defaultTriggerProps: any) => {
-      if (triggerComponent) {
-        return React.cloneElement(triggerComponent, {
-          ...defaultTriggerProps,
-          ...triggerProps,
-        });
-      }
       return (
         <DefaultTrigger
           label={triggerLabel}
@@ -83,7 +76,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
         />
       );
     },
-    [triggerComponent, triggerProps, triggerLabel],
+    [triggerProps, triggerLabel],
   );
 
   return (
@@ -94,9 +87,9 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
       trigger={renderTrigger}
       {...menuProps}
     >
-      {items.map(item => (
+      {items?.map((item: MenuItemData, index: number) => (
         <MenuItem
-          key={item.key}
+          key={item.key || index.toString()}
           textValue={item.textValue}
           onPress={() => handleMenuItemPress(item.key)}
         >

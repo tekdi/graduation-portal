@@ -50,10 +50,16 @@ export default function Select({
   // Determine writing direction for RTL support
   const writingDirection = I18nManager.isRTL ? 'rtl' : 'ltr';
 
+  const handleValueChange = (newValue: string | undefined) => {
+    if (newValue && typeof newValue === 'string' && newValue.trim() !== '') {
+      onChange(newValue);
+    }
+  };
+
   return (
     <GluestackSelect
       selectedValue={value}
-      onValueChange={onChange}
+      onValueChange={handleValueChange}
       {...(Platform.OS === 'web' ? { defaultValue: value } : {})}
     >
       <SelectTrigger variant="outline" size="md" width="$full">

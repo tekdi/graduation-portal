@@ -5,15 +5,17 @@
 
 import React from 'react';
 import './src/config/i18n'; // Initialize i18n
+import { GlobalProvider, useGlobal } from './src/contexts/GlobalContext';
 import { LanguageProvider } from './src/contexts/LanguageContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { GluestackUIProvider } from '@gluestack-ui/themed';
 import { theme } from './src/config/theme';
 
 function App() {
-  const mode = localStorage.getItem('colorMode') || 'light';
+  const { colorMode } = useGlobal();
+
   return (
-    <GluestackUIProvider config={theme} colorMode={mode as any}>
+    <GluestackUIProvider config={theme} colorMode={colorMode}>
       <LanguageProvider>
         <AppNavigator />
       </LanguageProvider>
@@ -21,4 +23,12 @@ function App() {
   );
 }
 
-export default App;
+const RootApp = () => {
+  return (
+    <GlobalProvider>
+      <App />
+    </GlobalProvider>
+  );
+};
+
+export default RootApp;

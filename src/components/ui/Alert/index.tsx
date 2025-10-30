@@ -13,14 +13,18 @@ export const useAlert = () => {
     action,
     description,
     variant = 'solid',
+    placement = 'top',
+    duration = 3000,
   }: {
     action: 'error' | 'warning' | 'success' | 'info' | 'attention';
     description: string;
     variant?: 'solid' | 'outline' | 'accent';
+    placement?: 'top' | 'bottom' | 'left' | 'right';
+    duration?: number;
   }) => {
     toast.show({
-      placement: 'top',
-      duration: 3000,
+      placement: placement as any,
+      duration: duration as any,
       render: ({ id }) => {
         return (
           <Toast nativeID={`toast-${id}`} action={action} variant={variant}>
@@ -33,20 +37,80 @@ export const useAlert = () => {
     });
   };
 
-  const showError = (description: string) => {
-    showAlert({ action: 'error', description, variant: 'solid' });
+  const showError = (
+    description: string,
+    {
+      placement = 'top',
+      duration = 3000,
+    }: {
+      placement?: 'top' | 'bottom' | 'left' | 'right';
+      duration?: number;
+    } = {},
+  ) => {
+    showAlert({
+      action: 'error',
+      description,
+      variant: 'solid',
+      placement,
+      duration,
+    });
   };
 
-  const showSuccess = (description: string) => {
-    showAlert({ action: 'success', description, variant: 'solid' });
+  const showSuccess = (
+    description: string,
+    {
+      placement = 'top',
+      duration = 3000,
+    }: {
+      placement?: 'top' | 'bottom' | 'left' | 'right';
+      duration?: number;
+    } = {},
+  ) => {
+    showAlert({
+      action: 'success',
+      description,
+      variant: 'solid',
+      placement,
+      duration,
+    });
   };
 
-  const showInfo = (description: string) => {
-    showAlert({ action: 'info', description, variant: 'solid' });
+  const showInfo = (
+    description: string,
+    {
+      placement = 'top',
+      duration = 3000,
+    }: {
+      placement?: 'top' | 'bottom' | 'left' | 'right';
+      duration?: number;
+    } = {},
+  ) => {
+    showAlert({
+      action: 'info',
+      description,
+      variant: 'solid',
+      placement,
+      duration,
+    });
   };
 
-  const showWarning = (description: string) => {
-    showAlert({ action: 'warning', description, variant: 'solid' });
+  const showWarning = (
+    description: string,
+    {
+      placement = 'top',
+      duration = 3000,
+    }: {
+      placement?: 'top' | 'bottom' | 'left' | 'right';
+      duration?: number;
+    } = {},
+  ) => {
+    showAlert({
+      action: 'warning',
+      description,
+      variant: 'solid',
+      placement,
+      duration,
+    });
   };
 
   return {

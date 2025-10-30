@@ -1,21 +1,16 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import {
-  I18nManager,
-  Platform,
-  View,
-  Text,
-  ActivityIndicator,
-} from 'react-native';
+import { I18nManager, Platform } from 'react-native';
 import { useLanguage } from '../contexts/LanguageContext';
-import SelectLanguageScreen from '../screens/SelectLanguageScreen';
+import SelectLanguageScreen from '../screens/Language/Index';
+import { Spinner } from '@ui';
 
 const Stack = createStackNavigator();
 
 // Linking configuration for web URL routing
 const linking = {
-  prefixes: ['http://localhost:3000', 'https://yourapp.com'],
+  prefixes: [],
   config: {
     screens: {
       login: 'login',
@@ -48,14 +43,7 @@ const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer
       linking={linking}
-      fallback={
-        <View
-          style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
-        >
-          <ActivityIndicator size="large" color="#0000ff" />
-          <Text>Loading...</Text>
-        </View>
-      }
+      fallback={<Spinner size="large" color="primary" />}
     >
       <Stack.Navigator
         initialRouteName="select-language"

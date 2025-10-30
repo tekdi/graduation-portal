@@ -11,7 +11,7 @@ import {
   changeLanguage as changeI18nLanguage,
   initializeLanguage,
   isRTL as checkIsRTL,
-} from '../config/i18n';
+} from '../utils/i18n';
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -59,6 +59,15 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
 
   const changeLanguage = async (languageCode: string) => {
     try {
+      // Validate that languageCode is a valid string
+      if (
+        !languageCode ||
+        typeof languageCode !== 'string' ||
+        languageCode.trim() === ''
+      ) {
+        console.warn('Invalid language code provided:', languageCode);
+        return;
+      }
       await changeI18nLanguage(languageCode);
       setCurrentLanguage(languageCode);
       setIsRTL(checkIsRTL(languageCode));
