@@ -9,7 +9,7 @@ import hi from '../locales/hi.json';
 
 // Initialize i18next
 i18n.use(initReactI18next).init({
-  compatibilityJSON: 'v3',
+  compatibilityJSON: 'v4',
   resources: {
     en: { translation: en },
     ar: { translation: ar },
