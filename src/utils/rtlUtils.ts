@@ -9,7 +9,10 @@ import { I18nManager, Platform } from 'react-native';
  */
 export const isRTL = (): boolean => {
   if (Platform.OS === 'web') {
-    return document.documentElement.dir === 'rtl';
+    if (typeof document !== 'undefined') {
+      return document.documentElement.dir === 'rtl';
+    }
+    return false;
   }
   return I18nManager.isRTL;
 };

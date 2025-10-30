@@ -11,12 +11,13 @@ import {
   changeLanguage as changeI18nLanguage,
   initializeLanguage,
   isRTL as checkIsRTL,
+  ChangeLanguageResult,
 } from '../utils/i18n';
 
 interface LanguageContextType {
   currentLanguage: string;
   isRTL: boolean;
-  changeLanguage: (languageCode: string) => Promise<void>;
+  changeLanguage: (languageCode: string) => Promise<ChangeLanguageResult>;
   t: (key: string, options?: any) => string;
 }
 
@@ -57,23 +58,32 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const changeLanguage = async (languageCode: string) => {
-    try {
-      // Validate that languageCode is a valid string
-      if (
-        !languageCode ||
-        typeof languageCode !== 'string' ||
-        languageCode.trim() === ''
-      ) {
-        console.warn('Invalid language code provided:', languageCode);
-        return;
-      }
-      await changeI18nLanguage(languageCode);
+  const changeLanguage = async (
+    languageCode: string,
+  ): Promise<ChangeLanguageResult> => {
+    // Validate that languageCode is a valid string
+    if (
+      !languageCode ||
+      typeof languageCode !== 'string' ||
+      languageCode.trim() === ''
+    ) {
+      console.warn('Invalid language code provided:', languageCode);
+      return {
+        restartRequired: false,
+        error: new Error('Invalid language code provided'),
+      };
+    }
+
+    const result = await changeI18nLanguage(languageCode);
+
+    // Update state only if language change was successful
+    if (!result.error) {
       setCurrentLanguage(languageCode);
       setIsRTL(checkIsRTL(languageCode));
-    } catch (error) {
-      console.error('Error changing language:', error);
     }
+
+    // Return result so callers can handle restart requirement and errors
+    return result;
   };
 
   const value: LanguageContextType = {

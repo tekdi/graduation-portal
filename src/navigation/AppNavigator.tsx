@@ -13,7 +13,7 @@ const linking = {
   prefixes: [],
   config: {
     screens: {
-      login: 'login',
+      'select-language': 'select-language',
     },
   },
 };

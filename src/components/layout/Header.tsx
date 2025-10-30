@@ -4,7 +4,6 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useGlobal } from '../../contexts/GlobalContext';
 import { stylesHeader } from './Styles';
 import LanguageSelector from './LanguageSelector';
-import { Platform } from 'react-native';
 
 const Header: React.FC<{ title: string }> = ({ title }) => {
   const { isRTL } = useLanguage();
@@ -19,7 +18,7 @@ const Header: React.FC<{ title: string }> = ({ title }) => {
       shadowColor={isDark ? '$backgroundDark950' : '$black'}
     >
       <HStack
-        flexDirection={isRTL && Platform.OS !== 'web' ? 'row-reverse' : 'row'}
+        flexDirection={isRTL ? 'row-reverse' : 'row'}
         {...stylesHeader.title}
       >
         {/* Title */}
@@ -32,7 +31,7 @@ const Header: React.FC<{ title: string }> = ({ title }) => {
 
         {/* Header Right */}
         <HStack
-          flexDirection={isRTL && Platform.OS === 'web' ? 'row-reverse' : 'row'}
+          flexDirection={isRTL ? 'row-reverse' : 'row'}
           {...stylesHeader.right}
         >
           {/* Language Selector */}

@@ -34,24 +34,31 @@ export const saveLanguagePreference = async (
   }
 };
 
+// Status object for language change result
+export interface ChangeLanguageResult {
+  restartRequired: boolean;
+  error?: Error;
+}
+
 // Change language and update RTL setting
-export const changeLanguage = async (languageCode: string): Promise<void> => {
+export const changeLanguage = async (
+  languageCode: string,
+): Promise<ChangeLanguageResult> => {
   try {
     await i18n.changeLanguage(languageCode);
     await saveLanguagePreference(languageCode);
 
     // Update RTL setting for React Native
     const isRTLLanguage = isRTL(languageCode);
+    let restartRequired = false;
 
     // Only update if RTL setting needs to change
     if (I18nManager.isRTL !== isRTLLanguage) {
       I18nManager.forceRTL(isRTLLanguage);
       I18nManager.allowRTL(isRTLLanguage);
-
-      // Note: On React Native, changing RTL requires app restart
-      // You might want to show a message to the user about this
+      restartRequired = true;
       console.log(
-        `RTL mode changed to ${isRTLLanguage}. App restart may be required.`,
+        `RTL mode changed to ${isRTLLanguage}. App restart required.`,
       );
     }
 
@@ -62,8 +69,12 @@ export const changeLanguage = async (languageCode: string): Promise<void> => {
         `Document direction set to: ${isRTLLanguage ? 'rtl' : 'ltr'}`,
       );
     }
+
+    return { restartRequired };
   } catch (error) {
-    console.error('Error changing language:', error);
+    const errorObj = error instanceof Error ? error : new Error(String(error));
+    console.error('Error changing language:', errorObj);
+    return { restartRequired: false, error: errorObj };
   }
 };
 

@@ -23,8 +23,8 @@ export const useAlert = () => {
     duration?: number;
   }) => {
     toast.show({
-      placement: placement as any,
-      duration: duration as any,
+      placement,
+      duration,
       render: ({ id }) => {
         return (
           <Toast nativeID={`toast-${id}`} action={action} variant={variant}>
