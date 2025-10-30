@@ -6,22 +6,33 @@ import {
   VStack,
 } from '@gluestack-ui/themed';
 
+/*
+  Example usage:
+  const { showAlert } = useAlert();
+
+  // Show different types of alerts
+  showAlert('error', 'Operation failed');
+  showAlert('success', 'Data saved!');
+  showAlert('info', 'Processing...');
+  showAlert('warning', 'Please check your input');
+*/
+
 export const useAlert = () => {
   const toast = useToast();
 
-  const showAlert = ({
-    action,
-    description,
-    variant = 'solid',
-    placement = 'top',
-    duration = 3000,
-  }: {
-    action: 'error' | 'warning' | 'success' | 'info' | 'attention';
-    description: string;
-    variant?: 'solid' | 'outline' | 'accent';
-    placement?: 'top' | 'bottom' | 'left' | 'right';
-    duration?: number;
-  }) => {
+  const showAlert = (
+    action: 'error' | 'warning' | 'success' | 'info' | 'attention',
+    description: string,
+    {
+      variant = 'solid',
+      placement = 'top',
+      duration = 3000,
+    }: {
+      variant?: 'solid' | 'outline' | 'accent';
+      placement?: 'top' | 'bottom';
+      duration?: number;
+    } = {},
+  ) => {
     toast.show({
       placement,
       duration,
@@ -37,87 +48,7 @@ export const useAlert = () => {
     });
   };
 
-  const showError = (
-    description: string,
-    {
-      placement = 'top',
-      duration = 3000,
-    }: {
-      placement?: 'top' | 'bottom' | 'left' | 'right';
-      duration?: number;
-    } = {},
-  ) => {
-    showAlert({
-      action: 'error',
-      description,
-      variant: 'solid',
-      placement,
-      duration,
-    });
-  };
-
-  const showSuccess = (
-    description: string,
-    {
-      placement = 'top',
-      duration = 3000,
-    }: {
-      placement?: 'top' | 'bottom' | 'left' | 'right';
-      duration?: number;
-    } = {},
-  ) => {
-    showAlert({
-      action: 'success',
-      description,
-      variant: 'solid',
-      placement,
-      duration,
-    });
-  };
-
-  const showInfo = (
-    description: string,
-    {
-      placement = 'top',
-      duration = 3000,
-    }: {
-      placement?: 'top' | 'bottom' | 'left' | 'right';
-      duration?: number;
-    } = {},
-  ) => {
-    showAlert({
-      action: 'info',
-      description,
-      variant: 'solid',
-      placement,
-      duration,
-    });
-  };
-
-  const showWarning = (
-    description: string,
-    {
-      placement = 'top',
-      duration = 3000,
-    }: {
-      placement?: 'top' | 'bottom' | 'left' | 'right';
-      duration?: number;
-    } = {},
-  ) => {
-    showAlert({
-      action: 'warning',
-      description,
-      variant: 'solid',
-      placement,
-      duration,
-    });
-  };
-
   return {
     showAlert,
-    showError,
-    showSuccess,
-    showInfo,
-    showWarning,
   };
 };
