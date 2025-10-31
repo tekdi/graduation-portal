@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#000000" />
     <meta name="description" content="React Native Web App" />
     <title>MyApp</title>
+    <script src="./storage-keys.js"></script>
     <script>
       // Set lang and dir attributes before React loads to prevent flash
       (function () {
@@ -14,7 +15,9 @@
           const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
 
           // Get saved language from localStorage
-          const savedLanguage = localStorage.getItem('@app_language');
+          // Fallback to direct key if STORAGE_KEYS is not loaded
+          const languageKey = window.STORAGE_KEYS?.LANGUAGE;
+          const savedLanguage = localStorage.getItem(languageKey);
           const language = savedLanguage || 'en';
 
           // Determine if language is RTL
@@ -24,7 +27,7 @@
           document.documentElement.setAttribute('lang', language);
           document.documentElement.setAttribute('dir', isRTL ? 'rtl' : 'ltr');
         } catch (error) {
-          console.error('Error setting initial language/direction:', error);
+          // console.error('Error setting initial language/direction:', error);
         }
       })();
     </script>

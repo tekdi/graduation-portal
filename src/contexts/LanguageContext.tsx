@@ -13,6 +13,7 @@ import {
   isRTL as checkIsRTL,
   ChangeLanguageResult,
 } from '../utils/i18n';
+import logger from '../utils/logger';
 
 interface LanguageContextType {
   currentLanguage: string;
@@ -49,7 +50,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
         }
       })
       .catch(error => {
-        console.error('Failed to initialize language:', error);
+        logger.error('Failed to initialize language:', error);
       });
 
     return () => {
@@ -67,7 +68,7 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({
       typeof languageCode !== 'string' ||
       languageCode.trim() === ''
     ) {
-      console.warn('Invalid language code provided:', languageCode);
+      logger.warn('Invalid language code provided:', languageCode);
       return {
         restartRequired: false,
         error: new Error('Invalid language code provided'),

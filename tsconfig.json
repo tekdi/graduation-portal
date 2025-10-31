@@ -8,7 +8,9 @@
     "baseUrl": ".",
     "paths": {
       "@ui": ["./src/components/ui"],
-      "@ui/*": ["./src/components/ui/*"]
+      "@ui/*": ["./src/components/ui/*"],
+      "@utils": ["./src/utils"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "src/components/ui/index.ts"],

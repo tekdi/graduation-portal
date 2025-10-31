@@ -10,6 +10,7 @@ const config = {
   resolver: {
     alias: {
       '@ui': path.resolve(__dirname, 'src/components/ui'),
+      '@utils': path.resolve(__dirname, 'src/utils'),
     },
   },
 };

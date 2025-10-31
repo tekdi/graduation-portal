@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, I18nManager } from 'react-native';
+import { I18nManager } from 'react-native';
 import i18n from '../../../../config/i18n';
 import {
   SelectItem,
@@ -14,6 +14,7 @@ import {
   ChevronDownIcon,
   SelectPortal,
 } from '@gluestack-ui/themed';
+import { usePlatform } from '@utils/usePlatform';
 
 type Option = {
   value: string;
@@ -35,6 +36,7 @@ export default function Select({
   onChange,
   placeholder,
 }: SelectProps) {
+  const { isWeb } = usePlatform();
   // For mobile, we need to ensure the Select component is properly configured
   const selectedOption = options.find(opt => opt.value === value);
   const displayValue =
@@ -60,7 +62,7 @@ export default function Select({
     <GluestackSelect
       selectedValue={value}
       onValueChange={handleValueChange}
-      {...(Platform.OS === 'web' ? { defaultValue: value } : {})}
+      {...(isWeb ? { defaultValue: value } : {})}
     >
       <SelectTrigger variant="outline" size="md" width="$full">
         <SelectInput

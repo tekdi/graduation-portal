@@ -5,8 +5,10 @@ import React, {
   useEffect,
   ReactNode,
 } from 'react';
-import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '../constant/STORAGE_KEYS';
+import logger from '../utils/logger';
+import { usePlatform } from '../utils/usePlatform';
 
 interface GlobalContextType {
   // Add global state here as needed
@@ -26,28 +28,28 @@ interface GlobalProviderProps {
 export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [colorMode, setColorMode] = useState<'light' | 'dark'>('light');
-
+  const { isWeb } = usePlatform();
   useEffect(() => {
     // Load color mode preference
     const loadColorMode = async () => {
       try {
-        if (Platform.OS === 'web') {
+        if (isWeb) {
           // For web, use localStorage
           if (typeof localStorage !== 'undefined') {
-            const savedMode = localStorage.getItem('colorMode');
+            const savedMode = localStorage.getItem(STORAGE_KEYS.COLOR_MODE);
             if (savedMode === 'light' || savedMode === 'dark') {
               setColorMode(savedMode);
             }
           }
         } else {
           // For React Native, use AsyncStorage
-          const savedMode = await AsyncStorage.getItem('colorMode');
+          const savedMode = await AsyncStorage.getItem(STORAGE_KEYS.COLOR_MODE);
           if (savedMode === 'light' || savedMode === 'dark') {
             setColorMode(savedMode);
           }
         }
       } catch (error) {
-        console.error('Error loading color mode:', error);
+        logger.error('Error loading color mode:', error);
       }
     };
 
@@ -59,15 +61,15 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
     try {
       setColorMode(mode);
       // Persist to storage
-      if (Platform.OS === 'web') {
+      if (isWeb) {
         if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('colorMode', mode);
+          localStorage.setItem(STORAGE_KEYS.COLOR_MODE, mode);
         }
       } else {
-        await AsyncStorage.setItem('colorMode', mode);
+        await AsyncStorage.setItem(STORAGE_KEYS.COLOR_MODE, mode);
       }
     } catch (error) {
-      console.error('Error saving color mode:', error);
+      logger.error('Error saving color mode:', error);
     }
   };
 

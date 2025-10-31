@@ -5,6 +5,8 @@ import { I18nManager, Platform } from 'react-native';
 import { useLanguage } from '../contexts/LanguageContext';
 import SelectLanguageScreen from '../screens/Language/Index';
 import { Spinner } from '@ui';
+import logger from '../utils/logger';
+import { usePlatform } from '../utils/usePlatform';
 
 const Stack = createStackNavigator();
 
@@ -20,13 +22,14 @@ const linking = {
 
 const AppNavigator: React.FC = () => {
   const { t, isRTL } = useLanguage();
+  const { isWeb } = usePlatform();
 
   // Update I18nManager when RTL changes (for React Native)
   useEffect(() => {
     // Note: On React Native (not web), changing RTL requires app restart
     // This ensures the correct direction is applied
     if (I18nManager.isRTL !== isRTL) {
-      console.log(
+      logger.log(
         'RTL direction changed, app may need restart on native platforms',
       );
     }
@@ -34,11 +37,11 @@ const AppNavigator: React.FC = () => {
 
   // Sync document direction on web when RTL state changes
   useEffect(() => {
-    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+    if (isWeb && typeof document !== 'undefined') {
       document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-      console.log('Document direction synced to:', isRTL ? 'rtl' : 'ltr');
+      logger.log('Document direction synced to:', isRTL ? 'rtl' : 'ltr');
     }
-  }, [isRTL]);
+  }, [isRTL, isWeb]);
 
   return (
     <NavigationContainer
@@ -49,10 +52,9 @@ const AppNavigator: React.FC = () => {
         initialRouteName="select-language"
         screenOptions={{
           headerShown: false,
-          cardStyle:
-            Platform.OS === 'web'
-              ? ({ width: '100%', height: '100vh' } as any)
-              : ({ width: '100%' } as any),
+          cardStyle: isWeb
+            ? ({ width: '100%', height: '100vh' } as any)
+            : ({ width: '100%' } as any),
         }}
       >
         <Stack.Screen

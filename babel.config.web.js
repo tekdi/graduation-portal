@@ -13,6 +13,7 @@ module.exports = {
         extensions: ['.web.js', '.js', '.ts', '.tsx', '.json'],
         alias: {
           '@ui': './src/components/ui',
+          '@utils': './src/utils',
         },
       },
     ],

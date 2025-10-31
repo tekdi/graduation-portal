@@ -1,8 +1,10 @@
 import { I18nManager, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from '../config/i18n';
+import { STORAGE_KEYS } from '../constant/STORAGE_KEYS';
+import logger from './logger';
 
-const LANGUAGE_STORAGE_KEY = '@app_language';
+const LANGUAGE_STORAGE_KEY = STORAGE_KEYS.LANGUAGE;
 
 // RTL languages
 export const RTL_LANGUAGES = ['ar', 'he', 'fa', 'ur'];
@@ -25,12 +27,12 @@ export const saveLanguagePreference = async (
   try {
     // Validate that languageCode is a valid string
     if (!languageCode || typeof languageCode !== 'string') {
-      console.warn('Invalid language code provided:', languageCode);
+      logger.warn('Invalid language code provided:', languageCode);
       return;
     }
     await AsyncStorage.setItem(LANGUAGE_STORAGE_KEY, languageCode);
   } catch (error) {
-    console.error('Error saving language preference:', error);
+    logger.error('Error saving language preference:', error);
   }
 };
 
@@ -57,23 +59,19 @@ export const changeLanguage = async (
       I18nManager.forceRTL(isRTLLanguage);
       I18nManager.allowRTL(isRTLLanguage);
       restartRequired = true;
-      console.log(
-        `RTL mode changed to ${isRTLLanguage}. App restart required.`,
-      );
+      logger.log(`RTL mode changed to ${isRTLLanguage}. App restart required.`);
     }
 
     // Update document direction for web
     if (Platform.OS === 'web' && typeof document !== 'undefined') {
       document.documentElement.dir = isRTLLanguage ? 'rtl' : 'ltr';
-      console.log(
-        `Document direction set to: ${isRTLLanguage ? 'rtl' : 'ltr'}`,
-      );
+      logger.log(`Document direction set to: ${isRTLLanguage ? 'rtl' : 'ltr'}`);
     }
 
     return { restartRequired };
   } catch (error) {
     const errorObj = error instanceof Error ? error : new Error(String(error));
-    console.error('Error changing language:', errorObj);
+    logger.error('Error changing language:', errorObj);
     return { restartRequired: false, error: errorObj };
   }
 };
@@ -84,7 +82,7 @@ export const loadSavedLanguage = async (): Promise<string | null> => {
     const savedLanguage = await AsyncStorage.getItem(LANGUAGE_STORAGE_KEY);
     return savedLanguage;
   } catch (error) {
-    console.error('Error loading saved language:', error);
+    logger.error('Error loading saved language:', error);
     return null;
   }
 };
@@ -97,6 +95,6 @@ export const initializeLanguage = async (): Promise<void> => {
 
     await changeLanguage(languageToUse);
   } catch (error) {
-    console.error('Error initializing language:', error);
+    logger.error('Error initializing language:', error);
   }
 };
