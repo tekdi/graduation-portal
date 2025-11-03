@@ -4,8 +4,9 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: './index.web.js',
-  mode: 'development',
-  devtool: 'source-map',
+  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
+  devtool:
+    process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-source-map',
   devServer: {
     static: {
       directory: path.join(__dirname, 'public'),

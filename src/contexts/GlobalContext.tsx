@@ -54,7 +54,7 @@ export const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
     };
 
     loadColorMode();
-  }, []);
+  }, [isWeb]);
 
   // Wrapper function to persist color mode changes
   const handleSetColorMode = async (mode: 'light' | 'dark') => {

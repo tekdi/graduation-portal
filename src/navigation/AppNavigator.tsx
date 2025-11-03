@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { I18nManager, Platform } from 'react-native';
+import { I18nManager } from 'react-native';
 import { useLanguage } from '../contexts/LanguageContext';
 import SelectLanguageScreen from '../screens/Language/Index';
 import { Spinner } from '@ui';
