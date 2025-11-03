@@ -1,12 +1,3 @@
-export const stylesLayout = {
-  safeAreaView: {
-    flex: 1,
-  },
-  mainContent: {
-    flex: 1,
-  },
-} as const;
-
 export const stylesHeader = {
   container: {
     borderBottomWidth: 1,

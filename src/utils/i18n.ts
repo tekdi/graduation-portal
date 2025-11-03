@@ -1,8 +1,8 @@
 import { I18nManager, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import i18n from '../config/i18n';
-import { STORAGE_KEYS } from '../constant/STORAGE_KEYS';
-import logger from './logger';
+import i18n from '@config/i18n';
+import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
+import logger from '@utils/logger';
 
 const LANGUAGE_STORAGE_KEY = STORAGE_KEYS.LANGUAGE;
 

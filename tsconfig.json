@@ -10,7 +10,19 @@
       "@ui": ["./src/components/ui"],
       "@ui/*": ["./src/components/ui/*"],
       "@utils": ["./src/utils"],
-      "@utils/*": ["./src/utils/*"]
+      "@utils/*": ["./src/utils/*"],
+      "@components": ["./src/components"],
+      "@components/*": ["./src/components/*"],
+      "@config": ["./src/config"],
+      "@config/*": ["./src/config/*"],
+      "@contexts": ["./src/contexts"],
+      "@contexts/*": ["./src/contexts/*"],
+      "@types": ["./src/types"],
+      "@types/*": ["./src/types/*"],
+      "@constants": ["./src/constants"],
+      "@constants/*": ["./src/constants/*"],
+      "@layout": ["./src/layout"],
+      "@layout/*": ["./src/layout/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "src/components/ui/index.ts"],

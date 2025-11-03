@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Text, Pressable, Menu, VStack, Modal, HStack } from '@ui';
-import { useLanguage } from '../../contexts/LanguageContext';
-import AVAILABLE_LANGUAGES from '../../constant/LANGUAGE_OPTIONS';
-import logger from '../../utils/logger';
-import { usePlatform } from '../../utils/usePlatform';
+import { useLanguage } from '@contexts/LanguageContext';
+import AVAILABLE_LANGUAGES from '@constants/LANGUAGE_OPTIONS';
+import logger from '@utils/logger';
+import { usePlatform } from '@utils/usePlatform';
+import { stylesLanguageSelector } from './Styles';
 
 const LanguageSelector: React.FC = () => {
   const { currentLanguage, changeLanguage, t } = useLanguage();
@@ -37,46 +38,32 @@ const LanguageSelector: React.FC = () => {
       offset={5}
       disabledKeys={[]}
       trigger={triggerProps => (
-        <Pressable
-          {...triggerProps}
-          flexDirection="row"
-          alignItems="center"
-          gap="$1"
-          px="$2"
-          py="$1"
-          rounded="$lg"
-          bg="transparent"
-          _hover={{ bg: '$backgroundLight100' }}
-        >
-          <Text fontSize="$sm">{currentLang.value.toUpperCase()}</Text>
-          <Text fontSize="$xs">▼</Text>
+        <Pressable {...stylesLanguageSelector.menuTrigger} {...triggerProps}>
+          <Text {...stylesLanguageSelector.menuTriggerText}>
+            {currentLang.value.toUpperCase()}
+          </Text>
+          <Text {...stylesLanguageSelector.menuTriggerIcon}>▼</Text>
         </Pressable>
       )}
       onSelect={handleLanguageChange}
-      menuProps={{}}
-      triggerProps={{}}
     />
   ) : (
     <>
       <Pressable
-        flexDirection="row"
-        alignItems="center"
-        gap="$1"
-        px="$2"
-        py="$1"
-        rounded="$lg"
-        bg="transparent"
+        {...stylesLanguageSelector.menuTrigger}
         onPress={() => setMenuOpen(true)}
       >
-        <Text fontSize="$sm">{currentLang.value.toUpperCase()}</Text>
-        <Text fontSize="$xs">▼</Text>
+        <Text {...stylesLanguageSelector.menuTriggerText}>
+          {currentLang.value.toUpperCase()}
+        </Text>
+        <Text {...stylesLanguageSelector.menuTriggerIcon}>▼</Text>
       </Pressable>
 
       <Modal isOpen={menuOpen} onClose={() => setMenuOpen(false)}>
         <Modal.Backdrop />
-        <Modal.Content rounded="$2xl" maxHeight="70%">
+        <Modal.Content {...stylesLanguageSelector.modalContent}>
           <Modal.Header>
-            <Text fontSize="$lg" fontWeight="$bold">
+            <Text {...stylesLanguageSelector.modalHeaderText}>
               {t('settings.selectLanguage')}
             </Text>
             <Modal.CloseButton />
@@ -89,17 +76,12 @@ const LanguageSelector: React.FC = () => {
                 return (
                   <Pressable
                     key={language.value}
-                    bg={isSelected ? '$primary100' : ''}
-                    rounded="$lg"
-                    p="$3"
+                    {...stylesLanguageSelector.languageItem}
+                    bg={isSelected ? '$primary100' : 'transparent'}
                     onPress={() => handleLanguageChange(language.value)}
                   >
-                    <HStack justifyContent="space-between" alignItems="center">
-                      <Text
-                        fontSize="$md"
-                        color="$textDark700"
-                        fontWeight={isSelected ? '$semibold' : '$normal'}
-                      >
+                    <HStack {...stylesLanguageSelector.languageItemText}>
+                      <Text {...stylesLanguageSelector.languageItemText}>
                         {language.nativeName}
                       </Text>
                       {isSelected && <Text color="$primary600">✓</Text>}

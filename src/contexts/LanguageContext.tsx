@@ -12,8 +12,8 @@ import {
   initializeLanguage,
   isRTL as checkIsRTL,
   ChangeLanguageResult,
-} from '../utils/i18n';
-import logger from '../utils/logger';
+} from '@utils/i18n';
+import logger from '@utils/logger';
 
 interface LanguageContextType {
   currentLanguage: string;

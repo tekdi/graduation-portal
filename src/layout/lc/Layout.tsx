@@ -1,7 +1,7 @@
 import React from 'react';
 import { StatusBar } from 'react-native';
 import { Box, SafeAreaView, useColorMode } from '@gluestack-ui/themed';
-import Header from './Header';
+import Header from '@components/Header';
 import { stylesLayout } from './Styles';
 
 interface LayoutProps {

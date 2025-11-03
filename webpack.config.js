@@ -90,7 +90,13 @@ module.exports = {
         'src/mocks/reanimated',
       ),
       '@ui': path.resolve(__dirname, 'src/components/ui'),
+      '@components': path.resolve(__dirname, 'src/components'),
       '@utils': path.resolve(__dirname, 'src/utils'),
+      '@config': path.resolve(__dirname, 'src/config'),
+      '@contexts': path.resolve(__dirname, 'src/contexts'),
+      '@types': path.resolve(__dirname, 'src/types'),
+      '@constants': path.resolve(__dirname, 'src/constants'),
+      '@layout': path.resolve(__dirname, 'src/layout'),
     },
     extensions: [
       '.web.tsx',

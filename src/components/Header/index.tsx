@@ -1,9 +1,9 @@
 import React from 'react';
 import { Box, HStack, Text, Icon, MoonIcon, SunIcon } from '@ui';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { useGlobal } from '../../contexts/GlobalContext';
+import { useLanguage } from '@contexts/LanguageContext';
+import { useGlobal } from '@contexts/GlobalContext';
 import { stylesHeader } from './Styles';
-import LanguageSelector from './LanguageSelector';
+import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
 
 const Header: React.FC<{ title: string }> = ({ title }) => {
   const { isRTL } = useLanguage();

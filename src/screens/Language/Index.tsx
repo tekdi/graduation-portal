@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Text, Select, Card } from '@ui';
-import { useLanguage } from '../../contexts/LanguageContext';
-import Layout from '../../components/layout/Layout';
-import LANGUAGE_OPTIONS from '../../constant/LANGUAGE_OPTIONS';
+import { useLanguage } from '@contexts/LanguageContext';
+import Layout from '@layout/lc/Layout';
+import LANGUAGE_OPTIONS from '@constants/LANGUAGE_OPTIONS';
 import { stylesLanguage } from './Styles';
 
 const SelectLanguageScreen: React.FC = () => {

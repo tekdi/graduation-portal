@@ -1,6 +1,6 @@
 import React from 'react';
 import { I18nManager } from 'react-native';
-import i18n from '../../../../config/i18n';
+import i18n from '@config/i18n';
 import {
   SelectItem,
   SelectDragIndicatorWrapper,

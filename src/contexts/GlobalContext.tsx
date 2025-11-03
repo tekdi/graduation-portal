@@ -6,9 +6,9 @@ import React, {
   ReactNode,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { STORAGE_KEYS } from '../constant/STORAGE_KEYS';
-import logger from '../utils/logger';
-import { usePlatform } from '../utils/usePlatform';
+import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
+import logger from '@utils/logger';
+import { usePlatform } from '@utils/usePlatform';
 
 interface GlobalContextType {
   // Add global state here as needed
