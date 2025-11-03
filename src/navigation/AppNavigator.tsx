@@ -28,12 +28,12 @@ const AppNavigator: React.FC = () => {
   useEffect(() => {
     // Note: On React Native (not web), changing RTL requires app restart
     // This ensures the correct direction is applied
-    if (I18nManager.isRTL !== isRTL) {
+    if (I18nManager.isRTL !== isRTL && !isWeb) {
       logger.log(
         'RTL direction changed, app may need restart on native platforms',
       );
     }
-  }, [isRTL]);
+  }, [isRTL, isWeb]);
 
   // Sync document direction on web when RTL state changes
   useEffect(() => {
