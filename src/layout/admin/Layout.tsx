@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Box, HStack, SafeAreaView, useColorMode } from '@ui';
+import {
+  Box,
+  CloseIcon,
+  HStack,
+  Icon,
+  MenuIcon,
+  SafeAreaView,
+  useColorMode,
+} from '@ui';
 import AdminHeader from '@components/Header';
 import AdminSidebar from '../../components/Sidebar/Sidebar';
 import { layoutStyles } from './styles';
-import { Platform } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -12,14 +20,10 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const mode = useColorMode();
   const isDark = mode === 'dark';
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [search, setSearch] = useState('');
   // Determine if we're on mobile/tablet (< 768px)
   const [isMobile, setIsMobile] = useState(false);
-
-  const handleToggleDrawer = () => {
-    setIsDrawerOpen(prev => !prev);
-  };
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
@@ -42,6 +46,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     }
   }, []);
 
+  const rightSideContent = (
+    <Pressable onPress={() => setIsDrawerOpen(!isDrawerOpen)}>
+      <Icon as={MenuIcon} />
+    </Pressable>
+  );
+
   return (
     <SafeAreaView
       {...layoutStyles.container}
@@ -58,7 +68,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
       <HStack {...layoutStyles.contentContainer}>
         {/* Header */}
         <Box {...layoutStyles.headerContent}>
-          <AdminHeader {...{ search, setSearch, showNotification: true }} />
+          <AdminHeader
+            {...{ search, setSearch, showNotification: true }}
+            rightSideContent={rightSideContent}
+          />
         </Box>
         {/* Main Content */}
         <Box {...layoutStyles.mainContent}>{children}</Box>

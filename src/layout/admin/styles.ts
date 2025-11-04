@@ -186,6 +186,10 @@ export const sidebarStyles = {
     p: '$2' as const,
     borderRadius: '$md' as const,
   },
+  mainSection: {
+    p: '$2' as const,
+    mb: '$6' as const,
+  },
 };
 
 // Sidebar Item Styles

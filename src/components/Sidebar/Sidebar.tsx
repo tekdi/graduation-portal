@@ -15,7 +15,6 @@ import {
   AddIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  MenuIcon,
   EditIcon,
   SettingsIcon,
   ThreeDotsIcon,
@@ -24,7 +23,7 @@ import {
   CloseIcon,
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
-import { sidebarStyles, sidebarItemStyles } from '../../layout/admin/styles';
+import { sidebarStyles, sidebarItemStyles } from '@layout/admin/styles';
 import logoImage from '@assets/images/logo.png';
 import { Platform } from 'react-native';
 
@@ -75,36 +74,16 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
 
   const mainItems: SidebarItem[] = [
     {
-      key: 'dashboard',
-      label: 'Dashboard',
-      icon: MenuIcon,
-      route: 'Home',
+      key: 'user-management',
+      label: 'User Management',
+      icon: SettingsIcon,
+      route: 'UserManagement',
     },
     {
       key: 'template-management',
       label: 'Template Management',
       icon: EditIcon,
       route: 'TemplateManagement',
-    },
-    {
-      key: 'user-management',
-      label: 'User Management',
-      icon: SettingsIcon,
-      route: 'UserManagement',
-      children: [
-        {
-          key: 'all-users',
-          label: 'All Users',
-          route: 'AllUsers',
-          icon: SettingsIcon,
-        },
-        {
-          key: 'learning-coaches',
-          label: 'Learning Coaches',
-          route: 'LearningCoaches',
-          icon: SettingsIcon,
-        },
-      ],
     },
     {
       key: 'audit-log',
@@ -117,21 +96,15 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   const quickActionItems: SidebarItem[] = [
     {
       key: 'upload-users',
-      label: 'Upload Users',
+      label: 'Upload Users (CSV)',
       icon: ArrowUpIcon,
       route: 'UploadUsers',
     },
     {
       key: 'new-lc',
-      label: 'New LC',
+      label: 'Create User',
       icon: AddIcon,
       route: 'NewLC',
-    },
-    {
-      key: 'new-template',
-      label: 'New Template',
-      icon: EditIcon,
-      route: 'NewTemplate',
     },
   ];
 
@@ -209,14 +182,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </HStack>
       <ScrollView {...sidebarStyles.scrollContent}>
         {/* MAIN Section */}
-        <Box>
+        <Box {...sidebarStyles.mainSection}>
           <Text {...sidebarStyles.sectionTitle}>MAIN</Text>
           <VStack space="xs">
             {mainItems.map(item => renderSidebarItem(item))}
           </VStack>
         </Box>
 
-        <Divider my="$2" />
+        <Divider my="$4" />
 
         {/* QUICK ACTIONS Section */}
         <Box>
@@ -296,7 +269,11 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   }
 
   // Desktop: Render as fixed sidebar
-  return <Box {...sidebarStyles.container}>{sidebarContent}</Box>;
+  return (
+    <Box {...sidebarStyles.container} display={isOpen ? 'flex' : 'none'}>
+      {sidebarContent}
+    </Box>
+  );
 };
 
 export default AdminSidebar;
