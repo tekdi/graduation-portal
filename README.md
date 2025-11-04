@@ -1,5 +1,81 @@
 This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
 
+# System Requirements
+
+Before getting started, ensure you have the following installed on your system:
+
+## Required Software
+
+- **Node.js**: >= 20.x (recommended: latest LTS version)
+
+  - Download from [nodejs.org](https://nodejs.org/)
+  - Verify installation: `node --version`
+
+- **Package Manager**: Choose one of the following:
+  - **npm** (comes with Node.js)
+  - **Yarn** (recommended for this project)
+    - Install: `npm install -g yarn`
+    - Verify installation: `yarn --version`
+
+## Platform-Specific Requirements
+
+### For iOS Development (macOS only)
+
+- **macOS**: Latest version recommended
+- **Xcode**: Latest version from Mac App Store
+- **Xcode Command Line Tools**: Install via `xcode-select --install`
+- **CocoaPods**: Ruby gem used for iOS dependency management
+  - Install: `sudo gem install cocoapods`
+  - Verify: `pod --version`
+- **Ruby**: Usually pre-installed on macOS
+
+### For Android Development
+
+- **Java Development Kit (JDK)**: JDK 17 or higher
+  - Download from [Oracle](https://www.oracle.com/java/technologies/downloads/) or use OpenJDK
+- **Android Studio**: Latest version
+  - Download from [developer.android.com](https://developer.android.com/studio)
+- **Android SDK**: Installed via Android Studio
+  - Android SDK Platform 33 or higher
+  - Android SDK Build-Tools
+- **Environment Variables**:
+  - `ANDROID_HOME` pointing to your Android SDK location
+  - `JAVA_HOME` pointing to your JDK installation
+- **Android Emulator** or physical device with USB debugging enabled
+
+### For Web Development
+
+- **Modern Web Browser**: Chrome, Firefox, Safari, or Edge (latest versions)
+- **No additional setup required** - Webpack and dev server are included
+
+## Development Tools (Optional but Recommended)
+
+- **Git**: For version control
+- **VS Code** or **Android Studio** / **Xcode**: For code editing and debugging
+- **React Native Debugger**: For debugging React Native apps
+
+## Verification
+
+After installation, verify your setup:
+
+```sh
+# Check Node.js version
+node --version
+
+# Check package manager
+npm --version  # or yarn --version
+
+# For iOS (macOS only)
+xcodebuild -version
+pod --version
+
+# For Android
+java -version
+adb version
+```
+
+> **Note**: For detailed setup instructions, refer to the official [React Native Environment Setup Guide](https://reactnative.dev/docs/set-up-your-environment).
+
 # Getting Started
 
 > **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
