@@ -18,10 +18,11 @@ import {
   CheckIcon,
   Image,
 } from '@ui';
-import { useAuth } from '../../contexts/AuthContext';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '@contexts/AuthContext';
+import { useLanguage } from '@contexts/LanguageContext';
 import { loginStyles } from './Styles';
-import logoImage from '../../assets/images/logo.png';
+import logoImage from '@assets/images/logo.png';
+import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
 
 const LoginScreen: React.FC = () => {
   const { login } = useAuth();
@@ -59,6 +60,7 @@ const LoginScreen: React.FC = () => {
   return (
     <ScrollView {...loginStyles.scrollView}>
       <Box {...loginStyles.container}>
+        <LanguageSelector menuTriggerProps={loginStyles.languageSelector} />
         <Box {...loginStyles.box}>
           <VStack {...loginStyles.vstack}>
             {/* Logo/Brand */}

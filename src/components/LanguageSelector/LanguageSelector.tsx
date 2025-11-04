@@ -6,7 +6,11 @@ import logger from '@utils/logger';
 import { usePlatform } from '@utils/platform';
 import { stylesLanguageSelector } from './Styles';
 
-const LanguageSelector: React.FC = () => {
+const LanguageSelector: React.FC = ({
+  menuTriggerProps,
+}: {
+  menuTriggerProps?: any;
+}) => {
   const { currentLanguage, changeLanguage, t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const currentLang =
@@ -38,7 +42,11 @@ const LanguageSelector: React.FC = () => {
       offset={5}
       disabledKeys={[]}
       trigger={triggerProps => (
-        <Pressable {...stylesLanguageSelector.menuTrigger} {...triggerProps}>
+        <Pressable
+          {...stylesLanguageSelector.menuTrigger}
+          {...(menuTriggerProps ?? {})}
+          {...triggerProps}
+        >
           <Text {...stylesLanguageSelector.menuTriggerText}>
             {currentLang.value.toUpperCase()}
           </Text>

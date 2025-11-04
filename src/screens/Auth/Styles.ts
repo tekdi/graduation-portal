@@ -1,4 +1,13 @@
 export const loginStyles = {
+  languageSelector: {
+    mb: '$8',
+    rounded: '$lg',
+    bg: '$backgroundLight100',
+    fontSize: '$sm',
+    color: '$textDark800',
+    px: '$4',
+    py: '$2',
+  },
   scrollView: {
     contentContainerStyle: { flexGrow: 1 },
   },
