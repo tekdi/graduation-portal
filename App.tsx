@@ -7,9 +7,10 @@ import React from 'react';
 import './src/config/i18n'; // Initialize i18n
 import { GlobalProvider, useGlobal } from './src/contexts/GlobalContext';
 import { LanguageProvider } from './src/contexts/LanguageContext';
-import AppNavigator from './src/navigation/AppNavigator';
+import AppNavigator from './src/navigation/AppNavigatorRole';
 import { GluestackUIProvider } from '@gluestack-ui/themed';
 import { theme } from './src/config/theme';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 function App() {
   const { colorMode } = useGlobal();
@@ -17,7 +18,9 @@ function App() {
   return (
     <GluestackUIProvider config={theme} colorMode={colorMode}>
       <LanguageProvider>
-        <AppNavigator />
+        <AuthProvider>
+          <AppNavigator />
+        </AuthProvider>
       </LanguageProvider>
     </GluestackUIProvider>
   );
