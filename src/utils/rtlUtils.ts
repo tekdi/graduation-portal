@@ -1,4 +1,5 @@
 import { I18nManager, Platform } from 'react-native';
+import { isWeb } from '@utils/platform';
 
 /**
  * Utility functions for RTL-aware styling
@@ -8,7 +9,7 @@ import { I18nManager, Platform } from 'react-native';
  * Get the current RTL status
  */
 export const isRTL = (): boolean => {
-  if (Platform.OS === 'web') {
+  if (isWeb) {
     if (typeof document !== 'undefined') {
       return document.documentElement.dir === 'rtl';
     }
@@ -29,7 +30,7 @@ export const getDirectionalStyle = (
   const isStart = property.includes('Start');
   const isMargin = property.includes('margin');
 
-  if (Platform.OS === 'web') {
+  if (isWeb) {
     // For web, use CSS logical properties
     return { [property]: value };
   }

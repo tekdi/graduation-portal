@@ -14,7 +14,7 @@ import {
   ChevronDownIcon,
   SelectPortal,
 } from '@gluestack-ui/themed';
-import { usePlatform } from '@utils/usePlatform';
+import { usePlatform } from '@utils/platform';
 
 type Option = {
   value: string;

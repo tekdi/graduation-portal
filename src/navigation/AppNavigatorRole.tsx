@@ -1,14 +1,15 @@
 import React, { useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { I18nManager, Platform } from 'react-native';
+import { I18nManager } from 'react-native';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import AdminNavigator from './navigators/AdminNavigator';
 import SupervisorNavigator from './navigators/SupervisorNavigator';
 import LCNavigator from './navigators/LCNavigator';
-import { Box, Spinner } from '@ui';
+import { Spinner } from '@ui';
+import { usePlatform } from '@utils/platform';
 
 const Stack = createStackNavigator();
 
@@ -48,6 +49,7 @@ const RoleBasedNavigator: React.FC = () => {
 const AppNavigator: React.FC = () => {
   const { t, isRTL } = useLanguage();
   const { isLoggedIn, loading } = useAuth();
+  const { isWeb } = usePlatform();
 
   // Update I18nManager when RTL changes (for React Native)
   useEffect(() => {
@@ -62,11 +64,11 @@ const AppNavigator: React.FC = () => {
 
   // Log current URL on web for debugging
   useEffect(() => {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       console.log('Current URL:', window.location.href);
       console.log('Pathname:', window.location.pathname);
     }
-  }, []);
+  }, [isWeb]);
 
   if (loading) {
     return <Spinner size="large" color="$primary500" />;
@@ -80,10 +82,9 @@ const AppNavigator: React.FC = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          cardStyle:
-            Platform.OS === 'web'
-              ? ({ width: '100%', height: '100vh' } as any)
-              : ({ width: '100%' } as any),
+          cardStyle: isWeb
+            ? ({ width: '100%', height: '100vh' } as any)
+            : ({ width: '100%' } as any),
         }}
       >
         {!isLoggedIn ? (

@@ -3,7 +3,7 @@ import { Text, Pressable, Menu, VStack, Modal, HStack } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import AVAILABLE_LANGUAGES from '@constants/LANGUAGE_OPTIONS';
 import logger from '@utils/logger';
-import { usePlatform } from '@utils/usePlatform';
+import { usePlatform } from '@utils/platform';
 import { stylesLanguageSelector } from './Styles';
 
 const LanguageSelector: React.FC = () => {

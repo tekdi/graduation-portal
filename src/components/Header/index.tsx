@@ -21,12 +21,11 @@ import {
   BellIcon,
   ChevronDownIcon,
 } from '@ui';
-import { useLanguage } from '@contexts/LanguageContext';
 import { useGlobal } from '@contexts/GlobalContext';
 import { stylesHeader } from './Styles';
 import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
 import { useAuth } from '@contexts/AuthContext';
-import { usePlatform } from '@utils/usePlatform';
+import { usePlatform } from '@utils/platform';
 
 const userMenuItems = [
   {

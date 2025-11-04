@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box,
-  CloseIcon,
   HStack,
   Icon,
   MenuIcon,
   SafeAreaView,
   useColorMode,
+  Pressable,
 } from '@ui';
 import AdminHeader from '@components/Header';
 import AdminSidebar from '../../components/Sidebar/Sidebar';
 import { layoutStyles } from './styles';
-import { Platform, Pressable } from 'react-native';
+import { usePlatform } from '@utils/platform';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -20,37 +20,24 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const mode = useColorMode();
   const isDark = mode === 'dark';
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [search, setSearch] = useState('');
   // Determine if we're on mobile/tablet (< 768px)
-  const [isMobile, setIsMobile] = useState(false);
+  const { isMobile } = usePlatform();
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
   };
-
-  useEffect(() => {
-    if (Platform.OS === 'web') {
-      const checkWidth = () => {
-        const width = window.innerWidth;
-        const mobile = width < 768;
-        setIsMobile(mobile);
-      };
-
-      checkWidth();
-      window.addEventListener('resize', checkWidth);
-      return () => window.removeEventListener('resize', checkWidth);
-    } else {
-      // For native, default to closed
-      setIsMobile(true);
-    }
-  }, []);
 
   const rightSideContent = (
     <Pressable onPress={() => setIsDrawerOpen(!isDrawerOpen)}>
       <Icon as={MenuIcon} />
     </Pressable>
   );
+
+  useEffect(() => {
+    setIsDrawerOpen(!isMobile);
+  }, [isMobile]);
 
   return (
     <SafeAreaView

@@ -25,7 +25,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { sidebarStyles, sidebarItemStyles } from '@layout/admin/styles';
 import logoImage from '@assets/images/logo.png';
-import { Platform } from 'react-native';
+import { usePlatform } from '@utils/platform';
 
 interface SidebarItem {
   key: string;
@@ -52,6 +52,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
   );
   const [expandedQuickActions, setExpandedQuickActions] = useState(true);
   const [activeRoute, setActiveRoute] = useState('dashboard');
+  const { isWeb } = usePlatform();
 
   const handleClose = () => {
     if (onClose) {
@@ -246,7 +247,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         <ModalBackdrop />
         <ModalContent
           {...sidebarStyles.drawerContent}
-          height={Platform.OS !== 'web' ? '100%' : 'auto'}
+          height={isWeb ? 'auto' : '100%'}
         >
           {/* Drawer Header */}
           <Box {...sidebarStyles.drawerHeader}>

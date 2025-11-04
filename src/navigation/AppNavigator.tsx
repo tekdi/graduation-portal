@@ -6,7 +6,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import SelectLanguageScreen from '../screens/Language/Index';
 import { Spinner } from '@ui';
 import logger from '@utils/logger';
-import { usePlatform } from '@utils/usePlatform';
+import { usePlatform } from '@utils/platform';
 
 const Stack = createStackNavigator();
 
