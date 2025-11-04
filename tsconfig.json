@@ -22,9 +22,7 @@
       "@constants": ["./src/constants"],
       "@constants/*": ["./src/constants/*"],
       "@layout": ["./src/layout"],
-      "@layout/*": ["./src/layout/*"],
-      "@assets": ["./src/assets"],
-      "@assets/*": ["./src/assets/*"]
+      "@layout/*": ["./src/layout/*"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx", "src/components/ui/index.ts"],

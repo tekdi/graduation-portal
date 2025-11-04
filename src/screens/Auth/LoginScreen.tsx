@@ -21,7 +21,7 @@ import {
 import { useAuth } from '@contexts/AuthContext';
 import { useLanguage } from '@contexts/LanguageContext';
 import { loginStyles } from './Styles';
-import logoImage from '@assets/images/logo.png';
+import logoImage from '../../assets/images/logo.png';
 import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
 
 const LoginScreen: React.FC = () => {

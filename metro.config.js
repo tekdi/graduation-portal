@@ -17,7 +17,6 @@ const config = {
       '@types': path.resolve(__dirname, 'src/types'),
       '@constants': path.resolve(__dirname, 'src/constants'),
       '@layout': path.resolve(__dirname, 'src/layout'),
-      '@assets': path.resolve(__dirname, 'src/assets'),
     },
   },
 };
