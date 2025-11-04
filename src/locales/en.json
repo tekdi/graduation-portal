@@ -1,0 +1,40 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "offline": "Offline Mode",
+    "online": "Online",
+    "selectOption": "Select an option"
+  },
+  "navigation": {
+    "menu": "Menu",
+    "closeMenu": "✕ Close Menu"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "selectLanguagePlaceholder": "Please choose your preferred language to continue",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "about": "About"
+  },
+  "languages": {
+    "en": "English",
+    "ar": "العربية",
+    "es": "Español",
+    "hi": "हिन्दी"
+  }
+}

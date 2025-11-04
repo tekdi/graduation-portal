@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- RTL-specific boolean flags -->
+    <!-- This file is automatically selected for all RTL languages (Arabic, Hebrew, Persian, etc.) -->
+    <bool name="is_rtl">true</bool>
+</resources>
+
