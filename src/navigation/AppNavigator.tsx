@@ -1,16 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { I18nManager } from 'react-native';
 import { useLanguage } from '@contexts/LanguageContext';
 import { useAuth } from '@contexts/AuthContext';
-import LoginScreen from '../screens/Auth/LoginScreen';
-import AdminNavigator from './navigators/AdminNavigator';
-import SupervisorNavigator from './navigators/SupervisorNavigator';
-import LCNavigator from './navigators/LCNavigator';
 import { Spinner } from '@ui';
 import logger from '@utils/logger';
 import { usePlatform } from '@utils/platform';
+import AccessBaseNavigator from './navigators/AccessBaseNavigator';
+import HomeScreen from '../admin_screens/Home';
+import LoginScreen from '../screens/Auth/LoginScreen';
+import SelectLanguageScreen from '../screens/Language/Index';
 
 const Stack = createStackNavigator();
 
@@ -29,22 +29,32 @@ const linking = {
 // Component to render role-based navigator
 const RoleBasedNavigator: React.FC = () => {
   const { user } = useAuth();
+  const [accessPages, setAccessPages] = useState<
+    { name: string; component: React.ComponentType<any> }[]
+  >([]);
 
-  if (!user) {
-    return null;
+  useEffect(() => {
+    // Return appropriate navigator based on user role
+    switch (user?.role?.toLowerCase()) {
+      case 'admin':
+        setAccessPages([{ name: 'home', component: HomeScreen }]);
+        break;
+      case 'supervisor':
+        setAccessPages([{ name: 'home', component: HomeScreen }]);
+        break;
+      case 'lc':
+        setAccessPages([{ name: 'home', component: SelectLanguageScreen }]);
+        break;
+      default:
+        setAccessPages([]);
+    }
+  }, [user]);
+
+  if (accessPages.length === 0) {
+    return <LoginScreen />;
   }
 
-  // Return appropriate navigator based on user role
-  switch (user.role) {
-    case 'Admin':
-      return <AdminNavigator />;
-    case 'Supervisor':
-      return <SupervisorNavigator />;
-    case 'LC':
-      return <LCNavigator />;
-    default:
-      return <LCNavigator />;
-  }
+  return <AccessBaseNavigator accessPages={accessPages} />;
 };
 
 const AppNavigator: React.FC = () => {

@@ -17,6 +17,14 @@ export interface PlatformInfo {
    */
   isWeb: boolean;
   /**
+   * Convenience property: true if platform is iOS
+   */
+  isIOS: boolean;
+  /**
+   * Convenience property: true if platform is Android
+   */
+  isAndroid: boolean;
+  /**
    * Convenience property: true if platform is native (iOS or Android)
    */
   isNative: boolean;
@@ -78,10 +86,14 @@ export const usePlatform = (mobileBreakpoint: number = 768): PlatformInfo => {
     platform,
     isMobile,
     isWeb,
+    isIOS,
+    isAndroid,
     isNative,
   };
 };
 
 export const platform = Platform.OS as 'web' | 'ios' | 'android';
 export const isWeb = platform === 'web';
+export const isIOS = platform === 'ios';
+export const isAndroid = platform === 'android';
 export const isNative = !isWeb;

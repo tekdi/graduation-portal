@@ -17,11 +17,9 @@ function App() {
 
   return (
     <GluestackUIProvider config={theme} colorMode={colorMode}>
-      <LanguageProvider>
-        <AuthProvider>
-          <AppNavigator />
-        </AuthProvider>
-      </LanguageProvider>
+      <AuthProvider>
+        <AppNavigator />
+      </AuthProvider>
     </GluestackUIProvider>
   );
 }
@@ -29,7 +27,9 @@ function App() {
 const RootApp = () => {
   return (
     <GlobalProvider>
-      <App />
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
     </GlobalProvider>
   );
 };

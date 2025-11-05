@@ -58,6 +58,8 @@ export const sidebarStyles = {
   languageSelectorContainer: {
     alignItems: 'center' as const,
     space: 'md' as const,
+    justifyContent: 'space-between' as const,
+    width: '100%' as const,
   },
   languageIcon: {
     color: '$textLight600' as const,

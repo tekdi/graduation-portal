@@ -188,21 +188,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       <Box {...sidebarStyles.bottomSection}>
         <VStack {...sidebarStyles.bottomContent}>
           {/* Language Selector */}
-          <Pressable
-            onPress={() => {
-              // Handle language selection
-            }}
-          >
-            <HStack {...sidebarStyles.languageSelectorContainer}>
-              <LanguageSelector
-                menuTriggerProps={{
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  width: '100%',
-                }}
-              />
-            </HStack>
-          </Pressable>
+
+          <LanguageSelector
+            menuTriggerProps={sidebarStyles.languageSelectorContainer}
+          />
 
           {/* System Status */}
           <HStack {...sidebarStyles.statusContainer}>
