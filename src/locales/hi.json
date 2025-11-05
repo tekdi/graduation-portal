@@ -41,8 +41,23 @@
     "es": "Español",
     "hi": "हिन्दी"
   },
+  "admin": {
+    "home": "होम",
+    "dashboard": "डैशबोर्ड",
+    "dashboardDescription": "आपका स्वागत है! यहां आपके जीवनस्तर उत्पन्न करने में क्या हो रहा है।",
+    "quickActions": "त्वरित कार्य",
+    "recentActivity": "हाल की गतिविधि",
+    "menu": {
+      "userManagement": "उपयोगकर्ता प्रबंधन",
+      "templateManagement": "टेम्पलेट प्रबंधन",
+      "auditLog": "जाँच लॉग",
+      "uploadUsers": "उपयोगकर्ताओं अपलोड करें",
+      "createUser": "उपयोगकर्ता बनाएं",
+      "main": "मुख्य",
+      "quickActions": "त्वरित कार्य"
+    }
+  },
   "login": {
-    "login": "लॉग इन",
     "pleaseEnterBothEmailAndPassword": "कृपया ईमेल और पासवर्ड दोनों दर्ज करें",
     "invalidEmailOrPassword": "अमान्य ईमेल या पासवर्ड",
     "anErrorOccurredDuringLogin": "लॉग इन करने में त्रुटि हो गई",

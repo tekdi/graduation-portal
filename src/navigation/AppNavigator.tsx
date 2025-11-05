@@ -5,10 +5,11 @@ import { I18nManager } from 'react-native';
 import { useLanguage } from '@contexts/LanguageContext';
 import { useAuth } from '@contexts/AuthContext';
 import LoginScreen from '../screens/Auth/LoginScreen';
+import AdminNavigator from './navigators/AdminNavigator';
+import SupervisorNavigator from './navigators/SupervisorNavigator';
+import LCNavigator from './navigators/LCNavigator';
 import { Spinner } from '@ui';
-import SelectLanguageScreen from '../screens/Language/Index';
 import logger from '@utils/logger';
-
 import { usePlatform } from '@utils/platform';
 
 const Stack = createStackNavigator();
@@ -23,6 +24,27 @@ const linking = {
       selectLanguage: 'select-language',
     },
   },
+};
+
+// Component to render role-based navigator
+const RoleBasedNavigator: React.FC = () => {
+  const { user } = useAuth();
+
+  if (!user) {
+    return null;
+  }
+
+  // Return appropriate navigator based on user role
+  switch (user.role) {
+    case 'Admin':
+      return <AdminNavigator />;
+    case 'Supervisor':
+      return <SupervisorNavigator />;
+    case 'LC':
+      return <LCNavigator />;
+    default:
+      return <LCNavigator />;
+  }
 };
 
 const AppNavigator: React.FC = () => {
@@ -73,15 +95,16 @@ const AppNavigator: React.FC = () => {
             name="login"
             component={LoginScreen}
             options={{
-              title: t('login.login'),
+              title: t('login.logIn'),
             }}
           />
         ) : (
+          // Show role-based navigator when logged in
           <Stack.Screen
-            name="selectLanguage"
-            component={SelectLanguageScreen}
+            name="main"
+            component={RoleBasedNavigator}
             options={{
-              title: t('settings.selectLanguage'),
+              title: t('navigation.menu'),
             }}
           />
         )}

@@ -42,7 +42,7 @@ export interface PlatformInfo {
  */
 export const usePlatform = (mobileBreakpoint: number = 768): PlatformInfo => {
   const [isMobile, setIsMobile] = useState<boolean>(() => {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       if (typeof window !== 'undefined') {
         return window.innerWidth < mobileBreakpoint;
       }
@@ -52,12 +52,8 @@ export const usePlatform = (mobileBreakpoint: number = 768): PlatformInfo => {
     return true;
   });
 
-  const platform = Platform.OS as 'web' | 'ios' | 'android';
-  const isWeb = platform === 'web';
-  const isNative = !isWeb;
-
   useEffect(() => {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       if (typeof window === 'undefined') {
         return;
       }
@@ -85,3 +81,7 @@ export const usePlatform = (mobileBreakpoint: number = 768): PlatformInfo => {
     isNative,
   };
 };
+
+export const platform = Platform.OS as 'web' | 'ios' | 'android';
+export const isWeb = platform === 'web';
+export const isNative = !isWeb;

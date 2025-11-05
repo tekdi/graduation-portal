@@ -46,10 +46,18 @@
     "dashboard": "Dashboard",
     "dashboardDescription": "Welcome back! Here's what's happening with your learning management system.",
     "quickActions": "Quick Actions",
-    "recentActivity": "Recent Activity"
+    "recentActivity": "Recent Activity",
+    "menu": {
+      "userManagement": "User Management",
+      "templateManagement": "Template Management",
+      "auditLog": "Audit Log",
+      "uploadUsers": "Upload Users",
+      "createUser": "Create User",
+      "main": "Main",
+      "quickActions": "Quick Actions"
+    }
   },
   "login": {
-    "login": "Login",
     "pleaseEnterBothEmailAndPassword": "Please enter both email and password",
     "invalidEmailOrPassword": "Invalid email or password",
     "anErrorOccurredDuringLogin": "An error occurred during login",
