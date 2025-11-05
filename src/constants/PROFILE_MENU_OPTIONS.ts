@@ -1,17 +1,17 @@
 export default [
   {
     key: 'profile',
-    label: 'Profile',
+    label: 'common.profile',
     textValue: 'profile',
   },
   {
     key: 'settings',
-    label: 'Settings',
+    label: 'common.settings',
     textValue: 'settings',
   },
   {
     key: 'logout',
-    label: 'Logout',
+    label: 'common.logout',
     textValue: 'logout',
   },
 ];

@@ -1,5 +1,8 @@
 {
   "common": {
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "logout": "लॉग आउट",
     "loading": "लोड हो रहा है...",
     "save": "सहेजें",
     "cancel": "रद्द करें",
@@ -16,7 +19,8 @@
     "confirm": "पुष्टि करें",
     "offline": "ऑफ़लाइन मोड",
     "online": "ऑनलाइन",
-    "selectOption": "एक विकल्प चुनें"
+    "selectOption": "एक विकल्प चुनें",
+    "placeholder": "उपयोगकर्ताओं, टेम्पलेट्स, लॉग्स खोजें..."
   },
   "navigation": {
     "menu": "मेनू",

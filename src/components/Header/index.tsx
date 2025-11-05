@@ -28,6 +28,7 @@ import { useAuth } from '@contexts/AuthContext';
 import { usePlatform } from '@utils/platform';
 import PROFILE_MENU_OPTIONS from '@constants/PROFILE_MENU_OPTIONS';
 import logger from '@utils/logger';
+import { useLanguage } from '@contexts/LanguageContext';
 
 const Header: React.FC<{
   title?: string;
@@ -53,6 +54,7 @@ const Header: React.FC<{
   const isDark = colorMode === 'dark';
   const { user, logout, isLoggedIn } = useAuth();
   const { isMobile } = usePlatform();
+  const { t } = useLanguage();
 
   const handleMenuSelect = (key: string | undefined) => {
     // Handle menu item selection
@@ -89,7 +91,7 @@ const Header: React.FC<{
                   <InputIcon as={SearchIcon} />
                 </InputSlot>
                 <InputField
-                  placeholder="Search users, templates, logs..."
+                  placeholder={t('common.search')}
                   {...stylesHeader.searchInputField}
                   value={search || ''}
                   onChangeText={text => setSearch(text)}

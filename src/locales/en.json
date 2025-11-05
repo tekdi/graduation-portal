@@ -1,5 +1,8 @@
 {
   "common": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
@@ -16,7 +19,8 @@
     "confirm": "Confirm",
     "offline": "Offline Mode",
     "online": "Online",
-    "selectOption": "Select an option"
+    "selectOption": "Select an option",
+    "placeholder": "Search users, templates, logs..."
   },
   "navigation": {
     "menu": "Menu",
