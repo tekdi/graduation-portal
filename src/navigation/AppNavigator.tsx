@@ -3,10 +3,13 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { I18nManager } from 'react-native';
 import { useLanguage } from '@contexts/LanguageContext';
-import SelectLanguageScreen from '../screens/Language/Index';
+import { useAuth } from '@contexts/AuthContext';
+import LoginScreen from '../screens/Auth/LoginScreen';
 import { Spinner } from '@ui';
+import SelectLanguageScreen from '../screens/Language/Index';
 import logger from '@utils/logger';
-import { usePlatform } from '@utils/usePlatform';
+
+import { usePlatform } from '@utils/platform';
 
 const Stack = createStackNavigator();
 
@@ -15,13 +18,16 @@ const linking = {
   prefixes: [],
   config: {
     screens: {
-      'select-language': 'select-language',
+      login: 'login',
+      main: '/',
+      selectLanguage: 'select-language',
     },
   },
 };
 
 const AppNavigator: React.FC = () => {
   const { t, isRTL } = useLanguage();
+  const { isLoggedIn, loading } = useAuth();
   const { isWeb } = usePlatform();
 
   // Update I18nManager when RTL changes (for React Native)
@@ -35,21 +41,25 @@ const AppNavigator: React.FC = () => {
     }
   }, [isRTL, isWeb]);
 
-  // Sync document direction on web when RTL state changes
+  // Log current URL on web for debugging
   useEffect(() => {
-    if (isWeb && typeof document !== 'undefined') {
-      document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-      logger.log('Document direction synced to:', isRTL ? 'rtl' : 'ltr');
+    if (isWeb) {
+      logger.log('Current URL:', window.location.href);
+      logger.log('Pathname:', window.location.pathname);
     }
-  }, [isRTL, isWeb]);
+  }, [isWeb]);
+
+  if (loading) {
+    return <Spinner size="large" color="$primary500" />;
+  }
 
   return (
     <NavigationContainer
       linking={linking}
-      fallback={<Spinner size="large" color="primary" />}
+      fallback={<Spinner size="large" color="$primary500" />}
     >
       <Stack.Navigator
-        initialRouteName="select-language"
+        initialRouteName="login"
         screenOptions={{
           headerShown: false,
           cardStyle: isWeb
@@ -57,13 +67,24 @@ const AppNavigator: React.FC = () => {
             : ({ width: '100%' } as any),
         }}
       >
-        <Stack.Screen
-          name="select-language"
-          component={SelectLanguageScreen}
-          options={{
-            title: t('settings.selectLanguage'),
-          }}
-        />
+        {!isLoggedIn ? (
+          // Show login screen when not logged in
+          <Stack.Screen
+            name="login"
+            component={LoginScreen}
+            options={{
+              title: t('login.login'),
+            }}
+          />
+        ) : (
+          <Stack.Screen
+            name="selectLanguage"
+            component={SelectLanguageScreen}
+            options={{
+              title: t('settings.selectLanguage'),
+            }}
+          />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -1,5 +1,8 @@
 {
   "common": {
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "logout": "लॉग आउट",
     "loading": "लोड हो रहा है...",
     "save": "सहेजें",
     "cancel": "रद्द करें",
@@ -16,7 +19,8 @@
     "confirm": "पुष्टि करें",
     "offline": "ऑफ़लाइन मोड",
     "online": "ऑनलाइन",
-    "selectOption": "एक विकल्प चुनें"
+    "selectOption": "एक विकल्प चुनें",
+    "placeholder": "उपयोगकर्ताओं, टेम्पलेट्स, लॉग्स खोजें..."
   },
   "navigation": {
     "menu": "मेनू",
@@ -36,5 +40,22 @@
     "ar": "العربية",
     "es": "Español",
     "hi": "हिन्दी"
+  },
+  "login": {
+    "login": "लॉग इन",
+    "pleaseEnterBothEmailAndPassword": "कृपया ईमेल और पासवर्ड दोनों दर्ज करें",
+    "invalidEmailOrPassword": "अमान्य ईमेल या पासवर्ड",
+    "anErrorOccurredDuringLogin": "लॉग इन करने में त्रुटि हो गई",
+    "logIn": "लॉग इन करें",
+    "testAccounts": "टेस्ट एकाउंट्स:",
+    "welcomeToYourAccount": "आपका खाता आपका स्वागत है",
+    "logInToContinue": "लॉग इन करके जारी रखें",
+    "description": "लॉग इन करके जारी रखें",
+    "username": "उपयोगकर्ता नाम",
+    "password": "पासवर्ड",
+    "rememberMe": "मुझे याद रखें",
+    "rememberMeDescription": "मुझे इस डिवाइस पर 30 दिनों के लिए याद रखें",
+    "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
+    "title": "बेहतर जीवनस्तर उत्पन्न करना"
   }
 }

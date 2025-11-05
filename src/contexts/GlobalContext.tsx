@@ -8,7 +8,7 @@ import React, {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import logger from '@utils/logger';
-import { usePlatform } from '@utils/usePlatform';
+import { usePlatform } from '@utils/platform';
 
 interface GlobalContextType {
   // Add global state here as needed

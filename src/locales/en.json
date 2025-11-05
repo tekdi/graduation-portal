@@ -1,5 +1,8 @@
 {
   "common": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
@@ -16,7 +19,8 @@
     "confirm": "Confirm",
     "offline": "Offline Mode",
     "online": "Online",
-    "selectOption": "Select an option"
+    "selectOption": "Select an option",
+    "placeholder": "Search users, templates, logs..."
   },
   "navigation": {
     "menu": "Menu",
@@ -36,5 +40,29 @@
     "ar": "العربية",
     "es": "Español",
     "hi": "हिन्दी"
+  },
+  "admin": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "dashboardDescription": "Welcome back! Here's what's happening with your learning management system.",
+    "quickActions": "Quick Actions",
+    "recentActivity": "Recent Activity"
+  },
+  "login": {
+    "login": "Login",
+    "pleaseEnterBothEmailAndPassword": "Please enter both email and password",
+    "invalidEmailOrPassword": "Invalid email or password",
+    "anErrorOccurredDuringLogin": "An error occurred during login",
+    "logIn": "Log In",
+    "testAccounts": "Test Accounts:",
+    "welcomeToYourAccount": "Welcome To Your Account",
+    "logInToContinue": "Log in to Continue",
+    "description": "Log in to Continue",
+    "username": "Username",
+    "password": "Password",
+    "rememberMe": "Remember Me",
+    "rememberMeDescription": "Remember me on this device for 30 days",
+    "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
+    "title": "Generating Better Livelihoods"
   }
 }

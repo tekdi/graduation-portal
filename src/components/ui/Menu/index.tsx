@@ -7,6 +7,7 @@ import {
   ButtonText,
   Button,
 } from '@gluestack-ui/themed';
+import { useLanguage } from '@contexts/LanguageContext';
 
 export interface MenuItemData {
   key: string;
@@ -61,6 +62,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
   onSelect,
   ...menuProps
 }) => {
+  const { t } = useLanguage();
   const handleMenuItemPress = (key: string) => {
     if (onSelect) {
       onSelect(key);
@@ -71,12 +73,12 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
     (defaultTriggerProps: any) => {
       return (
         <DefaultTrigger
-          label={triggerLabel}
+          label={t(triggerLabel)}
           triggerProps={{ ...defaultTriggerProps, ...triggerProps }}
         />
       );
     },
-    [triggerProps, triggerLabel],
+    [triggerProps, triggerLabel, t],
   );
 
   return (
@@ -96,7 +98,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
           {item.icon && (
             <Icon as={item.icon} size={item.iconSize || 'sm'} me="$2" />
           )}
-          <MenuItemLabel size="sm">{item.label}</MenuItemLabel>
+          <MenuItemLabel size="sm">{t(item.label)}</MenuItemLabel>
         </MenuItem>
       ))}
     </Menu>

@@ -10,6 +10,7 @@ import { LanguageProvider } from './src/contexts/LanguageContext';
 import AppNavigator from './src/navigation/AppNavigator';
 import { GluestackUIProvider } from '@gluestack-ui/themed';
 import { theme } from './src/config/theme';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 function App() {
   const { colorMode } = useGlobal();
@@ -17,7 +18,9 @@ function App() {
   return (
     <GluestackUIProvider config={theme} colorMode={colorMode}>
       <LanguageProvider>
-        <AppNavigator />
+        <AuthProvider>
+          <AppNavigator />
+        </AuthProvider>
       </LanguageProvider>
     </GluestackUIProvider>
   );
