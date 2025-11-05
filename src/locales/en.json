@@ -57,6 +57,15 @@
       "quickActions": "Quick Actions"
     }
   },
+  "brand": {
+    "primaryName": "brac",
+    "secondaryName": "GBL Admin",
+    "version": "Console v3.1"
+  },
+  "system": {
+    "online": "System Active",
+    "offline": "System Inactive"
+  },
   "login": {
     "pleaseEnterBothEmailAndPassword": "Please enter both email and password",
     "invalidEmailOrPassword": "Invalid email or password",

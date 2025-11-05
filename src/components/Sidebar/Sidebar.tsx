@@ -14,11 +14,11 @@ import {
   Image,
   ChevronDownIcon,
   ChevronUpIcon,
-  GlobeIcon,
   CloseIcon,
 } from '@ui';
+import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
 import { useNavigation } from '@react-navigation/native';
-import { sidebarStyles, sidebarItemStyles } from '@layout/admin/styles';
+import { sidebarStyles, sidebarItemStyles } from './Styles';
 import logoImage from '../../assets/images/logo.png';
 import { usePlatform } from '@utils/platform';
 import {
@@ -138,10 +138,14 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           />
           <VStack {...sidebarStyles.brandContainer}>
             <HStack {...sidebarStyles.brandRow}>
-              <Text {...sidebarStyles.brandTextPrimary}>brac</Text>
-              <Text {...sidebarStyles.brandTextSecondary}>GBL Admin</Text>
+              <Text {...sidebarStyles.brandTextPrimary}>
+                {t('brand.primaryName')}
+              </Text>
+              <Text {...sidebarStyles.brandTextSecondary}>
+                {t('brand.secondaryName')}
+              </Text>
             </HStack>
-            <Text {...sidebarStyles.versionText}>Console v3.1</Text>
+            <Text {...sidebarStyles.versionText}>{t('brand.version')}</Text>
           </VStack>
         </HStack>
       </HStack>
@@ -190,16 +194,20 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
             }}
           >
             <HStack {...sidebarStyles.languageSelectorContainer}>
-              <Icon as={GlobeIcon} {...sidebarStyles.languageIcon} />
-              <Text {...sidebarStyles.languageText}>English</Text>
-              <Icon as={ChevronDownIcon} {...sidebarStyles.languageChevron} />
+              <LanguageSelector
+                menuTriggerProps={{
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  width: '100%',
+                }}
+              />
             </HStack>
           </Pressable>
 
           {/* System Status */}
           <HStack {...sidebarStyles.statusContainer}>
             <Box {...sidebarStyles.statusIndicator} />
-            <Text {...sidebarStyles.statusText}>System Active</Text>
+            <Text {...sidebarStyles.statusText}>{t('system.online')}</Text>
           </HStack>
         </VStack>
       </Box>
@@ -222,7 +230,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
               justifyContent="space-between"
               width="100%"
             >
-              <Text {...sidebarStyles.drawerTitle}>Menu</Text>
+              <Text {...sidebarStyles.drawerTitle}>{t('navigation.menu')}</Text>
               <Pressable onPress={handleClose} {...sidebarStyles.closeButton}>
                 <Icon as={CloseIcon} size="md" />
               </Pressable>

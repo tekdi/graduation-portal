@@ -57,6 +57,15 @@
       "quickActions": "त्वरित कार्य"
     }
   },
+  "brand": {
+    "primaryName": "brac",
+    "secondaryName": "GBL Admin",
+    "version": "Console v3.1"
+  },
+  "system": {
+    "online": "सिस्टम सक्रिय",
+    "offline": "सिस्टम अक्रिय"
+  },
   "login": {
     "pleaseEnterBothEmailAndPassword": "कृपया ईमेल और पासवर्ड दोनों दर्ज करें",
     "invalidEmailOrPassword": "अमान्य ईमेल या पासवर्ड",

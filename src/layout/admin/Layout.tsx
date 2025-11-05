@@ -10,7 +10,7 @@ import {
 } from '@ui';
 import AdminHeader from '@components/Header';
 import AdminSidebar from '@components/Sidebar/Sidebar';
-import { layoutStyles } from './styles';
+import { layoutStyles } from './Styles';
 import { usePlatform } from '@utils/platform';
 
 interface AdminLayoutProps {
