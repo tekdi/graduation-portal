@@ -38,12 +38,12 @@
     "hi": "हिन्दी"
   },
   "login": {
+    "login": "लॉग इन",
     "pleaseEnterBothEmailAndPassword": "कृपया ईमेल और पासवर्ड दोनों दर्ज करें",
     "invalidEmailOrPassword": "अमान्य ईमेल या पासवर्ड",
     "anErrorOccurredDuringLogin": "लॉग इन करने में त्रुटि हो गई",
     "logIn": "लॉग इन करें",
     "testAccounts": "टेस्ट एकाउंट्स:",
-    "admin@brac.net | supervisor@brac.net | lc@brac.net": "admin@brac.net | supervisor@brac.net | lc@brac.net",
     "welcomeToYourAccount": "आपका खाता आपका स्वागत है",
     "logInToContinue": "लॉग इन करके जारी रखें",
     "description": "लॉग इन करके जारी रखें",

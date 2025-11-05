@@ -27,7 +27,7 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
       />
 
       {/* Header */}
-      <Header title={title} showLang={true} showTheme={true} />
+      <Header title={title} showLanguage={true} showTheme={true} />
 
       {/* Main Content */}
       <Box

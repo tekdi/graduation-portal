@@ -59,6 +59,7 @@ const LanguageSelector: React.FC = ({
     <>
       <Pressable
         {...stylesLanguageSelector.menuTrigger}
+        {...(menuTriggerProps ?? {})}
         onPress={() => setMenuOpen(true)}
       >
         <Text {...stylesLanguageSelector.menuTriggerText}>

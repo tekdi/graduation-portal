@@ -18,9 +18,9 @@ const linking = {
   prefixes: [],
   config: {
     screens: {
-      Login: 'login',
-      Main: '/',
-      SelectLanguage: 'select-language',
+      login: 'login',
+      main: '/',
+      selectLanguage: 'select-language',
     },
   },
 };
@@ -59,7 +59,7 @@ const AppNavigator: React.FC = () => {
       fallback={<Spinner size="large" color="$primary500" />}
     >
       <Stack.Navigator
-        initialRouteName="Login"
+        initialRouteName="login"
         screenOptions={{
           headerShown: false,
           cardStyle: isWeb
@@ -70,15 +70,15 @@ const AppNavigator: React.FC = () => {
         {!isLoggedIn ? (
           // Show login screen when not logged in
           <Stack.Screen
-            name="Login"
+            name="login"
             component={LoginScreen}
             options={{
-              title: 'Login',
+              title: t('login.login'),
             }}
           />
         ) : (
           <Stack.Screen
-            name="select-language"
+            name="selectLanguage"
             component={SelectLanguageScreen}
             options={{
               title: t('settings.selectLanguage'),

@@ -1,7 +1,7 @@
 export const loginStyles = {
   languageSelector: {
     mb: '$8',
-    rounded: '$lg',
+    rounded: '$full',
     bg: '$backgroundLight100',
     fontSize: '$sm',
     color: '$textDark800',
@@ -47,13 +47,6 @@ export const loginStyles = {
   text3: { fontSize: '$sm', color: '$textDark400' },
   vstack3: { space: 'xs', w: '$full' },
   text4: { fontSize: '$sm', fontWeight: '$medium', color: '$textDark800' },
-  input: {
-    variant: 'rounded',
-    size: 'md',
-    borderWidth: 0,
-    borderRadius: '$lg',
-    bg: '$backgroundLight100',
-  },
   vstack4: { space: 'xs', w: '$full' },
   text5: { fontSize: '$sm', fontWeight: '$medium', color: '$textDark800' },
   hstack: { w: '$full', space: 'sm', alignItems: 'center' },

@@ -6,6 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import logger from '@utils/logger';
 
 export type UserRole = 'Admin' | 'Supervisor' | 'LC';
 
@@ -78,7 +79,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setIsLoggedIn(true);
       return true;
     } catch (error) {
-      console.error('Login error:', error);
+      logger.error('Login error:', error);
       return false;
     }
   };
@@ -89,7 +90,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       setUser(null);
       setIsLoggedIn(false);
     } catch (error) {
-      console.error('Logout error:', error);
+      logger.error('Logout error:', error);
     }
   };
 

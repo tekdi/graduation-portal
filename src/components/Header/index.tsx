@@ -26,24 +26,9 @@ import { stylesHeader } from './Styles';
 import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
 import { useAuth } from '@contexts/AuthContext';
 import { usePlatform } from '@utils/platform';
+import PROFILE_MENU_OPTIONS from '@constants/PROFILE_MENU_OPTIONS';
+import logger from '@utils/logger';
 
-const userMenuItems = [
-  {
-    key: 'profile',
-    label: 'Profile',
-    textValue: 'profile',
-  },
-  {
-    key: 'settings',
-    label: 'Settings',
-    textValue: 'settings',
-  },
-  {
-    key: 'logout',
-    label: 'Logout',
-    textValue: 'logout',
-  },
-];
 const Header: React.FC<{
   title?: string;
   rightSideContent?: React.ReactNode;
@@ -51,7 +36,7 @@ const Header: React.FC<{
   search?: string;
   setSearch?: (search: string) => void;
   // Props for controlling the visibility of language and theme sections
-  showLang?: boolean;
+  showLanguage?: boolean;
   showTheme?: boolean;
   showNotification?: boolean;
 }> = ({
@@ -60,7 +45,7 @@ const Header: React.FC<{
   leftSideContent,
   search,
   setSearch,
-  showLang,
+  showLanguage,
   showTheme,
   showNotification,
 }) => {
@@ -71,7 +56,7 @@ const Header: React.FC<{
 
   const handleMenuSelect = (key: string | undefined) => {
     // Handle menu item selection
-    console.log('Menu selected:', key);
+    logger.log('Menu selected:', key);
     if (key === 'logout') {
       logout();
     }
@@ -124,7 +109,7 @@ const Header: React.FC<{
               </Badge>
             </Pressable>
           )}
-          {showLang && <LanguageSelector />}
+          {showLanguage && <LanguageSelector />}
           {showTheme && (
             <Icon
               {...stylesHeader.rightColorModeIcon}
@@ -138,7 +123,7 @@ const Header: React.FC<{
           {/* User Menu */}
           {isLoggedIn && (
             <Menu
-              items={userMenuItems}
+              items={PROFILE_MENU_OPTIONS}
               placement="bottom right"
               offset={5}
               trigger={triggerProps => (
@@ -156,11 +141,11 @@ const Header: React.FC<{
                     <>
                       <VStack {...stylesHeader.userInfoContainer}>
                         <Text {...stylesHeader.userNameText}>
-                          {user?.name || 'Admin User'}
+                          {user?.name || ''}
                         </Text>
                         <HStack {...stylesHeader.userRoleContainer}>
                           <Text {...stylesHeader.userRoleText}>
-                            {user?.role || 'Admin'}
+                            {user?.role || ''}
                           </Text>
                         </HStack>
                       </VStack>

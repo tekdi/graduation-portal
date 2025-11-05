@@ -45,12 +45,12 @@
     "recentActivity": "Recent Activity"
   },
   "login": {
+    "login": "Login",
     "pleaseEnterBothEmailAndPassword": "Please enter both email and password",
     "invalidEmailOrPassword": "Invalid email or password",
     "anErrorOccurredDuringLogin": "An error occurred during login",
     "logIn": "Log In",
     "testAccounts": "Test Accounts:",
-    "admin@brac.net | supervisor@brac.net | lc@brac.net": "admin@brac.net | supervisor@brac.net | lc@brac.net",
     "welcomeToYourAccount": "Welcome To Your Account",
     "logInToContinue": "Log in to Continue",
     "description": "Log in to Continue",

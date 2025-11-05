@@ -81,7 +81,7 @@ const LoginScreen: React.FC = () => {
             {/* Email Input */}
             <VStack {...loginStyles.vstack3}>
               <Text {...loginStyles.text4}>{t('login.username')}</Text>
-              <Input {...loginStyles.input} isDisabled={loading}>
+              <Input isDisabled={loading}>
                 <InputField
                   placeholder="your.email@brac.net"
                   value={email}
@@ -95,7 +95,7 @@ const LoginScreen: React.FC = () => {
             {/* Password Input */}
             <VStack {...loginStyles.vstack4}>
               <Text {...loginStyles.text5}>{t('login.password')}</Text>
-              <Input {...loginStyles.input} isDisabled={loading}>
+              <Input isDisabled={loading}>
                 <InputField
                   placeholder="••••••••"
                   value={password}
