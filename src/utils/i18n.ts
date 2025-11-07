@@ -1,8 +1,9 @@
-import { I18nManager, Platform } from 'react-native';
+import { I18nManager } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from '@config/i18n';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import logger from '@utils/logger';
+import { isWeb } from '@utils/platform';
 
 const LANGUAGE_STORAGE_KEY = STORAGE_KEYS.LANGUAGE;
 
@@ -63,7 +64,7 @@ export const changeLanguage = async (
     }
 
     // Update document direction for web
-    if (Platform.OS === 'web' && typeof document !== 'undefined') {
+    if (isWeb && typeof document !== 'undefined') {
       document.documentElement.dir = isRTLLanguage ? 'rtl' : 'ltr';
       logger.log(`Document direction set to: ${isRTLLanguage ? 'rtl' : 'ltr'}`);
     }

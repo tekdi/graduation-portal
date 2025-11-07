@@ -17,6 +17,14 @@ export interface PlatformInfo {
    */
   isWeb: boolean;
   /**
+   * Convenience property: true if platform is iOS
+   */
+  isIOS: boolean;
+  /**
+   * Convenience property: true if platform is Android
+   */
+  isAndroid: boolean;
+  /**
    * Convenience property: true if platform is native (iOS or Android)
    */
   isNative: boolean;
@@ -42,7 +50,7 @@ export interface PlatformInfo {
  */
 export const usePlatform = (mobileBreakpoint: number = 768): PlatformInfo => {
   const [isMobile, setIsMobile] = useState<boolean>(() => {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       if (typeof window !== 'undefined') {
         return window.innerWidth < mobileBreakpoint;
       }
@@ -52,12 +60,8 @@ export const usePlatform = (mobileBreakpoint: number = 768): PlatformInfo => {
     return true;
   });
 
-  const platform = Platform.OS as 'web' | 'ios' | 'android';
-  const isWeb = platform === 'web';
-  const isNative = !isWeb;
-
   useEffect(() => {
-    if (Platform.OS === 'web') {
+    if (isWeb) {
       if (typeof window === 'undefined') {
         return;
       }
@@ -82,6 +86,14 @@ export const usePlatform = (mobileBreakpoint: number = 768): PlatformInfo => {
     platform,
     isMobile,
     isWeb,
+    isIOS,
+    isAndroid,
     isNative,
   };
 };
+
+export const platform = Platform.OS as 'web' | 'ios' | 'android';
+export const isWeb = platform === 'web';
+export const isIOS = platform === 'ios';
+export const isAndroid = platform === 'android';
+export const isNative = !isWeb;
