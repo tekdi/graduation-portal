@@ -36,5 +36,16 @@
     "ar": "العربية",
     "es": "Español",
     "hi": "हिन्दी"
+  },
+  "welcome": {
+    "WelcomeBack": "Bienvenido de nuevo",
+    "ChooseOptionBelowToGetStarted": "Elige una opción a continuación para comenzar",
+    "MyParticipants": "Mis Participantes",
+    "MyParticipantsDescription": "Administra tu carga de casos, realiza un seguimiento del progreso de los participantes y registra las visitas",
+    "MyLearningProgress": "Mi Progreso de Aprendizaje",
+    "MyLearningProgressDescription": "Accede a materiales de formación y haz un seguimiento de tu desarrollo profesional",
+    "ConnectWithExperts": "Conéctate con Expertos",
+    "ConnectWithExpertsDescription": "Obtén apoyo, haz preguntas y conéctate con especialistas",
+    "GetStarted": "Comenzar"
   }
 }

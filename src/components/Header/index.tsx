@@ -29,6 +29,8 @@ import { usePlatform } from '@utils/platform';
 import PROFILE_MENU_OPTIONS from '@constants/PROFILE_MENU_OPTIONS';
 import logger from '@utils/logger';
 import { useLanguage } from '@contexts/LanguageContext';
+import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
+import { theme } from '@config/theme';
 
 const Header: React.FC<{
   title?: string;
@@ -73,6 +75,11 @@ const Header: React.FC<{
     >
       <HStack {...stylesHeader.hStack}>
         {rightSideContent && rightSideContent}
+        {user?.name && (
+          <Text {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}>
+            {user?.name}
+          </Text>
+        )}
         {/* Title */}
         {title && (
           <Text

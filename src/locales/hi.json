@@ -81,5 +81,16 @@
     "rememberMeDescription": "मुझे इस डिवाइस पर 30 दिनों के लिए याद रखें",
     "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
     "title": "बेहतर जीवनस्तर उत्पन्न करना"
+  },
+  "welcome": {
+    "WelcomeBack": "वापसी पर स्वागत है",
+    "ChooseOptionBelowToGetStarted": "शुरू करने के लिए नीचे दिए गए विकल्पों में से एक चुनें",
+    "MyParticipants": "मेरे प्रतिभागी",
+    "MyParticipantsDescription": "अपने केसलोड को प्रबंधित करें, प्रतिभागियों की प्रगति को ट्रैक करें और विज़िट दर्ज करें",
+    "MyLearningProgress": "मेरी सीखने की प्रगति",
+    "MyLearningProgressDescription": "प्रशिक्षण सामग्री तक पहुँचें, अपने व्यावसायिक विकास को ट्रैक करें",
+    "ConnectWithExperts": "विशेषज्ञों से जुड़ें",
+    "ConnectWithExpertsDescription": "सहायता प्राप्त करें, प्रश्न पूछें और विशेषज्ञों से जुड़ें",
+    "GetStarted": "शुरू करें"
   }
 }
