@@ -7,18 +7,20 @@ import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
 
-const FeatureCard: React.FC<FeatureCardProps> = ({
-  color,
-  icon,
-  title,
-  description,
-  navigationUrl,
-  isDisabled = false,
-  pressableActionText,
-}) => {
+const FeatureCard: React.FC<FeatureCardProps> = ({ card }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
   const [isHovered, setIsHovered] = useState(false);
+
+  const {
+    color,
+    icon,
+    title,
+    description,
+    navigationUrl,
+    isDisabled = false,
+    pressableActionText,
+  } = card;
 
   const handleMouseEnter = () => {
     if (Platform.OS === 'web' && !isDisabled) {

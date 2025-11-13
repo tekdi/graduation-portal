@@ -1,4 +1,4 @@
-export interface FeatureCardProps {
+export interface FeatureCardData {
   id?: string;
   color: string;
   icon: React.ReactNode;
@@ -7,4 +7,8 @@ export interface FeatureCardProps {
   navigationUrl?: string;
   isDisabled?: boolean;
   pressableActionText?: string;
+}
+
+export interface FeatureCardProps {
+  card: FeatureCardData;
 }

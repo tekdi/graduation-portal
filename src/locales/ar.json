@@ -38,14 +38,14 @@
     "hi": "हिन्दी"
   },
   "welcome": {
-    "WelcomeBack": "مرحبًا بعودتك",
-    "ChooseOptionBelowToGetStarted": "اختر أحد الخيارات أدناه للبدء",
-    "MyParticipants": "مشاركيني",
-    "MyParticipantsDescription": "قم بإدارة الحالات، وتتبع تقدم المشاركين، وتسجيل الزيارات",
-    "MyLearningProgress": "تقدمي في التعلم",
-    "MyLearningProgressDescription": "الوصول إلى مواد التدريب وتتبع التطور المهني",
-    "ConnectWithExperts": "تواصل مع الخبراء",
-    "ConnectWithExpertsDescription": "احصل على الدعم، اطرح الأسئلة، وتواصل مع المتخصصين",
-    "GetStarted": "ابدأ"
+    "welcomeBack": "مرحبًا بعودتك",
+    "chooseOptionBelowToGetStarted": "اختر أحد الخيارات أدناه للبدء",
+    "myParticipants": "مشاركيني",
+    "myParticipantsDescription": "قم بإدارة الحالات، وتتبع تقدم المشاركين، وتسجيل الزيارات",
+    "myLearningProgress": "تقدمي في التعلم",
+    "myLearningProgressDescription": "الوصول إلى مواد التدريب وتتبع التطور المهني",
+    "connectWithExperts": "تواصل مع الخبراء",
+    "connectWithExpertsDescription": "احصل على الدعم، اطرح الأسئلة، وتواصل مع المتخصصين",
+    "getStarted": "ابدأ"
   }
 }

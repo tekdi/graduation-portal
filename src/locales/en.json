@@ -83,14 +83,14 @@
     "title": "Generating Better Livelihoods"
   },
   "welcome": {
-    "WelcomeBack": "Welcome back",
-    "ChooseOptionBelowToGetStarted": "Choose an option below to get started",
-    "MyParticipants": "My Participants",
-    "MyParticipantsDescription": "Manage your caseload, track participant progress, and log visits",
-    "MyLearningProgress": "My Learning Progress",
-    "MyLearningProgressDescription": "Access training materials, track your professional development",
-    "ConnectWithExperts": "Connect with Experts",
-    "ConnectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
-    "GetStarted": "Get started"
+    "welcomeBack": "Welcome back",
+    "chooseOptionBelowToGetStarted": "Choose an option below to get started",
+    "myParticipants": "My Participants",
+    "myParticipantsDescription": "Manage your caseload, track participant progress, and log visits",
+    "myLearningProgress": "My Learning Progress",
+    "myLearningProgressDescription": "Access training materials, track your professional development",
+    "connectWithExperts": "Connect with Experts",
+    "connectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
+    "getStarted": "Get started"
   }
 }

@@ -41,10 +41,10 @@ const WelcomePage: React.FC = () => {
             marginBottom="$4"
           >
             <Heading {...TYPOGRAPHY.h1} color="$textDark900">
-              {t('welcome.WelcomeBack')}, {user?.name}
+              {t('welcome.welcomeBack')}, {user?.name}
             </Heading>
             <Text {...TYPOGRAPHY.paragraph} color="$textDark600">
-              {t('welcome.ChooseOptionBelowToGetStarted')}
+              {t('welcome.chooseOptionBelowToGetStarted')}
             </Text>
           </VStack>
 
@@ -59,15 +59,7 @@ const WelcomePage: React.FC = () => {
           >
             {WELCOME_CARDS?.map(card => (
               <Box key={card.id} width="$full" $md-width="33.33%" $md-flex={1}>
-                <FeatureCard
-                  color={card.color}
-                  icon={card.icon}
-                  title={card.title}
-                  description={card.description}
-                  navigationUrl={card.navigationUrl}
-                  isDisabled={card.isDisabled}
-                  pressableActionText={card.pressableActionText}
-                />
+                <FeatureCard card={card} />
               </Box>
             ))}
           </Box>

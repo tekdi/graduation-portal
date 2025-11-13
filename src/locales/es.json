@@ -38,14 +38,14 @@
     "hi": "हिन्दी"
   },
   "welcome": {
-    "WelcomeBack": "Bienvenido de nuevo",
-    "ChooseOptionBelowToGetStarted": "Elige una opción a continuación para comenzar",
-    "MyParticipants": "Mis Participantes",
-    "MyParticipantsDescription": "Administra tu carga de casos, realiza un seguimiento del progreso de los participantes y registra las visitas",
-    "MyLearningProgress": "Mi Progreso de Aprendizaje",
-    "MyLearningProgressDescription": "Accede a materiales de formación y haz un seguimiento de tu desarrollo profesional",
-    "ConnectWithExperts": "Conéctate con Expertos",
-    "ConnectWithExpertsDescription": "Obtén apoyo, haz preguntas y conéctate con especialistas",
-    "GetStarted": "Comenzar"
+    "welcomeBack": "Bienvenido de nuevo",
+    "chooseOptionBelowToGetStarted": "Elige una opción a continuación para comenzar",
+    "myParticipants": "Mis Participantes",
+    "myParticipantsDescription": "Administra tu carga de casos, realiza un seguimiento del progreso de los participantes y registra las visitas",
+    "myLearningProgress": "Mi Progreso de Aprendizaje",
+    "myLearningProgressDescription": "Accede a materiales de formación y haz un seguimiento de tu desarrollo profesional",
+    "connectWithExperts": "Conéctate con Expertos",
+    "connectWithExpertsDescription": "Obtén apoyo, haz preguntas y conéctate con especialistas",
+    "getStarted": "Comenzar"
   }
 }
