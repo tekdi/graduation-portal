@@ -1,5 +1,3 @@
-import React from 'react';
-import Icon from '@ui/Icon';
 import { theme } from '@config/theme';
 import { FeatureCardData } from '@app-types/components';
 
@@ -7,7 +5,7 @@ export const WELCOME_CARDS: FeatureCardData[] = [
   {
     id: 'my-participants',
     color: theme.tokens.colors.primary500,
-    icon: <Icon name="user" size={32} />,
+    icon: 'user',
     title: 'welcome.myParticipants',
     description: 'welcome.myParticipantsDescription',
     navigationUrl: 'participants',
@@ -17,7 +15,7 @@ export const WELCOME_CARDS: FeatureCardData[] = [
   {
     id: 'learning-progress',
     color: theme.tokens.colors.info100,
-    icon: <Icon name="chart" size={32} />,
+    icon: 'chart',
     title: 'welcome.myLearningProgress',
     description: 'welcome.myLearningProgressDescription',
     navigationUrl: 'learning-progress',
@@ -27,7 +25,7 @@ export const WELCOME_CARDS: FeatureCardData[] = [
   {
     id: 'connect-experts',
     color: theme.tokens.colors.accent200,
-    icon: <Icon name="chat" size={32} />,
+    icon: 'chat',
     title: 'welcome.connectWithExperts',
     description: 'welcome.connectWithExpertsDescription',
     navigationUrl: 'connect-experts',

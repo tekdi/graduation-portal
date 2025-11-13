@@ -6,7 +6,7 @@ import { FeatureCardProps } from '@app-types/components';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
-
+import Icon from '@ui/Icon';
 const FeatureCard: React.FC<FeatureCardProps> = ({ card }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
@@ -49,7 +49,7 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ card }) => {
       style={{ opacity: isDisabled ? 0.5 : 1 }}
     >
       <Box
-        bg={theme.tokens.colors.background}
+        bg={theme.tokens.colors.backgroundPrimary.light}
         borderRadius="$lg"
         borderTopWidth={4}
         borderTopColor={color}
@@ -84,7 +84,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ card }) => {
               alignItems="center"
               justifyContent="center"
             >
-              {icon}
+              {/* Render Icon component here with the icon name */}
+              <Icon name={icon} size={32} />
             </Box>
 
             {/* Title */}

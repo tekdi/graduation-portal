@@ -11,7 +11,10 @@ export const theme = {
       info100: '#0ea5e9',
       accent100: '#F1F5F94D',
       accent200: '#10B981',
-      background: '#ffffff',
+      backgroundPrimary: {
+        light: '#ffffff',
+        dark: '#1a1a1a',
+      },
       foreground: 'oklch(0.145 0 0)',
       mutedForeground: '#717182',
     },

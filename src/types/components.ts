@@ -1,7 +1,8 @@
+import type { IconName } from '@constants/ICONS';
 export interface FeatureCardData {
   id?: string;
   color: string;
-  icon: React.ReactNode;
+  icon: IconName;
   title: string;
   description: string;
   navigationUrl?: string;

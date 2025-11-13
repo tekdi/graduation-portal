@@ -41,7 +41,8 @@ const WelcomePage: React.FC = () => {
             marginBottom="$4"
           >
             <Heading {...TYPOGRAPHY.h1} color="$textDark900">
-              {t('welcome.welcomeBack')}, {user?.name}
+              {t('welcome.welcomeBack')}
+              {user?.name ? `, ${user.name}` : ''}
             </Heading>
             <Text {...TYPOGRAPHY.paragraph} color="$textDark600">
               {t('welcome.chooseOptionBelowToGetStarted')}
@@ -57,7 +58,7 @@ const WelcomePage: React.FC = () => {
             width="$full"
             maxWidth={1100}
           >
-            {WELCOME_CARDS?.map(card => (
+            {WELCOME_CARDS.map(card => (
               <Box key={card.id} width="$full" $md-width="33.33%" $md-flex={1}>
                 <FeatureCard card={card} />
               </Box>
