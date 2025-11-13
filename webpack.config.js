@@ -2,40 +2,69 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
-module.exports = (env = {}) => {
-  let entry = './index.web.js';
-  let mode =
-    env.mode || process.env.NODE_ENV === 'production'
+module.exports = (env = {}, argv = {}) => {
+  const mode =
+    argv.mode || env.mode || process.env.NODE_ENV === 'production'
       ? 'production'
       : 'development';
-  let output = {
-    path: path.resolve(__dirname, 'dist'),
-    filename: '[name].js',
-    publicPath: '/',
-  };
-
-  if (env.entry && env.entry === 'project-player') {
-    const entryName = env.entry; // Default entry
-    const entryPath = `./src/web-component/registerButton.tsx`;
-
-    console.log(`🛠️ Building Web Component: ${entryName}`);
-    console.log(`📂 Entry file: ${entryPath}`);
-    // entry = {
-    //   [entryName]: entryPath,
-    // };
-    entry = entryPath;
-    output = {
-      path: path.resolve(__dirname, 'project-player-dist'),
-      filename: '[name].js',
-      publicPath: '/',
-    };
-  }
+  const isProduction = mode === 'production';
 
   return {
-    entry,
-    output,
+    entry: './index.web.js',
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: isProduction ? 'js/[name].[contenthash:8].js' : 'js/[name].js',
+      chunkFilename: isProduction
+        ? 'js/[name].[contenthash:8].chunk.js'
+        : 'js/[name].chunk.js',
+      assetModuleFilename: 'assets/[name].[contenthash:8][ext]',
+      publicPath: '/',
+      clean: true,
+    },
     mode,
-    devtool: mode === 'production' ? 'source-map' : 'eval-source-map',
+    devtool: isProduction ? 'source-map' : 'eval-cheap-module-source-map',
+    optimization: {
+      minimize: isProduction,
+      minimizer: isProduction ? ['...'] : [],
+      usedExports: true,
+      sideEffects: false,
+      moduleIds: isProduction ? 'deterministic' : 'named',
+      chunkIds: isProduction ? 'deterministic' : 'named',
+      splitChunks: isProduction
+        ? {
+            chunks: 'all',
+            cacheGroups: {
+              default: false,
+              vendors: false,
+              // Vendor chunk for node_modules
+              vendor: {
+                name: 'vendor',
+                chunks: 'all',
+                test: /[\\/]node_modules[\\/]/,
+                priority: 20,
+              },
+              // Common chunk for shared code
+              common: {
+                name: 'common',
+                minChunks: 2,
+                chunks: 'all',
+                priority: 10,
+                reuseExistingChunk: true,
+                enforce: true,
+              },
+              // React and ReactDOM separate chunk
+              react: {
+                name: 'react',
+                test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+                chunks: 'all',
+                priority: 30,
+                enforce: true,
+              },
+            },
+          }
+        : false,
+      runtimeChunk: isProduction ? { name: 'runtime' } : false,
+    },
     devServer: {
       static: {
         directory: path.join(__dirname, 'public'),
@@ -45,6 +74,19 @@ module.exports = (env = {}) => {
       port: 3000,
       hot: true,
       historyApiFallback: true,
+      client: {
+        overlay: {
+          errors: true,
+          warnings: false,
+        },
+      },
+    },
+    cache: {
+      type: 'filesystem',
+      buildDependencies: {
+        // eslint-disable-next-line no-undef
+        config: [__filename],
+      },
     },
     module: {
       rules: [
@@ -56,25 +98,34 @@ module.exports = (env = {}) => {
             loader: 'babel-loader',
             options: {
               presets: [
-                '@babel/preset-env',
+                [
+                  '@babel/preset-env',
+                  {
+                    modules: false,
+                  },
+                ],
                 '@babel/preset-react',
                 '@babel/preset-typescript',
               ],
               plugins: ['react-native-web'],
+              cacheDirectory: true,
+              cacheCompression: false,
             },
           },
         },
         {
-          test: /\.(png|jpe?g|gif|svg)$/i,
-          use: [
-            {
-              loader: 'file-loader',
-              options: {
-                name: '[name].[ext]',
-                outputPath: 'assets/images/',
-              },
-            },
-          ],
+          test: /\.(png|jpe?g|gif|svg|webp|ico)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/images/[name].[contenthash:8][ext]',
+          },
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/fonts/[name].[contenthash:8][ext]',
+          },
         },
       ],
     },
@@ -114,19 +165,39 @@ module.exports = (env = {}) => {
         '.js',
         '.json',
       ],
+      modules: ['node_modules', path.resolve(__dirname, 'src')],
     },
     plugins: [
       new HtmlWebpackPlugin({
         template: './public/index.html',
         inject: true,
+        minify: isProduction
+          ? {
+              removeComments: true,
+              collapseWhitespace: true,
+              removeRedundantAttributes: true,
+              useShortDoctype: true,
+              removeEmptyAttributes: true,
+              removeStyleLinkTypeAttributes: true,
+              minifyJS: true,
+              minifyCSS: true,
+              minifyURLs: true,
+            }
+          : false,
       }),
       new webpack.DefinePlugin({
-        __DEV__: JSON.stringify(mode !== 'production'),
+        __DEV__: JSON.stringify(!isProduction),
+        'process.env.NODE_ENV': JSON.stringify(mode),
       }),
-      // 🧠 Ignore native-only modules entirely
+      // Ignore native-only modules entirely
       new webpack.IgnorePlugin({
         resourceRegExp: /^react-native-(gesture-handler|screens)$/,
       }),
     ],
+    performance: {
+      hints: isProduction ? 'warning' : false,
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000,
+    },
   };
 };

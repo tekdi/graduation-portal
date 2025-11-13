@@ -7,7 +7,7 @@
     "ios": "react-native run-ios",
     "web": "webpack serve --mode development",
     "build:web": "webpack --mode production",
-    "build:project-player": "webpack --env entry=project-player --mode production",
+    "build:project-player": "webpack --config webpack.config.project-player.js --mode production",
     "build:android": "cd android && ./gradlew assembleRelease",
     "build:ios": "cd ios && xcodebuild -scheme MyApp -configuration Release -workspace MyApp.xcworkspace -sdk iphoneos",
     "lint": "eslint .",
