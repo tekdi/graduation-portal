@@ -124,14 +124,6 @@ const ProjectPlayer: React.FC<Props> = props => {
       ? projectdata
       : {};
   // 🔒 Require unique project ID
-  console.log(
-    'data:sagar1',
-    props,
-    previewmode,
-    data,
-    typeof projectdata,
-    typeof data,
-  );
 
   const [project, setProject] = useState<ProjectData>(data);
   const [uploadModal, setUploadModal] = useState<{

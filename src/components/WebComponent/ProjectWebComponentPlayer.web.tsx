@@ -2,6 +2,7 @@
 // import { getTelemetryEvents, handleExitEvent } from '@workspace/utils/Helper';
 import React, { useEffect, useRef } from 'react';
 import '../../../project-player-dist/main.js';
+import logger from '@utils/logger';
 
 interface PlayerConfigProps {
   playerConfig: any;
@@ -16,14 +17,14 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
     let playerElement: HTMLDivElement | null = null;
 
     const handlePlayerEvent = (event: any) => {
-      console.log('Player Event', event.detail);
+      logger.info('Player Event', event.detail);
       if (event?.detail?.type === 'EXIT') {
         // handleExitEvent();
       }
     };
 
     const handleTelemetryEvent = (event: any) => {
-      console.log('Telemetry Event', event.detail);
+      logger.info('Telemetry Event', event.detail);
       // getTelemetryEvents(event.detail, 'video');
     };
 

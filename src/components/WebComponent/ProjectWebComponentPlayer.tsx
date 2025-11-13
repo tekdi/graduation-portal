@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
 import { isWeb } from '../../utils/platform';
+import logger from '@utils/logger';
 
 // Web-specific: Access DOM element from React Native Web View ref
 const getDOMNode = (ref: any): HTMLElement | null => {
@@ -94,7 +95,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
       // Add event listeners
       const handlePlayerEvent = (event: any) => {
         if (event && event.detail) {
-          console.log('Player event received:', event.detail);
+          logger.info('Player event received:', event.detail);
           if (event.detail.edata && event.detail.edata.type === 'EXIT') {
             event.preventDefault();
           }
@@ -103,7 +104,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
 
       const handleTelemetryEvent = (event: any) => {
         if (event && event.detail) {
-          console.log('Telemetry event received:', event.detail);
+          logger.info('Telemetry event received:', event.detail);
         }
       };
 
@@ -118,7 +119,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
 
       setLoading(false);
     } catch (error) {
-      console.error('Error initializing web player:', error);
+      logger.error('Error initializing web player:', error);
       setLoading(false);
     }
   }, [playerConfig]);
@@ -132,7 +133,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
 
     // Set a timeout to ensure loading is set to false even if custom element never loads
     const timeoutId = setTimeout(() => {
-      console.warn('Custom element project-player not defined after 5 seconds');
+      logger.warn('Custom element project-player not defined after 5 seconds');
       setLoading(false);
     }, 5000);
 
@@ -151,7 +152,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
           initPlayer();
         })
         .catch(error => {
-          console.error('Error waiting for custom element:', error);
+          logger.error('Error waiting for custom element:', error);
           clearTimeout(timeoutId);
           setLoading(false);
         });
@@ -236,22 +237,22 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
 
     try {
       const message = JSON.parse(event.nativeEvent.data);
-      console.log('Message from WebView:', message);
+      logger.info('Message from WebView:', message);
 
       if (message.type === 'playerEvent') {
-        console.log('Player event received:', message.data);
+        logger.info('Player event received:', message.data);
         if (message.data?.edata?.type === 'EXIT') {
-          console.log('Player exit event received');
+          logger.info('Player exit event received');
           // Handle exit event - you can add navigation logic here
         }
       } else if (message.type === 'telemetryEvent') {
-        console.log('Telemetry event received:', message.data);
+        logger.info('Telemetry event received:', message.data);
         // Handle telemetry events
       } else if (message.type === 'error') {
-        console.error('WebView error:', message.data);
+        logger.error('WebView error:', message.data);
       }
     } catch (error) {
-      console.error('Error parsing message from WebView:', error);
+      logger.error('Error parsing message from WebView:', error);
     }
   };
 
@@ -285,7 +286,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
                           initializeWebPlayer();
                         })
                         .catch(error => {
-                          console.error(
+                          logger.error(
                             'Error waiting for custom element in ref:',
                             error,
                           );
@@ -302,7 +303,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
                 // Set a timeout to retry or give up
                 setTimeout(() => {
                   if (!containerRef.current) {
-                    console.warn(
+                    logger.warn(
                       'Could not access DOM node for web player container',
                     );
                     setLoading(false);
