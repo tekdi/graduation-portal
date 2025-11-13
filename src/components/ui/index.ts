@@ -3,4 +3,6 @@ import Select from './Inputs/Select';
 import { CustomMenu as Menu } from './Menu';
 import { useAlert } from './Alert';
 import { Input } from './Inputs/input';
-export { Select, Menu, useAlert, Input };
+import FeatureCard from './FeatureCard';
+import Icon from './Icon';
+export { Select, Menu, useAlert, Input, FeatureCard, Icon };
