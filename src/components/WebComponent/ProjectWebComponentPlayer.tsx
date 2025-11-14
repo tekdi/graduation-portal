@@ -1,42 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { isWeb } from '../../utils/platform';
 import logger from '@utils/logger';
-
-// Web-specific: Access DOM element from React Native Web View ref
-const getDOMNode = (ref: any): HTMLElement | null => {
-  if (!ref || typeof window === 'undefined') return null;
-
-  // React Native Web exposes the DOM node in different ways depending on version
-  // Try multiple methods to find the DOM node
-
-  // Method 1: Direct node access
-  if (ref._nativeNode) return ref._nativeNode;
-  if (ref.node) return ref.node;
-
-  // Method 2: React Native Web internal structure
-  if (ref._internalFiberInstanceHandleDEV) {
-    const fiber = ref._internalFiberInstanceHandleDEV;
-    if (fiber.stateNode) return fiber.stateNode;
-  }
-
-  // Method 3: Try to find by traversing React internals
-  if (ref._reactInternalFiber) {
-    let fiber = ref._reactInternalFiber;
-    while (fiber) {
-      if (fiber.stateNode && fiber.stateNode.nodeType === 1) {
-        return fiber.stateNode;
-      }
-      fiber = fiber.return;
-    }
-  }
-
-  // Method 4: If ref is already a DOM element
-  if (ref.nodeType === 1) return ref;
-
-  return null;
-};
 
 interface PlayerConfigProps {
   playerConfig: any;
@@ -45,295 +10,159 @@ interface PlayerConfigProps {
 const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
   const [loading, setLoading] = useState(true);
   const webViewRef = useRef<any>(null);
-  const containerRef = useRef<HTMLElement | null>(null);
-  const playerRef = useRef<HTMLElement | null>(null);
-
-  // Web platform: Initialize web component directly
-  const initializeWebPlayer = React.useCallback(() => {
-    if (!isWeb || !playerConfig) {
-      setLoading(false);
-      alert('No player config');
-      return;
-    }
-
-    if (!containerRef.current) {
-      // Retry after a short delay if container is not ready
-      setTimeout(() => {
-        if (containerRef.current) {
-          initializeWebPlayer();
-        } else {
-          setLoading(false);
-        }
-      }, 100);
-      return;
-    }
-
-    try {
-      const container = containerRef.current;
-      if (!container) {
-        setLoading(false);
-        return;
-      }
-
-      // Create or get the player element
-      let playerElement = playerRef.current;
-      if (!playerElement) {
-        playerElement = document.createElement('project-player');
-        playerRef.current = playerElement;
-      }
-
-      // Set attributes
-      playerElement.setAttribute(
-        'projectdata',
-        JSON.stringify(playerConfig.projectdata),
-      );
-      playerElement.setAttribute(
-        'previewmode',
-        JSON.stringify(playerConfig.previewmode),
-      );
-
-      // Add event listeners
-      const handlePlayerEvent = (event: any) => {
-        if (event && event.detail) {
-          logger.info('Player event received:', event.detail);
-          if (event.detail.edata && event.detail.edata.type === 'EXIT') {
-            event.preventDefault();
-          }
-        }
-      };
-
-      const handleTelemetryEvent = (event: any) => {
-        if (event && event.detail) {
-          logger.info('Telemetry event received:', event.detail);
-        }
-      };
-
-      playerElement.addEventListener('playerEvent', handlePlayerEvent);
-      playerElement.addEventListener('telemetryEvent', handleTelemetryEvent);
-
-      // Append to container if not already appended
-      if (!container.contains(playerElement)) {
-        container.innerHTML = '';
-        container.appendChild(playerElement);
-      }
-
-      setLoading(false);
-    } catch (error) {
-      logger.error('Error initializing web player:', error);
-      setLoading(false);
-    }
-  }, [playerConfig]);
-
-  // Web platform: Wait for custom element and initialize
-  useEffect(() => {
-    if (!isWeb || !playerConfig) {
-      setLoading(false);
-      return;
-    }
-
-    // Set a timeout to ensure loading is set to false even if custom element never loads
-    const timeoutId = setTimeout(() => {
-      logger.warn('Custom element project-player not defined after 5 seconds');
-      setLoading(false);
-    }, 5000);
-
-    const initPlayer = () => {
-      clearTimeout(timeoutId);
-      initializeWebPlayer();
-    };
-
-    // Wait for custom element to be defined
-    if (customElements.get('project-player')) {
-      initPlayer();
-    } else {
-      customElements
-        .whenDefined('project-player')
-        .then(() => {
-          initPlayer();
-        })
-        .catch(error => {
-          logger.error('Error waiting for custom element:', error);
-          clearTimeout(timeoutId);
-          setLoading(false);
-        });
-    }
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [playerConfig, initializeWebPlayer]);
 
   // Native platform: Inject into WebView
   useEffect(() => {
-    if (!isWeb) {
-      // Wait a bit for WebView to be ready, then inject the player config
-      const timer = setTimeout(() => {
-        if (webViewRef.current && playerConfig) {
-          const injectedJS = `
-          (function() {
-            try {
-              const videoElement = document.createElement('project-player');
-              videoElement.setAttribute('projectdata', '${JSON.stringify(
-                playerConfig.projectdata,
-              )?.replace(/'/g, "\\'")}');
-              videoElement.setAttribute('previewmode', '${JSON.stringify(
-                playerConfig.previewmode,
-              )?.replace(/'/g, "\\'")}');
-              
-              // Send events back to React Native
-              videoElement.addEventListener('playerEvent', function(event) {
-                if (event && event.detail) {
-                  window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'playerEvent',
-                    data: event.detail
-                  }));
-                  
-                  if (event.detail.edata && event.detail.edata.type === 'EXIT') {
-                    event.preventDefault();
-                  }
-                }
-              });
-              
-              videoElement.addEventListener('telemetryEvent', function(event) {
-                if (event && event.detail) {
-                  window.ReactNativeWebView.postMessage(JSON.stringify({
-                    type: 'telemetryEvent',
-                    data: event.detail
-                  }));
-                }
-              });
-              
-              const myPlayer = document.getElementById('my-player');
-              if (myPlayer) {
-                myPlayer.innerHTML = '';
-                myPlayer.appendChild(videoElement);
-              } else {
-                console.error('my-player element not found');
-              }
-            } catch (error) {
-              console.error('Error initializing player:', error);
-              window.ReactNativeWebView.postMessage(JSON.stringify({
-                type: 'error',
-                data: error.toString()
-              }));
-            }
-          })();
-          true;
-        `;
-
-          webViewRef.current.injectJavaScript(injectedJS);
-        }
-      }, 500);
-
-      return () => clearTimeout(timer);
-    }
-  }, [playerConfig]);
-
-  const handleMessage = (event: any) => {
-    if (isWeb) {
-      // Web platform handles events directly via DOM events
+    if (!playerConfig) {
+      logger.warn('No playerConfig provided');
+      setLoading(false);
       return;
     }
 
+    // Escape JSON properly for injection into JavaScript string
+    const escapeForJS = (str: string) => {
+      return str
+        .replace(/\\/g, '\\\\') // Escape backslashes first
+        .replace(/'/g, "\\'") // Escape single quotes
+        .replace(/"/g, '\\"') // Escape double quotes
+        .replace(/\n/g, '\\n') // Escape newlines
+        .replace(/\r/g, '\\r') // Escape carriage returns
+        .replace(/\t/g, '\\t'); // Escape tabs
+    };
+
+    const projectData = escapeForJS(
+      JSON.stringify(playerConfig.projectdata || {}),
+    );
+    const previewMode = escapeForJS(
+      JSON.stringify(playerConfig.previewmode || false),
+    );
+    console.log('projectData', projectData);
+
+    const injectPlayer = () => {
+      if (!webViewRef.current) {
+        logger.warn('WebView ref not available');
+        return;
+      }
+
+      const injectedJS = `
+        (function() {
+          try {
+            // Check DOM readiness
+            if (document.readyState === 'loading' || !document.body) {
+              return false;
+            }
+            
+            const container = document.getElementById('project-player');
+            if (!container) {
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'error',
+                data: 'project-player element not found'
+              }));
+              return false;
+            }
+            
+            // Helper function to create and append player
+            const createPlayer = function() {
+              const player = document.createElement('project-player');
+              player.setAttribute('projectdata', '${projectData}');
+              player.setAttribute('previewmode', '${previewMode}');
+              container.innerHTML = '';
+              container.appendChild(player);
+              window.ReactNativeWebView.postMessage(JSON.stringify({
+                type: 'success',
+                data: 'Player initialized'
+              }));
+            };
+            
+            // Check if custom element is available
+            if (typeof customElements === 'undefined' || !customElements.get('project-player')) {
+              if (customElements && customElements.whenDefined) {
+                customElements.whenDefined('project-player')
+                  .then(createPlayer)
+                  .catch(function(err) {
+                    window.ReactNativeWebView.postMessage(JSON.stringify({
+                      type: 'error',
+                      data: 'Custom element registration failed: ' + err.toString()
+                    }));
+                  });
+                return false;
+              }
+              return false;
+            }
+            
+            // Custom element is ready, create player immediately
+            createPlayer();
+            return true;
+          } catch (error) {
+            window.ReactNativeWebView.postMessage(JSON.stringify({
+              type: 'error',
+              data: error.toString()
+            }));
+            return false;
+          }
+        })();
+        true;
+      `;
+
+      webViewRef.current.injectJavaScript(injectedJS);
+    };
+
+    // Try multiple times with increasing delays
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    [1000, 2000, 3000, 5000].forEach(delay => {
+      const timer = setTimeout(() => {
+        injectPlayer();
+      }, delay);
+      timers.push(timer);
+    });
+
+    return () => {
+      timers.forEach(timer => clearTimeout(timer));
+    };
+  }, [playerConfig]);
+
+  const handleMessage = (event: any) => {
     try {
       const message = JSON.parse(event.nativeEvent.data);
       logger.info('Message from WebView:', message);
 
-      if (message.type === 'playerEvent') {
+      if (message.type === 'domReady') {
+        logger.info('DOM is ready:', message.data);
+        // DOM is ready, we can use this info for debugging
+      } else if (message.type === 'success') {
+        logger.info('Player initialized successfully:', message.data);
+        setLoading(false);
+      } else if (message.type === 'playerEvent') {
         logger.info('Player event received:', message.data);
         if (message.data?.edata?.type === 'EXIT') {
           logger.info('Player exit event received');
-          // Handle exit event - you can add navigation logic here
         }
       } else if (message.type === 'telemetryEvent') {
         logger.info('Telemetry event received:', message.data);
-        // Handle telemetry events
       } else if (message.type === 'error') {
         logger.error('WebView error:', message.data);
+        setLoading(false);
       }
     } catch (error) {
       logger.error('Error parsing message from WebView:', error);
     }
   };
 
-  // Web platform: Render web component directly
-  if (isWeb) {
-    return (
-      <View style={styles.container}>
-        {loading && (
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color="#007AFF" />
-            <Text style={styles.loadingText}>Loading Player...</Text>
-          </View>
-        )}
-        <View
-          ref={(ref: any) => {
-            if (isWeb && ref) {
-              // On web, get the DOM node from the React Native Web View ref
-              const domNode = getDOMNode(ref);
-              if (domNode && !containerRef.current) {
-                containerRef.current = domNode;
-                // Trigger initialization when container is ready
-                if (playerConfig) {
-                  // Use setTimeout to ensure DOM is ready
-                  setTimeout(() => {
-                    if (customElements.get('project-player')) {
-                      initializeWebPlayer();
-                    } else {
-                      customElements
-                        .whenDefined('project-player')
-                        .then(() => {
-                          initializeWebPlayer();
-                        })
-                        .catch(error => {
-                          logger.error(
-                            'Error waiting for custom element in ref:',
-                            error,
-                          );
-                          setLoading(false);
-                        });
-                    }
-                  }, 0);
-                } else {
-                  // No playerConfig, set loading to false
-                  setLoading(false);
-                }
-              } else if (!domNode && isWeb) {
-                // If we can't get DOM node, try alternative approach
-                // Set a timeout to retry or give up
-                setTimeout(() => {
-                  if (!containerRef.current) {
-                    logger.warn(
-                      'Could not access DOM node for web player container',
-                    );
-                    setLoading(false);
-                  }
-                }, 1000);
-              }
-            }
-          }}
-          style={styles.webContainer}
-        />
-      </View>
-    );
-  }
-
   // Native platform: Use WebView
   return (
     <View style={styles.container}>
-      {loading && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
-          <Text style={styles.loadingText}>Loading Player...</Text>
-        </View>
-      )}
+      <LoadingIndicator loading={loading} />
       <WebView
         ref={webViewRef}
         source={{
           uri: 'file:///android_asset/project-player-dist/index.html',
         }}
         style={styles.webView}
-        onLoadEnd={() => setLoading(false)}
+        onLoadEnd={() => {
+          logger.info('WebView loaded');
+          setLoading(false);
+          // Don't set loading to false here - wait for player initialization
+        }}
         onMessage={handleMessage}
         javaScriptEnabled={true}
         domStorageEnabled={true}
@@ -354,10 +183,8 @@ const styles = StyleSheet.create({
   },
   webView: {
     flex: 1,
-  },
-  webContainer: {
-    flex: 1,
-    minHeight: 400,
+    height: 450,
+    width: '100%',
   },
   loadingContainer: {
     position: 'absolute',
@@ -376,5 +203,13 @@ const styles = StyleSheet.create({
     color: '#333',
   },
 });
+
+const LoadingIndicator = ({ loading }: { loading: boolean }) =>
+  loading ? (
+    <View style={styles.loadingContainer}>
+      <ActivityIndicator size="large" color="#007AFF" />
+      <Text style={styles.loadingText}>Loading Player...</Text>
+    </View>
+  ) : null;
 
 export default WebComponentPlayer;

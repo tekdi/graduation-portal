@@ -140,7 +140,7 @@ module.exports = (env = {}, argv = {}) => {
     },
     plugins: [
       new HtmlWebpackPlugin({
-        template: './public/index.html',
+        template: './public/project-player-index.html',
         inject: 'body', // Inject scripts at the end of body
         scriptLoading: 'blocking',
         // Add CommonJS polyfill before main bundle
