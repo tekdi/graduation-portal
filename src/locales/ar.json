@@ -47,5 +47,29 @@
     "connectWithExperts": "تواصل مع الخبراء",
     "connectWithExpertsDescription": "احصل على الدعم، اطرح الأسئلة، وتواصل مع المتخصصين",
     "getStarted": "ابدأ"
+  },
+  "participants": {
+    "myParticipants": "مشاركيّ",
+    "dashboard": "لوحة التحكم",
+    "searchByNameOrId": "ابحث بالاسم أو المعرّف...",
+    "notEnrolled": "غير مسجل",
+    "enrolled": "مسجل",
+    "inProgress": "قيد التقدم",
+    "completed": "مكتمل",
+    "droppedOut": "منسحب",
+    "name": "الاسم",
+    "participantID": "معرّف المشارك",
+    "overallProgress": "التقدم العام",
+    "contact": "التواصل",
+    "actions": "الإجراءات",
+    "noParticipantsFound": "لم يتم العثور على مشاركين",
+    "loadingParticipants": "جاري تحميل المشاركين..."
+  },
+  "actions": {
+    "viewDetails": "عرض التفاصيل",
+    "logVisit": "تسجيل الزيارة",
+    "dropout": "انسحاب",
+    "confirmDropout": "تأكيد الانسحاب",
+    "dropoutMessage": "هل أنت متأكد من رغبتك في وضع هذا المشارك كمنسحب؟ يمكن التراجع عن هذا الإجراء لاحقًا."
   }
 }

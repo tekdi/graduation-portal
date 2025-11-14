@@ -92,5 +92,30 @@
     "connectWithExperts": "विशेषज्ञों से जुड़ें",
     "connectWithExpertsDescription": "सहायता प्राप्त करें, प्रश्न पूछें और विशेषज्ञों से जुड़ें",
     "getStarted": "शुरू करें"
+  },
+
+  "participants": {
+    "myParticipants": "मेरे प्रतिभागी",
+    "dashboard": "डैशबोर्ड",
+    "searchByNameOrId": "नाम या आईडी से खोजें...",
+    "notEnrolled": "नामांकित नहीं",
+    "enrolled": "नामांकित",
+    "inProgress": "प्रगति पर",
+    "completed": "पूर्ण",
+    "droppedOut": "छोड़ दिया",
+    "name": "नाम",
+    "participantID": "प्रतिभागी आईडी",
+    "overallProgress": "कुल प्रगति",
+    "contact": "संपर्क",
+    "actions": "क्रियाएँ",
+    "noParticipantsFound": "कोई प्रतिभागी नहीं मिला",
+    "loadingParticipants": "प्रतिभागियों को लोड किया जा रहा है..."
+  },
+  "actions": {
+    "viewDetails": "विवरण देखें",
+    "logVisit": "भेंट दर्ज करें",
+    "dropout": "ड्रॉपआउट",
+    "confirmDropout": "ड्रॉपआउट की पुष्टि करें",
+    "dropoutMessage": "क्या आप सुनिश्चित हैं कि आप इस प्रतिभागी को ड्रॉपआउट के रूप में चिह्नित करना चाहते हैं? इस क्रिया को बाद में बदला जा सकता है।"
   }
 }

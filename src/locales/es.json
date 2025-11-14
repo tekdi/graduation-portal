@@ -47,5 +47,29 @@
     "connectWithExperts": "Conéctate con Expertos",
     "connectWithExpertsDescription": "Obtén apoyo, haz preguntas y conéctate con especialistas",
     "getStarted": "Comenzar"
+  },
+  "participants": {
+    "myParticipants": "Mis Participantes",
+    "dashboard": "Panel de Control",
+    "searchByNameOrId": "Buscar por nombre o ID...",
+    "notEnrolled": "No Inscrito",
+    "enrolled": "Inscrito",
+    "inProgress": "En Progreso",
+    "completed": "Completado",
+    "droppedOut": "Abandonado",
+    "name": "Nombre",
+    "participantID": "ID del Participante",
+    "overallProgress": "Progreso General",
+    "contact": "Contacto",
+    "actions": "Acciones",
+    "noParticipantsFound": "No se encontraron participantes",
+    "loadingParticipants": "Cargando participantes..."
+  },
+  "actions": {
+    "viewDetails": "Ver Detalles",
+    "logVisit": "Registrar Visita",
+    "dropout": "Abandono",
+    "confirmDropout": "Confirmar Abandono",
+    "dropoutMessage": "¿Estás seguro de que deseas marcar a este participante como abandonado? Esta acción puede revertirse más tarde."
   }
 }

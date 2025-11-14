@@ -5,4 +5,17 @@ import { useAlert } from './Alert';
 import { Input } from './Inputs/input';
 import FeatureCard from './FeatureCard';
 import Icon from './Icon';
-export { Select, Menu, useAlert, Input, FeatureCard, Icon };
+import SearchBar from './SearchBar';
+import DataTable from './DataTable';
+import ActionsMenu from './ActionsMenu';
+export {
+  Select,
+  Menu,
+  useAlert,
+  Input,
+  FeatureCard,
+  Icon,
+  SearchBar,
+  DataTable,
+  ActionsMenu,
+};

@@ -20,7 +20,9 @@
     "offline": "Offline Mode",
     "online": "Online",
     "selectOption": "Select an option",
-    "placeholder": "Search users, templates, logs..."
+    "placeholder": "Search users, templates, logs...",
+    "actions": "Actions",
+    "noDataFound": "No data found"
   },
   "navigation": {
     "menu": "Menu",
@@ -92,5 +94,29 @@
     "connectWithExperts": "Connect with Experts",
     "connectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
     "getStarted": "Get started"
+  },
+  "participants": {
+    "myParticipants": "My Participants",
+    "dashboard": "Dashboard",
+    "searchByNameOrId": "Search by name or ID...",
+    "notEnrolled": "Not Enrolled",
+    "enrolled": "Enrolled",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "droppedOut": "Dropped out",
+    "name": "Name",
+    "participantID": "Participant ID",
+    "overallProgress": "Overall Progress",
+    "contact": "Contact",
+    "actions": "Actions",
+    "noParticipantsFound": "No participants found",
+    "loadingParticipants": "Loading participants..."
+  },
+  "actions": {
+    "viewDetails": "View Details",
+    "logVisit": "Log Visit",
+    "dropout": "Dropout",
+    "confirmDropout": "Confirm Dropout",
+    "dropoutMessage": "Are you sure you want to mark this participant as dropout? This action can be reversed later."
   }
 }

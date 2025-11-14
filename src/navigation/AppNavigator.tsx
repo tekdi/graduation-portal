@@ -12,6 +12,7 @@ import HomeScreen from '../screens/Home';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
+import ParticipantsList from '../screens/ParticipantsList/index';
 
 const Stack = createStackNavigator();
 
@@ -38,6 +39,7 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
+        { name: 'participants', component: ParticipantsList },
       ];
     default:
       return [];

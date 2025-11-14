@@ -1,0 +1,249 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import {
+  Box,
+  VStack,
+  HStack,
+  Text,
+  Heading,
+  Pressable,
+  ScrollView,
+} from '@gluestack-ui/themed';
+import { useNavigation } from '@react-navigation/native';
+import SearchBar from '@ui/SearchBar';
+import DataTable from '@ui/DataTable';
+import { getParticipantsColumns } from '@ui/DataTable/ParticipantsTableConfig';
+import { theme } from '@config/theme';
+import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
+import {
+  Participant,
+  ParticipantStatus,
+  StatusCount,
+  // ParticipantsQueryParams,
+} from '@app-types/screens';
+// import { participantsService } from '@services/participantsService';
+import { useLanguage } from '@contexts/LanguageContext';
+import { TabButton } from '@ui/Tabs';
+import { TABS } from '@constants/TABS';
+import { getStatusItems } from '@constants/FILTERS';
+import { PARTICIPANTS_LIST } from '@constants/PARTICIPANTS_LIST';
+
+const ParticipantsList: React.FC = () => {
+  const navigation = useNavigation();
+  const { t } = useLanguage();
+
+  // State management
+  const [activeTab, setActiveTab] = useState<string>('participants');
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [statusCounts] = useState<StatusCount>({
+    not_enrolled: 5,
+    enrolled: 11,
+    in_progress: 13,
+    completed: 6,
+    dropped_out: 0,
+  });
+  const [activeStatus, setActiveStatus] = useState<ParticipantStatus | ''>(
+    'not_enrolled',
+  );
+  const [_searchKey, setSearchKey] = useState('');
+  const [isLoading] = useState(false);
+  const [_page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Get status items with current counts
+  const statusItems = getStatusItems(statusCounts);
+
+  useEffect(() => {
+    if (activeTab === 'participants') {
+      // Set mock participants data
+      setParticipants(PARTICIPANTS_LIST);
+      setTotalCount(PARTICIPANTS_LIST.length);
+    }
+  }, [activeTab]);
+
+  // Handlers
+  const handleSearch = useCallback((text: string) => {
+    setSearchKey(text);
+    setPage(1); // Reset to first page on search
+  }, []);
+
+  const handleStatusChange = useCallback((status: ParticipantStatus | '') => {
+    setActiveStatus(status);
+    setPage(1); // Reset to first page on filter change
+  }, []);
+
+  const handleRowClick = useCallback(
+    (participant: Participant) => {
+      console.log('Navigate to participant detail:', participant.id);
+      // @ts-ignore
+      navigation.navigate('ParticipantDetail', {
+        participantId: participant.id,
+      });
+    },
+    [navigation],
+  );
+
+  const handleDropout = useCallback((participant: Participant) => {
+    console.log('Dropout participant:', participant.id);
+    // TODO: Implement dropout logic - API call to mark participant as dropout
+    // For now, just log it
+    alert(`Participant ${participant.name} marked as dropout`);
+  }, []);
+
+  return (
+    <Box flex={1}>
+      {/* Tabs Header */}
+      <HStack
+        borderBottomWidth={1}
+        borderBottomColor="$borderLight300"
+        bg={theme.tokens.colors.backgroundPrimary.light}
+      >
+        {TABS?.map(tab => (
+          <TabButton
+            key={tab.key}
+            tab={tab}
+            isActive={activeTab === tab.key}
+            onPress={setActiveTab}
+          />
+        ))}
+      </HStack>
+
+      {/* Tab Content */}
+      <ScrollView flex={1} bg={theme.tokens.colors.accent100}>
+        {activeTab === 'participants' ? (
+          <VStack space="lg" padding="$6" flex={1}>
+            {/* Page Title */}
+            <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}>
+              {t('participants.myParticipants')}
+            </Heading>
+
+            {/* Search Bar */}
+            <SearchBar
+              placeholder={t('participants.searchByNameOrId')}
+              onSearch={handleSearch}
+              debounceMs={500}
+            />
+
+            {/* Status Filter Bar */}
+            <Box
+              bg="$backgroundLight50"
+              borderRadius="$lg"
+              padding="$1"
+              width="$full"
+            >
+              <HStack space="xs" width="$full">
+                {statusItems.map(item => {
+                  const isActive = activeStatus === item.key;
+
+                  return (
+                    <Pressable
+                      key={item.key}
+                      onPress={() => handleStatusChange(item.key)}
+                      flex={1}
+                      paddingVertical="$3"
+                      paddingHorizontal="$2"
+                      borderRadius="$md"
+                      bg={isActive ? '$white' : 'transparent'}
+                      $web-cursor="pointer"
+                      $web-transition="all 0.2s"
+                      sx={{
+                        ':hover': {
+                          opacity: 0.8,
+                        },
+                      }}
+                    >
+                      <HStack
+                        space="xs"
+                        alignItems="center"
+                        justifyContent="center"
+                      >
+                        <Text
+                          fontSize="$sm"
+                          color={
+                            isActive
+                              ? theme.tokens.colors.primary500
+                              : theme.tokens.colors.mutedForeground
+                          }
+                          fontWeight={isActive ? '$medium' : '$normal'}
+                          textAlign="center"
+                        >
+                          {t(item.label)}
+                        </Text>
+                        <Box
+                          bg={
+                            isActive
+                              ? theme.tokens.colors.primary500
+                              : '$backgroundLight200'
+                          }
+                          borderRadius="$full"
+                          paddingHorizontal="$2"
+                          paddingVertical="$0.5"
+                          minWidth={24}
+                          height={20}
+                          alignItems="center"
+                          justifyContent="center"
+                        >
+                          <Text
+                            fontSize="$xs"
+                            color={
+                              isActive
+                                ? '$white'
+                                : theme.tokens.colors.mutedForeground
+                            }
+                            fontWeight="$semibold"
+                          >
+                            {item.count}
+                          </Text>
+                        </Box>
+                      </HStack>
+                    </Pressable>
+                  );
+                })}
+              </HStack>
+            </Box>
+
+            {/* Participants Table */}
+            <DataTable
+              data={participants}
+              columns={getParticipantsColumns(activeStatus)}
+              getRowKey={participant => participant.id}
+              onRowClick={handleRowClick}
+              onActionClick={handleDropout}
+              isLoading={isLoading}
+              showActions={true}
+              emptyMessage={t('participants.noParticipantsFound')}
+              loadingMessage={t('participants.loadingParticipants')}
+            />
+
+            {/* Pagination Info */}
+            {!isLoading && participants.length > 0 && (
+              <Box paddingVertical="$4">
+                <Text
+                  {...TYPOGRAPHY.bodySmall}
+                  color={theme.tokens.colors.mutedForeground}
+                >
+                  Showing {participants.length} of {totalCount} participants
+                </Text>
+              </Box>
+            )}
+          </VStack>
+        ) : (
+          <Box
+            padding="$6"
+            alignItems="center"
+            justifyContent="center"
+            minHeight={400}
+          >
+            <Text
+              {...TYPOGRAPHY.paragraph}
+              color={theme.tokens.colors.mutedForeground}
+            >
+              Dashboard coming soon...
+            </Text>
+          </Box>
+        )}
+      </ScrollView>
+    </Box>
+  );
+};
+
+export default ParticipantsList;

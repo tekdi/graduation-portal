@@ -17,6 +17,7 @@ export const theme = {
       },
       foreground: 'oklch(0.145 0 0)',
       mutedForeground: '#717182',
+      error: '#dc2626',
     },
   },
   components: {
