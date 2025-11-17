@@ -17,6 +17,9 @@ export const theme = {
       },
       foreground: 'oklch(0.145 0 0)',
       mutedForeground: '#717182',
+      textMutedForeground: '#64748b',
+      textForeground: '#2d2d2d',
+      fontMedium: 500, // .text-muted-foreground
     },
   },
   components: {

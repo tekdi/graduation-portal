@@ -138,9 +138,9 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           />
           <VStack {...sidebarStyles.brandContainer}>
             <HStack {...sidebarStyles.brandRow}>
-              <Text {...sidebarStyles.brandTextPrimary}>
+              {/* <Text {...sidebarStyles.brandTextPrimary}>
                 {t('brand.primaryName')}
-              </Text>
+              </Text> */}
               <Text {...sidebarStyles.brandTextSecondary}>
                 {t('brand.secondaryName')}
               </Text>

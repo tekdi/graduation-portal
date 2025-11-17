@@ -55,7 +55,8 @@
       "createUser": "Create User",
       "main": "Main",
       "quickActions": "Quick Actions"
-    }
+    },
+    "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations."
   },
   "brand": {
     "primaryName": "brac",

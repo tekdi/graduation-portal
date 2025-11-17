@@ -1,10 +1,10 @@
 // Sidebar Styles
 export const sidebarStyles = {
   container: {
-    bg: '$backgroundLight50' as const,
+    bg: '#f8fafc',
     borderRightWidth: 1,
     borderRightColor: '$borderLight300' as const,
-    width: 280,
+    width: 256,
     height: '100%' as '100%',
   },
   scrollContent: {
@@ -125,14 +125,14 @@ export const sidebarStyles = {
   },
   logoContainer: {
     alignItems: 'center' as const,
-    space: 'sm' as const,
+    space: 'md' as const,
   },
   logoImage: {
-    width: 32,
-    height: 32,
+    width: 48,
+    height: 48,
   },
   brandContainer: {
-    space: 'xs' as const,
+    //space: 'xs' as const,
   },
   brandRow: {
     alignItems: 'center' as const,
@@ -144,9 +144,10 @@ export const sidebarStyles = {
     color: '$primary600' as const,
   },
   brandTextSecondary: {
-    fontSize: '$lg' as const,
+    fontSize: '$md' as const,
     fontWeight: '$bold' as const,
     color: '$textLight900' as const,
+    lineHeight: 20,
   },
   versionText: {
     fontSize: '$xs' as const,
@@ -155,7 +156,7 @@ export const sidebarStyles = {
   mobileMenuButton: {
     alignItems: 'center' as const,
     space: 'sm' as const,
-    py: '$4' as const,
+    py: '$2' as const,
     px: '$6' as const,
     minHeight: 64,
   },

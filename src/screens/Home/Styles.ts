@@ -1,5 +1,7 @@
 export const dashboardStyles = {
   scrollView: {
+    flex: 1,
+    width: '100%',
     p: '$4',
     bg: '$backgroundLight0',
   },

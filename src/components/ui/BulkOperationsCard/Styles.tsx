@@ -1,0 +1,57 @@
+export const bulkOperationStyles = {
+  container: {
+    bg: '$white',
+    borderWidth: 1,
+    borderColor: '$borderLight300',
+    borderRadius: '$lg',
+    p: '$6',
+    width: '100%',
+    mt: '$6',
+  },
+  sectionTitle: {
+    fontSize: '$md',
+    fontWeight: '$normal',
+    mb: '$6',
+    color: '$textLight900',
+  },
+  subTitle: {
+    fontSize: '$sm',
+    fontWeight: '$normal',
+    mb: '$3',
+    color: '$textLight900',
+  },
+  description: {
+    fontSize: '$xs',
+    color: '$textMutedForeground',
+    mb: '$2',
+  },
+  templateButton: {
+    bg: '$white',
+    borderWidth: 1,
+    borderColor: '$borderLight300',
+    borderRadius: '$md',
+    px: '$2',
+    flexDirection: 'row',
+    alignItems: 'center',
+    mb: '$2',
+    height: '$8',
+    //fontSize: '$xs',
+  },
+  templateButtonText: {
+    fontSize: '$sm',
+    color: '$textForeground',
+    fontWeight: '$medium',
+  },
+  icon: {
+    width: 20,
+    height: 20,
+    mr: '$2.5',
+  },
+  bulletText: {
+    fontSize: '$xs',
+    fontWeight: '$normal',
+    color: '$textMutedForeground',
+    lineHeight: 16,
+    mb: '$1',
+  },
+};

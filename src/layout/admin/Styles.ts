@@ -6,14 +6,15 @@ export const layoutStyles = {
     flexDirection: 'row' as const,
   },
   contentContainer: {
-    alignItems: 'flex-start' as const,
-    height: '100%' as '100%',
     flex: 1,
+    width: '100%',
     flexDirection: 'column' as const,
+    minHeight: '100%',
   },
   mainContent: {
     width: '100%' as '100%',
     bg: '$backgroundLight0' as const,
+    padding: 24,
     // minHeight: '100%' as '100%',
   },
   headerContent: {
