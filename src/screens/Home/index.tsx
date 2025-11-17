@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, VStack, Text } from '@ui';
+import { VStack, Text } from '@ui';
 import { View } from 'react-native';
 
 import { dashboardStyles } from './Styles';
@@ -39,10 +39,6 @@ const statsData = [
   }
 ];
   return (
-  <ScrollView 
-    {...dashboardStyles.scrollView}
-    contentContainerStyle={{ flexGrow: 1 }}
-  >
     <VStack space="md" width="100%">
       <VStack {...dashboardStyles.mainVStack}>
         <Text {...dashboardStyles.titleText}>{t('admin.menu.userManagement')}</Text>
@@ -67,10 +63,10 @@ const statsData = [
           ))}
         </StatsRow>
       </View>
-     
+      <BulkOperationsCard/>
+       <BulkOperationsCard/>
     </VStack>
-  </ScrollView>
-);
+  );
 };
 
 export default DashboardScreen;

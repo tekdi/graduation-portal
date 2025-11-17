@@ -162,7 +162,11 @@ const AppNavigator: React.FC = () => {
         screenOptions={{
           headerShown: false,
           cardStyle: isWeb
-            ? ({ width: '100%', height: '100vh' } as any)
+            ? ({
+                width: '100%',
+                minHeight: '100vh',
+                height: 'auto',
+              } as any)
             : ({ width: '100%' } as any),
         }}
       >
