@@ -10,7 +10,7 @@ export interface Participant {
   name: string;
   progress: number;
   email: string;
-  phone: string | number;
+  phone: string;
   status?: ParticipantStatus;
 }
 

@@ -1,5 +1,8 @@
 {
   "common": {
+    "profile": "الملف الشخصي",
+    "settings": "الإعدادات",
+    "logout": "تسجيل الخروج",
     "loading": "جار التحميل...",
     "save": "حفظ",
     "cancel": "إلغاء",
@@ -16,7 +19,10 @@
     "confirm": "تأكيد",
     "offline": "وضع عدم الاتصال",
     "online": "متصل",
-    "selectOption": "اختر خياراً"
+    "selectOption": "اختر خياراً",
+    "placeholder": "البحث عن المستخدمين والقوالب والسجلات...",
+    "actions": "الإجراءات",
+    "noDataFound": "لم يتم العثور على بيانات"
   },
   "navigation": {
     "menu": "القائمة",
@@ -36,6 +42,47 @@
     "ar": "العربية",
     "es": "Español",
     "hi": "हिन्दी"
+  },
+  "admin": {
+    "home": "الرئيسية",
+    "dashboard": "لوحة التحكم",
+    "dashboardDescription": "مرحبًا بعودتك! هذا ما يحدث في نظام إدارة التعلم الخاص بك.",
+    "quickActions": "إجراءات سريعة",
+    "recentActivity": "النشاط الأخير",
+    "menu": {
+      "userManagement": "إدارة المستخدمين",
+      "templateManagement": "إدارة القوالب",
+      "auditLog": "سجل التدقيق",
+      "uploadUsers": "تحميل المستخدمين",
+      "createUser": "إنشاء مستخدم",
+      "main": "الرئيسية",
+      "quickActions": "إجراءات سريعة"
+    }
+  },
+  "brand": {
+    "primaryName": "brac",
+    "secondaryName": "GBL Admin",
+    "version": "Console v1.0"
+  },
+  "system": {
+    "online": "النظام نشط",
+    "offline": "النظام غير نشط"
+  },
+  "login": {
+    "pleaseEnterBothEmailAndPassword": "يرجى إدخال البريد الإلكتروني وكلمة المرور",
+    "invalidEmailOrPassword": "بريد إلكتروني أو كلمة مرور غير صالحة",
+    "anErrorOccurredDuringLogin": "حدث خطأ أثناء تسجيل الدخول",
+    "logIn": "تسجيل الدخول",
+    "testAccounts": "حسابات الاختبار:",
+    "welcomeToYourAccount": "مرحبًا بك في حسابك",
+    "logInToContinue": "تسجيل الدخول للمتابعة",
+    "description": "تسجيل الدخول للمتابعة",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "rememberMe": "تذكرني",
+    "rememberMeDescription": "تذكرني على هذا الجهاز لمدة 30 يومًا",
+    "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
+    "title": "توليد سبل عيش أفضل"
   },
   "welcome": {
     "welcomeBack": "مرحبًا بعودتك",

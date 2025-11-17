@@ -50,6 +50,7 @@ interface ActionsMenuProps<T = any> {
  */
 const ActionsMenu = <T = any,>({
   item,
+  actions,
   onDropout,
   getItemId = (data: any) => data.id,
   getItemName = (data: any) => data.name || data.id,
@@ -96,13 +97,14 @@ const ActionsMenu = <T = any,>({
         <Icon
           as={AlertCircleIcon}
           size="md"
-          color={theme.tokens.colors.error}
+          color={theme.tokens.colors.error.light}
         />
       ),
-      color: theme.tokens.colors.error,
+      color: theme.tokens.colors.error.light,
       action: 'modal',
     },
   ];
+  const effectiveActions = actions ?? defaultActions;
 
   const handleActionClick = (actionItem: ActionItem) => {
     setShowMenu(false);
@@ -237,7 +239,7 @@ const ActionsMenu = <T = any,>({
               $web-boxShadow="0px 8px 24px rgba(0, 0, 0, 0.2)"
             >
               <VStack space="xs" padding="$2">
-                {defaultActions.map(actionItem => (
+                {effectiveActions.map(actionItem => (
                   <Pressable
                     key={actionItem.key}
                     onPress={() => handleActionClick(actionItem)}
@@ -296,9 +298,9 @@ const ActionsMenu = <T = any,>({
                 <ButtonText>{t('common.cancel') || 'Cancel'}</ButtonText>
               </Button>
               <Button
-                bg={theme.tokens.colors.error}
+                bg={theme.tokens.colors.error.light}
                 onPress={handleDropoutConfirm}
-                $hover-bg={theme.tokens.colors.error}
+                $hover-bg={theme.tokens.colors.error.light}
               >
                 <ButtonText>{t('actions.dropout') || 'Dropout'}</ButtonText>
               </Button>

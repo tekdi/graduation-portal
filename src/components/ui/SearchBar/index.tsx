@@ -24,7 +24,6 @@ const SearchBar: React.FC<SearchBarProps> = ({
 
   const handleChange = useCallback((text: string) => {
     setSearchText(text);
-    console.log('searchterm', text);
   }, []);
 
   return (

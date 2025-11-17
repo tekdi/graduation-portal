@@ -9,7 +9,6 @@ import chartIcon from '../assets/images/chartIcon.png';
 import chatIcon from '../assets/images/chatIcon.png';
 import logoIcon from '../assets/images/logo.png';
 import searchIcon from '../assets/images/searchIcon.png';
-import avatarIcon from '../assets/images/avatarIcon.png';
 
 export const ICONS = {
   user: userIcon,
@@ -17,7 +16,6 @@ export const ICONS = {
   chat: chatIcon,
   logo: logoIcon,
   search: searchIcon,
-  avatar: avatarIcon,
 } as const;
 
 // Type for autocomplete

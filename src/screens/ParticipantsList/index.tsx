@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Box,
   VStack,
@@ -60,6 +60,19 @@ const ParticipantsList: React.FC = () => {
     }
   }, [activeTab]);
 
+  const filteredParticipants = useMemo(() => {
+    // Example placeholder logic until API integration:
+    const term = _searchKey.trim().toLowerCase();
+    return PARTICIPANTS_LIST.filter(p => {
+      const matchesSearch =
+        !term ||
+        p.name.toLowerCase().includes(term) ||
+        p.id.toLowerCase().includes(term);
+      // If/when Participant has a status field, also filter on activeStatus here.
+      return matchesSearch;
+    });
+  }, [_searchKey]);
+
   // Handlers
   const handleSearch = useCallback((text: string) => {
     setSearchKey(text);
@@ -75,7 +88,7 @@ const ParticipantsList: React.FC = () => {
     (participant: Participant) => {
       console.log('Navigate to participant detail:', participant.id);
       // @ts-ignore
-      navigation.navigate('ParticipantDetail', {
+      navigation.navigate('participant-detail', {
         participantId: participant.id,
       });
     },
@@ -203,7 +216,7 @@ const ParticipantsList: React.FC = () => {
 
             {/* Participants Table */}
             <DataTable
-              data={participants}
+              data={filteredParticipants}
               columns={getParticipantsColumns(activeStatus)}
               getRowKey={participant => participant.id}
               onRowClick={handleRowClick}

@@ -107,7 +107,7 @@ const TableRow = <T,>({
               {...TYPOGRAPHY.paragraph}
               color={theme.tokens.colors.mutedForeground}
             >
-              {String((item as any)[column.key] || '')}
+              {String((item as any)[column.key] ?? '')}
             </Text>
           )}
         </Box>
