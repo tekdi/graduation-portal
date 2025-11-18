@@ -1,0 +1,96 @@
+{
+  "common": {
+    "profile": "प्रोफ़ाइल",
+    "settings": "सेटिंग्स",
+    "logout": "लॉग आउट",
+    "loading": "लोड हो रहा है...",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "close": "बंद करें",
+    "search": "खोजें",
+    "filter": "फ़िल्टर",
+    "submit": "जमा करें",
+    "back": "वापस",
+    "next": "अगला",
+    "error": "त्रुटि",
+    "success": "सफल",
+    "confirm": "पुष्टि करें",
+    "offline": "ऑफ़लाइन मोड",
+    "online": "ऑनलाइन",
+    "selectOption": "एक विकल्प चुनें",
+    "placeholder": "उपयोगकर्ताओं, टेम्पलेट्स, लॉग्स खोजें..."
+  },
+  "navigation": {
+    "menu": "मेनू",
+    "closeMenu": "✕ मेनू बंद करें"
+  },
+  "settings": {
+    "title": "सेटिंग्स",
+    "language": "भाषा",
+    "selectLanguage": "भाषा चुनें",
+    "selectLanguagePlaceholder": "कृपया अपनी पसंदीदा भाषा चुनकर जारी रखें",
+    "theme": "थीम",
+    "notifications": "सूचनाएं",
+    "about": "के बारे में"
+  },
+  "languages": {
+    "en": "English",
+    "ar": "العربية",
+    "es": "Español",
+    "hi": "हिन्दी"
+  },
+  "admin": {
+    "home": "होम",
+    "dashboard": "डैशबोर्ड",
+    "dashboardDescription": "आपका स्वागत है! यहां आपके जीवनस्तर उत्पन्न करने में क्या हो रहा है।",
+    "quickActions": "त्वरित कार्य",
+    "recentActivity": "हाल की गतिविधि",
+    "menu": {
+      "userManagement": "उपयोगकर्ता प्रबंधन",
+      "templateManagement": "टेम्पलेट प्रबंधन",
+      "auditLog": "जाँच लॉग",
+      "uploadUsers": "उपयोगकर्ताओं अपलोड करें",
+      "createUser": "उपयोगकर्ता बनाएं",
+      "main": "मुख्य",
+      "quickActions": "त्वरित कार्य"
+    }
+  },
+  "brand": {
+    "primaryName": "brac",
+    "secondaryName": "GBL Admin",
+    "version": "Console v1.0"
+  },
+  "system": {
+    "online": "सिस्टम सक्रिय",
+    "offline": "सिस्टम अक्रिय"
+  },
+  "login": {
+    "pleaseEnterBothEmailAndPassword": "कृपया ईमेल और पासवर्ड दोनों दर्ज करें",
+    "invalidEmailOrPassword": "अमान्य ईमेल या पासवर्ड",
+    "anErrorOccurredDuringLogin": "लॉग इन करने में त्रुटि हो गई",
+    "logIn": "लॉग इन करें",
+    "testAccounts": "टेस्ट एकाउंट्स:",
+    "welcomeToYourAccount": "आपका खाता आपका स्वागत है",
+    "logInToContinue": "लॉग इन करके जारी रखें",
+    "description": "लॉग इन करके जारी रखें",
+    "username": "उपयोगकर्ता नाम",
+    "password": "पासवर्ड",
+    "rememberMe": "मुझे याद रखें",
+    "rememberMeDescription": "मुझे इस डिवाइस पर 30 दिनों के लिए याद रखें",
+    "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
+    "title": "बेहतर जीवनस्तर उत्पन्न करना"
+  },
+  "welcome": {
+    "welcomeBack": "वापसी पर स्वागत है",
+    "chooseOptionBelowToGetStarted": "शुरू करने के लिए नीचे दिए गए विकल्पों में से एक चुनें",
+    "myParticipants": "मेरे प्रतिभागी",
+    "myParticipantsDescription": "अपने केसलोड को प्रबंधित करें, प्रतिभागियों की प्रगति को ट्रैक करें और विज़िट दर्ज करें",
+    "myLearningProgress": "मेरी सीखने की प्रगति",
+    "myLearningProgressDescription": "प्रशिक्षण सामग्री तक पहुँचें, अपने व्यावसायिक विकास को ट्रैक करें",
+    "connectWithExperts": "विशेषज्ञों से जुड़ें",
+    "connectWithExpertsDescription": "सहायता प्राप्त करें, प्रश्न पूछें और विशेषज्ञों से जुड़ें",
+    "getStarted": "शुरू करें"
+  }
+}

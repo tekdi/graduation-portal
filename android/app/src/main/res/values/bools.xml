@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default boolean flags for LTR languages -->
+    <bool name="is_rtl">false</bool>
+</resources>
+

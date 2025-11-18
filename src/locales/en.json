@@ -1,0 +1,96 @@
+{
+  "common": {
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Logout",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "search": "Search",
+    "filter": "Filter",
+    "submit": "Submit",
+    "back": "Back",
+    "next": "Next",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "offline": "Offline Mode",
+    "online": "Online",
+    "selectOption": "Select an option",
+    "placeholder": "Search users, templates, logs..."
+  },
+  "navigation": {
+    "menu": "Menu",
+    "closeMenu": "✕ Close Menu"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "selectLanguage": "Select Language",
+    "selectLanguagePlaceholder": "Please choose your preferred language to continue",
+    "theme": "Theme",
+    "notifications": "Notifications",
+    "about": "About"
+  },
+  "languages": {
+    "en": "English",
+    "ar": "العربية",
+    "es": "Español",
+    "hi": "हिन्दी"
+  },
+  "admin": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "dashboardDescription": "Welcome back! Here's what's happening with your learning management system.",
+    "quickActions": "Quick Actions",
+    "recentActivity": "Recent Activity",
+    "menu": {
+      "userManagement": "User Management",
+      "templateManagement": "Template Management",
+      "auditLog": "Audit Log",
+      "uploadUsers": "Upload Users",
+      "createUser": "Create User",
+      "main": "Main",
+      "quickActions": "Quick Actions"
+    }
+  },
+  "brand": {
+    "primaryName": "brac",
+    "secondaryName": "GBL Admin",
+    "version": "Console v1.0"
+  },
+  "system": {
+    "online": "System Active",
+    "offline": "System Inactive"
+  },
+  "login": {
+    "pleaseEnterBothEmailAndPassword": "Please enter both email and password",
+    "invalidEmailOrPassword": "Invalid email or password",
+    "anErrorOccurredDuringLogin": "An error occurred during login",
+    "logIn": "Log In",
+    "testAccounts": "Test Accounts:",
+    "welcomeToYourAccount": "Welcome To Your Account",
+    "logInToContinue": "Log in to Continue",
+    "description": "Log in to Continue",
+    "username": "Username",
+    "password": "Password",
+    "rememberMe": "Remember Me",
+    "rememberMeDescription": "Remember me on this device for 30 days",
+    "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
+    "title": "Generating Better Livelihoods"
+  },
+  "welcome": {
+    "welcomeBack": "Welcome back",
+    "chooseOptionBelowToGetStarted": "Choose an option below to get started",
+    "myParticipants": "My Participants",
+    "myParticipantsDescription": "Manage your caseload, track participant progress, and log visits",
+    "myLearningProgress": "My Learning Progress",
+    "myLearningProgressDescription": "Access training materials, track your professional development",
+    "connectWithExperts": "Connect with Experts",
+    "connectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
+    "getStarted": "Get started"
+  }
+}
