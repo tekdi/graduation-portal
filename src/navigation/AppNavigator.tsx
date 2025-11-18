@@ -9,12 +9,14 @@ import logger from '@utils/logger';
 import { usePlatform } from '@utils/platform';
 import AccessBaseNavigator from './navigators/AccessBaseNavigator';
 import HomeScreen from '../screens/Home';
+import UserManagementScreen from '../screens/UserManagement';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
 
 const Stack = createStackNavigator();
 
+// Shared function to generate accessPages based on user role
 const getAccessPages = (
   userRole?: string,
 ): { name: string; path?: string; component: React.ComponentType<any> }[] => {
@@ -24,25 +26,11 @@ const getAccessPages = (
   switch (role) {
     case 'admin':
       return [
-        { 
-          name: 'home', 
-          path: '/', 
-          component: HomeScreen 
-        },
-        { 
-          name: 'UserManagement', 
-          path: '/user-management', 
-          component: HomeScreen
-        },
-        { 
-          name: 'TemplateManagement', 
-          path: '/template-management', 
-          component: TemplateManagement 
-        },
+        { name: 'home', path: '/', component: HomeScreen },
         {
-          name: 'select-language',
-          path: '/select-language',
-          component: SelectLanguageScreen,
+          name: 'user-management',
+          path: '/user-management',
+          component: UserManagementScreen,
         },
       ];
     case 'supervisor':
@@ -66,6 +54,7 @@ const getLinkingConfig = (
     component: React.ComponentType<any>;
   }[],
 ) => {
+  // Define the base screens that are always available in linking
   const screens: Record<string, any> = {
     login: 'login',
     main: {
@@ -77,12 +66,17 @@ const getLinkingConfig = (
   if (accessPages.length > 0) {
     const mainScreens: Record<string, string> = {};
     accessPages.forEach(page => {
+      // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
-        ? page.path.startsWith('/')
+        ? // Remove leading slash for react-navigation config consistency
+        page.path.startsWith('/')
           ? page.path.substr(1)
           : page.path
         : page.name;
 
+
+        // Special handling for LC role:
+        // If there are multiple pages (e.g., 'home' and 'home1') and this is 'home', map it to select-language
       if (
         page.name === 'home' &&
         accessPages.length > 1 &&
@@ -112,6 +106,7 @@ const RoleBasedNavigator: React.FC = () => {
   >([]);
 
   useEffect(() => {
+    // Use shared function to get accessPages based on user role
     setAccessPages(getAccessPages(user?.role));
   }, [user]);
 
@@ -130,11 +125,17 @@ const AppNavigator: React.FC = () => {
   const { t, isRTL } = useLanguage();
   const { isLoggedIn, loading, user } = useAuth();
   const { isWeb } = usePlatform();
-
+// Generate accessPages based on user role
   const accessPages = useMemo(() => getAccessPages(user?.role), [user?.role]);
+
+  // Generate dynamic linking configuration based on accessPages
+  // Memoize to prevent unnecessary recalculations
   const linking = useMemo(() => getLinkingConfig(accessPages), [accessPages]);
 
+  // Update I18nManager when RTL changes (for React Native)
   useEffect(() => {
+    // Note: On React Native (not web), changing RTL requires app restart
+    // This ensures the correct direction is applied
     if (I18nManager.isRTL !== isRTL && !isWeb) {
       logger.log(
         'RTL direction changed, app may need restart on native platforms',
@@ -142,6 +143,7 @@ const AppNavigator: React.FC = () => {
     }
   }, [isRTL, isWeb]);
 
+  // Log current URL on web for debugging
   useEffect(() => {
     if (isWeb) {
       logger.log('Current URL:', window.location.href);
@@ -171,6 +173,7 @@ const AppNavigator: React.FC = () => {
         }}
       >
         {!isLoggedIn ? (
+          // Show login screen when not logged in
           <Stack.Screen
             name="login"
             component={LoginScreen}
@@ -179,6 +182,7 @@ const AppNavigator: React.FC = () => {
             }}
           />
         ) : (
+          // Show role-based navigator when logged in
           <Stack.Screen
             name="main"
             component={RoleBasedNavigator}

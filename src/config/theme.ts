@@ -19,7 +19,7 @@ export const theme = {
       mutedForeground: '#717182',
       textMutedForeground: '#64748b',
       textForeground: '#2d2d2d',
-      fontMedium: 500, // .text-muted-foreground
+      bgSidebar: '#f8fafc',
     },
   },
   components: {

@@ -6,20 +6,20 @@ export const StatsRowContainer = styled(View, {
   flexDirection: 'row',
   flexWrap: 'wrap',
  // marginVertical: 16,
-  marginHorizontal: -8,
+  marginHorizontal: '-$2',
 });
 
 // Individual stat card container
 export const StatCardContainer = styled(View, {
   flex: 1,
   backgroundColor: 'white',
-  borderRadius: 12,
+  borderRadius: '$xl',
   padding: '$6',
   borderWidth: 1,
   borderColor: '#E2E8F0',
   minWidth: 150,
-  marginHorizontal: 8,
-  marginBottom: 16,
+  marginHorizontal: '$2',
+  marginBottom: '$4',
   gap:'$6',
 });
 
@@ -27,13 +27,13 @@ export const StatTitle = styled(Text, {
   fontSize: '$sm',
   color: '$textForeground',
   fontWeight: '$medium',
-  marginBottom: 8,
+  marginBottom: '$2',
 });
 
 export const StatCount = styled(Text, {
-  fontSize: 24,
+  fontSize: '$2xl',
   fontWeight: '$normal',
-  marginBottom: 4,
+  marginBottom: '$2',
 });
 
 export const StatSubLabel = styled(Text, {

@@ -19,7 +19,7 @@ export const MAIN_MENU_ITEMS: SidebarItem[] = [
     key: 'user-management',
     label: 'admin.menu.userManagement',
     icon: SettingsIcon,
-    route: 'UserManagement',
+    route: 'user-management',
   },
   {
     key: 'template-management',

@@ -2,7 +2,7 @@
 export const layoutStyles = {
   container: {
     bg: '$backgroundLight0' as const,
-    minHeight: '100%' as '100%',
+    minHeight: '$full' as '$full',
     flexDirection: 'row' as const,
   },
   scrollContent: {
@@ -17,11 +17,11 @@ export const layoutStyles = {
     flex: 1,
     width: '$full' as const,
     bg: '$backgroundLight0' as const,
-    padding: 24,
+    padding: '$6',
   },
   headerContent: {
     bg: '$backgroundLight0' as const,
-    minHeight: 64,
+    minHeight: '$16',
     width: '$full' as const,
   },
 };

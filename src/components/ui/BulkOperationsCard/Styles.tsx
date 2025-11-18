@@ -5,7 +5,7 @@ export const bulkOperationStyles = {
     borderColor: '$borderLight300',
     borderRadius: '$lg',
     p: '$6',
-    width: '100%',
+    width: '$full',
     mt: '$6',
   },
   sectionTitle: {
@@ -43,15 +43,15 @@ export const bulkOperationStyles = {
     fontWeight: '$medium',
   },
   icon: {
-    width: 20,
-    height: 20,
+    width: '$5',
+    height: '$5',
     mr: '$2.5',
   },
   bulletText: {
     fontSize: '$xs',
     fontWeight: '$normal',
     color: '$textMutedForeground',
-    lineHeight: 16,
+    lineHeight: '$2xs',
     mb: '$1',
   },
 };

@@ -1,11 +1,11 @@
 // Sidebar Styles
 export const sidebarStyles = {
   container: {
-    bg: '#f8fafc',
+    bg: '$bgSidebar' as const,
     borderRightWidth: 1,
     borderRightColor: '$borderLight300' as const,
-    width: 256,
-    height: '100%' as '100%',
+    width: '$64',
+    height: '$full',
   },
   scrollContent: {
     flex: 1,
@@ -59,7 +59,7 @@ export const sidebarStyles = {
     alignItems: 'center' as const,
     space: 'md' as const,
     justifyContent: 'space-between' as const,
-    width: '100%' as const,
+    width: '$full' as const,
   },
   languageIcon: {
     color: '$textLight600' as const,
@@ -93,7 +93,7 @@ export const sidebarStyles = {
     bg: '$backgroundLight50' as const,
     borderRightWidth: 1,
     borderRightColor: '$borderLight300' as const,
-    height: '100%' as '100%',
+    height: '$full' as '$full',
   },
   drawerHeader: {
     borderBottomWidth: 1,
@@ -111,7 +111,7 @@ export const sidebarStyles = {
   },
   drawerBody: {
     flex: 1,
-    height: '100%' as '100%',
+    height: '$full' as '$full',
   },
 
   menuButton: {
@@ -132,7 +132,7 @@ export const sidebarStyles = {
     height: 48,
   },
   brandContainer: {
-    //space: 'xs' as const,
+  
   },
   brandRow: {
     alignItems: 'center' as const,
