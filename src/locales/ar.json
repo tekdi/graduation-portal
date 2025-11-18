@@ -110,13 +110,14 @@
     "contact": "التواصل",
     "actions": "الإجراءات",
     "noParticipantsFound": "لم يتم العثور على مشاركين",
-    "loadingParticipants": "جاري تحميل المشاركين..."
+    "loadingParticipants": "جاري تحميل المشاركين...",
+    "dashboardComingSoon": "لوحة التحكم قريباً..."
   },
   "actions": {
     "viewDetails": "عرض التفاصيل",
     "logVisit": "تسجيل الزيارة",
     "dropout": "انسحاب",
     "confirmDropout": "تأكيد الانسحاب",
-    "dropoutMessage": "هل أنت متأكد من رغبتك في وضع هذا المشارك كمنسحب؟ يمكن التراجع عن هذا الإجراء لاحقًا."
+    "dropoutMessage": "هل أنت متأكد من رغبتك في وضع {{name}} كمنسحب؟ يمكن التراجع عن هذا الإجراء لاحقًا."
   }
 }

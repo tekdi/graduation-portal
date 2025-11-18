@@ -250,7 +250,7 @@ const ParticipantsList: React.FC = () => {
               {...TYPOGRAPHY.paragraph}
               color={theme.tokens.colors.mutedForeground}
             >
-              Dashboard coming soon...
+              {t('participants.dashboardComingSoon')}
             </Text>
           </Box>
         )}

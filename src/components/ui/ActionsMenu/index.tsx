@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   Pressable,
@@ -16,7 +16,6 @@ import {
   Heading,
 } from '@gluestack-ui/themed';
 import { useNavigation } from '@react-navigation/native';
-import { Platform } from 'react-native';
 import {
   Icon,
   ThreeDotsIcon,
@@ -26,6 +25,7 @@ import {
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
+import { getBackdropStyle, getDropdownStyle } from './Styles';
 
 interface ActionItem {
   key: string;
@@ -122,25 +122,6 @@ const ActionsMenu = <T = any,>({
     onDropout?.(item);
   };
 
-  // Close menu when clicking outside (web only)
-  useEffect(() => {
-    if (Platform.OS === 'web' && showMenu) {
-      const handleClickOutside = () => {
-        setShowMenu(false);
-      };
-
-      // Add delay to prevent immediate closing
-      const timer = setTimeout(() => {
-        document.addEventListener('click', handleClickOutside);
-      }, 100);
-
-      return () => {
-        clearTimeout(timer);
-        document.removeEventListener('click', handleClickOutside);
-      };
-    }
-  }, [showMenu]);
-
   const handleMenuClick = (e: any) => {
     e.stopPropagation();
     setShowMenu(!showMenu);
@@ -175,30 +156,7 @@ const ActionsMenu = <T = any,>({
 
         {/* Backdrop to prevent see-through and handle outside clicks */}
         {showMenu && (
-          <Pressable
-            onPress={handleBackdropClick}
-            // @ts-ignore - web specific styles
-            style={
-              Platform.OS === 'web'
-                ? {
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    zIndex: 999,
-                    backgroundColor: 'transparent',
-                  }
-                : {
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    zIndex: 999,
-                  }
-            }
-          />
+          <Pressable onPress={handleBackdropClick} style={getBackdropStyle()} />
         )}
 
         {/* Dropdown Menu */}
@@ -207,24 +165,7 @@ const ActionsMenu = <T = any,>({
             onPress={e => {
               e.stopPropagation();
             }}
-            // @ts-ignore - web specific styles
-            style={
-              Platform.OS === 'web'
-                ? {
-                    position: 'absolute',
-                    top: 35,
-                    right: 0,
-                    zIndex: 10000,
-                    minWidth: 180,
-                  }
-                : {
-                    position: 'absolute',
-                    top: 35,
-                    right: 0,
-                    zIndex: 10000,
-                    minWidth: 180,
-                  }
-            }
+            style={getDropdownStyle()}
           >
             <Box
               bg="#FFFFFF"
@@ -260,7 +201,7 @@ const ActionsMenu = <T = any,>({
                           actionItem.color || theme.tokens.colors.foreground
                         }
                       >
-                        {actionItem.label}
+                        {t(actionItem.label)}
                       </Text>
                     </HStack>
                   </Pressable>
@@ -285,7 +226,7 @@ const ActionsMenu = <T = any,>({
           </ModalHeader>
           <ModalBody>
             <Text {...TYPOGRAPHY.paragraph}>
-              {t('actions.dropoutMessage') ||
+              {t('actions.dropoutMessage', { name: itemName }) ||
                 `Are you sure you want to mark "${itemName}" as dropout? This action can be reversed later.`}
             </Text>
           </ModalBody>

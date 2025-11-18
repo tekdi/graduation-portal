@@ -4,15 +4,18 @@ import Icon from '../Icon';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { SearchBarProps } from '@app-types/components';
+import { useLanguage } from '@contexts/LanguageContext';
 
 const SearchBar: React.FC<SearchBarProps> = ({
-  placeholder = 'Search...',
+  placeholder,
   onSearch,
   debounceMs = 500,
   defaultValue = '',
 }) => {
+  const { t } = useLanguage();
   const [searchText, setSearchText] = useState(defaultValue);
 
+  const finalPlaceholder = placeholder || t('common.search');
   // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -46,7 +49,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           />
         </InputSlot>
         <InputField
-          placeholder={placeholder}
+          placeholder={finalPlaceholder}
           value={searchText}
           onChangeText={handleChange}
           {...TYPOGRAPHY.input}

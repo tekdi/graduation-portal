@@ -110,13 +110,14 @@
     "contact": "Contacto",
     "actions": "Acciones",
     "noParticipantsFound": "No se encontraron participantes",
-    "loadingParticipants": "Cargando participantes..."
+    "loadingParticipants": "Cargando participantes...",
+    "dashboardComingSoon": "Panel de control próximamente..."
   },
   "actions": {
     "viewDetails": "Ver Detalles",
     "logVisit": "Registrar Visita",
     "dropout": "Abandono",
     "confirmDropout": "Confirmar Abandono",
-    "dropoutMessage": "¿Estás seguro de que deseas marcar a este participante como abandonado? Esta acción puede revertirse más tarde."
+    "dropoutMessage": "¿Estás seguro de que deseas marcar a {{name}} como abandonado? Esta acción puede revertirse más tarde."
   }
 }
