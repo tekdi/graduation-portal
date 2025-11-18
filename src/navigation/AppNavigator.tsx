@@ -21,7 +21,6 @@ const getAccessPages = (
   userRole?: string,
 ): { name: string; path?: string; component: React.ComponentType<any> }[] => {
   const role = userRole?.toLowerCase();
-  const TemplateManagement = React.lazy(() => import('../screens/TemplateManagement'));
 
   switch (role) {
     case 'admin':

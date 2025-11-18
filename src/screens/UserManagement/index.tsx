@@ -7,37 +7,13 @@ import { useLanguage } from '@contexts/LanguageContext';
 import Filters from '../../components/ui/Filter';
 import BulkOperationsCard from '../../components/ui/BulkOperationsCard';
 import StatCard, { StatsRow } from '@components/ui/StatCard';
+import { USER_MANAGEMENT_STATS } from '@constants/USER_MANAGEMENT_STATS';
 
 /**
- * DashboardScreen - Layout is automatically applied by navigation based on user role
+ * UserManagementScreen - Layout is automatically applied by navigation based on user role
  */
 const UserManagementScreen = () => {
   const { t } = useLanguage();
-const statsData = [
-  { 
-    title: "Total Users", 
-    count: "10", 
-    subLabel: "All roles" 
-  },
-  { 
-    title: "Participants", 
-    count: "4", 
-    subLabel: "Active learners", 
-    color: "#3b82f6" 
-  },
-  { 
-    title: "Linkage Champions", 
-    count: "2", 
-    subLabel: "Active coaches", 
-    color: "#f59e0b" 
-  },
-  { 
-    title: "Supervisors", 
-    count: "2", 
-    subLabel: "Active supervisors", 
-    color: "#10b981" 
-  }
-];
   return (
     <VStack space="md" width="100%">
       <VStack {...userManagementStyles.mainVStack}>
@@ -52,7 +28,7 @@ const statsData = [
       
       <View style={{ marginTop: 24, width: '100%' }}>
         <StatsRow>
-          {statsData.map((stat, index) => (
+          {USER_MANAGEMENT_STATS.map((stat, index) => (
             <StatCard
               key={index}
               title={stat.title}
