@@ -53,8 +53,11 @@ export default function Select({
   const writingDirection = I18nManager.isRTL ? 'rtl' : 'ltr';
 
   const handleValueChange = (newValue: string | undefined) => {
-    if (newValue && typeof newValue === 'string' && newValue.trim() !== '') {
-      onChange(newValue);
+    if (newValue !== undefined && newValue !== null) {
+      const stringValue = String(newValue).trim();
+      if (stringValue !== '') {
+        onChange(stringValue);
+      }
     }
   };
 
@@ -62,7 +65,6 @@ export default function Select({
     <GluestackSelect
       selectedValue={value}
       onValueChange={handleValueChange}
-      {...(isWeb ? { defaultValue: value } : {})}
     >
       <SelectTrigger variant="outline" size="md" width="$full">
         <SelectInput
