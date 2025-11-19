@@ -61,6 +61,7 @@ export const stylesHeader = {
     placeholderTextColor: '$textLight400' as const,
   },
   rightActionsContainer: {
+    marginLeft: 'auto',
     alignItems: 'center' as const,
     space: 'lg' as const,
   },

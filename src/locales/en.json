@@ -81,5 +81,16 @@
     "rememberMeDescription": "Remember me on this device for 30 days",
     "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
     "title": "Generating Better Livelihoods"
+  },
+  "welcome": {
+    "welcomeBack": "Welcome back",
+    "chooseOptionBelowToGetStarted": "Choose an option below to get started",
+    "myParticipants": "My Participants",
+    "myParticipantsDescription": "Manage your caseload, track participant progress, and log visits",
+    "myLearningProgress": "My Learning Progress",
+    "myLearningProgressDescription": "Access training materials, track your professional development",
+    "connectWithExperts": "Connect with Experts",
+    "connectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
+    "getStarted": "Get started"
   }
 }

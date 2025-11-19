@@ -11,6 +11,7 @@ import AccessBaseNavigator from './navigators/AccessBaseNavigator';
 import HomeScreen from '../screens/Home';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
+import WelcomePage from '../screens/Welcome/index';
 
 const Stack = createStackNavigator();
 
@@ -34,6 +35,7 @@ const getAccessPages = (
       return [{ name: 'home', path: '/home', component: HomeScreen }];
     case 'lc':
       return [
+        { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
       ];

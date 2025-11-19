@@ -151,6 +151,7 @@ module.exports = (env = {}, argv = {}) => {
         '@config': path.resolve(__dirname, 'src/config'),
         '@contexts': path.resolve(__dirname, 'src/contexts'),
         '@types': path.resolve(__dirname, 'src/types'),
+        '@app-types': path.resolve(__dirname, 'src/types'),
         '@constants': path.resolve(__dirname, 'src/constants'),
         '@layout': path.resolve(__dirname, 'src/layout'),
       },

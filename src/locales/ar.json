@@ -36,5 +36,16 @@
     "ar": "العربية",
     "es": "Español",
     "hi": "हिन्दी"
+  },
+  "welcome": {
+    "welcomeBack": "مرحبًا بعودتك",
+    "chooseOptionBelowToGetStarted": "اختر أحد الخيارات أدناه للبدء",
+    "myParticipants": "مشاركيني",
+    "myParticipantsDescription": "قم بإدارة الحالات، وتتبع تقدم المشاركين، وتسجيل الزيارات",
+    "myLearningProgress": "تقدمي في التعلم",
+    "myLearningProgressDescription": "الوصول إلى مواد التدريب وتتبع التطور المهني",
+    "connectWithExperts": "تواصل مع الخبراء",
+    "connectWithExpertsDescription": "احصل على الدعم، اطرح الأسئلة، وتواصل مع المتخصصين",
+    "getStarted": "ابدأ"
   }
 }

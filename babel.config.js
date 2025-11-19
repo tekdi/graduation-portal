@@ -12,7 +12,7 @@ module.exports = {
           '@utils': './src/utils',
           '@config': './src/config',
           '@contexts': './src/contexts',
-          '@types': './src/types',
+          '@app-types': './src/types',
           '@constants': './src/constants',
           '@layout': './src/layout',
         },
