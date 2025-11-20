@@ -20,6 +20,7 @@ export const theme = {
       textMutedForeground: '#64748b',
       textForeground: '#2d2d2d',
       bgSidebar: '#f8fafc',
+      btnPrimary: '#8B2842', 
     },
   },
   components: {
