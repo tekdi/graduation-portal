@@ -132,16 +132,6 @@ export default function FilterButton({ data }: any) {
         </VStack>
       </HStack>
 
-      {/* Display current filter values */}
-      <VStack mt="$4">
-        <Text fontSize="$sm" color="$textLight500">
-          {"Value : {"}
-          {Object.keys(value)
-            .map((e) => `${e}: ${value[e]}`)
-            .join(", ")}
-          {"}"}
-        </Text>
-      </VStack>
     </VStack>
   );
 }

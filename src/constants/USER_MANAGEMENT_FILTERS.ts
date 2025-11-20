@@ -3,8 +3,17 @@
  * Data-driven filter definitions for the User Management screen
  */
 
+// Type definition for filter configuration
+type FilterConfig = {
+  name: string;
+  attr: string;
+  type: 'search' | 'select';
+  data: Array<string | { label: string; value: string | null }>;
+  placeholder?: string;
+};
+
 // Search filter configuration
-export const SearchFilter = {
+export const SearchFilter: FilterConfig = {
   name: 'Search',
   attr: 'search',
   type: 'search',
@@ -13,14 +22,13 @@ export const SearchFilter = {
 };
 
 // Select filters (Role, Status, etc.)
-export const FilterOptions = [
+export const FilterOptions: ReadonlyArray<FilterConfig> = [
   {
     name: 'Role',
     attr: 'role',
     type: 'select',
-    data: [{label:"All role", value:"All"}, 'Admin', 'Supervisor', 
-    'Linkage-Champion', 'Participant',
-    {label:"String Null", value:""},{label:"Null", value:null}],
+    data: ['Admin', 'Supervisor', 
+    'Linkage Champion', 'Participant',],
   },
   {
     name: 'Status',
