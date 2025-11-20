@@ -14,7 +14,6 @@ import {
   ChevronDownIcon,
   SelectPortal,
 } from '@gluestack-ui/themed';
-import { usePlatform } from '@utils/platform';
 
 type Option = {
   value: string;
@@ -36,8 +35,6 @@ export default function Select({
   onChange,
   placeholder,
 }: SelectProps) {
-  const { isWeb } = usePlatform();
-  // For mobile, we need to ensure the Select component is properly configured
   const selectedOption = options.find(opt => opt.value === value);
   const displayValue =
     selectedOption?.nativeName ||
@@ -54,10 +51,10 @@ export default function Select({
 
   const handleValueChange = (newValue: string | undefined) => {
     if (newValue !== undefined && newValue !== null) {
-      const stringValue = String(newValue).trim();
-      if (stringValue !== '') {
-        onChange(stringValue);
-      }
+      const stringValue = String(newValue);
+      // Allow empty strings and special markers (like __NULL_VALUE__) to pass through
+      // Empty strings are valid selections for filters (e.g., "String Null" option)
+      onChange(stringValue);
     }
   };
 
