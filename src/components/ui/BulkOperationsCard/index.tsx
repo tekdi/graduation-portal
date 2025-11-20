@@ -13,8 +13,6 @@ interface BulletListProps {
   items: string[];
 }
 
-type StyleType = typeof styles;
-
 const BulkOperationsCard: React.FC = () => {
   return (
     <Box {...(styles.container as ViewProps)}>

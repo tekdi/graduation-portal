@@ -18,7 +18,9 @@ export const FilterOptions = [
     name: 'Role',
     attr: 'role',
     type: 'select',
-    data: ['All Roles', 'Admin', 'Supervisor', 'Linkage-Champion', 'Participant'],
+    data: [{label:"All role", value:"All"}, 'Admin', 'Supervisor', 
+    'Linkage-Champion', 'Participant',
+    {label:"String Null", value:""},{label:"Null", value:null}],
   },
   {
     name: 'Status',
