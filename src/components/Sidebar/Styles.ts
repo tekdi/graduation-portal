@@ -22,6 +22,8 @@ export const sidebarStyles = {
     mb: '$2' as const,
     letterSpacing: 1,
     height: "$8",
+    display: 'flex',
+    alignItems: 'center',
   },
   quickActionsHeader: {
     px: '$4' as const,
@@ -185,7 +187,7 @@ export const sidebarItemStyles = {
   },
   itemContent: {
     alignItems: 'center' as const,
-    space: 'md' as const,
+    space: 'sm' as const,
     flex: 1,
     p: '$2' as const,
     bg: '#f1f5f9'
@@ -196,7 +198,7 @@ export const sidebarItemStyles = {
   }),
   itemText: (isActive: boolean) => ({
     fontSize: '$sm' as const,
-    fontWeight: isActive ? ('$semibold' as const) : ('$normal' as const),
+    fontWeight: isActive ? ('$medium' as const) : ('$normal' as const),
     color: (isActive ? '$primary600' : '$textLight900') as const,
   }),
   chevronIcon: {

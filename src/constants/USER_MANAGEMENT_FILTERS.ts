@@ -3,22 +3,17 @@
  * Data-driven filter definitions for the User Management screen
  */
 
-export interface FilterConfig {
-  name: string; // Display label
-  attr: string; // Attribute key for filtering
-  data: string[]; // Options/values for the filter
-  type?: 'select' | 'search'; // Filter type (default: 'select')
-  placeholder?: string; // Placeholder text for search inputs
-}
+// Search filter configuration
+export const SearchFilter = {
+  name: 'Search',
+  attr: 'search',
+  type: 'search',
+  data: [],
+  placeholder: 'Search by name or email...',
+};
 
-export const USER_MANAGEMENT_FILTERS: FilterConfig[] = [
-  {
-    name: 'Search',
-    attr: 'search',
-    type: 'search',
-    data: [],
-    placeholder: 'Search by name or email...',
-  },
+// Select filters (Role, Status, etc.)
+export const FilterOptions = [
   {
     name: 'Role',
     attr: 'role',
@@ -31,5 +26,5 @@ export const USER_MANAGEMENT_FILTERS: FilterConfig[] = [
     type: 'select',
     data: ['All Status', 'Active', 'Deactivated'],
   },
-] as const;
+];
 
