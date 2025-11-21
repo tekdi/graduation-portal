@@ -1,53 +1,14 @@
-import React, { useState } from 'react';
-import {
-  Box,
-  Pressable,
-  VStack,
-  HStack,
-  Text,
-  Modal,
-  ModalBackdrop,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-  Button,
-  ButtonText,
-  Heading,
-} from '@gluestack-ui/themed';
+import React, { useState, useRef } from 'react';
+import { Box, Pressable, VStack, HStack, Text } from '@gluestack-ui/themed';
 import { useNavigation } from '@react-navigation/native';
-import {
-  Icon,
-  ThreeDotsIcon,
-  EyeIcon,
-  AlertCircleIcon,
-} from '@gluestack-ui/themed';
+import { Modal as RNModal } from 'react-native';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
-import { getBackdropStyle, getDropdownStyle } from './Styles';
+import ConfirmationModal from '../ConfirmationModal';
+import Icon from '../Icon';
+import { ActionItem, ActionsMenuProps } from '@app-types/components';
 
-interface ActionItem {
-  key: string;
-  label: string;
-  icon: React.ReactNode;
-  color?: string;
-  action: 'navigate' | 'modal';
-  route?: string;
-}
-
-interface ActionsMenuProps<T = any> {
-  item: T;
-  actions?: ActionItem[];
-  onDropout?: (item: T) => void;
-  getItemId?: (item: T) => string;
-  getItemName?: (item: T) => string;
-}
-
-/**
- * ActionsMenu Component
- * Shows a dropdown menu with actions for a table row
- */
 const ActionsMenu = <T = any,>({
   item,
   actions,
@@ -59,9 +20,20 @@ const ActionsMenu = <T = any,>({
   const navigation = useNavigation();
   const [showMenu, setShowMenu] = useState(false);
   const [showDropoutModal, setShowDropoutModal] = useState(false);
+  const [dropoutReason, setDropoutReason] = useState('');
+  const buttonRef = useRef<any>(null);
+  const [menuPosition, setMenuPosition] = useState({
+    top: 0,
+    left: 0,
+  });
 
-  const itemId = getItemId(item);
-  const itemName = getItemName(item);
+  // ✅ Capture item properties immediately - not in closures
+  const thisItemId = getItemId(item);
+  const thisItemName = getItemName(item);
+
+  // Store the actual item in ref to always have latest
+  const itemRef = useRef(item);
+  itemRef.current = item;
 
   const defaultActions: ActionItem[] = [
     {
@@ -69,9 +41,9 @@ const ActionsMenu = <T = any,>({
       label: t('actions.viewDetails') || 'View Details',
       icon: (
         <Icon
-          as={EyeIcon}
-          size="md"
-          color={theme.tokens.colors.mutedForeground}
+          name="eyeIcon"
+          size={20}
+          tintColor={theme.tokens.colors.mutedForeground}
         />
       ),
       action: 'navigate',
@@ -82,9 +54,9 @@ const ActionsMenu = <T = any,>({
       label: t('actions.logVisit') || 'Log Visit',
       icon: (
         <Icon
-          as={EyeIcon}
-          size="md"
-          color={theme.tokens.colors.mutedForeground}
+          name="logVisitIcon"
+          size={20}
+          tintColor={theme.tokens.colors.mutedForeground}
         />
       ),
       action: 'navigate',
@@ -95,9 +67,9 @@ const ActionsMenu = <T = any,>({
       label: t('actions.dropout') || 'Dropout',
       icon: (
         <Icon
-          as={AlertCircleIcon}
-          size="md"
-          color={theme.tokens.colors.error.light}
+          name="dropoutIcon"
+          size={20}
+          tintColor={theme.tokens.colors.error.light}
         />
       ),
       color: theme.tokens.colors.error.light,
@@ -106,38 +78,81 @@ const ActionsMenu = <T = any,>({
   ];
   const effectiveActions = actions ?? defaultActions;
 
-  const handleActionClick = (actionItem: ActionItem) => {
-    setShowMenu(false);
+  const handleMenuOpen = (e: any) => {
+    e?.stopPropagation?.();
 
-    if (actionItem.action === 'navigate' && actionItem.route) {
-      // @ts-ignore - Navigation type inference
-      navigation.navigate(actionItem.route, { participantId: itemId });
-    } else if (actionItem.action === 'modal') {
-      setShowDropoutModal(true);
+    console.log('Item ID:', thisItemId);
+    console.log('Item:', item);
+
+    // Measure button position
+    if (buttonRef.current) {
+      buttonRef.current.measure(
+        (
+          x: number,
+          y: number,
+          width: number,
+          height: number,
+          pageX: number,
+          pageY: number,
+        ) => {
+          // Position menu below the button
+          setMenuPosition({
+            top: pageY + height + 5, // 5px below button
+            left: pageX - 140, // Align to right side of button
+          });
+          setShowMenu(true);
+        },
+      );
+    } else {
+      // Fallback if measure fails
+      setShowMenu(true);
     }
   };
 
-  const handleDropoutConfirm = () => {
-    setShowDropoutModal(false);
-    onDropout?.(item);
-  };
-
-  const handleMenuClick = (e: any) => {
-    e.stopPropagation();
-    setShowMenu(!showMenu);
-  };
-
-  const handleBackdropClick = (e: any) => {
-    e.stopPropagation();
+  const handleMenuClose = (e?: any) => {
+    e?.stopPropagation?.();
     setShowMenu(false);
+  };
+
+  const handleActionClick = (actionItem: ActionItem) => (e: any) => {
+    e?.stopPropagation?.();
+
+    // Get fresh item ID at click time
+    const currentItemId = getItemId(itemRef.current);
+
+    console.log('Action:', actionItem.key);
+    console.log('Item ID:', currentItemId);
+    console.log('Item:', itemRef.current);
+
+    handleMenuClose();
+
+    if (actionItem.action === 'navigate' && actionItem.route) {
+      // @ts-ignore - Navigation type inference
+      navigation.navigate(actionItem.route, { participantId: currentItemId });
+    } else if (actionItem.action === 'modal') {
+      setTimeout(() => {
+        setShowDropoutModal(true);
+      }, 100);
+    }
+  };
+
+  const handleDropoutConfirm = (reason?: string) => {
+    const currentItemId = getItemId(itemRef.current);
+    console.log('Item ID:', currentItemId);
+    console.log('Item:', itemRef.current);
+    console.log('Dropout reason:', reason);
+
+    setShowDropoutModal(false);
+    setDropoutReason(''); // Reset reason
+    onDropout?.(itemRef.current);
   };
 
   return (
     <>
-      {/* Actions Button */}
-      <Box position="relative">
+      {/* Three-dot Button */}
+      <Box ref={buttonRef}>
         <Pressable
-          onPress={handleMenuClick}
+          onPress={handleMenuOpen}
           padding="$2"
           borderRadius="$sm"
           $web-cursor="pointer"
@@ -148,107 +163,116 @@ const ActionsMenu = <T = any,>({
           }}
         >
           <Icon
-            as={ThreeDotsIcon}
-            size="md"
-            color={theme.tokens.colors.mutedForeground}
+            name="threeDotIcon"
+            size={30}
+            tintColor={theme.tokens.colors.mutedForeground}
           />
         </Pressable>
-
-        {/* Backdrop to prevent see-through and handle outside clicks */}
-        {showMenu && (
-          <Pressable onPress={handleBackdropClick} style={getBackdropStyle()} />
-        )}
-
-        {/* Dropdown Menu */}
-        {showMenu && (
-          <Pressable
-            onPress={e => {
-              e.stopPropagation();
-            }}
-            style={getDropdownStyle()}
-          >
-            <Box
-              bg="#FFFFFF"
-              borderRadius="$md"
-              borderWidth={1}
-              borderColor="$borderLight300"
-              shadowColor="$black"
-              shadowOffset={{ width: 0, height: 2 }}
-              shadowOpacity={0.15}
-              shadowRadius={12}
-              elevation={15}
-              $web-boxShadow="0px 8px 24px rgba(0, 0, 0, 0.2)"
-            >
-              <VStack space="xs" padding="$2">
-                {effectiveActions.map(actionItem => (
-                  <Pressable
-                    key={actionItem.key}
-                    onPress={() => handleActionClick(actionItem)}
-                    padding="$3"
-                    borderRadius="$sm"
-                    $web-cursor="pointer"
-                    sx={{
-                      ':hover': {
-                        bg: '$backgroundLight50',
-                      },
-                    }}
-                  >
-                    <HStack space="md" alignItems="center">
-                      {actionItem.icon}
-                      <Text
-                        {...TYPOGRAPHY.bodySmall}
-                        color={
-                          actionItem.color || theme.tokens.colors.foreground
-                        }
-                      >
-                        {t(actionItem.label)}
-                      </Text>
-                    </HStack>
-                  </Pressable>
-                ))}
-              </VStack>
-            </Box>
-          </Pressable>
-        )}
       </Box>
 
-      {/* Dropout Confirmation Modal */}
-      <Modal
-        isOpen={showDropoutModal}
-        onClose={() => setShowDropoutModal(false)}
+      {/* Dropdown Menu Modal - Renders outside table hierarchy */}
+      <RNModal
+        visible={showMenu}
+        transparent
+        animationType="fade"
+        onRequestClose={handleMenuClose}
+        statusBarTranslucent
       >
-        <ModalBackdrop />
-        <ModalContent maxWidth={450}>
-          <ModalHeader>
-            <Heading {...TYPOGRAPHY.h3}>
-              {t('actions.confirmDropout') || 'Confirm Dropout'}
-            </Heading>
-          </ModalHeader>
-          <ModalBody>
-            <Text {...TYPOGRAPHY.paragraph}>
-              {t('actions.dropoutMessage', { name: itemName }) ||
-                `Are you sure you want to mark "${itemName}" as dropout? This action can be reversed later.`}
-            </Text>
-          </ModalBody>
-          <ModalFooter>
-            <HStack space="md" width="$full" justifyContent="flex-end">
-              <Button
-                variant="outline"
-                onPress={() => setShowDropoutModal(false)}
+        {/* Full-screen transparent backdrop */}
+        <Pressable onPress={handleMenuClose} flex={1} bg="$transparent">
+          {/* Menu positioned absolutely - below the three-dot icon */}
+          <Box
+            position="absolute"
+            top={menuPosition.top}
+            left={menuPosition.left}
+            minWidth={200}
+            maxWidth={220}
+            zIndex={99999}
+          >
+            <Pressable onPress={e => e?.stopPropagation?.()}>
+              <Box
+                bg="$white"
+                borderRadius="$md"
+                borderWidth={1}
+                borderColor="$borderLight300"
+                shadowColor="$black"
+                shadowOffset={{ width: 0, height: 2 }}
+                shadowOpacity={0.15}
+                shadowRadius={12}
+                elevation={20}
+                $web-boxShadow="0px 8px 24px rgba(0, 0, 0, 0.2)"
               >
-                <ButtonText>{t('common.cancel') || 'Cancel'}</ButtonText>
-              </Button>
-              <Button
-                bg={theme.tokens.colors.error.light}
-                onPress={handleDropoutConfirm}
-                $hover-bg={theme.tokens.colors.error.light}
-              >
-                <ButtonText>{t('actions.dropout') || 'Dropout'}</ButtonText>
-              </Button>
-            </HStack>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+                <VStack space="xs" padding="$2">
+                  {effectiveActions.map(actionItem => (
+                    <Pressable
+                      key={actionItem.key}
+                      onPress={handleActionClick(actionItem)}
+                      padding="$3"
+                      borderRadius="$sm"
+                      $web-cursor="pointer"
+                      sx={{
+                        ':hover': {
+                          bg: '$backgroundLight50',
+                        },
+                      }}
+                    >
+                      <HStack space="md" alignItems="center">
+                        {actionItem.icon}
+                        <Text
+                          {...TYPOGRAPHY.bodySmall}
+                          color={
+                            actionItem.color || theme.tokens.colors.foreground
+                          }
+                        >
+                          {t(actionItem.label)}
+                        </Text>
+                      </HStack>
+                    </Pressable>
+                  ))}
+                </VStack>
+              </Box>
+            </Pressable>
+          </Box>
+        </Pressable>
+      </RNModal>
+
+      {/* Dropout Confirmation Modal with Input */}
+      <ConfirmationModal
+        isOpen={showDropoutModal}
+        onClose={() => {
+          setShowDropoutModal(false);
+          setDropoutReason(''); // Reset on close
+        }}
+        onConfirm={handleDropoutConfirm}
+        title={t('actions.confirmDropout') || 'Confirm Dropout'}
+        message={
+          t('actions.dropoutMessage', { name: thisItemName }) ||
+          `Mark ${thisItemName} as dropout from the program`
+        }
+        confirmText={t('actions.confirmDropout') || 'Confirm Dropout'}
+        cancelText={t('common.cancel') || 'Cancel'}
+        confirmButtonColor={theme.tokens.colors.error.light}
+        headerIcon={
+          <Icon
+            name="dropoutIcon"
+            size={24}
+            tintColor={theme.tokens.colors.error.light}
+          />
+        }
+        showInput
+        inputLabel={t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
+        inputPlaceholder={
+          t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
+        }
+        inputHint={
+          t('actions.dropoutHint') ||
+          'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'
+        }
+        inputValue={dropoutReason}
+        onInputChange={setDropoutReason}
+        inputRequired={false}
+        maxWidth={500}
+      />
     </>
   );
 };

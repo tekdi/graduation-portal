@@ -1,7 +1,8 @@
-import { ParticipantStatus, StatusCount } from '@app-types/screens';
+import { StatusCount, StatusType } from '@app-types/screens';
+import { STATUS } from './app.constant';
 
 export interface StatusFilterItem {
-  key: ParticipantStatus;
+  key: StatusType;
   label: string;
   count: number;
 }
@@ -10,27 +11,27 @@ export const getStatusItems = (
   statusCounts: StatusCount,
 ): StatusFilterItem[] => [
   {
-    key: 'not_enrolled' as ParticipantStatus,
+    key: STATUS.NOT_ENROLLED,
     label: 'participants.notEnrolled',
     count: statusCounts.not_enrolled,
   },
   {
-    key: 'enrolled' as ParticipantStatus,
+    key: STATUS.ENROLLED,
     label: 'participants.enrolled',
     count: statusCounts.enrolled,
   },
   {
-    key: 'in_progress' as ParticipantStatus,
+    key: STATUS.IN_PROGRESS,
     label: 'participants.inProgress',
     count: statusCounts.in_progress,
   },
   {
-    key: 'completed' as ParticipantStatus,
+    key: STATUS.COMPLETED,
     label: 'participants.completed',
     count: statusCounts.completed,
   },
   {
-    key: 'dropped_out' as ParticipantStatus,
+    key: STATUS.DROPOUT,
     label: 'participants.droppedOut',
     count: statusCounts.dropped_out,
   },

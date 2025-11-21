@@ -111,7 +111,8 @@
     "actions": "Acciones",
     "noParticipantsFound": "No se encontraron participantes",
     "loadingParticipants": "Cargando participantes...",
-    "dashboardComingSoon": "Panel de control próximamente..."
+    "dashboardComingSoon": "Panel de control próximamente...",
+    "showingParticipants": "Mostrando {{count}} de {{total}} participantes"
   },
   "actions": {
     "viewDetails": "Ver Detalles",

@@ -1,9 +1,11 @@
 import React from 'react';
 import { Box, HStack, Text } from '@gluestack-ui/themed';
-import { Participant, ParticipantStatus } from '@app-types/screens';
+import { Participant, StatusType } from '@app-types/screens';
 import { ColumnDef } from '@app-types/components';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
+import { STATUS } from '@constants/app.constant';
+import Icon from '@ui/Icon';
 
 /**
  * Progress Bar Component for Participants Table
@@ -68,6 +70,17 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
     render: participant => <ProgressBar progress={participant.progress} />,
   },
   {
+    key: 'graduated',
+    label: 'participants.graduated',
+    flex: 2,
+    render: participant =>
+      participant.progress === 100 ? (
+        <Icon name="checkCircleIcon" size={30} tintColor="green" />
+      ) : (
+        '-'
+      ),
+  },
+  {
     key: 'phone',
     label: 'participants.contact',
     flex: 1.5,
@@ -82,20 +95,14 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
   },
 ];
 
-/**
- * Get filtered columns based on participant status
- * Progress column is only shown when status is 'in_progress'
- */
 export const getParticipantsColumns = (
-  status?: ParticipantStatus | '',
+  status?: StatusType,
 ): ColumnDef<Participant>[] => {
-  // Show progress column only when status is 'in_progress'
-  if (status === 'in_progress') {
-    return allParticipantsColumns;
-  }
-
-  // Filter out the progress column for other statuses
-  return allParticipantsColumns.filter(col => col.key !== 'progress');
+  return allParticipantsColumns.filter(col => {
+    if (col.key === 'progress') return status === STATUS.IN_PROGRESS;
+    if (col.key === 'graduated') return status === STATUS.COMPLETED;
+    return true; // keep all other columns for any status
+  });
 };
 
 /**

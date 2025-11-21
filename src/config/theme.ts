@@ -21,6 +21,17 @@ export const theme = {
         light: '#dc2626',
         dark: '#f87171',
       },
+      // Modal & UI colors
+      modalBorder: '#8B2842',
+      modalBackground: '#FFFFFF',
+      modalBackdrop: 'rgba(0, 0, 0, 0.5)',
+      inputBorder: '#E5E7EB',
+      inputFocusBorder: '#8B2842',
+      textPrimary: '#111827',
+      textSecondary: '#6B7280',
+      textMuted: '#9CA3AF',
+      iconBackground: 'rgba(139, 40, 66, 0.08)',
+      hoverBackground: '#F9FAFB',
     },
   },
   components: {

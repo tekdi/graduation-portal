@@ -69,56 +69,57 @@ const TableRow = <T,>({
   onActionClick,
   showActions,
 }: TableRowProps<T>) => (
-  <Pressable
-    onPress={() => onRowClick?.(item)}
-    $web-cursor={onRowClick ? 'pointer' : undefined}
-  >
-    <HStack
-      padding="$4"
-      borderBottomWidth={1}
-      borderBottomColor="$borderLight200"
-      space="md"
-      alignItems="center"
-      $web-transition="background-color 0.2s"
-      overflow="visible"
-      sx={{
-        ':hover': {
-          bg: '$backgroundLight50',
-        },
-      }}
+  <Box position="relative">
+    <Pressable
+      onPress={() => onRowClick?.(item)}
+      $web-cursor={onRowClick ? 'pointer' : undefined}
     >
-      {columns.map(column => (
-        <Box
-          key={column.key}
-          flex={column.flex}
-          width={column.width}
-          alignItems={
-            column.align === 'center'
-              ? 'center'
-              : column.align === 'right'
-              ? 'flex-end'
-              : 'flex-start'
-          }
-        >
-          {column.render ? (
-            column.render(item)
-          ) : (
-            <Text
-              {...TYPOGRAPHY.paragraph}
-              color={theme.tokens.colors.mutedForeground}
-            >
-              {String((item as any)[column.key] ?? '')}
-            </Text>
-          )}
-        </Box>
-      ))}
-      {showActions && (
-        <Box width={60} alignItems="center" position="relative" zIndex={1}>
-          <ActionsMenu<T> item={item} onDropout={onActionClick} />
-        </Box>
-      )}
-    </HStack>
-  </Pressable>
+      <HStack
+        padding="$4"
+        borderBottomWidth={1}
+        borderBottomColor="$borderLight200"
+        space="md"
+        alignItems="center"
+        $web-transition="background-color 0.2s"
+        sx={{
+          ':hover': {
+            bg: '$backgroundLight50',
+          },
+        }}
+      >
+        {columns.map(column => (
+          <Box
+            key={column.key}
+            flex={column.flex}
+            width={column.width}
+            alignItems={
+              column.align === 'center'
+                ? 'center'
+                : column.align === 'right'
+                ? 'flex-end'
+                : 'flex-start'
+            }
+          >
+            {column.render ? (
+              column.render(item)
+            ) : (
+              <Text
+                {...TYPOGRAPHY.paragraph}
+                color={theme.tokens.colors.mutedForeground}
+              >
+                {String((item as any)[column.key] ?? '')}
+              </Text>
+            )}
+          </Box>
+        ))}
+        {showActions && (
+          <Box width={60} alignItems="center">
+            <ActionsMenu<T> item={item} onDropout={onActionClick} />
+          </Box>
+        )}
+      </HStack>
+    </Pressable>
+  </Box>
 );
 
 /**
@@ -182,9 +183,10 @@ const DataTable = <T,>({
       borderRadius="$lg"
       borderWidth={1}
       borderColor="$borderLight300"
+      overflow="visible"
     >
       <TableHeader columns={columns} showActions={showActions} />
-      <Box maxHeight={600} overflow="hidden">
+      <Box maxHeight={600} overflow="scroll">
         <ScrollView>
           {isLoading ? (
             <LoadingState message={loadingMessage} />

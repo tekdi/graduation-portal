@@ -8,6 +8,7 @@ import Icon from './Icon';
 import SearchBar from './SearchBar';
 import DataTable from './DataTable';
 import ActionsMenu from './ActionsMenu';
+import ConfirmationModal from './ConfirmationModal';
 export {
   Select,
   Menu,
@@ -18,4 +19,5 @@ export {
   SearchBar,
   DataTable,
   ActionsMenu,
+  ConfirmationModal,
 };
