@@ -42,33 +42,4 @@ export const userManagementStyles = {
     p: '$4',
     bg: '$backgroundLight0',
   },
-  // Buttons
-  bulkUploadButton: {
-    bg: '$white',
-    borderWidth: 1,
-    borderColor: '$borderLight300',
-    borderRadius: '$md',
-    px: '$3',
-    py: '$2',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  bulkUploadButtonText: {
-    fontSize: '$sm',
-    color: '$textForeground',
-    fontWeight: '$medium',
-  },
-  createUserButton: {
-    bg: '$btnPrimary',
-    borderRadius: '$md',
-    px: '$3',
-    py: '$2',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  createUserButtonText: {
-    fontSize: '$sm',
-    color: '$white',
-    fontWeight: '$medium',
-  },
 } as const;

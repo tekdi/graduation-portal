@@ -57,7 +57,24 @@
       "main": "Main Navigation",
       "quickActions": "Quick Actions"
     },
-    "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations."
+    "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
+    "bulkOperations": {
+      "title": "Bulk Operations & CSV Templates",
+      "csvImportTemplates": "CSV Import Templates",
+      "participantImportTemplate": "Participant Import Template",
+      "lcAssignmentTemplate": "LC Assignment Template",
+      "supervisorMappingTemplate": "Supervisor Mapping Template",
+      "userMapping": "User Mapping",
+      "userMappingDescription": "Use CSV uploads to map relationships between users:",
+      "assignParticipantsToLCs": "Assign participants to LCs",
+      "linkLCsToSupervisors": "Link LCs to supervisors",
+      "updateRoleHierarchies": "Update role hierarchies in bulk",
+      "passwordManagement": "Password Management",
+      "passwordManagementDescription": "Supervisors and admins can reset passwords for:",
+      "participantsAllLevels": "Participants (all levels)",
+      "linkageChampions": "Linkage Champions (supervisors+)",
+      "otherSupervisors": "Other supervisors (admin only)"
+    }
   },
   "brand": {
     "primaryName": "brac",

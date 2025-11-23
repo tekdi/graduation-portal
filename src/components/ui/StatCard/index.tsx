@@ -13,7 +13,7 @@ const StatCard: React.FC<StatCardProps> = ({
   title, 
   count, 
   subLabel,
-  color = '#2d2d2d' 
+  color = '$textForeground' 
 }) => {
   return (
     <StatCardContainer>

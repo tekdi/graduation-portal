@@ -27,7 +27,7 @@ export const FilterOptions: ReadonlyArray<FilterConfig> = [
     name: 'Role',
     attr: 'role',
     type: 'select',
-    data: ['Admin', 'Supervisor', 
+    data: ['All Roles', 'Admin', 'Supervisor', 
     'Linkage Champion', 'Participant',],
   },
   {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VStack, HStack, Text, Spinner, Button, Image } from '@ui';
+import { VStack, HStack, Text, Spinner } from '@ui';
 import { View } from 'react-native';
 
 import { userManagementStyles } from './Styles';
@@ -7,11 +7,12 @@ import UploadIcon from '../../assets/images/UploadIcon.png';
 import ExportIcon from '../../assets/images/ExportIcon.png';
 import { useLanguage } from '@contexts/LanguageContext';
 import Filters from '../../components/ui/Filter';
-import BulkOperationsCard from '../../components/ui/BulkOperationsCard';
+import BulkOperationsCard from '../../components/BulkOperationsCard';
 import StatCard, { StatsRow } from '@components/ui/StatCard';
 import { USER_MANAGEMENT_STATS } from '@constants/USER_MANAGEMENT_STATS';
 import { SearchFilter, FilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
 import FilterButton from '@components/ui/Filter';
+import AdminActionButtons from '@components/AdminActionButtons';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -35,43 +36,26 @@ const UserManagementScreen = () => {
           </Text>
         </VStack>
         
-        <HStack space="md" alignItems="center" mt="$2">
-          <Button
-            {...userManagementStyles.bulkUploadButton}
-            onPress={() => {
-              // Handle bulk upload
-            }}
-          >
-            <HStack space="sm" alignItems="center">
-              <Image 
-                source={UploadIcon}
-                style={{ width: 16, height: 16 }}
-                alt="Upload icon"
-              />
-              <Text {...userManagementStyles.bulkUploadButtonText}>
-                Bulk Upload (CSV)
-              </Text>
-            </HStack>
-          </Button>
-          
-          <Button
-            {...userManagementStyles.createUserButton}
-            onPress={() => {
-              // Handle create user
-            }}
-          >
-            <HStack space="sm" alignItems="center">
-              <Image 
-                source={ExportIcon}
-                style={{ width: 16, height: 16 }}
-                alt="Export icon"
-              />
-              <Text {...userManagementStyles.createUserButtonText}>
-                Create User
-              </Text>
-            </HStack>
-          </Button>
-        </HStack>
+        <AdminActionButtons
+          buttons={[
+            {
+              label: 'Bulk Upload (CSV)',
+              icon: UploadIcon,
+              variant: 'outline',
+              onPress: () => {
+                // Handle bulk upload
+              },
+            },
+            {
+              label: 'Create User',
+              icon: ExportIcon,
+              variant: 'solid',
+              onPress: () => {
+                // Handle create user
+              },
+            },
+          ]}
+        />
       </HStack>
       
       <FilterButton data={data} />

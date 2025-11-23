@@ -15,11 +15,10 @@ export default function FilterButton({ data }: any) {
       if (typeof firstItem === 'string') {
         return firstItem;
       } else if (firstItem?.value !== undefined) {
-        // Use markers for actual null and empty string to match option values
+        // Use marker for actual null to match option values
+        // Empty strings are handled directly
         if (firstItem.value === null) {
           return '__NULL_VALUE__';
-        } else if (firstItem.value === '') {
-          return '__EMPTY_VALUE__';
         } else {
           return String(firstItem.value);
         }
@@ -90,30 +89,7 @@ export default function FilterButton({ data }: any) {
                     });
                   }
                 }}
-                options={item?.data?.map((e: any) => {
-                  // Handle different data formats: string, object with value/label
-                  let optionValue: string;
-                  let optionName: string;
-                  
-                  if (typeof e === 'string') {
-                    optionValue = e;
-                    optionName = e;
-                  } else {
-                    // For objects, handle null values properly
-                    if (e?.value !== undefined) {
-                      // Use marker for actual null, keep string "null" as is
-                      optionValue = e.value === null ? '__NULL_VALUE__' : String(e.value);
-                    } else {
-                      optionValue = '';
-                    }
-                    optionName = e?.label ?? e?.name ?? optionValue;
-                  }
-                  
-                  return {
-                    value: optionValue,
-                    name: optionName,
-                  };
-                })}
+                options={item?.data || []}
                 {...filterStyles.input}
               />
 

@@ -1,8 +1,9 @@
 import React from "react";
 import { VStack, HStack, Text, Pressable, Box, Image } from "@ui";
 import type { ViewProps, TextProps, PressableProps } from "react-native";
-import DownloadIcon from "../../../assets/images/DownloadIcon.png";
+import DownloadIcon from "../../assets/images/DownloadIcon.png";
 import { bulkOperationStyles as styles } from "./Styles";
+import { useLanguage } from "@contexts/LanguageContext";
 
 // Extend the style types to ensure type safety
 interface TemplateButtonProps extends PressableProps {
@@ -14,49 +15,51 @@ interface BulletListProps {
 }
 
 const BulkOperationsCard: React.FC = () => {
+  const { t } = useLanguage();
+  
   return (
     <Box {...(styles.container as ViewProps)}>
       <Text {...(styles.sectionTitle as TextProps)}>
-        Bulk Operations & CSV Templates
+        {t('admin.bulkOperations.title')}
       </Text>
 
       <HStack space="lg" w="100%" alignItems="flex-start">
         {/* LEFT SECTION */}
         <VStack flex={1}>
-          <Text {...(styles.subTitle as TextProps)}>CSV Import Templates</Text>
+          <Text {...(styles.subTitle as TextProps)}>{t('admin.bulkOperations.csvImportTemplates')}</Text>
           <VStack>
-            <TemplateButton label="Participant Import Template" />
-            <TemplateButton label="LC Assignment Template" />
-            <TemplateButton label="Supervisor Mapping Template" />
+            <TemplateButton label={t('admin.bulkOperations.participantImportTemplate')} />
+            <TemplateButton label={t('admin.bulkOperations.lcAssignmentTemplate')} />
+            <TemplateButton label={t('admin.bulkOperations.supervisorMappingTemplate')} />
           </VStack>
         </VStack>
 
         {/* MIDDLE SECTION */}
         <VStack flex={1}>
-          <Text {...(styles.subTitle as TextProps)}>User Mapping</Text>
+          <Text {...(styles.subTitle as TextProps)}>{t('admin.bulkOperations.userMapping')}</Text>
           <Text {...(styles.description as TextProps)}>
-            Use CSV uploads to map relationships between users:
+            {t('admin.bulkOperations.userMappingDescription')}
           </Text>
           <BulletList
             items={[
-              "Assign participants to LCs",
-              "Link LCs to supervisors",
-              "Update role hierarchies in bulk",
+              t('admin.bulkOperations.assignParticipantsToLCs'),
+              t('admin.bulkOperations.linkLCsToSupervisors'),
+              t('admin.bulkOperations.updateRoleHierarchies'),
             ]}
           />
         </VStack>
 
         {/* RIGHT SECTION */}
         <VStack flex={1}>
-          <Text {...(styles.subTitle as TextProps)}>Password Management</Text>
+          <Text {...(styles.subTitle as TextProps)}>{t('admin.bulkOperations.passwordManagement')}</Text>
           <Text {...(styles.description as TextProps)}>
-            Supervisors and admins can reset passwords for:
+            {t('admin.bulkOperations.passwordManagementDescription')}
           </Text>
           <BulletList
             items={[
-              "Participants (all levels)",
-              "Linkage Champions (supervisors+)",
-              "Other supervisors (admin only)",
+              t('admin.bulkOperations.participantsAllLevels'),
+              t('admin.bulkOperations.linkageChampions'),
+              t('admin.bulkOperations.otherSupervisors'),
             ]}
           />
         </VStack>
