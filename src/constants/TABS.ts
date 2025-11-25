@@ -12,3 +12,4 @@ export const TABS: TabData[] = [
     isDisabled: true,
   },
 ];
+

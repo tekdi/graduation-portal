@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Input, InputField, InputSlot } from '@gluestack-ui/themed';
-import Icon from '../Icon';
+import Icon from '@ui/Icon';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { SearchBarProps } from '@app-types/components';

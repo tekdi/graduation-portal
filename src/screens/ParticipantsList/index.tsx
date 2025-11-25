@@ -9,23 +9,18 @@ import {
   ScrollView,
 } from '@gluestack-ui/themed';
 import { useNavigation } from '@react-navigation/native';
-import SearchBar from '@ui/SearchBar';
-import DataTable from '@ui/DataTable';
-import { getParticipantsColumns } from '@ui/DataTable/ParticipantsTableConfig';
+import SearchBar from '@components/SearchBar';
+import DataTable from '@components/DataTable';
+import { getParticipantsColumns } from '@components/DataTable/ParticipantsTableConfig';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
-import {
-  Participant,
-  ParticipantStatus,
-  StatusCount,
-  // ParticipantsQueryParams,
-} from '@app-types/screens';
-// import { participantsService } from '@services/participantsService';
+import { Participant, StatusCount, StatusType } from '@app-types/screens';
 import { useLanguage } from '@contexts/LanguageContext';
-import { TabButton } from '@ui/Tabs';
+import { TabButton } from '@components/Tabs';
 import { TABS } from '@constants/TABS';
 import { getStatusItems } from '@constants/FILTERS';
 import { PARTICIPANTS_LIST } from '@constants/PARTICIPANTS_LIST';
+import { STATUS } from '@constants/app.constant';
 
 const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
@@ -41,8 +36,9 @@ const ParticipantsList: React.FC = () => {
     completed: 6,
     dropped_out: 0,
   });
-  const [activeStatus, setActiveStatus] = useState<ParticipantStatus | ''>(
-    'not_enrolled',
+
+  const [activeStatus, setActiveStatus] = useState<StatusType | ''>(
+    STATUS.NOT_ENROLLED,
   );
   const [_searchKey, setSearchKey] = useState('');
   const [isLoading] = useState(false);
@@ -79,7 +75,7 @@ const ParticipantsList: React.FC = () => {
     setPage(1); // Reset to first page on search
   }, []);
 
-  const handleStatusChange = useCallback((status: ParticipantStatus | '') => {
+  const handleStatusChange = useCallback((status: StatusType | '') => {
     setActiveStatus(status);
     setPage(1); // Reset to first page on filter change
   }, []);
@@ -98,8 +94,6 @@ const ParticipantsList: React.FC = () => {
   const handleDropout = useCallback((participant: Participant) => {
     console.log('Dropout participant:', participant.id);
     // TODO: Implement dropout logic - API call to mark participant as dropout
-    // For now, just log it
-    alert(`Participant ${participant.name} marked as dropout`);
   }, []);
 
   return (
@@ -234,7 +228,10 @@ const ParticipantsList: React.FC = () => {
                   {...TYPOGRAPHY.bodySmall}
                   color={theme.tokens.colors.mutedForeground}
                 >
-                  Showing {participants.length} of {totalCount} participants
+                  {t('participants.showingParticipants', {
+                    count: participants.length,
+                    total: totalCount,
+                  })}{' '}
                 </Text>
               </Box>
             )}

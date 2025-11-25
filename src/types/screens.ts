@@ -1,26 +1,17 @@
-export type ParticipantStatus =
-  | 'not_enrolled'
-  | 'enrolled'
-  | 'in_progress'
-  | 'completed'
-  | 'dropped_out';
-
+import { STATUS } from '../constants/app.constant';
+export type StatusType = (typeof STATUS)[keyof typeof STATUS];
 export interface Participant {
   id: string;
   name: string;
   progress: number;
   email: string;
   phone: string;
-  status?: ParticipantStatus;
+  status?: StatusType;
 }
 
-export interface StatusCount {
-  not_enrolled: number;
-  enrolled: number;
-  in_progress: number;
-  completed: number;
-  dropped_out: number;
-}
+export type StatusCount = {
+  [K in StatusType]: number;
+};
 
 export interface ParticipantsResponse {
   result: {
@@ -34,7 +25,7 @@ export interface ParticipantsResponse {
 
 export interface ParticipantsQueryParams {
   searchKey?: string;
-  status?: ParticipantStatus | '';
+  status?: StatusType | '';
   page?: number;
   limit?: number;
 }
