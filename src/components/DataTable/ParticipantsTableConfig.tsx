@@ -5,7 +5,7 @@ import { ColumnDef } from '@app-types/components';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { STATUS } from '@constants/app.constant';
-import Icon from '@ui/Icon';
+import { LucideIcon } from '@ui/index';
 
 /**
  * Progress Bar Component for Participants Table
@@ -74,8 +74,8 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
     label: 'participants.graduated',
     flex: 2,
     render: participant =>
-      participant.progress === 100 ? (
-        <Icon name="checkCircleIcon" size={30} tintColor="green" />
+      participant.progress === 0 ? (
+        <LucideIcon name="CircleCheck" size={30} color="#22c55e" />
       ) : (
         '-'
       ),

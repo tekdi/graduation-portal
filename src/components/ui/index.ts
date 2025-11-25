@@ -3,5 +3,5 @@ import Select from './Inputs/Select';
 import { CustomMenu as Menu } from './Menu';
 import { useAlert } from './Alert';
 import { Input } from './Inputs/input';
-import Icon from './Icon';
-export { Select, Menu, useAlert, Input, Icon };
+import LucideIcon from './LucideIcon';
+export { Select, Menu, useAlert, Input, LucideIcon };

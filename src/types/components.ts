@@ -1,9 +1,8 @@
-import type { IconName } from '@constants/ICONS';
 import { ReactNode } from 'react';
 export interface FeatureCardData {
   id?: string;
   color: string;
-  icon: IconName;
+  icon: string; // Updated to accept any Lucide icon name
   title: string;
   description: string;
   navigationUrl?: string;

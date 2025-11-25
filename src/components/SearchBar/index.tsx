@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Input, InputField, InputSlot } from '@gluestack-ui/themed';
-import Icon from '@ui/Icon';
+import { LucideIcon } from '@ui/index';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { SearchBarProps } from '@app-types/components';
@@ -42,10 +42,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
         }}
       >
         <InputSlot paddingLeft="$3">
-          <Icon
-            name="search"
+          <LucideIcon
+            name="Search"
             size={20}
-            tintColor={theme.tokens.colors.mutedForeground}
+            color={theme.tokens.colors.mutedForeground}
           />
         </InputSlot>
         <InputField

@@ -8,7 +8,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { DataTableProps, ColumnDef } from '@app-types/components';
 // import ActionsMenu from '@components/ActionsMenu';
 import { CustomMenu } from '@components/ui/Menu';
-import Icon from '@components/ui/Icon';
+import { LucideIcon } from '@components/ui';
 import ConfirmationModal from '@components/ConfirmationModal';
 
 interface TableHeaderProps<T> {
@@ -121,10 +121,10 @@ const TableRow = <T,>({
         },
       }}
     >
-      <Icon
-        name="threeDotIcon"
-        size={30}
-        tintColor={theme.tokens.colors.mutedForeground}
+      <LucideIcon
+        name="MoreVertical"
+        size={20}
+        color={theme.tokens.colors.mutedForeground}
       />
     </Pressable>
   );
@@ -185,10 +185,10 @@ const TableRow = <T,>({
                       textValue: 'View Details',
                       iconElement: (
                         <Box marginRight="$2">
-                          <Icon
-                            name="eyeIcon"
+                          <LucideIcon
+                            name="Eye"
                             size={20}
-                            tintColor={theme.tokens.colors.mutedForeground}
+                            color={theme.tokens.colors.mutedForeground}
                           />
                         </Box>
                       ),
@@ -199,10 +199,10 @@ const TableRow = <T,>({
                       textValue: 'Log Visit',
                       iconElement: (
                         <Box marginRight="$2">
-                          <Icon
-                            name="logVisitIcon"
+                          <LucideIcon
+                            name="ClipboardCheck"
                             size={20}
-                            tintColor={theme.tokens.colors.mutedForeground}
+                            color={theme.tokens.colors.mutedForeground}
                           />
                         </Box>
                       ),
@@ -213,10 +213,10 @@ const TableRow = <T,>({
                       textValue: 'Dropout',
                       iconElement: (
                         <Box marginRight="$2">
-                          <Icon
-                            name="dropoutIcon"
+                          <LucideIcon
+                            name="UserX"
                             size={20}
-                            tintColor={theme.tokens.colors.error.light}
+                            color={theme.tokens.colors.error.light}
                           />
                         </Box>
                       ),
@@ -251,10 +251,10 @@ const TableRow = <T,>({
         cancelText={t('common.cancel') || 'Cancel'}
         confirmButtonColor={theme.tokens.colors.error.light}
         headerIcon={
-          <Icon
-            name="dropoutIcon"
+          <LucideIcon
+            name="UserX"
             size={24}
-            tintColor={theme.tokens.colors.error.light}
+            color={theme.tokens.colors.error.light}
           />
         }
         showInput
