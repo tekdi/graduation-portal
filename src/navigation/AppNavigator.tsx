@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, useMemo } from 'react';
+import React, { useState, useEffect, Suspense, useMemo, Component, ErrorInfo, ReactNode } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { I18nManager } from 'react-native';
@@ -13,6 +13,36 @@ import UserManagementScreen from '../screens/UserManagement';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
+
+// Error Boundary for Navigation
+class NavigationErrorBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; fallback?: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    logger.error('Navigation error:', error, errorInfo);
+    // Reset error state after a short delay to allow recovery
+    setTimeout(() => {
+      this.setState({ hasError: false });
+    }, 1000);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || <Spinner size="large" color="$primary500" />;
+    }
+    return this.props.children;
+  }
+}
 
 const Stack = createStackNavigator();
 
@@ -129,7 +159,21 @@ const AppNavigator: React.FC = () => {
 
   // Generate dynamic linking configuration based on accessPages
   // Memoize to prevent unnecessary recalculations
-  const linking = useMemo(() => getLinkingConfig(accessPages), [accessPages]);
+  // Only generate linking when accessPages is stable and not empty
+  const linking = useMemo(() => {
+    if (accessPages.length === 0) {
+      // Return minimal config when no access pages (e.g., during logout)
+      return {
+        prefixes: [],
+        config: {
+          screens: {
+            login: 'login',
+          },
+        },
+      };
+    }
+    return getLinkingConfig(accessPages);
+  }, [accessPages]);
 
   // Update I18nManager when RTL changes (for React Native)
   useEffect(() => {
@@ -150,15 +194,36 @@ const AppNavigator: React.FC = () => {
     }
   }, [isWeb]);
 
+  // Create a stable key for NavigationContainer to prevent state issues
+  // when linking config changes
+  // MUST be called before any conditional returns (Rules of Hooks)
+  const navigationKey = useMemo(() => {
+    return isLoggedIn 
+      ? `nav-${user?.role || 'guest'}-${accessPages.length}` 
+      : 'nav-login';
+  }, [isLoggedIn, user?.role, accessPages.length]);
+
   if (loading) {
     return <Spinner size="large" color="$primary500" />;
   }
 
   return (
-    <NavigationContainer
-      linking={linking}
-      fallback={<Spinner size="large" color="$primary500" />}
-    >
+    <NavigationErrorBoundary>
+      <NavigationContainer
+        key={navigationKey}
+        linking={linking}
+        fallback={<Spinner size="large" color="$primary500" />}
+        onReady={() => {
+          if (isWeb) {
+            logger.log('Navigation container ready');
+          }
+        }}
+        onStateChange={(state) => {
+          if (isWeb && state) {
+            logger.log('Navigation state changed:', state);
+          }
+        }}
+      >
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
@@ -192,6 +257,7 @@ const AppNavigator: React.FC = () => {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    </NavigationErrorBoundary>
   );
 };
 

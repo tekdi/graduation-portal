@@ -1,8 +1,8 @@
 import React from "react";
 import { VStack, HStack, Text, Image, Input, InputField, Button } from "@ui";
-import Select from "../Inputs/Select";
+import Select from "../ui/Inputs/Select";
 import { filterStyles } from "./Styles";
-import filterIcon from "../../../assets/images/FilterIcon.png";
+import filterIcon from "../../assets/images/FilterIcon.png";
 
 export default function FilterButton({ data }: any) {
   const [value, setValue] = React.useState<any>({});

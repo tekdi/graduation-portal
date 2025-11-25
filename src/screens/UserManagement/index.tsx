@@ -6,12 +6,11 @@ import { userManagementStyles } from './Styles';
 import UploadIcon from '../../assets/images/UploadIcon.png';
 import ExportIcon from '../../assets/images/ExportIcon.png';
 import { useLanguage } from '@contexts/LanguageContext';
-import Filters from '../../components/ui/Filter';
 import BulkOperationsCard from '../../components/BulkOperationsCard';
-import StatCard, { StatsRow } from '@components/ui/StatCard';
+import StatCard, { StatsRow } from '@components/StatCard';
 import { USER_MANAGEMENT_STATS } from '@constants/USER_MANAGEMENT_STATS';
 import { SearchFilter, FilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
-import FilterButton from '@components/ui/Filter';
+import FilterButton from '@components/Filter';
 import AdminActionButtons from '@components/AdminActionButtons';
 
 /**
