@@ -58,6 +58,10 @@
       "quickActions": "Quick Actions"
     },
     "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
+    "actions": {
+      "bulkUploadCSV": "Bulk Upload (CSV)",
+      "createUser": "Create User"
+    },
     "bulkOperations": {
       "title": "Bulk Operations & CSV Templates",
       "csvImportTemplates": "CSV Import Templates",

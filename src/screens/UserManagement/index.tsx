@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VStack, Spinner } from '@ui';
+import { VStack, HStack, Spinner, Button, Text, Image } from '@ui';
 import { View } from 'react-native';
 
 import UploadIcon from '../../assets/images/UploadIcon.png';
@@ -10,8 +10,8 @@ import StatCard, { StatsRow } from '@components/StatCard';
 import { USER_MANAGEMENT_STATS } from '@constants/USER_MANAGEMENT_STATS';
 import { SearchFilter, FilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
 import FilterButton from '@components/Filter';
-import AdminActionButtons from '@components/AdminActionButtons';
 import TitleHeader from '@components/TitleHeader';
+import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -26,26 +26,43 @@ const UserManagementScreen = () => {
         title={t('admin.menu.userManagement')}
         description={t('admin.userManagementDescription')}
         right={
-          <AdminActionButtons
-            buttons={[
-              {
-                label: 'Bulk Upload (CSV)',
-                icon: UploadIcon,
-                variant: 'outline',
-                onPress: () => {
-                  // Handle bulk upload
-                },
-              },
-              {
-                label: 'Create User',
-                icon: ExportIcon,
-                variant: 'solid',
-                onPress: () => {
-                  // Handle create user
-                },
-              },
-            ]}
-          />
+          <HStack space="md" alignItems="center">
+            <Button
+              {...titleHeaderStyles.outlineButton}
+              onPress={() => {
+                // Handle bulk upload
+              }}
+            >
+              <HStack space="sm" alignItems="center">
+                <Image 
+                  source={UploadIcon}
+                  style={{ width: 16, height: 16 }}
+                  alt="Upload icon"
+                />
+                <Text {...titleHeaderStyles.outlineButtonText}>
+                  {t('admin.actions.bulkUploadCSV')}
+                </Text>
+              </HStack>
+            </Button>
+            
+            <Button
+              {...titleHeaderStyles.solidButton}
+              onPress={() => {
+                // Handle create user
+              }}
+            >
+              <HStack space="sm" alignItems="center">
+                <Image 
+                  source={ExportIcon}
+                  style={{ width: 16, height: 16 }}
+                  alt="Export icon"
+                />
+                <Text {...titleHeaderStyles.solidButtonText}>
+                  {t('admin.actions.createUser')}
+                </Text>
+              </HStack>
+            </Button>
+          </HStack>
         }
       />
       
