@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { VStack, HStack, Text, Spinner } from '@ui';
+import { VStack, Spinner } from '@ui';
 import { View } from 'react-native';
 
-import { userManagementStyles } from './Styles';
 import UploadIcon from '../../assets/images/UploadIcon.png';
 import ExportIcon from '../../assets/images/ExportIcon.png';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -12,6 +11,7 @@ import { USER_MANAGEMENT_STATS } from '@constants/USER_MANAGEMENT_STATS';
 import { SearchFilter, FilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
 import FilterButton from '@components/Filter';
 import AdminActionButtons from '@components/AdminActionButtons';
+import TitleHeader from '@components/TitleHeader';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -22,40 +22,32 @@ const UserManagementScreen = () => {
 
   return (
     <VStack space="md" width="100%">
-      <HStack 
-        justifyContent="space-between" 
-        alignItems="flex-start" 
-        width="100%"
-        flexWrap="wrap"
-      >
-        <VStack {...userManagementStyles.mainVStack} flex={1}>
-          <Text {...userManagementStyles.titleText}>{t('admin.menu.userManagement')}</Text>
-          <Text {...userManagementStyles.welcomeText}>
-            {t('admin.userManagementDescription')}
-          </Text>
-        </VStack>
-        
-        <AdminActionButtons
-          buttons={[
-            {
-              label: 'Bulk Upload (CSV)',
-              icon: UploadIcon,
-              variant: 'outline',
-              onPress: () => {
-                // Handle bulk upload
+      <TitleHeader
+        title={t('admin.menu.userManagement')}
+        description={t('admin.userManagementDescription')}
+        right={
+          <AdminActionButtons
+            buttons={[
+              {
+                label: 'Bulk Upload (CSV)',
+                icon: UploadIcon,
+                variant: 'outline',
+                onPress: () => {
+                  // Handle bulk upload
+                },
               },
-            },
-            {
-              label: 'Create User',
-              icon: ExportIcon,
-              variant: 'solid',
-              onPress: () => {
-                // Handle create user
+              {
+                label: 'Create User',
+                icon: ExportIcon,
+                variant: 'solid',
+                onPress: () => {
+                  // Handle create user
+                },
               },
-            },
-          ]}
-        />
-      </HStack>
+            ]}
+          />
+        }
+      />
       
       <FilterButton data={data} />
       

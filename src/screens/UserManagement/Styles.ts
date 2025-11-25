@@ -5,19 +5,6 @@ export const userManagementStyles = {
     p: '$4',
     bg: '$backgroundLight0',
   },
- mainVStack: {
-   
-  },
-  titleText: {
-    fontSize: '$2xl',
-    fontWeight: '$bold',
-    lineHeight: 36,
-  },
-  welcomeText: {
-    color: '$textLight500',
-    fontSize: "$md",
-    lineHeight: "$md",
-  },
   statsHStack: {
     flexWrap: 'wrap',
     justifyContent: 'space-between',
