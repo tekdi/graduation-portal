@@ -23,8 +23,8 @@ const UserManagementScreen = () => {
   return (
     <VStack space="md" width="100%">
       <TitleHeader
-        title={t('admin.menu.userManagement')}
-        description={t('admin.userManagementDescription')}
+        title="admin.menu.userManagement"
+        description="admin.userManagementDescription"
         right={
           <HStack space="md" alignItems="center">
             <Button

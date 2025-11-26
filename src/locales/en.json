@@ -11,6 +11,8 @@
     "close": "Close",
     "search": "Search",
     "filter": "Filter",
+    "filters": "Filters",
+    "clearFilters": "Clear Filters",
     "submit": "Submit",
     "back": "Back",
     "next": "Next",
@@ -61,6 +63,29 @@
     "actions": {
       "bulkUploadCSV": "Bulk Upload (CSV)",
       "createUser": "Create User"
+    },
+    "filters": {
+      "role": "Role",
+      "status": "Status",
+      "searchPlaceholder": "Search by name or email...",
+      "allRoles": "All Roles",
+      "admin": "Admin",
+      "supervisor": "Supervisor",
+      "linkageChampion": "Linkage Champion",
+      "participant": "Participant",
+      "allStatus": "All Status",
+      "active": "Active",
+      "deactivated": "Deactivated"
+    },
+    "stats": {
+      "totalUsers": "Total Users",
+      "allRoles": "All roles",
+      "participants": "Participants",
+      "activeLearners": "Active learners",
+      "linkageChampions": "Linkage Champions",
+      "activeCoaches": "Active coaches",
+      "supervisors": "Supervisors",
+      "activeSupervisors": "Active supervisors"
     },
     "bulkOperations": {
       "title": "Bulk Operations & CSV Templates",

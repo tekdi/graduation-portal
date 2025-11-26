@@ -4,6 +4,7 @@ import type { ViewProps, TextProps, PressableProps } from "react-native";
 import DownloadIcon from "../../assets/images/DownloadIcon.png";
 import { bulkOperationStyles as styles } from "./Styles";
 import { useLanguage } from "@contexts/LanguageContext";
+import { USER_MAPPING_ITEMS, PASSWORD_MANAGEMENT_ITEMS } from "@constants/BULK_OPERATIONS";
 
 // Extend the style types to ensure type safety
 interface TemplateButtonProps extends PressableProps {
@@ -41,11 +42,7 @@ const BulkOperationsCard: React.FC = () => {
             {t('admin.bulkOperations.userMappingDescription')}
           </Text>
           <BulletList
-            items={[
-              t('admin.bulkOperations.assignParticipantsToLCs'),
-              t('admin.bulkOperations.linkLCsToSupervisors'),
-              t('admin.bulkOperations.updateRoleHierarchies'),
-            ]}
+            items={USER_MAPPING_ITEMS.map(key => t(key))}
           />
         </VStack>
 
@@ -56,11 +53,7 @@ const BulkOperationsCard: React.FC = () => {
             {t('admin.bulkOperations.passwordManagementDescription')}
           </Text>
           <BulletList
-            items={[
-              t('admin.bulkOperations.participantsAllLevels'),
-              t('admin.bulkOperations.linkageChampions'),
-              t('admin.bulkOperations.otherSupervisors'),
-            ]}
+            items={PASSWORD_MANAGEMENT_ITEMS.map(key => t(key))}
           />
         </VStack>
       </HStack>

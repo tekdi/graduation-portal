@@ -8,6 +8,8 @@
     "close": "إغلاق",
     "search": "بحث",
     "filter": "تصفية",
+    "filters": "المرشحات",
+    "clearFilters": "مسح المرشحات",
     "submit": "إرسال",
     "back": "رجوع",
     "next": "التالي",
@@ -36,6 +38,52 @@
     "ar": "العربية",
     "es": "Español",
     "hi": "हिन्दी"
+  },
+  "admin": {
+    "actions": {
+      "bulkUploadCSV": "رفع مجمع (CSV)",
+      "createUser": "إنشاء مستخدم"
+    },
+    "filters": {
+      "role": "الدور",
+      "status": "الحالة",
+      "searchPlaceholder": "البحث بالاسم أو البريد الإلكتروني...",
+      "allRoles": "جميع الأدوار",
+      "admin": "مسؤول",
+      "supervisor": "مشرف",
+      "linkageChampion": "ابطال الربط",
+      "participant": "مشارك",
+      "allStatus": "جميع الحالات",
+      "active": "نشط",
+      "deactivated": "معطل"
+    },
+    "bulkOperations": {
+      "title": "العمليات المجمعة وقوالب CSV",
+      "csvImportTemplates": "قوالب استيراد CSV",
+      "participantImportTemplate": "قالب استيراد المشاركين",
+      "lcAssignmentTemplate": "قالب تعيين LC",
+      "supervisorMappingTemplate": "قالب تعيين المشرف",
+      "userMapping": "تعيين المستخدمين",
+      "userMappingDescription": "استخدم تحميلات CSV لتعيين العلاقات بين المستخدمين:",
+      "assignParticipantsToLCs": "تعيين المشاركين إلى LCs",
+      "linkLCsToSupervisors": "ربط LCs بالمشرفين",
+      "updateRoleHierarchies": "تحديث التسلسل الهرمي للدور بشكل مجمع",
+      "passwordManagement": "إدارة كلمة المرور",
+      "passwordManagementDescription": "يمكن للمشرفين والمسؤولين إعادة تعيين كلمات المرور لـ:",
+      "participantsAllLevels": "المشاركون (جميع المستويات)",
+      "linkageChampions": "ابطال الربط (المشرفون+)",
+      "otherSupervisors": "مشرفون آخرون (المسؤول فقط)"
+    },
+    "stats": {
+      "totalUsers": "إجمالي المستخدمين",
+      "allRoles": "جميع الأدوار",
+      "participants": "المشاركون",
+      "activeLearners": "المتعلمون النشطون",
+      "linkageChampions": "ابطال الربط",
+      "activeCoaches": "المدربون النشطون",
+      "supervisors": "المشرفون",
+      "activeSupervisors": "المشرفون النشطون"
+    }
   },
   "welcome": {
     "welcomeBack": "مرحبًا بعودتك",

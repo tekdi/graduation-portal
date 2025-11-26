@@ -3,8 +3,10 @@ import { VStack, HStack, Text, Image, Input, InputField, Button } from "@ui";
 import Select from "../ui/Inputs/Select";
 import { filterStyles } from "./Styles";
 import filterIcon from "../../assets/images/FilterIcon.png";
+import { useLanguage } from "@contexts/LanguageContext";
 
 export default function FilterButton({ data }: any) {
+  const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
 
   // Get default display values for UI (not included in output)
@@ -41,7 +43,7 @@ export default function FilterButton({ data }: any) {
           alt="Filter icon"
         />
         <Text {...filterStyles.titleText}>
-          Filters
+          {t('common.filters')}
         </Text>
       </HStack>
 
@@ -54,11 +56,17 @@ export default function FilterButton({ data }: any) {
               ? filterStyles.searchContainer 
               : filterStyles.roleContainer)}
           >
-            <Text {...filterStyles.label}>{item.name}</Text>
+            <Text {...filterStyles.label}>
+              {item.nameKey ? t(item.nameKey) : item.name}
+            </Text>
             {item.type === 'search' ? (
               <Input {...filterStyles.input}>
                 <InputField
-                  placeholder={item.placeholder || `Search ${item.name.toLowerCase()}...`}
+                  placeholder={
+                    item.placeholderKey 
+                      ? t(item.placeholderKey) 
+                      : item.placeholder || (item.nameKey ? `${t('common.search')} ${t(item.nameKey).toLowerCase()}...` : `Search ${item.name?.toLowerCase()}...`)
+                  }
                   value={value?.[item.attr] || ""}
                   onChangeText={(v: any) => {
                     if (!v || v.trim() === "") {
@@ -89,7 +97,23 @@ export default function FilterButton({ data }: any) {
                     });
                   }
                 }}
-                options={item?.data || []}
+                options={
+                  item?.data?.map((option: any) => {
+                    // If it's a string, return as-is (backward compatibility)
+                    if (typeof option === 'string') {
+                      return option;
+                    }
+                    // If it's an object with labelKey, translate it
+                    if (option.labelKey) {
+                      return {
+                        ...option,
+                        label: t(option.labelKey),
+                      };
+                    }
+                    // If it has label, return as-is
+                    return option;
+                  }) || []
+                }
                 {...filterStyles.input}
               />
 
@@ -103,7 +127,7 @@ export default function FilterButton({ data }: any) {
             onPress={handleClearFilters}
             {...filterStyles.button}
           >
-            <Text {...filterStyles.buttonText}>Clear Filters</Text>
+            <Text {...filterStyles.buttonText}>{t('common.clearFilters')}</Text>
           </Button>
         </VStack>
       </HStack>

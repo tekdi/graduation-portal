@@ -1,14 +1,17 @@
 import React from 'react';
 import { HStack, VStack, Text } from '@ui';
 import { titleHeaderStyles } from './Styles';
+import { useLanguage } from '@contexts/LanguageContext';
 
 export interface TitleHeaderProps {
-  title: string;
-  description: string;
+  title: string; // Can be a translation key or plain text
+  description: string; // Can be a translation key or plain text
   right?: React.ReactNode;
 }
 
 const TitleHeader: React.FC<TitleHeaderProps> = ({ title, description, right }) => {
+  const { t } = useLanguage();
+  
   return (
     <HStack 
       justifyContent="space-between" 
@@ -17,8 +20,8 @@ const TitleHeader: React.FC<TitleHeaderProps> = ({ title, description, right }) 
       flexWrap="wrap"
     >
       <VStack {...titleHeaderStyles.textContainer} flex={1}>
-        <Text {...titleHeaderStyles.titleText}>{title}</Text>
-        <Text {...titleHeaderStyles.descriptionText}>{description}</Text>
+        <Text {...titleHeaderStyles.titleText}>{t(title)}</Text>
+        <Text {...titleHeaderStyles.descriptionText}>{t(description)}</Text>
       </VStack>
       
       {/* 

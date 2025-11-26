@@ -1,11 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
 import { StatCardContainer, StatTitle, StatCount, StatSubLabel, StatsRowContainer } from './Styles';
+import { useLanguage } from '@contexts/LanguageContext';
 
 interface StatCardProps {
-  title: string;
+  title: string; // Can be a translation key or plain text
   count: number | string;
-  subLabel: string;
+  subLabel: string; // Can be a translation key or plain text
   color?: string;
 }
 
@@ -15,12 +16,14 @@ const StatCard: React.FC<StatCardProps> = ({
   subLabel,
   color = '$textForeground' 
 }) => {
+  const { t } = useLanguage();
+  
   return (
     <StatCardContainer>
-      <StatTitle>{title}</StatTitle>
+      <StatTitle>{t(title)}</StatTitle>
       <View>
          <StatCount style={{ color }}>{count}</StatCount>
-         <StatSubLabel>{subLabel}</StatSubLabel>
+         <StatSubLabel>{t(subLabel)}</StatSubLabel>
       </View>
      
     </StatCardContainer>

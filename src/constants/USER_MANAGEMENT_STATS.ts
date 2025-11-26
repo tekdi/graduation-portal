@@ -12,26 +12,26 @@ export interface UserStatData {
 
 export const USER_MANAGEMENT_STATS: UserStatData[] = [
   {
-    title: 'Total Users',
+    title: 'admin.stats.totalUsers',
     count: 10,
-    subLabel: 'All roles',
+    subLabel: 'admin.stats.allRoles',
   },
   {
-    title: 'Participants',
+    title: 'admin.stats.participants',
     count: 4,
-    subLabel: 'Active learners',
+    subLabel: 'admin.stats.activeLearners',
     color: '#3b82f6',
   },
   {
-    title: 'Linkage Champions',
+    title: 'admin.stats.linkageChampions',
     count: 2,
-    subLabel: 'Active coaches',
+    subLabel: 'admin.stats.activeCoaches',
     color: '#f59e0b',
   },
   {
-    title: 'Supervisors',
+    title: 'admin.stats.supervisors',
     count: 2,
-    subLabel: 'Active supervisors',
+    subLabel: 'admin.stats.activeSupervisors',
     color: '#10b981',
   },
 ] as const;
