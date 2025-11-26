@@ -68,12 +68,15 @@ export default function FilterButton({ data }: any) {
                       : item.placeholder || (item.nameKey ? `${t('common.search')} ${t(item.nameKey).toLowerCase()}...` : `Search ${item.name?.toLowerCase()}...`)
                   }
                   value={value?.[item.attr] || ""}
-                  onChangeText={(v: any) => {
-                    if (!v || v.trim() === "") {
-                      const { [item.attr]: removed, ...rest } = value;
-                      setValue(rest);
+                  onChangeText={(text: string) => {
+                    if (!text || text.trim() === "") {
+                      setValue((prev: any) => {
+                        const updated = { ...prev };
+                        delete updated[item.attr];
+                        return updated;
+                      });
                     } else {
-                      setValue({ ...value, [item.attr]: v });
+                      setValue((prev: any) => ({ ...prev, [item.attr]: text }));
                     }
                   }}
                 />
@@ -81,20 +84,21 @@ export default function FilterButton({ data }: any) {
             ) : (
               <Select
                 value={value?.[item.attr] || getDefaultDisplayValue(item)}
-                onChange={(e) => {
-                  const v = e;
-
+                onChange={(v) => {
                   // ❗ If actual null (marked), empty string, or undefined → remove from state
                   // Note: String "null" is kept in state, only actual null/empty removes the key
                   if (v == null || v === '__NULL_VALUE__' || v === '') {
-                    const { [item.attr]: removed, ...rest } = value;
-                    setValue(rest);
+                    setValue((prev: any) => {
+                      const updated = { ...prev };
+                      delete updated[item.attr];
+                      return updated;
+                    });
                   } else {
                     // Otherwise store the selected value (including string "null")
-                    setValue({
-                      ...value,
+                    setValue((prev: any) => ({
+                      ...prev,
                       [item.attr]: v,
-                    });
+                    }));
                   }
                 }}
                 options={

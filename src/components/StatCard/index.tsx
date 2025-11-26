@@ -4,9 +4,9 @@ import { StatCardContainer, StatTitle, StatCount, StatSubLabel, StatsRowContaine
 import { useLanguage } from '@contexts/LanguageContext';
 
 interface StatCardProps {
-  title: string; // Can be a translation key or plain text
+  title: string; // Translation key for the stat title
   count: number | string;
-  subLabel: string; // Can be a translation key or plain text
+  subLabel: string; // Translation key for the stat title
   color?: string;
 }
 

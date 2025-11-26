@@ -4,8 +4,8 @@ import { titleHeaderStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 
 export interface TitleHeaderProps {
-  title: string; // Can be a translation key or plain text
-  description: string; // Can be a translation key or plain text
+  title: string; // Translation key for the header title
+  description: string; // Translation key for the header description
   right?: React.ReactNode;
 }
 

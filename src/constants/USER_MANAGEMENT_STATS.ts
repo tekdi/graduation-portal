@@ -34,5 +34,5 @@ export const USER_MANAGEMENT_STATS: UserStatData[] = [
     subLabel: 'admin.stats.activeSupervisors',
     color: '#10b981',
   },
-] as const;
+];
 
