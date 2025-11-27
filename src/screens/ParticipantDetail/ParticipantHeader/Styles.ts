@@ -73,16 +73,18 @@ export const participantHeaderStyles = {
 
   // Status badge
   statusBadge: {
-    bg: '$error600' as const,
-    borderRadius: '$md' as const,
-    px: '$3' as const,
-    py: '$1' as const,
+    bg: '$bgDestructive' as const,
+    borderRadius: '$xl' as const,
+    px: '$2' as const,
+    py: '$0.5' as const,
     ml: '$3' as const,
+   
   },
   statusBadgeText: {
+    fontSize: '$xs' as const,
+    fontWeight: '$medium' as const,
     color: '$white' as const,
-    fontSize: '$sm' as const,
-    fontWeight: '$semibold' as const,
+    lineHeight: '$xs' as const,
   },
 
   // Action buttons

@@ -30,6 +30,7 @@ export const theme = {
       error600: '#dc2626',
       error700: '#7f1d1d',
       error900: '#82181a',
+      bgDestructive: '#ef4444',
     },
   },
   components: {
