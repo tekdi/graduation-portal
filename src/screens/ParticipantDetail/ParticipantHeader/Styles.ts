@@ -12,8 +12,6 @@ export const participantHeaderStyles = {
     marginHorizontal: 'auto' as const,
     px: '$4' as const, // Mobile: smaller padding
     py: '$6' as const,
-   // gap: '$4' as const,
-   bg: '$backgroundLight50' as const,
   },
 
   // Back navigation link
@@ -201,9 +199,11 @@ export const participantHeaderStyles = {
     lineHeight: '$sm' as const,
   },
   progressCardContent: {
-    justifyContent: 'space-between' as const,
-    alignItems: 'center' as const,
+    // Mobile: vertical stacking (default)
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start' as const,
     width: '$full' as const,
+    // Desktop: horizontal layout (overridden by $md-* props in component)
   },
   progressPercentage: {
     fontSize: '$2xl' as const,

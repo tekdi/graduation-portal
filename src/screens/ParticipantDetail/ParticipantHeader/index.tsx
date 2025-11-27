@@ -285,11 +285,22 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
           <Text {...participantHeaderStyles.progressCardTitle}>
             {t('participantDetail.header.graduationReadiness')}
           </Text>
-          <HStack {...participantHeaderStyles.progressCardContent}>
+          <VStack 
+            {...participantHeaderStyles.progressCardContent}
+            // Mobile: stack vertically, Desktop: horizontal layout
+            $md-flexDirection="row"
+            $md-justifyContent="space-between"
+            $md-alignItems="center"
+            space="sm"
+          >
             <Text {...participantHeaderStyles.progressPercentage}>
               {progress}%
             </Text>
-            <Box {...participantHeaderStyles.progressBarContainer}>
+            <Box 
+              {...participantHeaderStyles.progressBarContainer}
+              // Mobile: full width, Desktop: auto width with maxWidth
+              $md-width="auto"
+            >
               <Box {...participantHeaderStyles.progressBarBackground}>
                 <Box 
                   {...participantHeaderStyles.progressBarFill}
@@ -297,7 +308,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
                 />
               </Box>
             </Box>
-          </HStack>
+          </VStack>
         </Box>
       );
     }
