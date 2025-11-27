@@ -24,7 +24,7 @@ export const participantHeaderStyles = {
   },
   backLinkText: {
     fontSize: '$sm' as const,
-    color: '$textForeground' as const,
+    color: '$textForegroundColor' as const,
     fontWeight: '$medium' as const,
   },
 
@@ -52,7 +52,7 @@ export const participantHeaderStyles = {
   participantName: {
     fontSize: '$md' as const,
     fontWeight: '$normal' as const,
-    color: '$textForeground' as const,
+    color: '$textForegroundColor' as const,
     lineHeight: '$lg' as const,
     marginBottom: '$1' as const,
   },
@@ -112,7 +112,7 @@ export const participantHeaderStyles = {
     alignItems: 'center' as const,
   },
   outlineButtonText: {
-    color: '$textForeground' as const,
+    color: '$textForegroundColor' as const,
     fontSize: '$sm' as const,
     fontWeight: '$medium' as const,
   },
@@ -208,7 +208,7 @@ export const participantHeaderStyles = {
   progressPercentage: {
     fontSize: '$2xl' as const,
     fontWeight: '$normal' as const,
-    color: '$textForeground' as const,
+    color: '$textForegroundColor' as const,
     minWidth: 60,
     lineHeight: '$xl' as const,
   },
