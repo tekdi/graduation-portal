@@ -1,3 +1,5 @@
+import { Participant } from './screens';
+
 /**
  * Participant Status Types
  * Defines the possible enrollment statuses for a participant
@@ -24,6 +26,18 @@ export interface ParticipantData {
   id: string;
   name: string;
   status: ParticipantStatus;
+  pathway?: PathwayType;
+  graduationProgress?: number;
+  graduationDate?: string;
+}
+
+/**
+ * Unified Participant Interface
+ * Combines Participant and ParticipantData fields for complete participant information.
+ * Used as the single source of truth for participant data.
+ */
+export interface UnifiedParticipant extends Participant {
+  status: 'not_enrolled' | 'enrolled' | 'in_progress' | 'completed' | 'dropout';
   pathway?: PathwayType;
   graduationProgress?: number;
   graduationDate?: string;
