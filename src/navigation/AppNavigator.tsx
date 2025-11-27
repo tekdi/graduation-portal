@@ -13,6 +13,7 @@ import UserManagementScreen from '../screens/UserManagement';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
+import ParticipantsList from '../screens/ParticipantsList/index';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -69,6 +70,7 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
+        { name: 'participants', component: ParticipantsList },
       ];
     default:
       return []; // Always return an array, even if empty

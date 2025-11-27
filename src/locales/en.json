@@ -22,7 +22,10 @@
     "offline": "Offline Mode",
     "online": "Online",
     "selectOption": "Select an option",
-    "placeholder": "Search users, templates, logs..."
+    "placeholder": "Search users, templates, logs...",
+    "actions": "Actions",
+    "noDataFound": "No data found",
+    "optional": "(Optional)"
   },
   "navigation": {
     "menu": "Menu",
@@ -140,5 +143,35 @@
     "connectWithExperts": "Connect with Experts",
     "connectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
     "getStarted": "Get started"
+  },
+  "participants": {
+    "myParticipants": "My Participants",
+    "dashboard": "Dashboard",
+    "searchByNameOrId": "Search by name or ID...",
+    "notEnrolled": "Not Enrolled",
+    "enrolled": "Enrolled",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "droppedOut": "Dropped out",
+    "name": "Name",
+    "participantID": "Participant ID",
+    "overallProgress": "Overall Progress",
+    "contact": "Contact",
+    "actions": "Actions",
+    "noParticipantsFound": "No participants found",
+    "loadingParticipants": "Loading participants...",
+    "dashboardComingSoon": "Dashboard coming soon...",
+    "showingParticipants": "Showing {{count}} of {{total}} participants",
+    "graduated": "Graduated"
+  },
+  "actions": {
+    "viewDetails": "View Details",
+    "logVisit": "Log Visit",
+    "dropout": "Dropout",
+    "confirmDropout": "Confirm Dropout",
+    "dropoutMessage": "Mark {{name}} as dropout from the program",
+    "dropoutReasonLabel": "Reason for Dropout",
+    "dropoutReasonPlaceholder": "Enter reason for dropout...",
+    "dropoutHint": "This will change the participant's status to \"Not Enrolled\" and log the action in their history."
   }
 }

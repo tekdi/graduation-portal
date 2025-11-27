@@ -15,6 +15,8 @@ export interface MenuItemData {
   textValue: string;
   icon?: any;
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  iconElement?: React.ReactNode;
+  color?: string;
 }
 
 export interface CustomMenuProps {
@@ -59,6 +61,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
   disabledKeys = [],
   triggerLabel = 'Menu',
   triggerProps = {},
+  trigger,
   onSelect,
   ...menuProps
 }) => {
@@ -71,6 +74,11 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
 
   const renderTrigger = React.useCallback(
     (defaultTriggerProps: any) => {
+      // If custom trigger provided, use it
+      if (trigger) {
+        return trigger(defaultTriggerProps);
+      }
+      // Otherwise use default trigger
       return (
         <DefaultTrigger
           label={t(triggerLabel)}
@@ -78,7 +86,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
         />
       );
     },
-    [triggerProps, triggerLabel, t],
+    [triggerProps, triggerLabel, t, trigger],
   );
 
   return (
@@ -95,10 +103,14 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
           textValue={item.textValue}
           onPress={() => handleMenuItemPress(item.key)}
         >
-          {item.icon && (
+          {item.iconElement ? (
+            item.iconElement
+          ) : item.icon ? (
             <Icon as={item.icon} size={item.iconSize || 'sm'} me="$2" />
-          )}
-          <MenuItemLabel size="sm">{t(item.label)}</MenuItemLabel>
+          ) : null}
+          <MenuItemLabel size="sm" color={item.color}>
+            {t(item.label)}
+          </MenuItemLabel>
         </MenuItem>
       ))}
     </Menu>
