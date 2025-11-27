@@ -1,11 +1,11 @@
 // Sidebar Styles
 export const sidebarStyles = {
   container: {
-    bg: '$backgroundLight50' as const,
+    bg: '$bgSidebar' as const,
     borderRightWidth: 1,
     borderRightColor: '$borderLight300' as const,
-    width: 280,
-    height: '100%' as '100%',
+    width: '$64',
+    height: '$full',
   },
   scrollContent: {
     flex: 1,
@@ -18,9 +18,12 @@ export const sidebarStyles = {
     fontWeight: '$bold' as const,
     color: '$textLight500' as const,
     textTransform: 'uppercase' as const,
-    px: '$4' as const,
+    //px: '$4' as const,
     mb: '$2' as const,
     letterSpacing: 1,
+    height: "$8",
+    display: 'flex',
+    alignItems: 'center',
   },
   quickActionsHeader: {
     px: '$4' as const,
@@ -59,7 +62,7 @@ export const sidebarStyles = {
     alignItems: 'center' as const,
     space: 'md' as const,
     justifyContent: 'space-between' as const,
-    width: '100%' as const,
+    width: '$full' as const,
   },
   languageIcon: {
     color: '$textLight600' as const,
@@ -93,7 +96,7 @@ export const sidebarStyles = {
     bg: '$backgroundLight50' as const,
     borderRightWidth: 1,
     borderRightColor: '$borderLight300' as const,
-    height: '100%' as '100%',
+    height: '$full' as '$full',
   },
   drawerHeader: {
     borderBottomWidth: 1,
@@ -111,7 +114,7 @@ export const sidebarStyles = {
   },
   drawerBody: {
     flex: 1,
-    height: '100%' as '100%',
+    height: '$full' as '$full',
   },
 
   menuButton: {
@@ -125,14 +128,14 @@ export const sidebarStyles = {
   },
   logoContainer: {
     alignItems: 'center' as const,
-    space: 'sm' as const,
+    space: 'md' as const,
   },
   logoImage: {
-    width: 32,
-    height: 32,
+    width: 48,
+    height: 48,
   },
   brandContainer: {
-    space: 'xs' as const,
+  
   },
   brandRow: {
     alignItems: 'center' as const,
@@ -144,18 +147,20 @@ export const sidebarStyles = {
     color: '$primary600' as const,
   },
   brandTextSecondary: {
-    fontSize: '$lg' as const,
+    fontSize: '$md' as const,
     fontWeight: '$bold' as const,
     color: '$textLight900' as const,
+    lineHeight: '$md',
   },
   versionText: {
     fontSize: '$xs' as const,
     color: '$textLight500' as const,
+    lineHeight: '13px', // 15px
   },
   mobileMenuButton: {
     alignItems: 'center' as const,
     space: 'sm' as const,
-    py: '$4' as const,
+    py: '$2' as const,
     px: '$6' as const,
     minHeight: 64,
   },
@@ -172,20 +177,20 @@ export const sidebarStyles = {
 // Sidebar Item Styles
 export const sidebarItemStyles = {
   container: (isChild: boolean) => ({
-    px: (isChild ? '$6' : '$4') as const,
-    py: '$3' as const,
-    mx: '$2' as const,
-    borderRadius: '$lg' as const,
+  
   }),
   itemContainer: {
     alignItems: 'center' as const,
     space: 'md' as const,
     justifyContent: 'space-between' as const,
+    gap: '$1' as const,
   },
   itemContent: {
     alignItems: 'center' as const,
-    space: 'md' as const,
+    space: 'sm' as const,
     flex: 1,
+    p: '$2' as const,
+    bg: '#f1f5f9'
   },
   itemIcon: (isActive: boolean) => ({
     color: (isActive ? '$primary600' : '$textLight600') as const,
@@ -193,7 +198,7 @@ export const sidebarItemStyles = {
   }),
   itemText: (isActive: boolean) => ({
     fontSize: '$sm' as const,
-    fontWeight: isActive ? ('$semibold' as const) : ('$normal' as const),
+    fontWeight: isActive ? ('$medium' as const) : ('$normal' as const),
     color: (isActive ? '$primary600' : '$textLight900') as const,
   }),
   chevronIcon: {
