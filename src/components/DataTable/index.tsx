@@ -83,8 +83,6 @@ const TableRow = <T,>({
   const itemId = (item as any)?.id;
 
   const handleMenuSelect = (key: string) => {
-    console.log('Selected action:', key, 'for item:', item);
-
     if (key === 'view-details') {
       // @ts-ignore - Navigation type inference
       navigation.navigate('participant-detail', { participantId: itemId });
@@ -100,12 +98,8 @@ const TableRow = <T,>({
   };
 
   const handleDropoutConfirm = (reason?: string) => {
-    console.log('Item ID:', itemId);
-    console.log('Item:', item);
-    console.log('Dropout reason:', reason);
-
     setShowDropoutModal(false);
-    setDropoutReason(''); // Reset reason
+    setDropoutReason(reason ?? ''); // Reset reason
     onActionClick?.(item);
   };
 
@@ -291,7 +285,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ message }) => {
         {...TYPOGRAPHY.paragraph}
         color={theme.tokens.colors.mutedForeground}
       >
-        {message || t('common.noDataFound')}
+        {message ? t(message) : t('common.noDataFound')}
       </Text>
     </Box>
   );

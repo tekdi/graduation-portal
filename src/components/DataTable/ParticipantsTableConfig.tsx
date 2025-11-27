@@ -74,8 +74,12 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
     label: 'participants.graduated',
     flex: 2,
     render: participant =>
-      participant.progress === 0 ? (
-        <LucideIcon name="CircleCheck" size={30} color="#22c55e" />
+      participant.progress === 100 ? (
+        <LucideIcon
+          name="CircleCheck"
+          size={30}
+          color={theme.tokens.colors.accent300}
+        />
       ) : (
         '-'
       ),
@@ -99,8 +103,8 @@ export const getParticipantsColumns = (
   status?: StatusType,
 ): ColumnDef<Participant>[] => {
   return allParticipantsColumns.filter(col => {
-    if (col.key === 'progress') return status === STATUS.IN_PROGRESS;
-    if (col.key === 'graduated') return status === STATUS.COMPLETED;
+    if (col.key === STATUS.IN_PROGRESS) return status === STATUS.IN_PROGRESS;
+    if (col.key === STATUS.COMPLETED) return status === STATUS.COMPLETED;
     return true; // keep all other columns for any status
   });
 };

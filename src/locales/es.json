@@ -22,7 +22,8 @@
     "selectOption": "Selecciona una opción",
     "placeholder": "Buscar usuarios, plantillas, registros...",
     "actions": "Acciones",
-    "noDataFound": "No se encontraron datos"
+    "noDataFound": "No se encontraron datos",
+    "optional": "(Opcional)"
   },
   "navigation": {
     "menu": "Menú",

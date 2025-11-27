@@ -49,7 +49,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           />
         </InputSlot>
         <InputField
-          placeholder={finalPlaceholder}
+          placeholder={t(finalPlaceholder)}
           value={searchText}
           onChangeText={handleChange}
           {...TYPOGRAPHY.input}

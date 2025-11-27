@@ -21,6 +21,7 @@ import {
 import { Pressable } from 'react-native';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
+import { useLanguage } from '@contexts/LanguageContext';
 import { ConfirmationModalProps } from '@app-types/components';
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
@@ -43,6 +44,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   inputValue: controlledInputValue,
   onInputChange,
 }) => {
+  const { t } = useLanguage();
+
   // Internal state for input if not controlled
   const [internalInputValue, setInternalInputValue] = useState('');
 
@@ -112,7 +115,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               flex={1}
               color={theme.tokens.colors.textPrimary}
             >
-              {title}
+              {t(title)}
             </Heading>
 
             {/* Close Button */}
@@ -142,7 +145,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               color={theme.tokens.colors.textSecondary}
               lineHeight="$xl"
             >
-              {message}
+              {t(message)}
             </Text>
 
             {/* Optional Input Field */}
@@ -155,11 +158,11 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     color={theme.tokens.colors.textPrimary}
                     fontWeight="$medium"
                   >
-                    {inputLabel}
+                    {t(inputLabel)}
                     {!inputRequired && (
                       <Text color={theme.tokens.colors.textMuted}>
                         {' '}
-                        (Optional)
+                        {t('common.optional')}
                       </Text>
                     )}
                   </Text>
@@ -178,7 +181,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                   minHeight={80}
                 >
                   <InputField
-                    placeholder={inputPlaceholder}
+                    placeholder={inputPlaceholder ? t(inputPlaceholder) : ''}
                     value={inputValue}
                     onChangeText={setInputValue}
                     multiline
@@ -196,7 +199,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     color={theme.tokens.colors.textSecondary}
                     lineHeight="$sm"
                   >
-                    {inputHint}
+                    {t(inputHint)}
                   </Text>
                 )}
               </VStack>
@@ -224,7 +227,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                 color={theme.tokens.colors.textPrimary}
                 {...TYPOGRAPHY.button}
               >
-                {cancelText}
+                {t(cancelText)}
               </ButtonText>
             </Button>
 
@@ -243,7 +246,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               opacity={isConfirmDisabled ? 0.5 : 1}
             >
               <ButtonText color={theme.tokens.colors.modalBackground}>
-                {confirmText}
+                {t(confirmText)}
               </ButtonText>
             </Button>
           </HStack>

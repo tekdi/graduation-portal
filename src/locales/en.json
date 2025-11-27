@@ -22,7 +22,8 @@
     "selectOption": "Select an option",
     "placeholder": "Search users, templates, logs...",
     "actions": "Actions",
-    "noDataFound": "No data found"
+    "noDataFound": "No data found",
+    "optional": "(Optional)"
   },
   "navigation": {
     "menu": "Menu",

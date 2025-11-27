@@ -53,3 +53,24 @@ export interface DataTableProps<T> {
   showActions?: boolean;
   getRowKey: (item: T) => string;
 }
+
+export interface ConfirmationModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (inputValue?: string) => void;
+  title: string;
+  message: string;
+  confirmText: string;
+  cancelText: string;
+  confirmButtonColor?: string;
+  confirmButtonVariant?: 'solid' | 'outline' | 'link';
+  maxWidth?: number;
+  headerIcon?: ReactNode;
+  showInput?: boolean;
+  inputLabel?: string;
+  inputPlaceholder?: string;
+  inputHint?: string;
+  inputRequired?: boolean;
+  inputValue?: string;
+  onInputChange?: (value: string) => void;
+}
