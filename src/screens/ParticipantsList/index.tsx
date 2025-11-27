@@ -7,7 +7,7 @@ import {
   Heading,
   Pressable,
   ScrollView,
-} from '@gluestack-ui/themed';
+} from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
 import DataTable from '@components/DataTable';
@@ -85,7 +85,7 @@ const ParticipantsList: React.FC = () => {
       console.log('Navigate to participant detail:', participant.id);
       // @ts-ignore
       navigation.navigate('participant-detail', {
-        participantId: participant.id,
+        id: participant.id,
       });
     },
     [navigation],

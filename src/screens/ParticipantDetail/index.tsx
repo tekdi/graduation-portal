@@ -3,7 +3,7 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import { VStack, ScrollView } from '@ui';
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
-import { getParticipantById } from '@constants/PARTICIPANTS_MOCK_DATA';
+import { getParticipantById } from '@constants/PARTICIPANTS_LIST';
 import type { ParticipantStatus } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
