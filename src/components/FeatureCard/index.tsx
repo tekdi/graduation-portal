@@ -6,7 +6,7 @@ import { FeatureCardProps } from '@app-types/components';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
-import Icon from '@ui/Icon';
+import { LucideIcon } from '@ui/index';
 const FeatureCard: React.FC<FeatureCardProps> = ({ card }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
@@ -84,8 +84,8 @@ const FeatureCard: React.FC<FeatureCardProps> = ({ card }) => {
               alignItems="center"
               justifyContent="center"
             >
-              {/* Render Icon component here with the icon name */}
-              <Icon name={icon} size={32} />
+              {/* Render Lucide icon */}
+              <LucideIcon name={icon} size={32} color="white" />
             </Box>
 
             {/* Title */}

@@ -1,10 +1,4 @@
-import {
-  SettingsIcon,
-  EditIcon,
-  ThreeDotsIcon,
-  ArrowUpIcon,
-  AddIcon,
-} from '@ui';
+import { SettingsIcon, EditIcon, ArrowUpIcon, AddIcon } from '@ui';
 
 interface SidebarItem {
   key: string;

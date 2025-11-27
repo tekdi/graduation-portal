@@ -1,5 +1,8 @@
 {
   "common": {
+    "profile": "Perfil",
+    "settings": "Configuración",
+    "logout": "Cerrar Sesión",
     "loading": "Cargando...",
     "save": "Guardar",
     "cancel": "Cancelar",
@@ -18,7 +21,11 @@
     "confirm": "Confirmar",
     "offline": "Modo sin conexión",
     "online": "En línea",
-    "selectOption": "Selecciona una opción"
+    "selectOption": "Selecciona una opción",
+    "placeholder": "Buscar usuarios, plantillas, registros...",
+    "actions": "Acciones",
+    "noDataFound": "No se encontraron datos",
+    "optional": "(Opcional)"
   },
   "navigation": {
     "menu": "Menú",
@@ -40,51 +47,91 @@
     "hi": "हिन्दी"
   },
   "admin": {
-    "actions": {
-      "bulkUploadCSV": "Carga Masiva (CSV)",
-      "createUser": "Crear Usuario"
-    },
-    "filters": {
-      "role": "Rol",
-      "status": "Estado",
-      "searchPlaceholder": "Buscar por nombre o correo electrónico...",
-      "allRoles": "Todos los Roles",
-      "admin": "Administrador",
-      "supervisor": "Supervisor",
-      "linkageChampion": "Campeón de Vinculación",
-      "participant": "Participante",
-      "allStatus": "Todos los Estados",
-      "active": "Activo",
-      "deactivated": "Desactivado"
-    },
-    "bulkOperations": {
-      "title": "Operaciones Masivas y Plantillas CSV",
-      "csvImportTemplates": "Plantillas de Importación CSV",
-      "participantImportTemplate": "Plantilla de Importación de Participantes",
-      "lcAssignmentTemplate": "Plantilla de Asignación de LC",
-      "supervisorMappingTemplate": "Plantilla de Mapeo de Supervisores",
-      "userMapping": "Mapeo de Usuarios",
-      "userMappingDescription": "Usa cargas CSV para mapear relaciones entre usuarios:",
-      "assignParticipantsToLCs": "Asignar participantes a LCs",
-      "linkLCsToSupervisors": "Vincular LCs a supervisores",
-      "updateRoleHierarchies": "Actualizar jerarquías de roles en masa",
-      "passwordManagement": "Gestión de Contraseñas",
-      "passwordManagementDescription": "Los supervisores y administradores pueden restablecer contraseñas para:",
-      "participantsAllLevels": "Participantes (todos los niveles)",
-      "linkageChampions": "Campeones de Vinculación (supervisores+)",
-      "otherSupervisors": "Otros supervisores (solo administrador)"
-    },
-    "stats": {
-      "totalUsers": "Total de Usuarios",
-      "allRoles": "Todos los roles",
-      "participants": "Participantes",
-      "activeLearners": "Aprendices activos",
-      "linkageChampions": "Campeones de Vinculación",
-      "activeCoaches": "Entrenadores activos",
-      "supervisors": "Supervisores",
-      "activeSupervisors": "Supervisores activos"
+    "home": "Inicio",
+    "dashboard": "Panel de Control",
+    "dashboardDescription": "¡Bienvenido de nuevo! Aquí está lo que está sucediendo con tu sistema de gestión de aprendizaje.",
+    "quickActions": "Acciones Rápidas",
+    "recentActivity": "Actividad Reciente",
+    "menu": {
+      "userManagement": "Gestión de Usuarios",
+      "templateManagement": "Gestión de Plantillas",
+      "auditLog": "Registro de Auditoría",
+      "uploadUsers": "Cargar Usuarios",
+      "createUser": "Crear Usuario",
+      "main": "Principal",
+      "quickActions": "Acciones Rápidas"
     }
   },
+  "brand": {
+    "primaryName": "brac",
+    "secondaryName": "GBL Admin",
+    "version": "Console v1.0"
+  },
+  "system": {
+    "online": "Sistema Activo",
+    "offline": "Sistema Inactivo"
+  },
+  "login": {
+    "pleaseEnterBothEmailAndPassword": "Por favor, ingrese tanto el correo electrónico como la contraseña",
+    "invalidEmailOrPassword": "Correo electrónico o contraseña inválidos",
+    "anErrorOccurredDuringLogin": "Ocurrió un error durante el inicio de sesión",
+    "logIn": "Iniciar Sesión",
+    "testAccounts": "Cuentas de Prueba:",
+    "welcomeToYourAccount": "Bienvenido a Tu Cuenta",
+    "logInToContinue": "Iniciar sesión para continuar",
+    "description": "Iniciar sesión para continuar",
+    "username": "Nombre de Usuario",
+    "password": "Contraseña",
+    "rememberMe": "Recuérdame",
+    "rememberMeDescription": "Recuérdame en este dispositivo por 30 días",
+    "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
+    "title": "Generando Mejores Medios de Vida"
+  },
+  "actions": {
+    "bulkUploadCSV": "Carga Masiva (CSV)",
+    "createUser": "Crear Usuario"
+  },
+  "filters": {
+    "role": "Rol",
+    "status": "Estado",
+    "searchPlaceholder": "Buscar por nombre o correo electrónico...",
+    "allRoles": "Todos los Roles",
+    "admin": "Administrador",
+    "supervisor": "Supervisor",
+    "linkageChampion": "Campeón de Vinculación",
+    "participant": "Participante",
+    "allStatus": "Todos los Estados",
+    "active": "Activo",
+    "deactivated": "Desactivado"
+  },
+  "bulkOperations": {
+    "title": "Operaciones Masivas y Plantillas CSV",
+    "csvImportTemplates": "Plantillas de Importación CSV",
+    "participantImportTemplate": "Plantilla de Importación de Participantes",
+    "lcAssignmentTemplate": "Plantilla de Asignación de LC",
+    "supervisorMappingTemplate": "Plantilla de Mapeo de Supervisores",
+    "userMapping": "Mapeo de Usuarios",
+    "userMappingDescription": "Usa cargas CSV para mapear relaciones entre usuarios:",
+    "assignParticipantsToLCs": "Asignar participantes a LCs",
+    "linkLCsToSupervisors": "Vincular LCs a supervisores",
+    "updateRoleHierarchies": "Actualizar jerarquías de roles en masa",
+    "passwordManagement": "Gestión de Contraseñas",
+    "passwordManagementDescription": "Los supervisores y administradores pueden restablecer contraseñas para:",
+    "participantsAllLevels": "Participantes (todos los niveles)",
+    "linkageChampions": "Campeones de Vinculación (supervisores+)",
+    "otherSupervisors": "Otros supervisores (solo administrador)"
+  },
+  "stats": {
+    "totalUsers": "Total de Usuarios",
+    "allRoles": "Todos los roles",
+    "participants": "Participantes",
+    "activeLearners": "Aprendices activos",
+    "linkageChampions": "Campeones de Vinculación",
+    "activeCoaches": "Entrenadores activos",
+    "supervisors": "Supervisores",
+    "activeSupervisors": "Supervisores activos"
+  },
+
   "welcome": {
     "welcomeBack": "Bienvenido de nuevo",
     "chooseOptionBelowToGetStarted": "Elige una opción a continuación para comenzar",
@@ -120,5 +167,31 @@
       "employment": "Vía de Empleo",
       "entrepreneurship": "Vía de Emprendimiento"
     }
+  },
+  "participants": {
+    "myParticipants": "Mis Participantes",
+    "dashboard": "Panel de Control",
+    "searchByNameOrId": "Buscar por nombre o ID...",
+    "notEnrolled": "No Inscrito",
+    "enrolled": "Inscrito",
+    "inProgress": "En Progreso",
+    "completed": "Completado",
+    "droppedOut": "Abandonado",
+    "name": "Nombre",
+    "participantID": "ID del Participante",
+    "overallProgress": "Progreso General",
+    "contact": "Contacto",
+    "actions": "Acciones",
+    "noParticipantsFound": "No se encontraron participantes",
+    "loadingParticipants": "Cargando participantes...",
+    "dashboardComingSoon": "Panel de control próximamente...",
+    "showingParticipants": "Mostrando {{count}} de {{total}} participantes"
+  },
+  "actions": {
+    "viewDetails": "Ver Detalles",
+    "logVisit": "Registrar Visita",
+    "dropout": "Abandono",
+    "confirmDropout": "Confirmar Abandono",
+    "dropoutMessage": "¿Estás seguro de que deseas marcar a {{name}} como abandonado? Esta acción puede revertirse más tarde."
   }
 }
