@@ -95,5 +95,30 @@
     "connectWithExperts": "تواصل مع الخبراء",
     "connectWithExpertsDescription": "احصل على الدعم، اطرح الأسئلة، وتواصل مع المتخصصين",
     "getStarted": "ابدأ"
+  },
+  "participantDetail": {
+    "notFound": {
+      "title": "المشارك غير موجود",
+      "message": "لم يتم العثور على مشارك بالمعرف: {{id}}",
+      "noIdProvided": "لم يتم تقديم معرف المشارك",
+      "availableIds": "معرفات المشاركين المتاحة: 1001، 1002، 1003، 1004، 1005"
+    },
+    "header": {
+      "backToCaseload": "العودة إلى قائمة الحالات",
+      "viewProfile": "عرض الملف الشخصي",
+      "enrollParticipant": "تسجيل المشارك",
+      "logVisit": "تسجيل الزيارة",
+      "droppedOut": "انسحب",
+      "graduationReadiness": "جاهزية التخرج",
+      "programStatus": "حالة البرنامج",
+      "graduatedComplete": "تخرج - 100% مكتمل",
+      "graduatedOn": "تخرج في {{date}}",
+      "participantDroppedOut": "انسحب المشارك من البرنامج",
+      "dropoutWarning": "انسحب هذا المشارك من البرنامج. أنت تعرض سجلاته في وضع القراءة فقط. لا يمكن إجراء أي تغييرات."
+    },
+    "pathways": {
+      "employment": "مسار التوظيف",
+      "entrepreneurship": "مسار ريادة الأعمال"
+    }
   }
 }

@@ -95,5 +95,30 @@
     "connectWithExperts": "Conéctate con Expertos",
     "connectWithExpertsDescription": "Obtén apoyo, haz preguntas y conéctate con especialistas",
     "getStarted": "Comenzar"
+  },
+  "participantDetail": {
+    "notFound": {
+      "title": "Participante no encontrado",
+      "message": "No se encontró ningún participante con ID: {{id}}",
+      "noIdProvided": "No se proporcionó ID de participante",
+      "availableIds": "IDs de participantes disponibles: 1001, 1002, 1003, 1004, 1005"
+    },
+    "header": {
+      "backToCaseload": "Volver a Casos",
+      "viewProfile": "Ver Perfil",
+      "enrollParticipant": "Inscribir Participante",
+      "logVisit": "Registrar Visita",
+      "droppedOut": "Abandonó",
+      "graduationReadiness": "Preparación para Graduación",
+      "programStatus": "Estado del Programa",
+      "graduatedComplete": "Graduado - 100% Completo",
+      "graduatedOn": "Graduado el {{date}}",
+      "participantDroppedOut": "El participante abandonó el programa",
+      "dropoutWarning": "Este participante ha abandonado el programa. Estás viendo sus registros en modo de solo lectura. No se pueden realizar cambios."
+    },
+    "pathways": {
+      "employment": "Vía de Empleo",
+      "entrepreneurship": "Vía de Emprendimiento"
+    }
   }
 }

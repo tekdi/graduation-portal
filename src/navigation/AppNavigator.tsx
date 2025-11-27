@@ -13,6 +13,7 @@ import UserManagementScreen from '../screens/UserManagement';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
+import ParticipantDetail from '../screens/ParticipantDetail';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -69,6 +70,7 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
+        { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
       ];
     default:
       return []; // Always return an array, even if empty
@@ -93,7 +95,7 @@ const getLinkingConfig = (
   };
 // Dynamically generate nested routes from accessPages array
   if (accessPages.length > 0) {
-    const mainScreens: Record<string, string> = {};
+    const mainScreens: Record<string, any> = {};
     accessPages.forEach(page => {
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
@@ -113,6 +115,8 @@ const getLinkingConfig = (
       ) {
         mainScreens[page.name] = 'select-language';
       } else {
+        // Handle dynamic routes with parameters (e.g., /participants/:id)
+        // React Navigation will automatically extract parameters from the path
         mainScreens[page.name] = screenPath;
       }
     });

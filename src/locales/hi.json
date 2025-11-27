@@ -138,5 +138,30 @@
     "connectWithExperts": "विशेषज्ञों से जुड़ें",
     "connectWithExpertsDescription": "सहायता प्राप्त करें, प्रश्न पूछें और विशेषज्ञों से जुड़ें",
     "getStarted": "शुरू करें"
+  },
+  "participantDetail": {
+    "notFound": {
+      "title": "प्रतिभागी नहीं मिला",
+      "message": "ID के साथ कोई प्रतिभागी नहीं मिला: {{id}}",
+      "noIdProvided": "कोई प्रतिभागी ID प्रदान नहीं की गई",
+      "availableIds": "उपलब्ध प्रतिभागी IDs: 1001, 1002, 1003, 1004, 1005"
+    },
+    "header": {
+      "backToCaseload": "केसलोड पर वापस जाएं",
+      "viewProfile": "प्रोफ़ाइल देखें",
+      "enrollParticipant": "प्रतिभागी नामांकित करें",
+      "logVisit": "विज़िट लॉग करें",
+      "droppedOut": "छोड़ दिया",
+      "graduationReadiness": "स्नातक तत्परता",
+      "programStatus": "कार्यक्रम स्थिति",
+      "graduatedComplete": "स्नातक - 100% पूर्ण",
+      "graduatedOn": "{{date}} को स्नातक",
+      "participantDroppedOut": "प्रतिभागी ने कार्यक्रम छोड़ दिया",
+      "dropoutWarning": "इस प्रतिभागी ने कार्यक्रम छोड़ दिया है। आप उनके रिकॉर्ड केवल-पढ़ने वाले मोड में देख रहे हैं। कोई भी परिवर्तन नहीं किया जा सकता है।"
+    },
+    "pathways": {
+      "employment": "रोजगार मार्ग",
+      "entrepreneurship": "उद्यमिता मार्ग"
+    }
   }
 }
