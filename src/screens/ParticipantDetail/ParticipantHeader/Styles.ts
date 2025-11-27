@@ -95,18 +95,6 @@ export const participantHeaderStyles = {
     width: '$full' as const, // Mobile: full width buttons (overridden by $md-width="auto")
     gap: '$3' as const, // Mobile: smaller gap
   },
-  outlineButton: {
-    variant: 'outline' as const,
-    size: 'md' as const,
-    borderColor: '$borderLight300' as const,
-    bg: '$white' as const,
-    borderRadius: '$xl' as const,
-    height: '$9' as const,
-    paddingHorizontal: '$3' as const,
-    paddingVertical: '$2' as const,
-    width: '$full' as const, // Mobile: full width
-    minWidth: 120 as const, // Desktop: minimum width
-  },
   outlineButtonContent: {
     space: 'sm' as const,
     alignItems: 'center' as const,

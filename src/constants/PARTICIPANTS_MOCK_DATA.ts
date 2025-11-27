@@ -1,45 +1,10 @@
-/**
- * Participant Status Types
- * Defines the possible enrollment statuses for a participant
- */
-export type ParticipantStatus =
-  | 'not-enrolled'
-  | 'enrolled'
-  | 'in-progress'
-  | 'completed'
-  | 'dropout';
+import type { ParticipantData } from '@app-types/participant';
 
 /**
- * Pathway Type
- * Defines the possible pathway types for participants
- * These keys correspond to translation keys in locale files
+ * Re-export types for backward compatibility
+ * @deprecated Import from '@app-types/participant' instead
  */
-export type PathwayType = 'employment' | 'entrepreneurship';
-
-/**
- * Participant Data Interface
- * Defines the structure of participant data
- * 
- * @property id - Unique participant identifier
- * @property name - Participant's full name
- * @property status - Current enrollment status
- * @property pathway - Pathway type key (used for translation)
- * @property graduationProgress - Progress percentage (0-100) for in-progress status
- * @property graduationDate - Graduation date string for completed status
- * 
- * @remarks
- * In production, this interface should match the API response structure.
- * The `pathway` field uses translation keys ('employment' | 'entrepreneurship')
- * which are translated in the UI using the `t()` function.
- */
-export interface ParticipantData {
-  id: string;
-  name: string;
-  status: ParticipantStatus;
-  pathway?: PathwayType;
-  graduationProgress?: number;
-  graduationDate?: string;
-}
+export type { ParticipantStatus, PathwayType, ParticipantData } from '@app-types/participant';
 
 /**
  * Mock Participants Data

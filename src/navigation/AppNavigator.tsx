@@ -95,7 +95,7 @@ const getLinkingConfig = (
   };
 // Dynamically generate nested routes from accessPages array
   if (accessPages.length > 0) {
-    const mainScreens: Record<string, any> = {};
+    const mainScreens: Record<string, string> = {};
     accessPages.forEach(page => {
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path

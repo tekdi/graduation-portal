@@ -1,63 +1,27 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { HStack, VStack, Text, Button, ButtonText, Box, Pressable } from '@gluestack-ui/themed';
-import { Platform } from 'react-native';
+import { HStack, VStack, Text, Button, ButtonText, Box, Pressable } from '@ui';
 import Icon from '@components/ui/Icon';
 import { participantHeaderStyles } from './Styles';
-import { ParticipantStatus } from '@constants/PARTICIPANTS_MOCK_DATA';
+import type { ParticipantStatus, PathwayType } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 
 /**
  * ParticipantHeader Props
- * 
- * @property participantName - Full name of the participant
- * @property participantId - Unique identifier for the participant
- * @property status - Current enrollment status (determines UI variations)
- * @property pathway - Pathway type key ('employment' | 'entrepreneurship') used for translation
- * @property graduationProgress - Progress percentage (0-100) for in-progress status
- * @property graduationDate - Graduation date string for completed status
+ * Component props for displaying participant header with status-based UI variations.
  */
 interface ParticipantHeaderProps {
   participantName: string;
   participantId: string;
   status?: ParticipantStatus;
-  pathway?: 'employment' | 'entrepreneurship';
+  pathway?: PathwayType;
   graduationProgress?: number;
   graduationDate?: string;
 }
 
 /**
  * ParticipantHeader Component
- * 
- * Displays participant information header with status-based variations.
- * The component dynamically renders different UI elements based on the participant's status:
- * 
- * **Status-based rendering:**
- * - **not-enrolled**: View Profile + Enroll Participant (disabled) buttons
- * - **enrolled/in-progress/completed**: View Profile + Log Visit buttons
- * - **in-progress**: Shows "Graduation Readiness" progress card with percentage
- * - **completed**: Shows "Program Status" card with graduation date
- * - **dropout**: Shows red "Dropped Out" badge + warning message, read-only mode
- * 
- * **Web-specific features:**
- * - Hover effects on back navigation link
- * - Box shadows and gradient backgrounds (via $web-* props)
- * 
- * @remarks
- * Web-specific props ($web-boxShadow, $web-backgroundImage) require @ts-ignore
- * because Gluestack UI's TypeScript definitions don't include web-specific props.
- * These props are handled by the underlying styled-components system.
- * 
- * @example
- * ```tsx
- * <ParticipantHeader
- *   participantName="John Doe"
- *   participantId="1001"
- *   status="in-progress"
- *   pathway="Employment Pathway"
- *   graduationProgress={57}
- * />
- * ```
+ * Displays participant header with status-based UI variations and action buttons.
  */
 const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   participantName,
@@ -69,7 +33,6 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
 }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
-  const [isBackLinkHovered, setIsBackLinkHovered] = useState(false);
 
   /**
    * Handle Back Navigation
@@ -81,57 +44,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     }
   };
 
-  /**
-   * Handle Back Link Hover (Web only)
-   * Updates hover state for visual feedback on web platform
-   */
-  const handleBackLinkMouseEnter = () => {
-    if (Platform.OS === 'web') {
-      setIsBackLinkHovered(true);
-    }
-  };
 
-  const handleBackLinkMouseLeave = () => {
-    if (Platform.OS === 'web') {
-      setIsBackLinkHovered(false);
-    }
-  };
-
-  /**
-   * Handle View Profile
-   * Navigates to participant profile screen
-   * 
-   * @remarks
-   * Implementation pending - will navigate to profile detail screen
-   */
-  const handleViewProfile = () => {
-    // Navigation to profile screen will be implemented when profile screen is available
-    // navigation.navigate('participant-profile', { id: participantId });
-  };
-
-  /**
-   * Handle Enroll Participant
-   * Opens enrollment flow for not-enrolled participants
-   * 
-   * @remarks
-   * Implementation pending - will open enrollment modal/flow
-   */
-  const handleEnrollParticipant = () => {
-    // Enrollment flow will be implemented when enrollment feature is available
-    // This button is currently disabled in the UI
-  };
-
-  /**
-   * Handle Log Visit
-   * Opens visit logging interface for enrolled/in-progress/completed participants
-   * 
-   * @remarks
-   * Implementation pending - will open visit logging modal/form
-   */
-  const handleLogVisit = () => {
-    // Visit logging will be implemented when visit logging feature is available
-    // navigation.navigate('log-visit', { participantId });
-  };
 
   /**
    * Render Status Badge
@@ -152,17 +65,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     return null;
   };
 
-  /**
-   * Render Action Buttons
-   * Returns different button combinations based on participant status
-   * 
-   * **Button combinations by status:**
-   * - **not-enrolled**: View Profile + Enroll Participant (disabled)
-   * - **dropout**: View Profile only (read-only mode)
-   * - **enrolled/in-progress/completed**: View Profile + Log Visit
-   * 
-   * @returns Button components based on status
-   */
+  // Render Action Buttons - returns different button combinations based on participant status
   const renderActionButtons = () => {
     // Not Enrolled: View Profile + Enroll Participant (disabled)
     if (status === 'not-enrolled') {
@@ -174,8 +77,17 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
           $md-width="auto"
         >
           <Button
-            {...participantHeaderStyles.outlineButton}
-            onPress={handleViewProfile}
+            variant="outline"
+            size="md"
+            borderColor="$borderLight300"
+            bg="$white"
+            borderRadius="$xl"
+            height="$9"
+            paddingHorizontal="$3"
+            paddingVertical="$2"
+            width="$full"
+            minWidth={120}
+            onPress={() => {}}
             $md-width="auto"
           >
             <HStack {...participantHeaderStyles.outlineButtonContent}>
@@ -188,7 +100,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
           
           <Button
             {...participantHeaderStyles.solidButtonPrimary}
-            onPress={handleEnrollParticipant}
+            onPress={() => {}}
             isDisabled={true}
             $md-width="auto"
           >
@@ -207,8 +119,17 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     if (status === 'dropout') {
       return (
         <Button
-          {...participantHeaderStyles.outlineButton}
-          onPress={handleViewProfile}
+          variant="outline"
+          size="md"
+          borderColor="$borderLight300"
+          bg="$white"
+          borderRadius="$xl"
+          height="$9"
+          paddingHorizontal="$3"
+          paddingVertical="$2"
+          width="$full"
+          minWidth={120}
+          onPress={() => {}}
           $md-width="auto"
         >
           <HStack {...participantHeaderStyles.outlineButtonContent}>
@@ -230,8 +151,17 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
         $md-width="auto"
       >
         <Button
-          {...participantHeaderStyles.outlineButton}
-          onPress={handleViewProfile}
+          variant="outline"
+          size="md"
+          borderColor="$borderLight300"
+          bg="$white"
+          borderRadius="$xl"
+          height="$9"
+          paddingHorizontal="$3"
+          paddingVertical="$2"
+          width="$full"
+          minWidth={120}
+          onPress={() => {}}
           $md-width="auto"
         >
           <HStack {...participantHeaderStyles.outlineButtonContent}>
@@ -244,7 +174,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
         
         <Button
           {...participantHeaderStyles.solidButtonPrimary}
-          onPress={handleLogVisit}
+          onPress={() => {}}
           $md-width="auto"
         >
           <HStack {...participantHeaderStyles.solidButtonContent}>
@@ -259,18 +189,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     );
   };
 
-  /**
-   * Render In Progress Status Card
-   * Shows graduation readiness progress card for in-progress participants
-   * Displays progress percentage and visual progress bar
-   * 
-   * @remarks
-   * Uses nullish coalescing (??) for safer default value handling.
-   * Web-specific props ($web-boxShadow, $web-backgroundImage) require @ts-ignore
-   * because Gluestack UI TypeScript definitions don't include web-specific props.
-   * 
-   * @returns Progress card component if status is 'in-progress', null otherwise
-   */
+  // Render In Progress Status Card - shows graduation readiness progress with percentage and progress bar
   const renderInProgressCard = () => {
     if (status === 'in-progress') {
       // Use nullish coalescing for safer default value (only use default if null/undefined)
@@ -315,18 +234,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     return null;
   };
 
-  /**
-   * Render Completed Status Card
-   * Shows graduation completion status card for completed participants
-   * Displays graduation status, date, and checkmark icon
-   * 
-   * @remarks
-   * Uses nullish coalescing (??) for safer default value handling.
-   * Web-specific props ($web-boxShadow, $web-backgroundImage) require @ts-ignore
-   * because Gluestack UI TypeScript definitions don't include web-specific props.
-   * 
-   * @returns Completed card component if status is 'completed', null otherwise
-   */
+  // Render Completed Status Card - shows graduation completion status with date and checkmark icon
   const renderCompletedCard = () => {
     if (status === 'completed') {
       // Use nullish coalescing for safer default value (only use default if null/undefined)
@@ -403,15 +311,13 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
       $md-p="$6"
     >
       {/* Back Navigation Link */}
-      <Pressable 
-        onPress={handleBackPress}
-        onHoverIn={handleBackLinkMouseEnter}
-        onHoverOut={handleBackLinkMouseLeave}
-      >
+      <Pressable onPress={handleBackPress}>
         <HStack {...participantHeaderStyles.backLinkContainer}>
           <Text 
             {...participantHeaderStyles.backLinkText}
-            color={isBackLinkHovered ? '$primary500' : '$textForeground'}
+            $hover={{
+              color: '$primary500',
+            }}
           >
             {t('participantDetail.header.backToCaseload')}
           </Text>
