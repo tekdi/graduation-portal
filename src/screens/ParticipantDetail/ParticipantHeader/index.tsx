@@ -4,10 +4,10 @@ import { HStack, VStack, Text, Box, Pressable } from '@ui';
 import { participantHeaderStyles } from './Styles';
 import type { ParticipantStatus, PathwayType } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
-import ActionButtons from './components/ActionButtons';
-import InProgressCard from './components/InProgressCard';
-import CompletedCard from './components/CompletedCard';
-import DropoutWarning from './components/DropoutWarning';
+import ActionButtons from './ActionButtons';
+import InProgressCard from './InProgressCard';
+import CompletedCard from './CompletedCard';
+import DropoutWarning from './DropoutWarning';
 
 /**
  * ParticipantHeader Props

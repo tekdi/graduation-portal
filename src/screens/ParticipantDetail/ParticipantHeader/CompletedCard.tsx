@@ -1,6 +1,6 @@
 import React from 'react';
 import { VStack, HStack, Text, Box } from '@ui';
-import { participantHeaderStyles } from '../Styles';
+import { participantHeaderStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 
 interface CompletedCardProps {

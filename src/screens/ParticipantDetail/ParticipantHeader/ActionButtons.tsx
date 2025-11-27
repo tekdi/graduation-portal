@@ -1,7 +1,6 @@
 import React from 'react';
-import { HStack, Button, ButtonText } from '@ui';
-import Icon from '@components/ui/Icon';
-import { participantHeaderStyles } from '../Styles';
+import { HStack, Button, ButtonText, LucideIcon } from '@ui';
+import { participantHeaderStyles } from './Styles';
 import type { ParticipantStatus } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 
@@ -39,7 +38,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ status }) => {
           $md-width="auto"
         >
           <HStack {...participantHeaderStyles.outlineButtonContent}>
-            <Icon name="user" size={16} tintColor="#000" />
+            <LucideIcon name="User" size={16} color="#000" />
             <ButtonText {...participantHeaderStyles.outlineButtonText}>
               {t('participantDetail.header.viewProfile')}
             </ButtonText>
@@ -53,7 +52,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ status }) => {
           $md-width="auto"
         >
           <HStack {...participantHeaderStyles.solidButtonContent}>
-            <Icon name="user" size={16} tintColor="#fff" />
+            <LucideIcon name="User" size={16} color="#fff" />
             <ButtonText {...participantHeaderStyles.solidButtonText}>
               {t('participantDetail.header.enrollParticipant')}
             </ButtonText>
@@ -81,7 +80,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ status }) => {
         $md-width="auto"
       >
         <HStack {...participantHeaderStyles.outlineButtonContent}>
-          <Icon name="user" size={16} tintColor="#000" />
+          <LucideIcon name="User" size={16} color="#000" />
           <ButtonText {...participantHeaderStyles.outlineButtonText}>
             {t('participantDetail.header.viewProfile')}
           </ButtonText>
@@ -112,7 +111,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ status }) => {
         $md-width="auto"
       >
         <HStack {...participantHeaderStyles.outlineButtonContent}>
-          <Icon name="user" size={16} tintColor="#000" />
+          <LucideIcon name="User" size={16} color="#000" />
           <ButtonText {...participantHeaderStyles.outlineButtonText}>
             {t('participantDetail.header.viewProfile')}
           </ButtonText>
@@ -125,7 +124,7 @@ const ActionButtons: React.FC<ActionButtonsProps> = ({ status }) => {
         $md-width="auto"
       >
         <HStack {...participantHeaderStyles.solidButtonContent}>
-          <Icon name="chart" size={16} tintColor="#fff" />
+          <LucideIcon name="FileText" size={16} color="#fff" />
           <ButtonText {...participantHeaderStyles.solidButtonText}>
             {t('participantDetail.header.logVisit')}
           </ButtonText>
