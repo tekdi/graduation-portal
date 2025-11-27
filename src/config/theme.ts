@@ -33,6 +33,10 @@ export const theme = {
       textMuted: '#9CA3AF',
       iconBackground: 'rgba(139, 40, 66, 0.08)',
       hoverBackground: '#F9FAFB',
+      textMutedForeground: '#64748b',
+      textForeground: '#2d2d2d',
+      bgSidebar: '#f8fafc',
+      btnPrimary: '#8B2842',
     },
   },
   components: {

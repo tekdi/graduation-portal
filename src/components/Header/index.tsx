@@ -75,11 +75,7 @@ const Header: React.FC<{
     >
       <HStack {...stylesHeader.hStack}>
         {rightSideContent && rightSideContent}
-        {user?.name && (
-          <Text {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}>
-            {user?.name}
-          </Text>
-        )}
+        
         {/* Title */}
         {title && (
           <Text

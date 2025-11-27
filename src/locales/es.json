@@ -11,6 +11,8 @@
     "close": "Cerrar",
     "search": "Buscar",
     "filter": "Filtrar",
+    "filters": "Filtros",
+    "clearFilters": "Limpiar Filtros",
     "submit": "Enviar",
     "back": "Atrás",
     "next": "Siguiente",
@@ -85,6 +87,51 @@
     "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
     "title": "Generando Mejores Medios de Vida"
   },
+  "actions": {
+    "bulkUploadCSV": "Carga Masiva (CSV)",
+    "createUser": "Crear Usuario"
+  },
+  "filters": {
+    "role": "Rol",
+    "status": "Estado",
+    "searchPlaceholder": "Buscar por nombre o correo electrónico...",
+    "allRoles": "Todos los Roles",
+    "admin": "Administrador",
+    "supervisor": "Supervisor",
+    "linkageChampion": "Campeón de Vinculación",
+    "participant": "Participante",
+    "allStatus": "Todos los Estados",
+    "active": "Activo",
+    "deactivated": "Desactivado"
+  },
+  "bulkOperations": {
+    "title": "Operaciones Masivas y Plantillas CSV",
+    "csvImportTemplates": "Plantillas de Importación CSV",
+    "participantImportTemplate": "Plantilla de Importación de Participantes",
+    "lcAssignmentTemplate": "Plantilla de Asignación de LC",
+    "supervisorMappingTemplate": "Plantilla de Mapeo de Supervisores",
+    "userMapping": "Mapeo de Usuarios",
+    "userMappingDescription": "Usa cargas CSV para mapear relaciones entre usuarios:",
+    "assignParticipantsToLCs": "Asignar participantes a LCs",
+    "linkLCsToSupervisors": "Vincular LCs a supervisores",
+    "updateRoleHierarchies": "Actualizar jerarquías de roles en masa",
+    "passwordManagement": "Gestión de Contraseñas",
+    "passwordManagementDescription": "Los supervisores y administradores pueden restablecer contraseñas para:",
+    "participantsAllLevels": "Participantes (todos los niveles)",
+    "linkageChampions": "Campeones de Vinculación (supervisores+)",
+    "otherSupervisors": "Otros supervisores (solo administrador)"
+  },
+  "stats": {
+    "totalUsers": "Total de Usuarios",
+    "allRoles": "Todos los roles",
+    "participants": "Participantes",
+    "activeLearners": "Aprendices activos",
+    "linkageChampions": "Campeones de Vinculación",
+    "activeCoaches": "Entrenadores activos",
+    "supervisors": "Supervisores",
+    "activeSupervisors": "Supervisores activos"
+  },
+
   "welcome": {
     "welcomeBack": "Bienvenido de nuevo",
     "chooseOptionBelowToGetStarted": "Elige una opción a continuación para comenzar",

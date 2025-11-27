@@ -1,10 +1,4 @@
-import {
-  SettingsIcon,
-  EditIcon,
-  ThreeDotsIcon,
-  ArrowUpIcon,
-  AddIcon,
-} from '@ui';
+import { SettingsIcon, EditIcon, ArrowUpIcon, AddIcon } from '@ui';
 
 interface SidebarItem {
   key: string;
@@ -19,7 +13,7 @@ export const MAIN_MENU_ITEMS: SidebarItem[] = [
     key: 'user-management',
     label: 'admin.menu.userManagement',
     icon: SettingsIcon,
-    route: 'UserManagement',
+    route: 'user-management',
   },
   {
     key: 'template-management',
