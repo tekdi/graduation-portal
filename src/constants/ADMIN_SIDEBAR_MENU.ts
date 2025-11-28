@@ -1,4 +1,4 @@
-import { SettingsIcon, EditIcon, ArrowUpIcon, AddIcon, MoreVerticalIcon } from '@ui';
+import { SettingsIcon, EditIcon, ArrowUpIcon, AddIcon } from '@ui';
 
 interface SidebarItem {
   key: string;
@@ -24,7 +24,7 @@ export const MAIN_MENU_ITEMS: SidebarItem[] = [
   {
     key: 'audit-log',
     label: 'admin.menu.auditLog',
-    icon: MoreVerticalIcon,
+    icon: EditIcon,
     route: 'AuditLog',
   },
 ];
