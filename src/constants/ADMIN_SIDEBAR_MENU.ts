@@ -24,7 +24,7 @@ export const MAIN_MENU_ITEMS: SidebarItem[] = [
   {
     key: 'audit-log',
     label: 'admin.menu.auditLog',
-    icon: ThreeDotsIcon,
+    icon: EditIcon,
     route: 'AuditLog',
   },
 ];
