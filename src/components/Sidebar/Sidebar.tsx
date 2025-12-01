@@ -15,6 +15,7 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   CloseIcon,
+  LucideIcon,
 } from '@ui';
 import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
 import { useNavigation } from '@react-navigation/native';
@@ -26,11 +27,12 @@ import {
   QUICK_ACTION_MENU_ITEMS,
 } from '@constants/ADMIN_SIDEBAR_MENU';
 import { useLanguage } from '@contexts/LanguageContext';
+import { theme } from '@config/theme';
 
 interface SidebarItem {
   key: string;
   label: string;
-  icon: any;
+  icon: string; // Lucide icon name
   route?: string;
   children?: SidebarItem[];
 }
@@ -104,7 +106,15 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
         >
           <HStack {...sidebarItemStyles.itemContainer}>
             <HStack {...sidebarItemStyles.itemContent}>
-              <Icon as={item.icon} {...sidebarItemStyles.itemIcon(isActive)} />
+              <LucideIcon
+                name={item.icon}
+                size={20}
+                color={
+                  isActive
+                    ? theme.tokens.colors.primary600
+                    : theme.tokens.colors.textLight600
+                }
+              />
               <Text {...sidebarItemStyles.itemText(isActive)}>
                 {t(item.label)}
               </Text>
