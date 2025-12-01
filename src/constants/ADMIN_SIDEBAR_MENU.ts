@@ -1,9 +1,7 @@
-import { SettingsIcon, EditIcon, ArrowUpIcon, AddIcon } from '@ui';
-
 interface SidebarItem {
   key: string;
   label: string;
-  icon: any;
+  icon: string; // Lucide icon name
   route?: string;
   children?: SidebarItem[];
 }
@@ -12,19 +10,19 @@ export const MAIN_MENU_ITEMS: SidebarItem[] = [
   {
     key: 'user-management',
     label: 'admin.menu.userManagement',
-    icon: SettingsIcon,
+    icon: 'Users', // Lucide icon name
     route: 'user-management',
   },
   {
     key: 'template-management',
     label: 'admin.menu.templateManagement',
-    icon: EditIcon,
+    icon: 'FileText', // Lucide icon name
     route: 'TemplateManagement',
   },
   {
     key: 'audit-log',
     label: 'admin.menu.auditLog',
-    icon: EditIcon,
+    icon: 'Activity', // Lucide icon name
     route: 'AuditLog',
   },
 ];
@@ -33,13 +31,13 @@ export const QUICK_ACTION_MENU_ITEMS: SidebarItem[] = [
   {
     key: 'upload-users',
     label: 'admin.menu.uploadUsers',
-    icon: ArrowUpIcon,
+    icon: 'Upload', // Lucide icon name
     route: 'UploadUsers',
   },
   {
     key: 'new-lc',
     label: 'admin.menu.createUser',
-    icon: AddIcon,
+    icon: 'UserPlus', // Lucide icon name
     route: 'NewLC',
   },
 ];
