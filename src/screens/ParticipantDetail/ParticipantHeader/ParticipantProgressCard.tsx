@@ -3,6 +3,8 @@ import { VStack, HStack, Text, Box } from '@ui';
 import { participantHeaderStyles, getStatusCard } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ParticipantStatus } from '@app-types/participant';
+import { LucideIcon } from '@ui';
+import { theme } from '@config/theme';
 
 interface ParticipantProgressCardProps {
   status?: ParticipantStatus;
@@ -86,9 +88,7 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
                 {t('participantDetail.header.graduatedOn', { date })}
               </Text>
             </VStack>
-            <Box {...participantHeaderStyles.completedCheckmark}>
-              <Text {...participantHeaderStyles.completedCheckmarkText}>✓</Text>
-            </Box>
+            <LucideIcon name="CircleCheck" size={50} color={theme.tokens.colors.accent300} />
           </HStack>
         </VStack>
       </Box>

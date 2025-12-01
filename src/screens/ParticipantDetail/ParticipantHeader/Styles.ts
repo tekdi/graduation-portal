@@ -274,18 +274,6 @@ export const participantHeaderStyles = {
     color: '$textMutedForeground' as const,
     lineHeight: '$sm' as const,
   },
-  completedCheckmark: {
-    width: 48,
-    height: 48,
-    borderRadius: '$full' as const,
-    bg: '$success500' as const,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-  },
-  completedCheckmarkText: {
-    color: '$white' as const,
-    fontSize: '$xl' as const,
-    fontWeight: '$bold' as const,
-  },
+
 } as const;
 

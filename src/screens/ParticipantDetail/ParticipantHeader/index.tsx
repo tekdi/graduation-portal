@@ -252,7 +252,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
       </HStack>
 
       {/* Participant Status Card/Warning */}
-      <ParticipantStatusCard
+      <ParticipantProgressCard
         status={status}
         graduationProgress={graduationProgress}
         graduationDate={graduationDate}
