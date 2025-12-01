@@ -1,12 +1,11 @@
-import { Participant } from '@app-types/screens';
-import type { ParticipantData, UnifiedParticipant } from '@app-types/participant';
+import type { UnifiedParticipant } from '@app-types/participant';
 
 /**
  * Mock Participants Data
  * Single source of truth for all participant data
  * Used for demo purposes until API is integrated
  */
-const PARTICIPANTS_DATA: UnifiedParticipant[] = [
+export const PARTICIPANTS_DATA: UnifiedParticipant[] = [
   {
     id: 'P-006',
     name: 'Aisha Patel',
@@ -52,40 +51,3 @@ const PARTICIPANTS_DATA: UnifiedParticipant[] = [
     graduationDate: '2025-09-20',
   },
 ];
-
-/**
- * Participants list for table view
- * Exports Participant[] format for list component
- */
-export const PARTICIPANTS_LIST: Participant[] = PARTICIPANTS_DATA.map(
-  ({ pathway, graduationProgress, graduationDate, ...participant }) =>
-    participant,
-);
-
-/**
- * Get participant detail data by ID
- * Returns detailed participant data including status, pathway, and progress
- * Converts status format from underscore to hyphen for ParticipantData type
- */
-export const getParticipantById = (id: string): ParticipantData | undefined => {
-  const participant = PARTICIPANTS_DATA.find(p => p.id === id);
-  if (!participant) return undefined;
-
-  // Convert status from underscore format to hyphen format
-  const statusMap: Record<string, ParticipantData['status']> = {
-    not_enrolled: 'not-enrolled',
-    enrolled: 'enrolled',
-    in_progress: 'in-progress',
-    completed: 'completed',
-    dropout: 'dropout',
-  };
-
-  return {
-    id: participant.id,
-    name: participant.name,
-    status: statusMap[participant.status] || 'not-enrolled',
-    pathway: participant.pathway,
-    graduationProgress: participant.graduationProgress,
-    graduationDate: participant.graduationDate,
-  };
-};
