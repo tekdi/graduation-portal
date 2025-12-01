@@ -4,7 +4,7 @@ import { HStack, VStack, Text, Box, Pressable, Button, ButtonText, LucideIcon } 
 import { participantHeaderStyles } from './Styles';
 import type { ParticipantStatus, PathwayType } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
-import ParticipantStatusCard from './ParticipantStatus';
+import ParticipantProgressCard from './ParticipantProgressCard';
 
 /**
  * ParticipantHeader Props

@@ -4,20 +4,20 @@ import { participantHeaderStyles, getStatusCard } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ParticipantStatus } from '@app-types/participant';
 
-interface ParticipantStatusProps {
+interface ParticipantProgressCardProps {
   status?: ParticipantStatus;
   graduationProgress?: number;
   graduationDate?: string;
 }
 
 /**
- * ParticipantStatusCard Component
+ * ParticipantProgressCard Component
  * Unified component that displays status-specific content based on participant status:
  * - In Progress: Shows graduation readiness progress
  * - Completed: Shows graduation completion status with date
  * - Dropout: Shows dropout warning message
  */
-const ParticipantStatusCard: React.FC<ParticipantStatusProps> = ({
+const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
   status,
   graduationProgress,
   graduationDate,
@@ -120,5 +120,5 @@ const ParticipantStatusCard: React.FC<ParticipantStatusProps> = ({
   return null;
 };
 
-export default ParticipantStatusCard;
+export default ParticipantProgressCard;
 
