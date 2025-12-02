@@ -196,15 +196,11 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     <VStack 
       {...participantHeaderStyles.container}
       // Responsive padding: smaller on mobile, larger on desktop
-      pb="$6"
       $md-p="$6"
     >
       {/* Back Navigation Link */}
       <Pressable onPress={handleBackPress}>
         <HStack {...participantHeaderStyles.backLinkContainer}>
-          <Box marginRight="$2">
-            <LucideIcon name="ArrowLeft" size={18} color="#000" />
-          </Box>
           <Text 
             {...participantHeaderStyles.backLinkText}
             $hover={{
@@ -266,4 +262,3 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
 };
 
 export default ParticipantHeader;
-
