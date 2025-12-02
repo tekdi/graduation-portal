@@ -1,0 +1,100 @@
+import { Task, TaskStatus } from '../types/project.types';
+
+// Find a task by ID in a nested structure
+export const findTaskById = (
+  tasks: Task[],
+  taskId: string,
+): Task | undefined => {
+  for (const task of tasks) {
+    if (task._id === taskId) {
+      return task;
+    }
+    if (task.children) {
+      const found = findTaskById(task.children, taskId);
+      if (found) return found;
+    }
+  }
+  return undefined;
+};
+
+// Update a task in a nested structure
+export const updateTaskInTree = (
+  tasks: Task[],
+  taskId: string,
+  updates: Partial<Task>,
+): Task[] => {
+  return tasks.map(task => {
+    if (task._id === taskId) {
+      return { ...task, ...updates };
+    }
+    if (task.children) {
+      return {
+        ...task,
+        children: updateTaskInTree(task.children, taskId, updates),
+      };
+    }
+    return task;
+  });
+};
+
+// Calculate overall project completion
+export const calculateProjectCompletion = (tasks: Task[]): number => {
+  if (!tasks || tasks.length === 0) return 0;
+
+  let totalTasks = 0;
+  let completedTasks = 0;
+
+  const countTasks = (taskList: Task[]) => {
+    taskList.forEach(task => {
+      totalTasks++;
+      if (task.status === 'completed' || task.status === 'submitted') {
+        completedTasks++;
+      }
+      if (task.children) {
+        countTasks(task.children);
+      }
+    });
+  };
+
+  countTasks(tasks);
+  return totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+};
+
+// Get tasks by status
+export const getTasksByStatus = (tasks: Task[], status: TaskStatus): Task[] => {
+  const result: Task[] = [];
+
+  const filterTasks = (taskList: Task[]) => {
+    taskList.forEach(task => {
+      if (task.status === status) {
+        result.push(task);
+      }
+      if (task.children) {
+        filterTasks(task.children);
+      }
+    });
+  };
+
+  filterTasks(tasks);
+  return result;
+};
+
+// Validate task completion
+export const canCompleteTask = (task: Task): boolean => {
+  // Check if task has required fields completed
+  if (task.type === 'file') {
+    return (task.attachments?.length ?? 0) > 0;
+  }
+  if (task.type === 'observation') {
+    return task.metadata?.formCompleted === true;
+  }
+  if (task.type === 'project') {
+    // All children must be completed
+    return (
+      task.children?.every(
+        child => child.status === 'completed' || child.status === 'submitted',
+      ) ?? false
+    );
+  }
+  return true;
+};
