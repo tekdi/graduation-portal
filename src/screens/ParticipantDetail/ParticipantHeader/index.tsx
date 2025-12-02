@@ -201,6 +201,9 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
       {/* Back Navigation Link */}
       <Pressable onPress={handleBackPress}>
         <HStack {...participantHeaderStyles.backLinkContainer}>
+          <Box marginRight="$2">
+            <LucideIcon name="ArrowLeft" size={18} color="#000" />
+          </Box>
           <Text 
             {...participantHeaderStyles.backLinkText}
             $hover={{
