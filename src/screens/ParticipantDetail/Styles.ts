@@ -1,3 +1,5 @@
+import { SHADOW_STYLES } from '@constants/styleConstants';
+
 /**
  * ParticipantDetail Styles
  * Centralized styles for ParticipantDetail screen component
@@ -8,5 +10,5 @@ export const participantDetailStyles = {
     borderBottomColor: '$borderLight300' as const,
     backgroundColor: '$white' as const,
   },
-  containerBoxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px',
+  containerBoxShadow: SHADOW_STYLES.containerBoxShadow,
 } as const;

@@ -73,7 +73,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
    */
   const renderActionButtons = () => {
     // Not Enrolled: View Profile + Enroll Participant (disabled)
-    if (status === 'not-enrolled') {
+    if (status === 'not_enrolled') {
       return (
         <HStack
           {...participantHeaderStyles.actionButtonsContainer}

@@ -27,13 +27,12 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
   const { t } = useLanguage();
 
   // Return null if status is invalid or not provided
-  if (!status || !['in-progress', 'completed', 'dropout'].includes(status)) {
+  if (!status || !['in_progress', 'completed', 'dropout'].includes(status)) {
     return null;
   }
 
   const progress = graduationProgress ?? 0;
-  const date = graduationDate ?? '2025-09-20';
-
+  const date = graduationDate;
   // Dropout: Return warning content directly
   if (status === 'dropout') {
     return (
@@ -56,29 +55,29 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
   }
 
   // In-progress or Completed: Return main card with title and content
-  // Note: Since dropout is handled above with early return, status here is always 'in-progress' or 'completed'
+  // Note: Since dropout is handled above with early return, status here is always 'in_progress' or 'completed'
   return (
     <Box
-      {...getStatusCard(status as 'in-progress' | 'completed')}
+      {...getStatusCard(status as 'in_progress' | 'completed')}
       // @ts-ignore - Web-specific props not in Gluestack UI types
       $web-boxShadow={participantHeaderStyles.statusCardBoxShadow}
       $web-backgroundImage={participantHeaderStyles.statusCardBackgroundImage}
     >
       {/* Title: Conditionally render based on status */}
       <Text
-        {...(status === 'in-progress'
+        {...(status === 'in_progress'
           ? participantHeaderStyles.progressCardTitle
           : participantHeaderStyles.completedCardTitle)}
       >
         {t(
-          status === 'in-progress'
+          status === 'in_progress'
             ? 'participantDetail.header.graduationReadiness'
             : 'participantDetail.header.programStatus'
         )}
       </Text>
       
       {/* Content: Conditionally render based on status */}
-      {status === 'in-progress' ? (
+      {status === 'in_progress' ? (
         <VStack
           {...participantHeaderStyles.progressCardContent}
           $md-flexDirection="row"
@@ -108,7 +107,9 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
               {t('participantDetail.header.graduatedComplete')}
             </Text>
             <Text {...participantHeaderStyles.completedDate}>
-              {t('participantDetail.header.graduatedOn', { date })}
+            {date 
+              ? t('participantDetail.header.graduatedOn', { date })
+              : t('participantDetail.header.graduationDateNotAvailable')}
             </Text>
           </VStack>
           <LucideIcon name="CircleCheck" size={50} color={theme.tokens.colors.accent300} />

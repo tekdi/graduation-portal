@@ -22,9 +22,9 @@ const statusCardTitleBase = {
  * Get status-specific card styles
  * Returns card styles based on participant status with common base styles
  */
-export const getStatusCard = (status: 'in-progress' | 'completed' | 'dropout') => {
+export const getStatusCard = (status: 'in_progress' | 'completed' | 'dropout') => {
   switch (status) {
-    case 'in-progress':
+    case 'in_progress':
       return {
         ...statusCardBase,
         borderColor: '$borderLight300' as const,

@@ -52,13 +52,13 @@ export const PARTICIPANTS_DATA: UnifiedParticipant[] = [
   },
   {
     id: 'P-020',
-    name: 'Tyler Mitchell',
-    progress: 100,
-    email: 'tyler@example.com',
+    name: 'John Doe',
+    progress: 10,
+    email: 'john@example.com',
     phone: '(555) 901-2345',
     status: 'dropout',
     pathway: 'entrepreneurship',
     graduationProgress: 50,
-    graduationDate: '2025-09-20',
+    graduationDate: 'undefined',
   },
 ];
