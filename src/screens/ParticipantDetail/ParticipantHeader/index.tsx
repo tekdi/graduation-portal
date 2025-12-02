@@ -1,13 +1,11 @@
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { HStack, VStack, Text, Box, Pressable } from '@ui';
+import { HStack, VStack, Text, Box, Pressable, Button, ButtonText, LucideIcon } from '@ui';
 import { participantHeaderStyles } from './Styles';
 import type { ParticipantStatus, PathwayType } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
-import ActionButtons from './ActionButtons';
-import InProgressCard from './InProgressCard';
-import CompletedCard from './CompletedCard';
-import DropoutWarning from './DropoutWarning';
+import ParticipantProgressCard from './ParticipantProgressCard';
+import { STATUS } from '@constants/app.constant';
 
 /**
  * ParticipantHeader Props
@@ -56,7 +54,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
    * @returns Badge component if status is 'dropout', null otherwise
    */
   const renderStatusBadge = () => {
-    if (status === 'dropout') {
+    if (status === STATUS.DROPOUT) {
       return (
         <Box {...participantHeaderStyles.statusBadge}>
           <Text {...participantHeaderStyles.statusBadgeText}>
@@ -66,6 +64,132 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
       );
     }
     return null;
+  };
+
+  /**
+   * Render Action Buttons
+   * Displays action buttons based on participant status
+   * 
+   * @returns Action buttons JSX based on status
+   */
+  const renderActionButtons = () => {
+    // Not Enrolled: View Profile + Enroll Participant (disabled)
+    if (status === STATUS.NOT_ENROLLED) {
+      return (
+        <HStack
+          {...participantHeaderStyles.actionButtonsContainer}
+          $md-flexDirection="row"
+          $md-width="auto"
+        >
+          <Button
+            variant="outline"
+            size="md"
+            borderColor="$borderLight300"
+            bg="$white"
+            borderRadius="$xl"
+            height="$9"
+            paddingHorizontal="$3"
+            paddingVertical="$2"
+            width="$full"
+            minWidth={120}
+            onPress={() => {}}
+            $md-width="auto"
+          >
+            <HStack {...participantHeaderStyles.outlineButtonContent}>
+              <LucideIcon name="User" size={16} color="#000" />
+              <ButtonText {...participantHeaderStyles.outlineButtonText}>
+                {t('participantDetail.header.viewProfile')}
+              </ButtonText>
+            </HStack>
+          </Button>
+
+          <Button
+            {...participantHeaderStyles.solidButtonPrimary}
+            onPress={() => {}}
+            isDisabled={true}
+            $md-width="auto"
+          >
+            <HStack {...participantHeaderStyles.solidButtonContent}>
+              <LucideIcon name="User" size={16} color="#fff" />
+              <ButtonText {...participantHeaderStyles.solidButtonText}>
+                {t('participantDetail.header.enrollParticipant')}
+              </ButtonText>
+            </HStack>
+          </Button>
+        </HStack>
+      );
+    }
+
+    // Dropout: Only View Profile (read-only mode)
+    if (status === STATUS.DROPOUT) {
+      return (
+        <Button
+          variant="outline"
+          size="md"
+          borderColor="$borderLight300"
+          bg="$white"
+          borderRadius="$xl"
+          height="$9"
+          paddingHorizontal="$3"
+          paddingVertical="$2"
+          width="$full"
+          minWidth={120}
+          onPress={() => {}}
+          $md-width="auto"
+        >
+          <HStack {...participantHeaderStyles.outlineButtonContent}>
+            <LucideIcon name="User" size={16} color="#000" />
+            <ButtonText {...participantHeaderStyles.outlineButtonText}>
+              {t('participantDetail.header.viewProfile')}
+            </ButtonText>
+          </HStack>
+        </Button>
+      );
+    }
+
+    // Enrolled, In Progress, Completed: View Profile + Log Visit
+    return (
+      <HStack
+        {...participantHeaderStyles.actionButtonsContainer}
+        $md-flexDirection="row"
+        $md-width="auto"
+      >
+        <Button
+          variant="outline"
+          size="md"
+          borderColor="$borderLight300"
+          bg="$white"
+          borderRadius="$xl"
+          height="$9"
+          paddingHorizontal="$3"
+          paddingVertical="$2"
+          width="$full"
+          minWidth={120}
+          onPress={() => {}}
+          $md-width="auto"
+        >
+          <HStack {...participantHeaderStyles.outlineButtonContent}>
+            <LucideIcon name="User" size={16} color="#000" />
+            <ButtonText {...participantHeaderStyles.outlineButtonText}>
+              {t('participantDetail.header.viewProfile')}
+            </ButtonText>
+          </HStack>
+        </Button>
+
+        <Button
+          {...participantHeaderStyles.solidButtonPrimary}
+          onPress={() => {}}
+          $md-width="auto"
+        >
+          <HStack {...participantHeaderStyles.solidButtonContent}>
+            <LucideIcon name="FileText" size={16} color="#fff" />
+            <ButtonText {...participantHeaderStyles.solidButtonText}>
+              {t('participantDetail.header.logVisit')}
+            </ButtonText>
+          </HStack>
+        </Button>
+      </HStack>
+    );
   };
 
 
@@ -124,25 +248,18 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
 
         {/* Right: Action Buttons */}
         <Box width="$full" $md-width="auto">
-          <ActionButtons status={status} />
+          {renderActionButtons()}
         </Box>
       </HStack>
 
-      {/* In Progress: Graduation Readiness Card */}
-      {status === 'in-progress' && (
-        <InProgressCard graduationProgress={graduationProgress} />
-      )}
-
-      {/* Completed: Graduation Status Card */}
-      {status === 'completed' && (
-        <CompletedCard graduationDate={graduationDate} />
-      )}
-
-      {/* Dropout Warning Box */}
-      {status === 'dropout' && <DropoutWarning />}
+      {/* Participant Status Card/Warning */}
+      <ParticipantProgressCard
+        status={status}
+        graduationProgress={graduationProgress}
+        graduationDate={graduationDate}
+      />
     </VStack>
   );
 };
 
 export default ParticipantHeader;
-

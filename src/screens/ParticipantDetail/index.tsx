@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { VStack, ScrollView, HStack, Box } from '@ui';
+import { VStack, HStack, Box } from '@ui';
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
-import { getParticipantById } from '@constants/PARTICIPANTS_LIST';
-import type { ParticipantStatus } from '@app-types/participant';
+import { getParticipantById } from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
 import { TabButton } from '@components/Tabs';
@@ -12,13 +11,15 @@ import { PARTICIPANT_DETAIL_TABS } from '@constants/TABS';
 import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
 import { theme } from '@config/theme';
+import type { ParticipantStatus } from '@app-types/participant';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
+ * The route path is configured as '/participants/:id', so the parameter is extracted as 'id'
+ * @example navigate('ParticipantDetail', { id: 'P-006' })
  */
 type ParticipantDetailRouteParams = {
   id?: string;
-  participantId?: string;
 };
 
 /**
@@ -38,8 +39,7 @@ export default function ParticipantDetail() {
   const [activeTab, setActiveTab] = useState<string>('intervention-plan');
   
   // Extract the id parameter from the route
-  const routeParams = route.params;
-  const participantId = routeParams?.id || routeParams?.participantId;
+  const participantId = route.params?.id;
   
   // Fetch participant data from mock data by ID
   // Ensure participantId exists before calling getParticipantById
@@ -47,7 +47,7 @@ export default function ParticipantDetail() {
   
   // Error State: Participant Not Found
   if (!participant) {
-    return <NotFound message={t('participantDetail.notFound.title')} />;
+    return <NotFound message="participantDetail.notFound.title" />;
   }
   
   // Extract participant data
@@ -116,9 +116,7 @@ export default function ParticipantDetail() {
         >
           <Box
             width="$full"
-//borderRadius="$2xl"
             bg="$white"
-          
           >
             {activeTab === 'intervention-plan' && <InterventionPlan />}
             {activeTab === 'assessment-surveys' && <AssessmentSurveys participantStatus={status as ParticipantStatus} />}

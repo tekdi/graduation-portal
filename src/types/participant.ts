@@ -3,11 +3,12 @@ import { Participant } from './screens';
 /**
  * Participant Status Types
  * Defines the possible enrollment statuses for a participant
+ * Uses underscore format to match API/database conventions and UnifiedParticipant
  */
 export type ParticipantStatus =
-  | 'not-enrolled'
+  | 'not_enrolled'
   | 'enrolled'
-  | 'in-progress'
+  | 'in_progress'
   | 'completed'
   | 'dropout';
 

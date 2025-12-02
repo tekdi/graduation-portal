@@ -3,6 +3,55 @@
  * Centralized styles for ParticipantHeader component
  */
 
+import { STATUS } from '@constants/app.constant';
+
+// Type for status card status values
+type StatusCardStatus = typeof STATUS.IN_PROGRESS | typeof STATUS.COMPLETED | typeof STATUS.DROPOUT;
+
+// Common status card base styles
+const statusCardBase = {
+  borderWidth: 1,
+  borderRadius: '$2xl' as const,
+  p: '$6' as const,
+};
+
+// Common card title style
+const statusCardTitleBase = {
+  fontSize: '$sm' as const,
+  fontWeight: '$normal' as const,
+  color: '$textMutedForeground' as const,
+  lineHeight: '$sm' as const,
+};
+
+/**
+ * Get status-specific card styles
+ * Returns card styles based on participant status with common base styles
+ */
+export const getStatusCard = (status: StatusCardStatus) => {
+  switch (status) {
+    case STATUS.IN_PROGRESS:
+      return {
+        ...statusCardBase,
+        borderColor: '$borderLight300' as const,
+        bg: '$white' as const,
+      };
+    case STATUS.COMPLETED:
+      return {
+        ...statusCardBase,
+        borderColor: '$success300' as const,
+        bg: '$success50' as const,
+      };
+    case STATUS.DROPOUT:
+      return {
+        ...statusCardBase,
+        borderColor: '$error200' as const,
+        bg: '$error50' as const,
+      };
+    default:
+      return statusCardBase;
+  }
+};
+
 export const participantHeaderStyles = {
   // Container styles
   container: {
@@ -11,7 +60,8 @@ export const participantHeaderStyles = {
     maxWidth: 1200 as const, // Use numeric value (pixels) - Gluestack doesn't support tokens for maxWidth
     marginHorizontal: 'auto' as const,
     px: '$4' as const, // Mobile: smaller padding
-    py: '$6' as const,
+    pt: '$6' as const,
+    pb: '$0' as const, // No bottom padding to eliminate gap before tabs
   },
 
   // Back navigation link
@@ -130,7 +180,11 @@ export const participantHeaderStyles = {
     fontWeight: '$medium' as const,
   },
 
-  // Dropout warning box
+  // Common status card styles (shared across all status cards)
+  statusCardBoxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px',
+  statusCardBackgroundImage: 'linear-gradient(to right bottom, oklch(0.984 0.003 247.858) 0%, rgb(255, 255, 255) 50%, oklab(0.984 -0.00113071 -0.00277876 / 0.5) 100%)',
+
+  // Dropout warning box (kept for backward compatibility, uses getStatusCard now)
   dropoutWarningBox: {
     bg: '$error50' as const,
     borderWidth: 1,
@@ -170,24 +224,8 @@ export const participantHeaderStyles = {
     fontSize: '$sm' as const,
   },
 
-  // In Progress: Graduation Readiness Card
-  progressCard: {
-    borderWidth: 1,
-    borderColor: '$borderLight300' as const,
-    borderRadius: '$2xl' as const,
-    p: '$6' as const,
-    bg: '$white' as const,
-  },
-  progressCardBoxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px',
-  progressCardBackgroundImage: 'linear-gradient(to right bottom, oklch(0.984 0.003 247.858) 0%, rgb(255, 255, 255) 50%, oklab(0.984 -0.00113071 -0.00277876 / 0.5) 100%)',
-
-  progressCardTitle: {
-    fontSize: '$sm' as const,
-    fontWeight: '$normal' as const,
-    color: '$textMutedForeground' as const,
-    mb: '$2' as const,
-    lineHeight: '$sm' as const,
-  },
+  // Common card title style (used by both progress and completed cards)
+  statusCardTitle: statusCardTitleBase,
   progressCardContent: {
     // Mobile: vertical stacking (default)
     flexDirection: 'column' as const,
@@ -219,23 +257,13 @@ export const participantHeaderStyles = {
     borderRadius: '$full' as const,
   },
 
-  // Completed: Graduation Status Card
-  completedCard: {
-    borderWidth: 1,
-    borderColor: '$success300' as const,
-    borderRadius: '$2xl' as const,
-    p: '$6' as const,
-    bg: '$success50' as const,
+  // In Progress specific styles
+  progressCardTitle: {
+    ...statusCardTitleBase,
+    mb: '$2' as const,
   },
-  completedCardBoxShadow: 'rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.1) 0px 1px 2px -1px',
-
-  completedCardBackgroundImage: 'linear-gradient(to right bottom, oklch(0.982 0.018 155.826) 0%, rgb(255, 255, 255) 50%, oklab(0.982 -0.0164215 0.00737116 / 0.5) 100%)',
-  completedCardTitle: {
-    fontSize: '$sm' as const,
-    fontWeight: '$normal' as const,
-    color: '$textMutedForeground' as const,
-    lineHeight: '$sm' as const,
-  },
+  // Completed specific styles
+  completedCardTitle: statusCardTitleBase,
   completedCardContent: {
     space: 'md' as const,
     alignItems: 'center' as const,
@@ -251,18 +279,6 @@ export const participantHeaderStyles = {
     color: '$textMutedForeground' as const,
     lineHeight: '$sm' as const,
   },
-  completedCheckmark: {
-    width: 48,
-    height: 48,
-    borderRadius: '$full' as const,
-    bg: '$success500' as const,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-  },
-  completedCheckmarkText: {
-    color: '$white' as const,
-    fontSize: '$xl' as const,
-    fontWeight: '$bold' as const,
-  },
+
 } as const;
 
