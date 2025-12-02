@@ -1,5 +1,4 @@
 import React from 'react';
-import { isWeb } from '@utils/platform';
 import type { LucideProps } from 'lucide-react-native';
 
 /**
@@ -36,43 +35,23 @@ const LucideIcon: React.FC<LucideIconProps> = ({
   strokeWidth = 2,
   ...props
 }) => {
-  if (isWeb) {
-    // Use lucide-react for web
-    const LucideReact = require('lucide-react');
-    const IconComponent = LucideReact[name];
+  // Use lucide-react-native for native platforms
+  const LucideNative = require('lucide-react-native');
+  const IconComponent = LucideNative[name];
 
-    if (!IconComponent) {
-      console.warn(`Lucide icon "${name}" not found`);
-      return null;
-    }
-
-    return (
-      <IconComponent
-        size={size}
-        color={color}
-        strokeWidth={strokeWidth}
-        {...props}
-      />
-    );
-  } else {
-    // Use lucide-react-native for native platforms
-    const LucideNative = require('lucide-react-native');
-    const IconComponent = LucideNative[name];
-
-    if (!IconComponent) {
-      console.warn(`Lucide icon "${name}" not found`);
-      return null;
-    }
-
-    return (
-      <IconComponent
-        size={size}
-        color={color}
-        strokeWidth={strokeWidth}
-        {...props}
-      />
-    );
+  if (!IconComponent) {
+    console.warn(`Lucide icon "${name}" not found`);
+    return null;
   }
+
+  return (
+    <IconComponent
+      size={size}
+      color={color}
+      strokeWidth={strokeWidth}
+      {...props}
+    />
+  );
 };
 
 export default LucideIcon;
