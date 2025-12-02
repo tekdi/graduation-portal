@@ -84,7 +84,6 @@ const ParticipantsList: React.FC = () => {
 
   const handleRowClick = useCallback(
     (participant: Participant) => {
-      console.log('Navigate to participant detail:', participant.id);
       // @ts-ignore
       navigation.navigate('participant-detail', {
         id: participant.id,

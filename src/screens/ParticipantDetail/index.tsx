@@ -15,13 +15,11 @@ import { theme } from '@config/theme';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
- * Supports both 'id' and 'participantId' parameter names for flexibility across different navigation calls
+ * The route path is configured as '/participants/:id', so the parameter is extracted as 'id'
  * @example navigate('ParticipantDetail', { id: 'P-006' })
- * @example navigate('ParticipantDetail', { participantId: 'P-006' })
  */
 type ParticipantDetailRouteParams = {
   id?: string;
-  participantId?: string;
 };
 
 /**
@@ -41,8 +39,7 @@ export default function ParticipantDetail() {
   const [activeTab, setActiveTab] = useState<string>('intervention-plan');
   
   // Extract the id parameter from the route
-  const routeParams = route.params;
-  const participantId = routeParams?.id || routeParams?.participantId;
+  const participantId = route.params?.id;
   
   // Fetch participant data from mock data by ID
   // Ensure participantId exists before calling getParticipantById
