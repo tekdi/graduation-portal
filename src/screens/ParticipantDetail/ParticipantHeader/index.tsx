@@ -196,6 +196,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     <VStack 
       {...participantHeaderStyles.container}
       // Responsive padding: smaller on mobile, larger on desktop
+      pb="$6"
       $md-p="$6"
     >
       {/* Back Navigation Link */}
