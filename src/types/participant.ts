@@ -43,3 +43,38 @@ export interface UnifiedParticipant extends Participant {
   graduationDate?: string;
 }
 
+/**
+ * Assessment Survey Card Data Interface
+ * Defines the structure for assessment survey card data
+ */
+export interface AssessmentSurveyCardData {
+  id: string;
+  title: string; // Translation key
+  description: string; // Translation key
+  additionalInfo?: string; // Optional translation key for additional information
+  icon: string; // Lucide icon name
+  status: {
+    type: 'not-started' | 'in-progress' | 'completed' | 'graduated';
+    label: string; // Translation key or text (e.g., "0% Complete", "Not Started", "Graduated")
+    percentage?: number; // Optional percentage for progress
+  };
+  actionButton: {
+    label: string; // Translation key
+    icon: string; // Lucide icon name
+    variant: 'primary' | 'secondary'; // Button style variant
+    onPress?: () => void; // Optional action handler
+  };
+  // Visibility rules based on participant status
+  visibilityRules?: {
+    showForStatuses?: Array<'not_enrolled' | 'enrolled' | 'in_progress' | 'completed' | 'dropout'>;
+    hideForStatuses?: Array<'not_enrolled' | 'enrolled' | 'in_progress' | 'completed' | 'dropout'>;
+  };
+}
+
+/**
+ * Assessment Survey Card Props Interface
+ */
+export interface AssessmentSurveyCardProps {
+  card: AssessmentSurveyCardData;
+}
+
