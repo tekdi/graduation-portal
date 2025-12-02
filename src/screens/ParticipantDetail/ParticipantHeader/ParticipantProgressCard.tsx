@@ -1,5 +1,5 @@
 import React from 'react';
-import { VStack, HStack, Text, Box } from '@ui';
+import { VStack, HStack, Text, Box, Progress, ProgressFilledTrack } from '@ui';
 import { participantHeaderStyles, getStatusCard } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ParticipantStatus } from '@app-types/participant';
@@ -26,76 +26,15 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
 }) => {
   const { t } = useLanguage();
 
-  // In Progress: Graduation Readiness Card
-  if (status === 'in-progress') {
-    const progress = graduationProgress ?? 57;
-    return (
-      <Box
-        {...getStatusCard('in-progress')}
-        // @ts-ignore - Web-specific props not in Gluestack UI types
-        $web-boxShadow={participantHeaderStyles.statusCardBoxShadow}
-        $web-backgroundImage={participantHeaderStyles.statusCardBackgroundImage}
-      >
-        <Text {...participantHeaderStyles.progressCardTitle}>
-          {t('participantDetail.header.graduationReadiness')}
-        </Text>
-        <VStack
-          {...participantHeaderStyles.progressCardContent}
-          $md-flexDirection="row"
-          $md-justifyContent="space-between"
-          $md-alignItems="center"
-          space="sm"
-        >
-          <Text {...participantHeaderStyles.progressPercentage}>
-            {progress}%
-          </Text>
-          <Box
-            {...participantHeaderStyles.progressBarContainer}
-            $md-width="auto"
-          >
-            <Box {...participantHeaderStyles.progressBarBackground}>
-              <Box
-                {...participantHeaderStyles.progressBarFill}
-                width={`${progress}%`}
-              />
-            </Box>
-          </Box>
-        </VStack>
-      </Box>
-    );
+  // Return null if status is invalid or not provided
+  if (!status || !['in-progress', 'completed', 'dropout'].includes(status)) {
+    return null;
   }
 
-  // Completed: Graduation Status Card
-  if (status === 'completed') {
-    const date = graduationDate ?? '2025-09-20';
-    return (
-      <Box
-        {...getStatusCard('completed')}
-        // @ts-ignore - Web-specific props not in Gluestack UI types
-        $web-boxShadow={participantHeaderStyles.statusCardBoxShadow}
-        $web-backgroundImage={participantHeaderStyles.statusCardBackgroundImage}
-      >
-        <VStack space="sm">
-          <Text {...participantHeaderStyles.completedCardTitle}>
-            {t('participantDetail.header.programStatus')}
-          </Text>
-          <HStack {...participantHeaderStyles.completedCardContent}>
-            <VStack flex={1} space="xs">
-              <Text {...participantHeaderStyles.completedStatus}>
-                {t('participantDetail.header.graduatedComplete')}
-              </Text>
-              <Text {...participantHeaderStyles.completedDate}>
-                {t('participantDetail.header.graduatedOn', { date })}
-              </Text>
-            </VStack>
-            <LucideIcon name="CircleCheck" size={50} color={theme.tokens.colors.accent300} />
-          </HStack>
-        </VStack>
-      </Box>
-    );
-  }
+  const progress = graduationProgress ?? 0;
+  const date = graduationDate ?? '2025-09-20';
 
-  // Dropout: Warning Box
+  // Dropout: Return warning content directly
   if (status === 'dropout') {
     return (
       <Box {...getStatusCard('dropout')}>
@@ -116,8 +55,67 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
     );
   }
 
-  // No status-specific content to display
-  return null;
+  // In-progress or Completed: Return main card with title and content
+  // Note: Since dropout is handled above with early return, status here is always 'in-progress' or 'completed'
+  return (
+    <Box
+      {...getStatusCard(status as 'in-progress' | 'completed')}
+      // @ts-ignore - Web-specific props not in Gluestack UI types
+      $web-boxShadow={participantHeaderStyles.statusCardBoxShadow}
+      $web-backgroundImage={participantHeaderStyles.statusCardBackgroundImage}
+    >
+      {/* Title: Conditionally render based on status */}
+      <Text
+        {...(status === 'in-progress'
+          ? participantHeaderStyles.progressCardTitle
+          : participantHeaderStyles.completedCardTitle)}
+      >
+        {t(
+          status === 'in-progress'
+            ? 'participantDetail.header.graduationReadiness'
+            : 'participantDetail.header.programStatus'
+        )}
+      </Text>
+      
+      {/* Content: Conditionally render based on status */}
+      {status === 'in-progress' ? (
+        <VStack
+          {...participantHeaderStyles.progressCardContent}
+          $md-flexDirection="row"
+          $md-justifyContent="space-between"
+          $md-alignItems="center"
+          space="sm"
+        >
+          <Text {...participantHeaderStyles.progressPercentage}>
+            {progress}%
+          </Text>
+          <Box
+            {...participantHeaderStyles.progressBarContainer}
+            $md-width="auto"
+          >
+            <Progress
+              value={progress}
+              {...participantHeaderStyles.progressBarBackground}
+            >
+              <ProgressFilledTrack {...participantHeaderStyles.progressBarFill} />
+            </Progress>
+          </Box>
+        </VStack>
+      ) : (
+        <HStack {...participantHeaderStyles.completedCardContent}>
+          <VStack flex={1} space="xs">
+            <Text {...participantHeaderStyles.completedStatus}>
+              {t('participantDetail.header.graduatedComplete')}
+            </Text>
+            <Text {...participantHeaderStyles.completedDate}>
+              {t('participantDetail.header.graduatedOn', { date })}
+            </Text>
+          </VStack>
+          <LucideIcon name="CircleCheck" size={50} color={theme.tokens.colors.accent300} />
+        </HStack>
+      )}
+    </Box>
+  );
 };
 
 export default ParticipantProgressCard;
