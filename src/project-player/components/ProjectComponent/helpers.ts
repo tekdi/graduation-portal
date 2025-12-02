@@ -2,11 +2,11 @@ import { Task, TaskStatus } from '../../types/project.types';
 
 export const getTaskProgress = (task: Task): number => {
   if (!task.children || task.children.length === 0) {
-    return task.status === 'completed' ? 100 : 0;
+    return task.status === 'completed' || task.status === 'submitted' ? 100 : 0;
   }
 
   const completedChildren = task.children.filter(
-    child => child.status === 'completed',
+    child => child.status === 'completed' || child.status === 'submitted',
   ).length;
   return Math.round((completedChildren / task.children.length) * 100);
 };
@@ -26,8 +26,6 @@ export const getStatusColor = (status: TaskStatus): string => {
 };
 
 export const canEditTask = (
-  task: Task,
+  _task: Task,
   mode: 'preview' | 'edit' | 'read-only',
-): boolean => {
-  return mode === 'edit';
-};
+): boolean => mode === 'edit';

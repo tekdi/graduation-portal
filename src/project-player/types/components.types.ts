@@ -1,5 +1,4 @@
 import { Task, ProjectData, Attachment, TaskStatus } from './project.types';
-import { FormSchema } from './form.types';
 
 // ============================================
 // TASK COMPONENT PROPS

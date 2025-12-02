@@ -11,16 +11,12 @@ import {
 
 export type { ProjectPlayerConfig, ProjectPlayerData };
 
-const ProjectPlayer: React.FC<ProjectPlayerProps> = ({
-  config,
-  data,
-  project,
-}) => {
+const ProjectPlayer: React.FC<ProjectPlayerProps> = ({ config, data }) => {
   const {
     project: loadedProject,
     isLoading,
     error,
-  } = useProjectLoader(config, data);
+  } = useProjectLoader(config, data ?? {});
 
   if (isLoading) {
     return (

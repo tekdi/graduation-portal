@@ -37,6 +37,12 @@ export const api = {
         `${API_CONFIG.baseUrl}/template/details/${solutionId}`,
         { headers: getHeaders() },
       );
+      if (!response.ok) {
+        return {
+          data: null,
+          error: `HTTP ${response.status}: ${response.statusText}`,
+        };
+      }
       const data = await response.json();
       return { data };
     } catch (error) {

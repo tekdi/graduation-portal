@@ -6,6 +6,9 @@ const STORE_NAME = 'projects';
 // Initialize IndexedDB (for web)
 const initDB = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
+    if (typeof indexedDB === 'undefined') {
+      return reject(new Error('IndexedDB not available in this environment'));
+    }
     const request = indexedDB.open(DB_NAME, 1);
 
     request.onerror = () => reject(request.error);
@@ -37,10 +40,12 @@ export const storage = {
     } catch (error) {
       console.error('Error saving project:', error);
       // Fallback to localStorage
-      localStorage.setItem(
-        `project_${projectData._id}`,
-        JSON.stringify(projectData),
-      );
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(
+          `project_${projectData._id}`,
+          JSON.stringify(projectData),
+        );
+      }
     }
   },
 
