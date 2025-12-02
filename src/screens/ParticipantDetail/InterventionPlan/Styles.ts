@@ -7,7 +7,6 @@ export const interventionPlanStyles = {
     borderWidth: 1,
     borderColor: '$borderLight300',
     borderRadius: '$2xl',
-    m: '$4',
     p: '$6',
   },
   content: {

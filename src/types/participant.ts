@@ -66,8 +66,8 @@ export interface AssessmentSurveyCardData {
   };
   // Visibility rules based on participant status
   visibilityRules?: {
-    showForStatuses?: Array<'not_enrolled' | 'enrolled' | 'in_progress' | 'completed' | 'dropout'>;
-    hideForStatuses?: Array<'not_enrolled' | 'enrolled' | 'in_progress' | 'completed' | 'dropout'>;
+    showForStatuses?: Array<ParticipantStatus>;
+    hideForStatuses?: Array<ParticipantStatus>;
   };
 }
 

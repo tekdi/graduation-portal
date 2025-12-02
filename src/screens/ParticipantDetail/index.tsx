@@ -62,7 +62,7 @@ export default function ParticipantDetail() {
   } = participant;
 
   return (
-    <VStack flex={1} bg="$white">
+    <Box flex={1} bg="$white">
       <VStack 
         {...participantDetailStyles.container} 
         $web-boxShadow={participantDetailStyles.containerBoxShadow}
@@ -77,33 +77,54 @@ export default function ParticipantDetail() {
           graduationDate={graduationDate}
         />
       </VStack>
-
-      {/* Tabs Header */}
-      <HStack
-        borderBottomWidth={1}
-        borderBottomColor="$borderLight300"
-        bg={theme.tokens.colors.accent100}
-        px="$4"
-        py="$2"
-      >
-        {PARTICIPANT_DETAIL_TABS?.map(tab => (
-          <TabButton
-            key={tab.key}
-            tab={tab}
-            isActive={activeTab === tab.key}
-            onPress={setActiveTab}
-            variant="ButtonTab"
-          />
-        ))}
-      </HStack>
+      {/* Tabs */}
+      <Box width="$full" mt="$4">
+        <Box 
+          maxWidth={1200} 
+          width="$full" 
+          marginHorizontal="auto"
+          px="$6"
+        >
+          <HStack
+            width="$full"
+            bg="$backgroundLight50"
+            borderRadius={50}
+            p={4}
+            gap={4}
+            alignItems="center"
+          >
+            {PARTICIPANT_DETAIL_TABS?.map(tab => (
+              <TabButton
+                key={tab.key}
+                tab={tab}
+                isActive={activeTab === tab.key}
+                onPress={setActiveTab}
+                variant="ButtonTab"
+              />
+            ))}
+          </HStack>
+        </Box>
+      </Box>
 
       {/* Tab Content */}
-      <Box flex={1} bg="$white">
-        {activeTab === 'intervention-plan' && <InterventionPlan />}
-        {activeTab === 'assessment-surveys' && (
-          <AssessmentSurveys participantStatus={status || 'not-enrolled'} />
-        )}
+      <Box flex={1} mt="$3" bg="transparent">
+        <Box
+          maxWidth={1200}
+          width="$full"
+          marginHorizontal="auto"
+          px="$6"
+        >
+          <Box
+            width="$full"
+//borderRadius="$2xl"
+            bg="$white"
+          
+          >
+            {activeTab === 'intervention-plan' && <InterventionPlan />}
+            {activeTab === 'assessment-surveys' && <AssessmentSurveys participantStatus={status as ParticipantStatus} />}
+          </Box>
+        </Box>
       </Box>
-    </VStack>
+    </Box>
   );
 }
