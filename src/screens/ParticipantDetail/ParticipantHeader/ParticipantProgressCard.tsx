@@ -5,6 +5,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import type { ParticipantStatus } from '@app-types/participant';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
+import { STATUS } from '@constants/app.constant';
 
 interface ParticipantProgressCardProps {
   status?: ParticipantStatus;
@@ -27,7 +28,7 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
   const { t } = useLanguage();
 
   // Return null if status is invalid or not provided
-  if (!status || !['in_progress', 'completed', 'dropout'].includes(status)) {
+  if (!status || ![STATUS.IN_PROGRESS, STATUS.COMPLETED, STATUS.DROPOUT].includes(status)) {
     return null;
   }
 

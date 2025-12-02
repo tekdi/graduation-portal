@@ -1,9 +1,10 @@
 import React from 'react';
 import { ScrollView, VStack, Text, Box } from '@ui';
 import { notFoundStyles } from './Styles';
+import { useLanguage } from '@contexts/LanguageContext';
 
 interface NotFoundProps {
-  message: string;
+  message: string; // Translation key or already translated message
   showScrollView?: boolean;
 }
 
@@ -15,13 +16,15 @@ const NotFound: React.FC<NotFoundProps> = ({
   message,
   showScrollView = true,
 }) => {
+  const { t } = useLanguage();
+  
   const content = (
     <VStack
       {...notFoundStyles.container}
       $web-boxShadow={notFoundStyles.containerBoxShadow}
     >
       <Box {...notFoundStyles.contentBox}>
-        <Text {...notFoundStyles.message}>{message}</Text>
+        <Text {...notFoundStyles.message}>{t(message)}</Text>
       </Box>
     </VStack>
   );

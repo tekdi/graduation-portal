@@ -5,6 +5,7 @@ import { participantHeaderStyles } from './Styles';
 import type { ParticipantStatus, PathwayType } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 import ParticipantProgressCard from './ParticipantProgressCard';
+import { STATUS } from '@constants/app.constant';
 
 /**
  * ParticipantHeader Props
@@ -53,7 +54,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
    * @returns Badge component if status is 'dropout', null otherwise
    */
   const renderStatusBadge = () => {
-    if (status === 'dropout') {
+    if (status === STATUS.DROPOUT) {
       return (
         <Box {...participantHeaderStyles.statusBadge}>
           <Text {...participantHeaderStyles.statusBadgeText}>
@@ -73,7 +74,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
    */
   const renderActionButtons = () => {
     // Not Enrolled: View Profile + Enroll Participant (disabled)
-    if (status === 'not_enrolled') {
+    if (status === STATUS.NOT_ENROLLED) {
       return (
         <HStack
           {...participantHeaderStyles.actionButtonsContainer}
@@ -120,7 +121,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     }
 
     // Dropout: Only View Profile (read-only mode)
-    if (status === 'dropout') {
+    if (status === STATUS.DROPOUT) {
       return (
         <Button
           variant="outline"

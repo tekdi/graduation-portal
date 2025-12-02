@@ -49,7 +49,7 @@ export default function ParticipantDetail() {
   
   // Error State: Participant Not Found
   if (!participant) {
-    return <NotFound message={t('participantDetail.notFound.title')} />;
+    return <NotFound message="participantDetail.notFound.title" />;
   }
   
   // Extract participant data
