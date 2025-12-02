@@ -1,4 +1,4 @@
-import { SHADOW_STYLES } from '@constants/styleConstants';
+import { SHADOW_STYLES } from '@constants/STYLE_CONSTANTS';
 
 /**
  * ParticipantDetail Styles

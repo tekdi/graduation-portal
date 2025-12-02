@@ -3,6 +3,8 @@
  * Centralized styles for ParticipantHeader component
  */
 
+import { STATUS } from '@constants/app.constant';
+
 // Common status card base styles
 const statusCardBase = {
   borderWidth: 1,
@@ -24,19 +26,19 @@ const statusCardTitleBase = {
  */
 export const getStatusCard = (status: 'in_progress' | 'completed' | 'dropout') => {
   switch (status) {
-    case 'in_progress':
+    case STATUS.IN_PROGRESS:
       return {
         ...statusCardBase,
         borderColor: '$borderLight300' as const,
         bg: '$white' as const,
       };
-    case 'completed':
+    case STATUS.COMPLETED:
       return {
         ...statusCardBase,
         borderColor: '$success300' as const,
         bg: '$success50' as const,
       };
-    case 'dropout':
+    case STATUS.DROPOUT:
       return {
         ...statusCardBase,
         borderColor: '$error200' as const,

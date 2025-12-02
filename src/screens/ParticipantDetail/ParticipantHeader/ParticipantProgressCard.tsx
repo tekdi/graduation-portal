@@ -35,9 +35,9 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
   const progress = graduationProgress ?? 0;
   const date = graduationDate;
   // Dropout: Return warning content directly
-  if (status === 'dropout') {
+  if (status === STATUS.DROPOUT) {
     return (
-      <Box {...getStatusCard('dropout')}>
+      <Box {...getStatusCard(STATUS.DROPOUT as 'dropout')}>
         <HStack {...participantHeaderStyles.dropoutWarningContent}>
           <Box {...participantHeaderStyles.dropoutWarningIcon}>
             <Text {...participantHeaderStyles.dropoutWarningIconText}>×</Text>
@@ -56,7 +56,7 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
   }
 
   // In-progress or Completed: Return main card with title and content
-  // Note: Since dropout is handled above with early return, status here is always 'in_progress' or 'completed'
+  // Note: Since dropout is handled above with early return, status here is always STATUS.IN_PROGRESS or STATUS.COMPLETED
   return (
     <Box
       {...getStatusCard(status as 'in_progress' | 'completed')}
@@ -66,19 +66,19 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
     >
       {/* Title: Conditionally render based on status */}
       <Text
-        {...(status === 'in_progress'
+        {...(status === STATUS.IN_PROGRESS
           ? participantHeaderStyles.progressCardTitle
           : participantHeaderStyles.completedCardTitle)}
       >
         {t(
-          status === 'in_progress'
+          status === STATUS.IN_PROGRESS
             ? 'participantDetail.header.graduationReadiness'
             : 'participantDetail.header.programStatus'
         )}
       </Text>
       
       {/* Content: Conditionally render based on status */}
-      {status === 'in_progress' ? (
+      {status === STATUS.IN_PROGRESS ? (
         <VStack
           {...participantHeaderStyles.progressCardContent}
           $md-flexDirection="row"
