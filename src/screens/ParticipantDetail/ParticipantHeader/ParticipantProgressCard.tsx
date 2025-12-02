@@ -59,7 +59,7 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
   // Note: Since dropout is handled above with early return, status here is always STATUS.IN_PROGRESS or STATUS.COMPLETED
   return (
     <Box
-      {...getStatusCard(status as 'in_progress' | 'completed')}
+      {...getStatusCard(status as typeof STATUS.IN_PROGRESS | typeof STATUS.COMPLETED)}
       // @ts-ignore - Web-specific props not in Gluestack UI types
       $web-boxShadow={participantHeaderStyles.statusCardBoxShadow}
       $web-backgroundImage={participantHeaderStyles.statusCardBackgroundImage}

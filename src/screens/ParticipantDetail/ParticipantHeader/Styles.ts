@@ -5,6 +5,9 @@
 
 import { STATUS } from '@constants/app.constant';
 
+// Type for status card status values
+type StatusCardStatus = typeof STATUS.IN_PROGRESS | typeof STATUS.COMPLETED | typeof STATUS.DROPOUT;
+
 // Common status card base styles
 const statusCardBase = {
   borderWidth: 1,
@@ -24,7 +27,7 @@ const statusCardTitleBase = {
  * Get status-specific card styles
  * Returns card styles based on participant status with common base styles
  */
-export const getStatusCard = (status: 'in_progress' | 'completed' | 'dropout') => {
+export const getStatusCard = (status: StatusCardStatus) => {
   switch (status) {
     case STATUS.IN_PROGRESS:
       return {
