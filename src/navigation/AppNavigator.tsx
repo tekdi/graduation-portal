@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useState, useEffect, Suspense, useMemo, Component, ErrorInfo, ReactNode } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { I18nManager } from 'react-native';
@@ -9,9 +9,41 @@ import logger from '@utils/logger';
 import { usePlatform } from '@utils/platform';
 import AccessBaseNavigator from './navigators/AccessBaseNavigator';
 import HomeScreen from '../screens/Home';
+import UserManagementScreen from '../screens/UserManagement';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
+import ParticipantsList from '../screens/ParticipantsList/index';
+
+// Error Boundary for Navigation
+class NavigationErrorBoundary extends Component<
+  { children: ReactNode; fallback?: ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: ReactNode; fallback?: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    logger.error('Navigation error:', error, errorInfo);
+    // Reset error state after a short delay to allow recovery
+    setTimeout(() => {
+      this.setState({ hasError: false });
+    }, 1000);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback || <Spinner size="large" color="$primary500" />;
+    }
+    return this.props.children;
+  }
+}
 
 const Stack = createStackNavigator();
 
@@ -26,9 +58,9 @@ const getAccessPages = (
       return [
         { name: 'home', path: '/', component: HomeScreen },
         {
-          name: 'select-language',
-          path: '/select-language',
-          component: SelectLanguageScreen,
+          name: 'user-management',
+          path: '/user-management',
+          component: UserManagementScreen,
         },
       ];
     case 'supervisor':
@@ -38,9 +70,10 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
+        { name: 'participants', component: ParticipantsList },
       ];
     default:
-      return [];
+      return []; // Always return an array, even if empty
   }
 };
 
@@ -60,21 +93,21 @@ const getLinkingConfig = (
       screens: {},
     },
   };
-
-  // Dynamically generate nested routes from accessPages array
+// Dynamically generate nested routes from accessPages array
   if (accessPages.length > 0) {
     const mainScreens: Record<string, string> = {};
     accessPages.forEach(page => {
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
         ? // Remove leading slash for react-navigation config consistency
-          page.path.startsWith('/')
+        page.path.startsWith('/')
           ? page.path.substr(1)
           : page.path
         : page.name;
 
-      // Special handling for LC role:
-      // If there are multiple pages (e.g., 'home' and 'home1') and this is 'home', map it to select-language
+
+        // Special handling for LC role:
+        // If there are multiple pages (e.g., 'home' and 'home1') and this is 'home', map it to select-language
       if (
         page.name === 'home' &&
         accessPages.length > 1 &&
@@ -112,20 +145,37 @@ const RoleBasedNavigator: React.FC = () => {
     return <LoginScreen />;
   }
 
-  return <AccessBaseNavigator accessPages={accessPages} />;
+  return (
+    <Suspense fallback={<Spinner size="large" color="$primary500" />}>
+      <AccessBaseNavigator accessPages={accessPages} />
+    </Suspense>
+  );
 };
 
 const AppNavigator: React.FC = () => {
   const { t, isRTL } = useLanguage();
   const { isLoggedIn, loading, user } = useAuth();
   const { isWeb } = usePlatform();
-
-  // Generate accessPages based on user role
+// Generate accessPages based on user role
   const accessPages = useMemo(() => getAccessPages(user?.role), [user?.role]);
 
   // Generate dynamic linking configuration based on accessPages
   // Memoize to prevent unnecessary recalculations
-  const linking = useMemo(() => getLinkingConfig(accessPages), [accessPages]);
+  // Only generate linking when accessPages is stable and not empty
+  const linking = useMemo(() => {
+    if (accessPages.length === 0) {
+      // Return minimal config when no access pages (e.g., during logout)
+      return {
+        prefixes: [],
+        config: {
+          screens: {
+            login: 'login',
+          },
+        },
+      };
+    }
+    return getLinkingConfig(accessPages);
+  }, [accessPages]);
 
   // Update I18nManager when RTL changes (for React Native)
   useEffect(() => {
@@ -146,20 +196,45 @@ const AppNavigator: React.FC = () => {
     }
   }, [isWeb]);
 
+  // Create a stable key for NavigationContainer to prevent state issues
+  // when linking config changes
+  // MUST be called before any conditional returns (Rules of Hooks)
+  const navigationKey = useMemo(() => {
+    return isLoggedIn 
+      ? `nav-${user?.role || 'guest'}-${accessPages.length}` 
+      : 'nav-login';
+  }, [isLoggedIn, user?.role, accessPages.length]);
+
   if (loading) {
     return <Spinner size="large" color="$primary500" />;
   }
 
   return (
-    <NavigationContainer
-      linking={linking}
-      fallback={<Spinner size="large" color="$primary500" />}
-    >
+    <NavigationErrorBoundary>
+      <NavigationContainer
+        key={navigationKey}
+        linking={linking}
+        fallback={<Spinner size="large" color="$primary500" />}
+        onReady={() => {
+          if (isWeb) {
+            logger.log('Navigation container ready');
+          }
+        }}
+        onStateChange={(state) => {
+          if (isWeb && state) {
+            logger.log('Navigation state changed:', state);
+          }
+        }}
+      >
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
           cardStyle: isWeb
-            ? ({ width: '100%', height: '100vh' } as any)
+            ? ({
+                width: '100%',
+                minHeight: '100vh',
+                height: 'auto',
+              } as any)
             : ({ width: '100%' } as any),
         }}
       >
@@ -184,6 +259,7 @@ const AppNavigator: React.FC = () => {
         )}
       </Stack.Navigator>
     </NavigationContainer>
+    </NavigationErrorBoundary>
   );
 };
 

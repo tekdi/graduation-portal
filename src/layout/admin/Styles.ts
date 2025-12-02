@@ -2,23 +2,26 @@
 export const layoutStyles = {
   container: {
     bg: '$backgroundLight0' as const,
-    minHeight: '100%' as '100%',
+    minHeight: '$full' as '$full',
     flexDirection: 'row' as const,
   },
+  scrollContent: {
+    flexGrow: 1,
+  },
   contentContainer: {
-    alignItems: 'flex-start' as const,
-    height: '100%' as '100%',
     flex: 1,
+    width: '$full' as const,
     flexDirection: 'column' as const,
   },
   mainContent: {
-    width: '100%' as '100%',
+    flex: 1,
+    width: '$full' as const,
     bg: '$backgroundLight0' as const,
-    // minHeight: '100%' as '100%',
+    padding: '$6',
   },
   headerContent: {
     bg: '$backgroundLight0' as const,
-    minHeight: 64,
-    width: '100%' as '100%',
+    minHeight: '$16',
+    width: '$full' as const,
   },
 };

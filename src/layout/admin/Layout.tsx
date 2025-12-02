@@ -5,6 +5,7 @@ import {
   Icon,
   MenuIcon,
   SafeAreaView,
+  ScrollView,
   useColorMode,
   Pressable,
 } from '@ui';
@@ -23,7 +24,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [search, setSearch] = useState('');
   // Determine if we're on mobile/tablet (< 768px)
-  const { isMobile } = usePlatform();
+  const { isMobile, isWeb } = usePlatform();
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
@@ -43,6 +44,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     <SafeAreaView
       {...layoutStyles.container}
       bg={isDark ? '$backgroundDark950' : '$backgroundLight0'}
+      style={isWeb ? ({ height: '100vh' } as any) : undefined}
     >
       {/* Sidebar */}
       <AdminSidebar
@@ -51,18 +53,27 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
         isMobile={isMobile}
       />
 
-      {/* Content with Sidebar */}
-      <HStack {...layoutStyles.contentContainer}>
-        {/* Header */}
-        <Box {...layoutStyles.headerContent}>
-          <AdminHeader
-            {...{ search, setSearch, showNotification: true }}
-            rightSideContent={rightSideContent}
-          />
-        </Box>
-        {/* Main Content */}
-        <Box {...layoutStyles.mainContent}>{children}</Box>
-      </HStack>
+      {/* Scrollable Content Area (Header + Main Content) */}
+      <ScrollView
+        flex={1}
+        contentContainerStyle={layoutStyles.scrollContent}
+      >
+        <HStack
+          flex={1}
+          width="$full"
+          flexDirection="column"
+        >
+          {/* Header */}
+          <Box {...layoutStyles.headerContent}>
+            <AdminHeader
+              {...{ search, setSearch, showNotification: true }}
+              rightSideContent={rightSideContent}
+            />
+          </Box>
+          {/* Main Content */}
+          <Box {...layoutStyles.mainContent}>{children}</Box>
+        </HStack>
+      </ScrollView>
     </SafeAreaView>
   );
 };

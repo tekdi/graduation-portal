@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, VStack, ScrollView, Text, Heading } from '@gluestack-ui/themed';
-import FeatureCard from '@ui/FeatureCard';
+import FeatureCard from '@components/FeatureCard';
 import { useAuth } from '@contexts/AuthContext';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';

@@ -14,7 +14,6 @@ import {
   ChevronDownIcon,
   SelectPortal,
 } from '@gluestack-ui/themed';
-import { usePlatform } from '@utils/platform';
 
 type Option = {
   value: string;
@@ -23,8 +22,11 @@ type Option = {
   isRTL?: boolean;
 };
 
+// Input format can be strings, objects, or already normalized Option[]
+type RawOption = string | { label?: string; name?: string; value: string | null } | Option;
+
 type SelectProps = {
-  options: Option[];
+  options: RawOption[];
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
@@ -36,9 +38,52 @@ export default function Select({
   onChange,
   placeholder,
 }: SelectProps) {
-  const { isWeb } = usePlatform();
-  // For mobile, we need to ensure the Select component is properly configured
-  const selectedOption = options.find(opt => opt.value === value);
+  // Normalize options: handle strings, objects, or already normalized Option[]
+  const normalizedOptions: Option[] = options.map((e: RawOption, index: number) => {
+    // If already normalized Option format (has value and optional name/nativeName)
+    if (typeof e === 'object' && 'value' in e && typeof e.value === 'string' && ('name' in e || 'nativeName' in e)) {
+      return e as Option;
+    }
+    
+    // If string format
+    if (typeof e === 'string') {
+      return {
+        value: e,
+        name: e,
+      };
+    }
+    
+    // If object with label/value format (from Filter component)
+    if (typeof e === 'object' && e !== null) {
+      let optionValue: string;
+      let optionName: string;
+      
+      if ('value' in e && e.value !== undefined) {
+        // Use marker for actual null, keep string "null" as is
+        optionValue = e.value === null ? '__NULL_VALUE__' : String(e.value);
+      } else {
+        optionValue = '';
+      }
+      
+      // Prefer label, then name, then value
+      optionName = ('label' in e ? e.label : undefined) ?? 
+                   ('name' in e ? e.name : undefined) ?? 
+                   optionValue;
+      
+      return {
+        value: optionValue,
+        name: optionName,
+      };
+    }
+    
+    // Fallback
+    return {
+      value: String(index),
+      name: 'Unknown',
+    };
+  });
+
+  const selectedOption = normalizedOptions.find(opt => opt.value === value);
   const displayValue =
     selectedOption?.nativeName ||
     selectedOption?.name ||
@@ -53,8 +98,11 @@ export default function Select({
   const writingDirection = I18nManager.isRTL ? 'rtl' : 'ltr';
 
   const handleValueChange = (newValue: string | undefined) => {
-    if (newValue && typeof newValue === 'string' && newValue.trim() !== '') {
-      onChange(newValue);
+    if (newValue !== undefined && newValue !== null) {
+      const stringValue = String(newValue);
+      // Allow empty strings and special markers (like __NULL_VALUE__) to pass through
+      // Empty strings are valid selections for filters (e.g., "String Null" option)
+      onChange(stringValue);
     }
   };
 
@@ -62,7 +110,6 @@ export default function Select({
     <GluestackSelect
       selectedValue={value}
       onValueChange={handleValueChange}
-      {...(isWeb ? { defaultValue: value } : {})}
     >
       <SelectTrigger variant="outline" size="md" width="$full">
         <SelectInput
@@ -81,7 +128,7 @@ export default function Select({
           <SelectDragIndicatorWrapper>
             <SelectDragIndicator />
           </SelectDragIndicatorWrapper>
-          {options.map((option: Option, index: number) => (
+          {normalizedOptions.map((option: Option, index: number) => (
             <SelectItem
               key={option?.value ?? option?.name ?? index.toString()}
               label={option?.nativeName || option?.name || option?.value}

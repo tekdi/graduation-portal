@@ -5,7 +5,7 @@ export const WELCOME_CARDS: FeatureCardData[] = [
   {
     id: 'my-participants',
     color: theme.tokens.colors.primary500,
-    icon: 'user',
+    icon: 'Users',
     title: 'welcome.myParticipants',
     description: 'welcome.myParticipantsDescription',
     navigationUrl: 'participants',
@@ -15,7 +15,7 @@ export const WELCOME_CARDS: FeatureCardData[] = [
   {
     id: 'learning-progress',
     color: theme.tokens.colors.info100,
-    icon: 'chart',
+    icon: 'TrendingUp',
     title: 'welcome.myLearningProgress',
     description: 'welcome.myLearningProgressDescription',
     navigationUrl: 'learning-progress',
@@ -25,7 +25,7 @@ export const WELCOME_CARDS: FeatureCardData[] = [
   {
     id: 'connect-experts',
     color: theme.tokens.colors.accent200,
-    icon: 'chat',
+    icon: 'MessageCircle',
     title: 'welcome.connectWithExperts',
     description: 'welcome.connectWithExpertsDescription',
     navigationUrl: 'connect-experts',
