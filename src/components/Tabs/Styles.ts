@@ -48,9 +48,7 @@ export const tabButtonStyles = {
   buttonTabText: (isActive: boolean) => ({
     fontSize: 14,
     fontWeight: isActive ? '$medium' : '$normal',
-    color: isActive
-      ? theme.tokens.colors.textForeground
-      : theme.tokens.colors.textForeground,
+    color: theme.tokens.colors.textForeground,
     textAlign: 'center',
   }),
  

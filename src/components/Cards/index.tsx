@@ -5,7 +5,6 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
 import { assessmentSurveyCardStyles } from './Styles';
 import { theme } from '@config/theme';
-import { STATUS } from '@constants/app.constant';
 
 /**
  * AssessmentCard Component
@@ -18,15 +17,17 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   const { title, description, additionalInfo, icon, status, actionButton } = card;
 
   // Get status badge styling based on status type
+  // Note: status.type uses card status values ('not-started', 'in-progress', 'completed', 'graduated')
+  // not participant STATUS constants
   const getStatusBadgeStyle = () => {
     switch (status.type) {
-      case STATUS.ENROLLED:
+      case 'graduated':
         return assessmentSurveyCardStyles.statusBadgeGraduated;
-      case STATUS.COMPLETED:
+      case 'completed':
         return assessmentSurveyCardStyles.statusBadgeCompleted;
-      case STATUS.IN_PROGRESS:
+      case 'in-progress':
         return assessmentSurveyCardStyles.statusBadgeInProgress;
-      case STATUS.NOT_ENROLLED:
+      case 'not-started':
       default:
         return assessmentSurveyCardStyles.statusBadgeNotStarted;
     }
@@ -72,7 +73,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
           <HStack alignItems="center" gap="$1">
             {(status.type === 'graduated' || status.type === 'completed') && (
               <LucideIcon
-                name={status.type === 'graduated' ? 'Check' : 'CheckCircle'}
+                name="CheckCircle"
                 size={12}
                 color={
                   status.type === 'graduated'
