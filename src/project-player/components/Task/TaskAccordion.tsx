@@ -25,11 +25,11 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
             <HStack justifyContent="space-between" alignItems="center">
               <VStack flex={1} space="xs">
                 <Text fontSize="$md" fontWeight="$bold" color="$primary700">
-                  {t(task.name)}
+                  {task.name}
                 </Text>
                 {task.description && (
                   <Text fontSize="$sm" color="$textLight600">
-                    {t(task.description)}
+                    {task.description}
                   </Text>
                 )}
                 <Text fontSize="$xs" color="$textLight500">

@@ -16,12 +16,12 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
     >
       <VStack space="sm">
         <Text fontSize="$xl" fontWeight="$bold">
-          {t(project.name)}
+          {project.name}
         </Text>
 
         {project.description && (
           <Text fontSize="$sm" color="$textLight600">
-            {t(project.description)}
+            {project.description}
           </Text>
         )}
 

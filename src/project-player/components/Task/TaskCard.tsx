@@ -36,11 +36,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, level = 0 }) => {
         <HStack justifyContent="space-between" alignItems="center">
           <VStack flex={1} space="xs">
             <Text fontSize="$md" fontWeight="$semibold">
-              {t(task.name)}
+              {task.name}
             </Text>
             {task.description && (
               <Text fontSize="$sm" color="$textLight600">
-                {t(task.description)}
+                {task.description}
               </Text>
             )}
           </VStack>
@@ -83,7 +83,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, level = 0 }) => {
             </Text>
             {task.attachments.map(attachment => (
               <Text key={attachment._id} fontSize="$sm" color="$textLight600">
-                📎 {t(attachment.name)}
+                📎 {attachment.name}
               </Text>
             ))}
           </VStack>

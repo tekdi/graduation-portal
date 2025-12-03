@@ -1,11 +1,17 @@
-export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'submitted';
+import {
+  TASK_STATUS,
+  PROJECT_STATUS,
+  UPLOAD_STATUS,
+} from '../../constants/app.constant';
+
+export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
 
 export interface ProjectData {
   _id: string;
   solutionId: string;
   name: string;
   description: string;
-  status: 'draft' | 'in-progress' | 'completed' | 'submitted';
+  status: (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS];
   progress: number;
   tasks: Task[];
   metaData?: Record<string, any>;
@@ -23,7 +29,12 @@ export interface Task {
   children?: Task[]; // For nested project tasks
   attachments?: Attachment[];
   observationFormId?: string;
-  metadata?: Record<string, any>;
+  metadata?: {
+    minFiles?: number; // Minimum files required for file-type tasks
+    maxFiles?: number; // Maximum files allowed for file-type tasks
+    formCompleted?: boolean; // For observation tasks
+    [key: string]: any;
+  };
 }
 
 export interface Attachment {
@@ -33,6 +44,6 @@ export interface Attachment {
   size: number;
   url?: string;
   localPath?: string;
-  uploadStatus: 'pending' | 'uploading' | 'uploaded' | 'failed';
+  uploadStatus: (typeof UPLOAD_STATUS)[keyof typeof UPLOAD_STATUS];
   createdAt: string;
 }

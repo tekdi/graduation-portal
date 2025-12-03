@@ -3,6 +3,7 @@ import { Box, Text, Pressable } from '@gluestack-ui/themed';
 import { TaskStatus as TaskStatusType } from '../../types/project.types';
 import { getStatusColor } from '../ProjectComponent/helpers';
 import { TaskStatusProps } from '../../types/components.types';
+import { TASK_STATUS } from '../../../constants/app.constant';
 
 const TaskStatus: React.FC<TaskStatusProps> = ({
   status,
@@ -14,12 +15,10 @@ const TaskStatus: React.FC<TaskStatusProps> = ({
   const toggleStatus = () => {
     if (isReadOnly || !onStatusChange) return;
 
-    // Cycle through statuses: pending -> in-progress -> completed
+    // Simple toggle: to-do ↔ completed
     const nextStatus: Record<TaskStatusType, TaskStatusType> = {
-      pending: 'in-progress',
-      'in-progress': 'completed',
-      completed: 'pending',
-      submitted: 'submitted', // Don't change submitted status
+      [TASK_STATUS.TO_DO]: TASK_STATUS.COMPLETED,
+      [TASK_STATUS.COMPLETED]: TASK_STATUS.TO_DO,
     };
 
     onStatusChange(nextStatus[status]);

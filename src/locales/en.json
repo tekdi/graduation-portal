@@ -31,11 +31,8 @@
     "status": "Status",
     "progress": "Progress",
     "statusTypes": {
-      "draft": "Draft",
-      "in-progress": "In Progress",
-      "completed": "Completed",
-      "submitted": "Submitted",
-      "pending": "Pending"
+      "to-do": "To Do",
+      "completed": "Completed"
     },
     "completeForm": "Complete Form",
     "attachments": "Attachments",

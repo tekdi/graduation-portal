@@ -1,4 +1,5 @@
 import { Task, TaskStatus } from '../types/project.types';
+import { TASK_STATUS } from '../../constants/app.constant';
 
 // Find a task by ID in a nested structure
 export const findTaskById = (
@@ -47,7 +48,7 @@ export const calculateProjectCompletion = (tasks: Task[]): number => {
   const countTasks = (taskList: Task[]) => {
     taskList.forEach(task => {
       totalTasks++;
-      if (task.status === 'completed' || task.status === 'submitted') {
+      if (task.status === TASK_STATUS.COMPLETED) {
         completedTasks++;
       }
       if (task.children) {
@@ -83,7 +84,8 @@ export const getTasksByStatus = (tasks: Task[], status: TaskStatus): Task[] => {
 export const canCompleteTask = (task: Task): boolean => {
   // Check if task has required fields completed
   if (task.type === 'file') {
-    return (task.attachments?.length ?? 0) > 0;
+    const minFiles = task.metadata?.minFiles ?? 1; // Default to 1 if not specified
+    return (task.attachments?.length ?? 0) >= minFiles;
   }
   if (task.type === 'observation') {
     return task.metadata?.formCompleted === true;
@@ -91,9 +93,8 @@ export const canCompleteTask = (task: Task): boolean => {
   if (task.type === 'project') {
     // All children must be completed
     return (
-      task.children?.every(
-        child => child.status === 'completed' || child.status === 'submitted',
-      ) ?? false
+      task.children?.every(child => child.status === TASK_STATUS.COMPLETED) ??
+      false
     );
   }
   return true;
