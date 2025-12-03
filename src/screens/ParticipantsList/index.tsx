@@ -7,7 +7,7 @@ import {
   Heading,
   Pressable,
   ScrollView,
-} from '@gluestack-ui/themed';
+} from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
 import DataTable from '@components/DataTable';
@@ -19,7 +19,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { TabButton } from '@components/Tabs';
 import { TABS } from '@constants/TABS';
 import { getStatusItems } from '@constants/FILTERS';
-import { PARTICIPANTS_LIST } from '@constants/PARTICIPANTS_LIST';
+import { getParticipantsList } from '../../services/participantService';
 import { STATUS } from '@constants/app.constant';
 
 const ParticipantsList: React.FC = () => {
@@ -51,15 +51,17 @@ const ParticipantsList: React.FC = () => {
   useEffect(() => {
     if (activeTab === 'participants') {
       // Set mock participants data
-      setParticipants(PARTICIPANTS_LIST);
-      setTotalCount(PARTICIPANTS_LIST.length);
+      const participants = getParticipantsList();
+      setParticipants(participants);
+      setTotalCount(participants.length);
     }
   }, [activeTab]);
 
   const filteredParticipants = useMemo(() => {
     // Example placeholder logic until API integration:
     const term = _searchKey.trim().toLowerCase();
-    return PARTICIPANTS_LIST.filter(p => {
+    const participants = getParticipantsList();
+    return participants.filter((p: Participant) => {
       const matchesSearch =
         !term ||
         p.name.toLowerCase().includes(term) ||
@@ -82,10 +84,9 @@ const ParticipantsList: React.FC = () => {
 
   const handleRowClick = useCallback(
     (participant: Participant) => {
-      console.log('Navigate to participant detail:', participant.id);
       // @ts-ignore
       navigation.navigate('participant-detail', {
-        participantId: participant.id,
+        id: participant.id,
       });
     },
     [navigation],

@@ -144,6 +144,31 @@
     "connectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
     "getStarted": "Get started"
   },
+  "participantDetail": {
+    "notFound": {
+      "title": "Participant Not Found",
+      "message": "No participant found with ID: {{id}}",
+      "noIdProvided": "No participant ID provided",
+      "availableIds": "Available participant IDs: 1001, 1002, 1003, 1004, 1005"
+    },
+    "header": {
+      "backToCaseload": "Back to Caseload",
+      "viewProfile": "View Profile",
+      "enrollParticipant": "Enroll Participant",
+      "logVisit": "Log Visit",
+      "droppedOut": "Dropped Out",
+      "graduationReadiness": "Graduation Readiness",
+      "programStatus": "Program Status",
+      "graduatedComplete": "Graduated - 100% Complete",
+      "graduatedOn": "Graduated on {{date}}",
+      "participantDroppedOut": "Participant Dropped Out",
+      "dropoutWarning": "This participant has dropped out of the program. You are viewing their records in read-only mode. No changes can be made."
+    },
+    "pathways": {
+      "employment": "Employment Pathway",
+      "entrepreneurship": "Entrepreneurship Pathway"
+    }
+  },
   "participants": {
     "myParticipants": "My Participants",
     "dashboard": "Dashboard",

@@ -13,6 +13,7 @@ import UserManagementScreen from '../screens/UserManagement';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
+import ParticipantDetail from '../screens/ParticipantDetail';
 import ParticipantsList from '../screens/ParticipantsList/index';
 
 // Error Boundary for Navigation
@@ -70,6 +71,7 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
+        { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
         { name: 'participants', component: ParticipantsList },
       ];
     default:
@@ -115,6 +117,8 @@ const getLinkingConfig = (
       ) {
         mainScreens[page.name] = 'select-language';
       } else {
+        // Handle dynamic routes with parameters (e.g., /participants/:id)
+        // React Navigation will automatically extract parameters from the path
         mainScreens[page.name] = screenPath;
       }
     });
