@@ -161,6 +161,7 @@
       "programStatus": "Program Status",
       "graduatedComplete": "Graduated - 100% Complete",
       "graduatedOn": "Graduated on {{date}}",
+      "graduationDateNotAvailable": "Graduation date not available",
       "participantDroppedOut": "Participant Dropped Out",
       "dropoutWarning": "This participant has dropped out of the program. You are viewing their records in read-only mode. No changes can be made."
     },
@@ -191,26 +192,26 @@
       },
       "householdProfile": {
         "title": "Household Profile",
-        "description": "Collect comprehensive information about the participant's household structure, demographics, and economic status.",
-        "actionButton": "Start Household Profile"
+        "description": "Comprehensive household profiling information including household composition, human capital, economic activities, and development goals.",
+        "actionButton": "View Household Profile"
       },
       "midlineSurvey": {
         "title": "Midline Survey",
-        "description": "Assess the participant's progress and gather feedback at the midpoint of the program.",
-        "additionalInfo": "This survey helps track program effectiveness and participant engagement.",
-        "actionButton": "Continue Midline Survey"
+        "description": "Comprehensive re-assessment at Month 12 milestone",
+        "additionalInfo": "All sections are mandatory for completion",
+        "actionButton": "Fill Midline Survey"
       },
       "graduationReadiness": {
         "title": "Graduation Readiness Survey",
-        "description": "Evaluate the participant's readiness for program graduation and assess their overall progress.",
-        "additionalInfo": "Complete this survey to determine if the participant is ready to graduate from the program.",
-        "actionButton": "View Graduation Readiness"
+        "description": "Complete the graduation readiness assessment to issue certificate",
+        "additionalInfo": "Submit survey to generate and issue graduation certificate",
+        "actionButton": "Fill Graduation Survey"
       },
       "endlineSurvey": {
         "title": "Endline Survey",
-        "description": "Final assessment to measure program outcomes and participant achievements.",
-        "additionalInfo": "This survey captures the final results and impact of the program on the participant.",
-        "actionButton": "Continue Endline Survey"
+        "description": "Final assessment at Month 24 milestone (Graduation Readiness)",
+        "additionalInfo": "Must be 100% complete before graduation",
+        "actionButton": "Fill Endline Survey"
       }
     }
   },

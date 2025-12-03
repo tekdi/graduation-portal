@@ -26,7 +26,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     title: 'participantDetail.assessmentSurveys.midlineSurvey.title',
     description: 'participantDetail.assessmentSurveys.midlineSurvey.description',
     additionalInfo: 'participantDetail.assessmentSurveys.midlineSurvey.additionalInfo',
-    icon: 'ClipboardCheck',
+    icon: 'FileText',
     status: {
       type: 'in-progress',
       label: 'participantDetail.assessmentSurveys.status.percentComplete',
@@ -34,12 +34,12 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     },
     actionButton: {
       label: 'participantDetail.assessmentSurveys.midlineSurvey.actionButton',
-      icon: 'ClipboardCheck',
+      icon: 'FileText',
       variant: 'primary',
     },
-    // Midline Survey only shows when status is 'completed'
+    // Midline Survey shows for all statuses except 'dropout'
     visibilityRules: {
-      showForStatuses: ['completed'],
+      hideForStatuses: ['dropout'],
     },
   },
   {
@@ -47,19 +47,19 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     title: 'participantDetail.assessmentSurveys.graduationReadiness.title',
     description: 'participantDetail.assessmentSurveys.graduationReadiness.description',
     additionalInfo: 'participantDetail.assessmentSurveys.graduationReadiness.additionalInfo',
-    icon: 'Award',
+    icon: 'FileText',
     status: {
-      type: 'graduated',
-      label: 'participantDetail.assessmentSurveys.status.graduated',
+      type: 'completed',
+      label: 'participantDetail.assessmentSurveys.status.completed',
     },
     actionButton: {
       label: 'participantDetail.assessmentSurveys.graduationReadiness.actionButton',
       icon: 'FileText',
-      variant: 'secondary',
+      variant: 'primary',
     },
-    // Graduation Readiness Survey only shows when status is 'completed'
+    // Graduation Readiness Survey shows for all statuses except 'dropout'
     visibilityRules: {
-      showForStatuses: ['completed'],
+      hideForStatuses: ['dropout'],
     },
   },
   {
@@ -67,7 +67,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     title: 'participantDetail.assessmentSurveys.endlineSurvey.title',
     description: 'participantDetail.assessmentSurveys.endlineSurvey.description',
     additionalInfo: 'participantDetail.assessmentSurveys.endlineSurvey.additionalInfo',
-    icon: 'ClipboardCheck',
+    icon: 'FileText',
     status: {
       type: 'in-progress',
       label: 'participantDetail.assessmentSurveys.status.percentComplete',
@@ -75,7 +75,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     },
     actionButton: {
       label: 'participantDetail.assessmentSurveys.endlineSurvey.actionButton',
-      icon: 'ClipboardCheck',
+      icon: 'FileText',
       variant: 'primary',
     },
     // Endline Survey shows for all statuses except 'dropout'

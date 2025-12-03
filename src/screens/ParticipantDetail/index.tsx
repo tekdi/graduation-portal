@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { VStack, HStack, Box } from '@ui';
+import { VStack, HStack, Box, ScrollView } from '@ui';
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
 import { getParticipantById } from '../../services/participantService';
@@ -62,67 +62,68 @@ export default function ParticipantDetail() {
   } = participant;
 
   return (
-    <Box flex={1} bg="$white">
-      <VStack 
-        {...participantDetailStyles.container} 
-        $web-boxShadow={participantDetailStyles.containerBoxShadow}
-      >
-        {/* Participant Header with status-based variations */}
-        <ParticipantHeader
-          participantName={participantName}
-          participantId={id}
-          status={status}
-          pathway={pathway}
-          graduationProgress={graduationProgress}
-          graduationDate={graduationDate}
-        />
-      </VStack>
-      {/* Tabs */}
-      <Box width="$full" mt="$4">
-        <Box 
-          maxWidth={1200} 
-          width="$full" 
-          marginHorizontal="auto"
-          px="$6"
+    <Box flex={1} bg={theme.tokens.colors.accent100}>
+      <ScrollView flex={1} showsVerticalScrollIndicator={false}>
+        <VStack 
+          {...participantDetailStyles.container} 
+          $web-boxShadow={participantDetailStyles.containerBoxShadow}
         >
-          <HStack
-            width="$full"
-            bg="$backgroundLight50"
-            borderRadius={50}
-            p={4}
-            gap={4}
-            alignItems="center"
+          {/* Participant Header with status-based variations */}
+          <ParticipantHeader
+            participantName={participantName}
+            participantId={id}
+            status={status}
+            pathway={pathway}
+            graduationProgress={graduationProgress}
+            graduationDate={graduationDate}
+          />
+        </VStack>
+        {/* Tabs */}
+        <Box width="$full" mt="$4" mb="$6">
+          <Box 
+            maxWidth={1200} 
+            width="$full" 
+            marginHorizontal="auto"
+            px="$6"
           >
-            {PARTICIPANT_DETAIL_TABS?.map(tab => (
-              <TabButton
-                key={tab.key}
-                tab={tab}
-                isActive={activeTab === tab.key}
-                onPress={setActiveTab}
-                variant="ButtonTab"
-              />
-            ))}
-          </HStack>
-        </Box>
-      </Box>
-
-      {/* Tab Content */}
-      <Box flex={1} mt="$3" bg="transparent">
-        <Box
-          maxWidth={1200}
-          width="$full"
-          marginHorizontal="auto"
-          px="$6"
-        >
-          <Box
-            width="$full"
-            bg="$white"
-          >
-            {activeTab === 'intervention-plan' && <InterventionPlan />}
-            {activeTab === 'assessment-surveys' && <AssessmentSurveys participantStatus={status as ParticipantStatus} />}
+            <HStack
+              width="$full"
+              bg="$backgroundLight50"
+              borderRadius={50}
+              p={4}
+              gap={4}
+              alignItems="center"
+            >
+              {PARTICIPANT_DETAIL_TABS?.map(tab => (
+                <TabButton
+                  key={tab.key}
+                  tab={tab}
+                  isActive={activeTab === tab.key}
+                  onPress={setActiveTab}
+                  variant="ButtonTab"
+                />
+              ))}
+            </HStack>
           </Box>
         </Box>
-      </Box>
+
+        {/* Tab Content */}
+        <Box flex={1} mt="$3" mb="$6" bg="transparent">
+          <Box
+            maxWidth={1200}
+            width="$full"
+            marginHorizontal="auto"
+            px="$6"
+          >
+            <Box
+              width="$full"
+            >
+              {activeTab === 'intervention-plan' && <InterventionPlan />}
+              {activeTab === 'assessment-surveys' && <AssessmentSurveys participantStatus={status as ParticipantStatus} />}
+            </Box>
+          </Box>
+        </Box>
+      </ScrollView>
     </Box>
   );
 }

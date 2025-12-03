@@ -16,12 +16,11 @@ export const interventionPlanStyles = {
     space: 'lg' as const,
   },
   iconContainer: {
-    mb: '$4',
   },
-  iconColor: theme.tokens.colors.mutedForeground,
+  iconColor: theme.tokens.colors.textMutedForeground,
   title: {
-    fontSize: '$xl',
-    fontWeight: '$bold',
+    fontSize: '$md',
+    fontWeight: '$normal',
     color: '$textForeground',
     textAlign: 'center' as const,
   },
@@ -29,18 +28,17 @@ export const interventionPlanStyles = {
     fontSize: '$md',
     color: '$textMutedForeground',
     textAlign: 'center' as const,
-    maxWidth: 500,
   },
   button: {
     bg: '$btnPrimary',
-    borderRadius: '$md',
-    px: '$6',
-    py: '$3',
+    borderRadius: '$xl',
+    px: '$4',
+    py: '$2',
     mt: '$4',
   },
   buttonText: {
     color: '$white',
-    fontSize: '$md',
+    fontSize: '$sm',
     fontWeight: '$medium',
   },
 } as const;

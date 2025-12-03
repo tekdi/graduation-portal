@@ -1,16 +1,17 @@
 import React from 'react';
-import { Box, VStack, HStack, Text, Button, ButtonText } from '@ui';
+import { Card, Box, VStack, HStack, Text, Button, ButtonText } from '@ui';
 import { AssessmentSurveyCardProps } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
 import { assessmentSurveyCardStyles } from './Styles';
 import { theme } from '@config/theme';
+import { STATUS } from '@constants/app.constant';
 
 /**
- * AssessmentSurveyCard Component
+ * AssessmentCard Component
  * Reusable card component for displaying assessment survey information
  */
-export const AssessmentSurveyCard: React.FC<AssessmentSurveyCardProps> = ({
+export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   card,
 }) => {
   const { t } = useLanguage();
@@ -19,13 +20,13 @@ export const AssessmentSurveyCard: React.FC<AssessmentSurveyCardProps> = ({
   // Get status badge styling based on status type
   const getStatusBadgeStyle = () => {
     switch (status.type) {
-      case 'graduated':
+      case STATUS.ENROLLED:
         return assessmentSurveyCardStyles.statusBadgeGraduated;
-      case 'completed':
+      case STATUS.COMPLETED:
         return assessmentSurveyCardStyles.statusBadgeCompleted;
-      case 'in-progress':
+      case STATUS.IN_PROGRESS:
         return assessmentSurveyCardStyles.statusBadgeInProgress;
-      case 'not-started':
+      case STATUS.NOT_ENROLLED:
       default:
         return assessmentSurveyCardStyles.statusBadgeNotStarted;
     }
@@ -47,14 +48,17 @@ export const AssessmentSurveyCard: React.FC<AssessmentSurveyCardProps> = ({
   };
 
   return (
-    <Box {...assessmentSurveyCardStyles.cardContainer}>
+    <Card
+      {...assessmentSurveyCardStyles.cardContainer}
+      $web-boxShadow="none" // Remove shadow on web
+    >
       {/* Card Header with Icon and Status Badge */}
       <HStack
         {...assessmentSurveyCardStyles.cardHeader}
         justifyContent="space-between"
         alignItems="flex-start"
       >
-        <HStack alignItems="center" gap="$3" flex={1}>
+        <HStack alignItems="center" gap="$2" flex={1}>
           <Box {...assessmentSurveyCardStyles.iconContainer}>
             <LucideIcon
               name={icon}
@@ -66,16 +70,22 @@ export const AssessmentSurveyCard: React.FC<AssessmentSurveyCardProps> = ({
         </HStack>
         <Box {...getStatusBadgeStyle()}>
           <HStack alignItems="center" gap="$1">
-            {status.type === 'graduated' && (
+            {(status.type === 'graduated' || status.type === 'completed') && (
               <LucideIcon
-                name="Check"
+                name={status.type === 'graduated' ? 'Check' : 'CheckCircle'}
                 size={12}
-                color={theme.tokens.colors.white || '#ffffff'}
+                color={
+                  status.type === 'graduated'
+                    ? theme.tokens.colors.white || '#ffffff'
+                    : theme.tokens.colors.success600
+                }
               />
             )}
             <Text
               {...(status.type === 'graduated'
                 ? assessmentSurveyCardStyles.statusBadgeTextGraduated
+                : status.type === 'completed'
+                ? assessmentSurveyCardStyles.statusBadgeTextCompleted
                 : assessmentSurveyCardStyles.statusBadgeText)}
             >
               {formatStatusLabel()}
@@ -85,7 +95,7 @@ export const AssessmentSurveyCard: React.FC<AssessmentSurveyCardProps> = ({
       </HStack>
 
       {/* Card Description */}
-      <VStack {...assessmentSurveyCardStyles.contentContainer} space="$2">
+      <VStack {...assessmentSurveyCardStyles.contentContainer} space="md">
         <Text {...assessmentSurveyCardStyles.description}>
           {t(description)}
         </Text>
@@ -118,12 +128,19 @@ export const AssessmentSurveyCard: React.FC<AssessmentSurveyCardProps> = ({
                 : theme.tokens.colors.textForeground
             }
           />
-          <ButtonText {...assessmentSurveyCardStyles.buttonText}>
+          <ButtonText
+            {...assessmentSurveyCardStyles.buttonText}
+            color={
+              actionButton.variant === 'primary'
+                ? '$white'
+                : theme.tokens.colors.textForeground
+            }
+          >
             {t(actionButton.label)}
           </ButtonText>
         </HStack>
       </Button>
-    </Box>
+    </Card>
   );
 };
 

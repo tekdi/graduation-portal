@@ -25,7 +25,7 @@ export const tabButtonStyles = {
   // ---------------------------------------------
   buttonTabContainer: (isActive: boolean) => ({
     flex: 1,
-    paddingVertical: '$1',
+    paddingVertical: '$0.5',
     paddingHorizontal: '$4',
   
     // Active = white pill, Inactive = transparent over blue bg

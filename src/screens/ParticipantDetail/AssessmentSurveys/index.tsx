@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { VStack, Box, ScrollView, Text } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { assessmentSurveysStyles } from './Styles';
-import { AssessmentSurveyCard } from '@components/AssessmentSurveyCard';
+import { AssessmentCard } from '@components/Cards';
 import { ASSESSMENT_SURVEY_CARDS } from '@constants/ASSESSMENT_SURVEY_CARDS';
 import type { ParticipantStatus } from '@app-types/participant';
 
@@ -74,9 +74,9 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
       {...assessmentSurveysStyles.scrollView}
       showsVerticalScrollIndicator={false}
     >
-      <VStack {...assessmentSurveysStyles.cardsContainer} space="$4">
+      <VStack {...assessmentSurveysStyles.cardsContainer} gap="$5">
         {visibleCards.map(card => (
-          <AssessmentSurveyCard key={card.id} card={card} />
+          <AssessmentCard key={card.id} card={card} />
         ))}
       </VStack>
     </ScrollView>

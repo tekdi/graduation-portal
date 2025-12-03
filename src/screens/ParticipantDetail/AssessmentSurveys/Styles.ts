@@ -19,7 +19,6 @@ export const assessmentSurveysStyles = {
   },
   cardsContainer: {
     width: '$full',
-    p: '$4',
   },
   emptyState: {
     alignItems: 'center' as const,

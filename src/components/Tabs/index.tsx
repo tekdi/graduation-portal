@@ -38,7 +38,7 @@ export const TabButton: React.FC<TabButtonProps> = ({
       opacity={isDisabled ? 0.5 : 1}
     >
       {icon ? (
-        <HStack alignItems="center" justifyContent="center" gap="$2">
+        <HStack alignItems="center" justifyContent="center" gap="$2" p="$1">
           <LucideIcon name={icon} size={20} color={iconColor} />
           <Text {...textStyles}>{t(label)}</Text>
         </HStack>

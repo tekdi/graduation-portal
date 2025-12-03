@@ -18,7 +18,7 @@ const InterventionPlan: React.FC = () => {
         <Box {...interventionPlanStyles.iconContainer}>
           <LucideIcon
             name="FileText"
-            size={64}
+            size={48}
             color={interventionPlanStyles.iconColor}
           />
         </Box>
