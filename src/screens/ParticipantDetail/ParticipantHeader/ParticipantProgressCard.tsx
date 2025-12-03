@@ -40,7 +40,7 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
       <Box {...getStatusCard(STATUS.DROPOUT as 'dropout')}>
         <HStack {...participantHeaderStyles.dropoutWarningContent}>
           <Box {...participantHeaderStyles.dropoutWarningIcon}>
-            <Text {...participantHeaderStyles.dropoutWarningIconText}>×</Text>
+            <LucideIcon name="XCircle" size={18} color={theme.tokens.colors.error600} />
           </Box>
           <VStack {...participantHeaderStyles.dropoutWarningTextContainer}>
             <Text {...participantHeaderStyles.dropoutWarningTitle}>
