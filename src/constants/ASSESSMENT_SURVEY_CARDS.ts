@@ -1,4 +1,5 @@
 import { AssessmentSurveyCardData } from '@app-types/participant';
+import { CARD_STATUS } from './app.constant';
 
 /**
  * Assessment Survey Cards Mock Data
@@ -11,7 +12,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     description: 'participantDetail.assessmentSurveys.householdProfile.description',
     icon: 'Users',
     status: {
-      type: 'not-started',
+      type: CARD_STATUS.NOT_STARTED,
       label: 'participantDetail.assessmentSurveys.status.notStarted',
     },
     actionButton: {
@@ -28,7 +29,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     additionalInfo: 'participantDetail.assessmentSurveys.midlineSurvey.additionalInfo',
     icon: 'FileText',
     status: {
-      type: 'in-progress',
+      type: CARD_STATUS.IN_PROGRESS,
       label: 'participantDetail.assessmentSurveys.status.percentComplete',
       percentage: 0,
     },
@@ -49,7 +50,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     additionalInfo: 'participantDetail.assessmentSurveys.graduationReadiness.additionalInfo',
     icon: 'FileText',
     status: {
-      type: 'completed',
+      type: CARD_STATUS.COMPLETED,
       label: 'participantDetail.assessmentSurveys.status.completed',
     },
     actionButton: {
@@ -69,7 +70,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     additionalInfo: 'participantDetail.assessmentSurveys.endlineSurvey.additionalInfo',
     icon: 'FileText',
     status: {
-      type: 'in-progress',
+      type: CARD_STATUS.IN_PROGRESS,
       label: 'participantDetail.assessmentSurveys.status.percentComplete',
       percentage: 0,
     },

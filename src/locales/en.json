@@ -33,6 +33,41 @@
     "noDataFound": "No data found",
     "optional": "(Optional)"
   },
+  "projectPlayer": {
+    "status": "Status",
+    "progress": "Progress",
+    "statusTypes": {
+      "to-do": "To Do",
+      "completed": "Completed"
+    },
+    "completeForm": "Complete Form",
+    "attachments": "Attachments",
+    "uploading": "Uploading...",
+    "clickToUpload": "📎 Click to upload files",
+    "maxFileSize": "Max file size: {{size}}MB",
+    "fileSizeError": "Some files exceed the maximum size of {{maxSize}}MB. Please choose smaller files.",
+    "uploadFailed": "Upload failed. Please try again.",
+    "uploadedFiles": "Uploaded Files",
+    "observationForm": "Observation Form",
+    "formId": "Form ID",
+    "formFieldsPlaceholder": "Form fields will be rendered here",
+    "submit": "Submit",
+    "addCustomTask": "Add Custom Task",
+    "taskName": "Task Name",
+    "enterTaskName": "Enter task name",
+    "description": "Description",
+    "enterTaskDescription": "Enter task description",
+    "taskType": "Task Type",
+    "taskTypes": {
+      "simple": "Simple",
+      "file": "File Upload",
+      "observation": "Observation",
+      "project": "Project"
+    },
+    "addTask": "Add Task",
+    "tasks": "tasks",
+    "complete": "complete"
+  },
   "navigation": {
     "menu": "Menu",
     "closeMenu": "✕ Close Menu"
