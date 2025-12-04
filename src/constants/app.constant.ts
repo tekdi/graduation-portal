@@ -27,3 +27,14 @@ export const UPLOAD_STATUS = {
   UPLOADED: 'uploaded',
   FAILED: 'failed',
 } as const;
+
+/**
+ * Card Status Types
+ * Defines the possible status types for assessment survey cards
+ */
+export const CARD_STATUS = {
+  NOT_STARTED: 'not-started',
+  IN_PROGRESS: 'in-progress',
+  COMPLETED: 'completed',
+  GRADUATED: 'graduated',
+} as const;

@@ -197,12 +197,7 @@ export const participantHeaderStyles = {
     alignItems: 'flex-start' as const,
   },
   dropoutWarningIcon: {
-    bg: '$error600' as const,
-    borderRadius: '$full' as const,
-    width: 24,
-    height: 24,
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
+  
   },
   dropoutWarningIconText: {
     color: '$white' as const,

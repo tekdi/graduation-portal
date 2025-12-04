@@ -6,6 +6,7 @@ import type { ParticipantStatus, PathwayType } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 import ParticipantProgressCard from './ParticipantProgressCard';
 import { STATUS } from '@constants/app.constant';
+import { theme } from '@config/theme';
 
 /**
  * ParticipantHeader Props
@@ -37,12 +38,11 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
 
   /**
    * Handle Back Navigation
-   * Navigates back to the previous screen (Caseload)
+   * Navigates to the participants list page
    */
   const handleBackPress = () => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    }
+    // @ts-ignore
+    navigation.navigate('participants');
   };
 
 
@@ -202,6 +202,9 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
       {/* Back Navigation Link */}
       <Pressable onPress={handleBackPress}>
         <HStack {...participantHeaderStyles.backLinkContainer}>
+          <Box mr="$2">
+            <LucideIcon name="ArrowLeft" size={18} color={theme.tokens.colors.textForeground} />
+          </Box>
           <Text 
             {...participantHeaderStyles.backLinkText}
             $hover={{

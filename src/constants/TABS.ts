@@ -13,3 +13,18 @@ export const TABS: TabData[] = [
   },
 ];
 
+export const PARTICIPANT_DETAIL_TABS: TabData[] = [
+  {
+    key: 'intervention-plan',
+    label: 'participantDetail.tabs.interventionPlan',
+    icon: 'FileText',
+    isDisabled: false,
+  },
+  {
+    key: 'assessment-surveys',
+    label: 'participantDetail.tabs.assessmentSurveys',
+    icon: 'UserCheck',
+    isDisabled: false,
+  },
+];
+
