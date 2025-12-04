@@ -8,6 +8,8 @@ import {
 } from '@gluestack-ui/themed';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
+import type { AlertOptions } from '@app-types/components';
+import { useLanguage } from '@contexts/LanguageContext';
 
 /*
   Example usage:
@@ -24,20 +26,6 @@ import { theme } from '@config/theme';
   showAlert('error', 'Operation failed', { placement: 'bottom-left' });
   showAlert('info', 'Processing...', { placement: 'bottom', duration: 5000 });
 */
-
-export type ToastPlacement =
-  | 'top'
-  | 'top-right'
-  | 'top-left'
-  | 'bottom'
-  | 'bottom-right'
-  | 'bottom-left';
-
-export interface AlertOptions {
-  variant?: 'solid' | 'outline' | 'accent';
-  placement?: ToastPlacement;
-  duration?: number;
-}
 
 // Icon mapping for different alert types
 const getAlertIcon = (action: 'error' | 'warning' | 'success' | 'info' | 'attention') => {
@@ -59,6 +47,7 @@ const getAlertIcon = (action: 'error' | 'warning' | 'success' | 'info' | 'attent
 
 export const useAlert = () => {
   const toast = useToast();
+  const { t } = useLanguage();
 
   const showAlert = (
     action: 'error' | 'warning' | 'success' | 'info' | 'attention',
@@ -85,7 +74,7 @@ export const useAlert = () => {
             <HStack space="md" alignItems="center">
               <LucideIcon name={icon.name} size={16} color={icon.color} />
               <VStack space="xs" flex={1}>
-                <ToastDescription>{description}</ToastDescription>
+                <ToastDescription>{t(description)}</ToastDescription>
               </VStack>
             </HStack>
           </Toast>

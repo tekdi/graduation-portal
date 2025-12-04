@@ -14,6 +14,7 @@ import {
   ChevronDownIcon,
   SelectPortal,
 } from '@gluestack-ui/themed';
+import { getSelectTriggerStyles } from './Styles';
 
 type Option = {
   value: string;
@@ -115,19 +116,7 @@ export default function Select({
       selectedValue={value}
       onValueChange={handleValueChange}
     >
-      <SelectTrigger 
-        variant="outline" 
-        size="md" 
-        width="$full" 
-        bg={bg}
-        backgroundColor={bg}
-        borderColor={borderColor}
-        $focus-borderColor={borderColor || 'transparent'}
-        $focus-borderWidth={0}
-        shadowColor="transparent"
-        shadowOpacity={0}
-        $web-style={{ boxShadow: 'none' }}
-      >
+      <SelectTrigger {...(getSelectTriggerStyles(bg, borderColor) as any)}>
         <SelectInput
           placeholder={localizedPlaceholder}
           value={displayValue}

@@ -218,7 +218,8 @@
       "saveLocation": "Save Location",
       "selectProvince": "Select province",
       "selectSite": "Select site",
-      "addressUpdated": "Profile updated successfully"
+      "addressUpdated": "Profile updated successfully",
+      "fillAllFields": "Please fill in all required fields (Street, Province, and Site) before saving."
     },
     "pathways": {
       "employment": "Employment Pathway",

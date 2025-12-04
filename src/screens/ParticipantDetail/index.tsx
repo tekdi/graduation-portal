@@ -10,7 +10,6 @@ import { TabButton } from '@components/Tabs';
 import { PARTICIPANT_DETAIL_TABS } from '@constants/TABS';
 import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
-import { theme } from '@config/theme';
 import type { ParticipantStatus, UnifiedParticipant } from '@app-types/participant';
 import { Modal, useAlert } from '@ui';
 
@@ -88,7 +87,7 @@ export default function ParticipantDetail() {
 
   return (
     <>
-      <Box flex={1} bg={theme.tokens.colors.accent100}>
+      <Box flex={1} bg="$accent100">
       <ScrollView flex={1} showsVerticalScrollIndicator={false}>
         <VStack 
           {...participantDetailStyles.container} 
@@ -193,6 +192,9 @@ export default function ParticipantDetail() {
           }}
           onSaveAddress={async () => {
             if (!editedAddress.street || !editedAddress.province || !editedAddress.site) {
+              showAlert('warning', t('participantDetail.profileModal.fillAllFields'), {
+                placement: 'bottom-right',
+              });
               return;
             }
 

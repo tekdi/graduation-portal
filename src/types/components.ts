@@ -100,3 +100,17 @@ export interface ConfirmationModalProps {
   onCancelEdit?: () => void;
   isSavingAddress?: boolean;
 }
+
+export type ToastPlacement =
+  | 'top'
+  | 'top-right'
+  | 'top-left'
+  | 'bottom'
+  | 'bottom-right'
+  | 'bottom-left';
+
+export interface AlertOptions {
+  variant?: 'solid' | 'outline' | 'accent';
+  placement?: ToastPlacement;
+  duration?: number;
+}

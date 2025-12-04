@@ -74,18 +74,8 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
    */
   const renderViewProfileButton = () => (
     <Button
-      variant="outline"
-      size="md"
-      borderColor="$borderLight300"
-      bg="$white"
-      borderRadius="$xl"
-      height="$9"
-      paddingHorizontal="$3"
-      paddingVertical="$2"
-      width="$full"
-      minWidth={120}
+      {...participantHeaderStyles.outlineButton}
       onPress={onViewProfile}
-      $md-width="auto"
     >
       <HStack {...participantHeaderStyles.outlineButtonContent}>
         <LucideIcon name="User" size={16} color="#000" />
