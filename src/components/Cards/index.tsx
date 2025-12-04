@@ -5,6 +5,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
 import { assessmentSurveyCardStyles } from './Styles';
 import { theme } from '@config/theme';
+import { CARD_STATUS } from '@constants/app.constant';
 
 /**
  * AssessmentCard Component
@@ -17,17 +18,15 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   const { title, description, additionalInfo, icon, status, actionButton } = card;
 
   // Get status badge styling based on status type
-  // Note: status.type uses card status values ('not-started', 'in-progress', 'completed', 'graduated')
-  // not participant STATUS constants
   const getStatusBadgeStyle = () => {
     switch (status.type) {
-      case 'graduated':
+      case CARD_STATUS.GRADUATED:
         return assessmentSurveyCardStyles.statusBadgeGraduated;
-      case 'completed':
+      case CARD_STATUS.COMPLETED:
         return assessmentSurveyCardStyles.statusBadgeCompleted;
-      case 'in-progress':
+      case CARD_STATUS.IN_PROGRESS:
         return assessmentSurveyCardStyles.statusBadgeInProgress;
-      case 'not-started':
+      case CARD_STATUS.NOT_STARTED:
       default:
         return assessmentSurveyCardStyles.statusBadgeNotStarted;
     }
@@ -71,21 +70,21 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
         </HStack>
         <Box {...getStatusBadgeStyle()}>
           <HStack alignItems="center" gap="$1">
-            {(status.type === 'graduated' || status.type === 'completed') && (
+            {(status.type === CARD_STATUS.GRADUATED || status.type === CARD_STATUS.COMPLETED) && (
               <LucideIcon
                 name="CheckCircle"
                 size={12}
                 color={
-                  status.type === 'graduated'
+                  status.type === CARD_STATUS.GRADUATED
                     ? theme.tokens.colors.white || '#ffffff'
                     : theme.tokens.colors.success600
                 }
               />
             )}
             <Text
-              {...(status.type === 'graduated'
+              {...(status.type === CARD_STATUS.GRADUATED
                 ? assessmentSurveyCardStyles.statusBadgeTextGraduated
-                : status.type === 'completed'
+                : status.type === CARD_STATUS.COMPLETED
                 ? assessmentSurveyCardStyles.statusBadgeTextCompleted
                 : assessmentSurveyCardStyles.statusBadgeText)}
             >
