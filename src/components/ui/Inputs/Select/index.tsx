@@ -122,6 +122,11 @@ export default function Select({
         bg={bg}
         backgroundColor={bg}
         borderColor={borderColor}
+        $focus-borderColor={borderColor || 'transparent'}
+        $focus-borderWidth={0}
+        shadowColor="transparent"
+        shadowOpacity={0}
+        $web-style={{ boxShadow: 'none' }}
       >
         <SelectInput
           placeholder={localizedPlaceholder}
