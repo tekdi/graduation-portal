@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Modal,
+  Modal as GluestackModal,
   ModalBackdrop,
   ModalContent,
   ModalHeader,
@@ -24,9 +24,10 @@ import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
 import { ConfirmationModalProps } from '@app-types/components';
 import { LucideIcon } from '@ui';
-import { profileStyles, commonModalContentStyles, commonModalContainerStyles } from './profileStyles';
+import { usePlatform } from '@utils/platform';
+import { profileStyles, commonModalContentStyles, commonModalContainerStyles } from './Styles';
 
-const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+const Modal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   onClose,
   variant = 'confirmation',
@@ -51,6 +52,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   onAddressEdit,
 }) => {
   const { t } = useLanguage();
+  const { isWeb } = usePlatform();
   
   const isProfileVariant = variant === 'profile';
 
@@ -86,10 +88,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   // Profile Variant Rendering
   if (isProfileVariant && profile) {
     return (
-      <Modal 
+      <GluestackModal 
         isOpen={isOpen} 
         onClose={onClose} 
-        size="md"
+        size={isWeb ? "sm" : "lg"}
         {...commonModalContainerStyles}
       >
         <ModalBackdrop />
@@ -97,7 +99,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             {...profileStyles.modalContent}
           >
           <ModalHeader {...profileStyles.modalHeader}>
-            <VStack space="xs" flex={1}>
+            <VStack space="sm" flex={1}>
               <Text {...profileStyles.modalTitle}>
                 {t(title)}
               </Text>
@@ -178,13 +180,13 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             </VStack>
           </ModalBody>
         </ModalContent>
-      </Modal>
+      </GluestackModal>
     );
   }
 
   // Confirmation Variant Rendering (Default)
   return (
-    <Modal 
+    <GluestackModal 
       isOpen={isOpen} 
       onClose={onClose} 
       size="md"
@@ -358,8 +360,9 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           </HStack>
         </ModalFooter>
       </ModalContent>
-    </Modal>
+    </GluestackModal>
   );
 };
 
-export default ConfirmationModal;
+export default Modal;
+

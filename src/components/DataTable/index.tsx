@@ -9,7 +9,7 @@ import { DataTableProps, ColumnDef } from '@app-types/components';
 // import ActionsMenu from '@components/ActionsMenu';
 import { CustomMenu } from '@components/ui/Menu';
 import { LucideIcon } from '@components/ui';
-import ConfirmationModal from '@components/ConfirmationModal';
+import { Modal } from '@ui';
 
 interface TableHeaderProps<T> {
   columns: ColumnDef<T>[];
@@ -229,7 +229,7 @@ const TableRow = <T,>({
       </Box>
 
       {/* Dropout Confirmation Modal */}
-      <ConfirmationModal
+      <Modal
         isOpen={showDropoutModal}
         onClose={() => {
           setShowDropoutModal(false);

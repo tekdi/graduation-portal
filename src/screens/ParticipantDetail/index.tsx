@@ -12,7 +12,7 @@ import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
 import { theme } from '@config/theme';
 import type { ParticipantStatus } from '@app-types/participant';
-import ConfirmationModal from '@components/ConfirmationModal';
+import { Modal } from '@ui';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
@@ -131,9 +131,9 @@ export default function ParticipantDetail() {
       </ScrollView>
     </Box>
 
-      {/* Profile Modal - Using ConfirmationModal with profile variant */}
+      {/* Profile Modal - Using Modal with profile variant */}
       {participantProfile && (
-        <ConfirmationModal
+        <Modal
           variant="profile"
           isOpen={isProfileModalOpen}
           onClose={() => setIsProfileModalOpen(false)}

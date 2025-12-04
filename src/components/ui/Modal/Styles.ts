@@ -47,7 +47,7 @@ export const commonModalContentStyles = {
 } as const;
 
 /**
- * Profile Variant Styles for ConfirmationModal
+ * Profile Variant Styles for Modal
  * Styles specific to profile variant display
  */
 export const profileStyles = {
@@ -63,7 +63,7 @@ export const profileStyles = {
     alignItems: 'flex-start' as const,
   },
   modalTitle: {
-    fontSize: '$xl' as const,
+    fontSize: '$lg' as const,
     fontWeight: '$semibold' as const,
     color: '$textForeground' as const,
   },
@@ -72,20 +72,22 @@ export const profileStyles = {
     color: '$textMutedForeground' as const,
   },
   modalBody: {
-    padding: '$6' as const,
+    paddingHorizontal: '$6' as const,
     paddingTop: '$4' as const,
+    paddingBottom: '$6' as const,
+   
   },
   fieldLabel: {
     fontSize: '$sm' as const,
     fontWeight: '$medium' as const,
     color: '$textMutedForeground' as const,
-    textTransform: 'uppercase' as const,
     letterSpacing: 0.5,
   },
   fieldValue: {
-    fontSize: '$md' as const,
+    fontSize: '$sm' as const,
     color: '$textForeground' as const,
-    lineHeight: '$md' as const,
+    lineHeight: '$sm' as const,
+    fontWeight: '$normal' as const,
   },
   fieldSection: {
     borderBottomWidth: 1,
