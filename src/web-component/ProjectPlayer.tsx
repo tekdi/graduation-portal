@@ -158,7 +158,7 @@ const ProjectPlayer: React.FC<Props> = props => {
         console.warn('Offline load failed', e);
       }
     })();
-  }, [data?.id]);
+  }, [data]);
 
   // ---------- Persist Offline ----------
   useEffect(() => {

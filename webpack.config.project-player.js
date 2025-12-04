@@ -9,7 +9,7 @@ module.exports = (env = {}, argv = {}) => {
 
   return {
     entry: {
-      main: ['./src/web-component/registerButton.tsx'],
+      main: ['./src/web-component/registerComponent.tsx'],
     },
     output: {
       path: path.resolve(__dirname, 'project-player-dist'),

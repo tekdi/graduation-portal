@@ -3,18 +3,19 @@
 import React, { useEffect, useRef } from 'react';
 import '../../../project-player-dist/main.js';
 import logger from '@utils/logger';
+import { Box } from '@ui';
 
 interface PlayerConfigProps {
   playerConfig: any;
 }
 
 const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
-  const WebComponentPlayerRef = useRef<HTMLDivElement | null>(null);
+  const WebComponentPlayerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     let playerScript: HTMLScriptElement | null = null;
     let cssLink: HTMLLinkElement | null = null;
-    let playerElement: HTMLDivElement | null = null;
+    let playerElement: HTMLElement | null = null;
 
     const handlePlayerEvent = (event: any) => {
       logger.info('Player Event', event.detail);
@@ -65,7 +66,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
   }, []);
 
   return (
-    <div className="player" style={{ height: 'auto' }}>
+    <Box height="auto">
       {/* @ts-ignore - Custom web component */}
       <project-player
         // ={JSON.stringify(playerConfig.)}
@@ -73,7 +74,7 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
         projectdata={JSON.stringify(playerConfig.projectdata)}
         ref={WebComponentPlayerRef}
       />
-    </div>
+    </Box>
   );
 };
 

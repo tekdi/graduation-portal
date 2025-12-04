@@ -1,5 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ActivityIndicator,
+  Text,
+  Platform,
+} from 'react-native';
 import { WebView } from 'react-native-webview';
 import logger from '@utils/logger';
 
@@ -149,18 +155,26 @@ const WebComponentPlayer = ({ playerConfig }: PlayerConfigProps) => {
   };
 
   // Native platform: Use WebView
+  // For iOS, the HTML file should be copied to the iOS bundle during build
+  // The path format points to the bundle root where project-player-dist/index.html should be located
+  const webViewSource = Platform.select({
+    android: {
+      uri: 'file:///android_asset/project-player-dist/index.html',
+    },
+    ios: {
+      uri: 'file:///project-player-dist/index.html',
+    },
+  }) || { uri: 'file:///android_asset/project-player-dist/index.html' }; // Fallback to Android path
+
   return (
     <View style={styles.container}>
       <LoadingIndicator loading={loading} />
       <WebView
         ref={webViewRef}
-        source={{
-          uri: 'file:///android_asset/project-player-dist/index.html',
-        }}
+        source={webViewSource}
         style={styles.webView}
         onLoadEnd={() => {
           logger.info('WebView loaded');
-          setLoading(false);
           // Don't set loading to false here - wait for player initialization
         }}
         onMessage={handleMessage}
