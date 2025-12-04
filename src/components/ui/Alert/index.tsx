@@ -4,18 +4,58 @@ import {
   Toast,
   ToastDescription,
   VStack,
+  HStack,
 } from '@gluestack-ui/themed';
+import { LucideIcon } from '@ui';
+import { theme } from '@config/theme';
 
 /*
   Example usage:
   const { showAlert } = useAlert();
 
-  // Show different types of alerts
+  // Show different types of alerts with default placement (top)
   showAlert('error', 'Operation failed');
   showAlert('success', 'Data saved!');
   showAlert('info', 'Processing...');
   showAlert('warning', 'Please check your input');
+
+  // Show alert with custom placement
+  showAlert('success', 'Data saved!', { placement: 'top-right' });
+  showAlert('error', 'Operation failed', { placement: 'bottom-left' });
+  showAlert('info', 'Processing...', { placement: 'bottom', duration: 5000 });
 */
+
+export type ToastPlacement =
+  | 'top'
+  | 'top-right'
+  | 'top-left'
+  | 'bottom'
+  | 'bottom-right'
+  | 'bottom-left';
+
+export interface AlertOptions {
+  variant?: 'solid' | 'outline' | 'accent';
+  placement?: ToastPlacement;
+  duration?: number;
+}
+
+// Icon mapping for different alert types
+const getAlertIcon = (action: 'error' | 'warning' | 'success' | 'info' | 'attention') => {
+  switch (action) {
+    case 'success':
+      return { name: 'CheckCircle', color: theme.tokens.colors.success600 || '#00a63e' };
+    case 'error':
+      return { name: 'XCircle', color: theme.tokens.colors.error600 || '#dc2626' };
+    case 'warning':
+      return { name: 'AlertTriangle', color: '#f59e0b' };
+    case 'info':
+      return { name: 'Info', color: theme.tokens.colors.info100 || '#0ea5e9' };
+    case 'attention':
+      return { name: 'AlertCircle', color: '#f59e0b' };
+    default:
+      return { name: 'Info', color: theme.tokens.colors.info100 || '#0ea5e9' };
+  }
+};
 
 export const useAlert = () => {
   const toast = useToast();
@@ -23,25 +63,31 @@ export const useAlert = () => {
   const showAlert = (
     action: 'error' | 'warning' | 'success' | 'info' | 'attention',
     description: string,
-    {
+    options: AlertOptions = {},
+  ) => {
+    const {
       variant = 'solid',
       placement = 'top',
       duration = 3000,
-    }: {
-      variant?: 'solid' | 'outline' | 'accent';
-      placement?: 'top' | 'bottom';
-      duration?: number;
-    } = {},
-  ) => {
+    } = options;
+
+    const icon = getAlertIcon(action);
+
+    // Convert placement format if needed (Gluestack UI uses spaces, not hyphens)
+    const gluestackPlacement = placement.replace('-', ' ') as any;
+    
     toast.show({
-      placement,
+      placement: gluestackPlacement,
       duration,
       render: ({ id }) => {
         return (
           <Toast nativeID={`toast-${id}`} action={action} variant={variant}>
-            <VStack space="xs">
-              <ToastDescription>{description}</ToastDescription>
-            </VStack>
+            <HStack space="md" alignItems="center">
+              <LucideIcon name={icon.name} size={16} color={icon.color} />
+              <VStack space="xs" flex={1}>
+                <ToastDescription>{description}</ToastDescription>
+              </VStack>
+            </HStack>
           </Toast>
         );
       },

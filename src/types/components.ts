@@ -88,4 +88,15 @@ export interface ConfirmationModalProps {
     address?: string;
   };
   onAddressEdit?: () => void; // Used in profile variant
+  // Address edit mode props
+  isEditingAddress?: boolean;
+  editedAddress?: {
+    street: string;
+    province: string;
+    site: string;
+  };
+  onAddressChange?: (field: 'street' | 'province' | 'site', value: string) => void;
+  onSaveAddress?: () => void;
+  onCancelEdit?: () => void;
+  isSavingAddress?: boolean;
 }

@@ -1,4 +1,36 @@
-import type { UnifiedParticipant } from '@app-types/participant';
+import type { UnifiedParticipant, Province, Site } from '@app-types/participant';
+
+/**
+ * South African Provinces
+ * Mock data for province selection dropdown
+ * TODO: Replace with API call in future
+ */
+
+export const PROVINCES: Province[] = [
+  { value: 'eastern-cape', label: 'Eastern Cape' },
+  { value: 'free-state', label: 'Free State' },
+  { value: 'gauteng', label: 'Gauteng' },
+  { value: 'kwazulu-natal', label: 'KwaZulu-Natal' },
+  { value: 'limpopo', label: 'Limpopo' },
+  { value: 'mpumalanga', label: 'Mpumalanga' },
+  { value: 'northern-cape', label: 'Northern Cape' },
+  { value: 'north-west', label: 'North West' },
+  { value: 'western-cape', label: 'Western Cape' },
+] as const;
+
+/**
+ * Site Options
+ * Mock data for site selection dropdown
+ * TODO: Replace with API call in future (may depend on selected province)
+ */
+export const SITES: Site[] = [
+  { value: 'site-a', label: 'Site A - Urban', type: 'Urban' },
+  { value: 'site-b', label: 'Site B - Urban', type: 'Urban' },
+  { value: 'site-c', label: 'Site C - Rural', type: 'Rural' },
+  { value: 'site-d', label: 'Site D - Rural', type: 'Rural' },
+  { value: 'site-e', label: 'Site E - Peri-urban', type: 'Peri-urban' },
+  { value: 'site-f', label: 'Site F - Peri-urban', type: 'Peri-urban' },
+] as const;
 
 /**
  * Mock Participants Data

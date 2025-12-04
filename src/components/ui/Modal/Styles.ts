@@ -34,7 +34,7 @@ export const commonModalWebStyles = {
  */
 export const commonModalContentStyles = {
   borderRadius: '$xl' as const,
-  bg: '$white' as const,
+  bg: '$bgSidebar' as const,
   shadowColor: '$black' as const,
   shadowOffset: { width: 0, height: 4 },
   shadowOpacity: 0.2,
@@ -93,6 +93,14 @@ export const profileStyles = {
     borderBottomWidth: 1,
     borderBottomColor: '$borderLight200' as const,
     paddingBottom: '$4' as const,
+  },
+  input: {
+    variant: 'outline' as const,
+    size: 'md' as const,
+    borderWidth: 1,
+    borderColor: 'transparent' as const,
+    borderRadius: '$md' as const,
+    bg: '$white' as const,
   },
 } as const;
 

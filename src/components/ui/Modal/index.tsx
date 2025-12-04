@@ -26,6 +26,9 @@ import { ConfirmationModalProps } from '@app-types/components';
 import { LucideIcon } from '@ui';
 import { usePlatform } from '@utils/platform';
 import { profileStyles, commonModalContentStyles, commonModalContainerStyles } from './Styles';
+import Select from '../Inputs/Select';
+import { PROVINCES } from '@constants/PARTICIPANTS_LIST';
+import { getSitesByProvince } from '../../../services/participantService';
 
 const Modal: React.FC<ConfirmationModalProps> = ({
   isOpen,
@@ -50,6 +53,12 @@ const Modal: React.FC<ConfirmationModalProps> = ({
   onInputChange,
   profile,
   onAddressEdit,
+  isEditingAddress = false,
+  editedAddress,
+  onAddressChange,
+  onSaveAddress,
+  onCancelEdit,
+  isSavingAddress = false,
 }) => {
   const { t } = useLanguage();
   const { isWeb } = usePlatform();
@@ -158,27 +167,131 @@ const Modal: React.FC<ConfirmationModalProps> = ({
               {/* Address Section */}
               {profile.address && (
                 <VStack space="xs">
-                  <HStack alignItems="center" justifyContent="space-between">
-                    <Text {...profileStyles.fieldLabel}>
-                      {t('common.profileFields.address')}
-                    </Text>
-                    {onAddressEdit && (
-                      <Pressable onPress={onAddressEdit}>
-                        <LucideIcon 
-                          name="Edit" 
-                          size={16} 
-                          color={theme.tokens.colors.primary500} 
+                  {!isEditingAddress ? (
+                    <>
+                      <HStack alignItems="center" justifyContent="space-between">
+                        <Text {...profileStyles.fieldLabel}>
+                          {t('common.profileFields.address')}
+                        </Text>
+                        {onAddressEdit && (
+                          <Pressable onPress={onAddressEdit}>
+                            <LucideIcon 
+                              name="Pencil" 
+                              size={16} 
+                              color={theme.tokens.colors.primary500} 
+                            />
+                          </Pressable>
+                        )}
+                      </HStack>
+                      <Text {...profileStyles.fieldValue}>
+                        {profile.address}
+                      </Text>
+                    </>
+                  ) : (
+                    <VStack space="sm">
+                      {/* Street Address Input */}
+                      <VStack space="xs">
+                        
+                      <Text {...profileStyles.fieldLabel}>
+                          {t('common.profileFields.address')}
+                        </Text>
+                        <Input
+                          {...profileStyles.input}
+                          $focus-borderColor={theme.tokens.colors.inputFocusBorder}
+                        >
+                          <InputField
+                            placeholder={t('common.profileFields.addressFields.street')}
+                            value={editedAddress?.street || ''}
+                            onChangeText={(value) => onAddressChange?.('street', value)}
+                          />
+                        </Input>
+                      </VStack>
+
+                      {/* Province Dropdown */}
+                      <VStack space="xs">
+                        {/* <Text {...profileStyles.fieldLabel}>
+                          {t('common.profileFields.addressFields.province')}
+                        </Text> */}
+                        <Select 
+                          options={PROVINCES.map(p => ({ label: p.label, value: p.value }))}
+                          value={editedAddress?.province || ''}
+                          onChange={(value) => onAddressChange?.('province', value)}
+                          placeholder={t('participantDetail.profileModal.selectProvince')}
+                          bg="$white" borderColor="transparent"
                         />
-                      </Pressable>
-                    )}
-                  </HStack>
-                  <Text {...profileStyles.fieldValue}>
-                    {profile.address}
-                  </Text>
+                      </VStack>
+
+                      {/* Site Dropdown */}
+                      <VStack space="xs">
+                        {/* <Text {...profileStyles.fieldLabel}>
+                          {t('common.profileFields.addressFields.site')}
+                        </Text> */}
+                        <Select
+                          options={getSitesByProvince(editedAddress?.province || '').map(s => ({ 
+                            label: s.label, 
+                            value: s.value 
+                          }))}
+                          value={editedAddress?.site || ''}
+                          onChange={(value) => onAddressChange?.('site', value)}
+                          placeholder={t('participantDetail.profileModal.selectSite')}
+                          bg="$white"
+                          borderColor="transparent"
+                        />
+                      </VStack>
+                    </VStack>
+                  )}
                 </VStack>
               )}
             </VStack>
           </ModalBody>
+
+          {/* Footer with Edit Mode Buttons */}
+          {isEditingAddress && (
+            <ModalFooter borderTopWidth={0} padding="$6" paddingTop="$4">
+              <HStack space="md" width="$full" justifyContent="flex-end">
+                {/* Cancel Button */}
+                <Button
+                  variant="outline"
+                  onPress={onCancelEdit}
+                  borderWidth={1}
+                  borderColor={theme.tokens.colors.inputBorder}
+                  bg={theme.tokens.colors.modalBackground}
+                  paddingHorizontal="$6"
+                  paddingVertical="$3"
+                  borderRadius="$md"
+                  $hover-bg={theme.tokens.colors.hoverBackground}
+                  $web-cursor="pointer"
+                  isDisabled={isSavingAddress}
+                >
+                  <ButtonText
+                    color={theme.tokens.colors.textPrimary}
+                    {...TYPOGRAPHY.button}
+                  >
+                    {t('common.cancel')}
+                  </ButtonText>
+                </Button>
+
+                {/* Save Location Button */}
+                <Button
+                  variant="solid"
+                  bg={theme.tokens.colors.primary500}
+                  onPress={onSaveAddress}
+                  paddingHorizontal="$6"
+                  paddingVertical="$3"
+                  borderRadius="$md"
+                  $hover-bg={theme.tokens.colors.primary500}
+                  $hover-opacity={0.9}
+                  $web-cursor="pointer"
+                  isDisabled={isSavingAddress || !editedAddress?.street || !editedAddress?.province || !editedAddress?.site}
+                  opacity={isSavingAddress ? 0.5 : 1}
+                >
+                  <ButtonText color={theme.tokens.colors.modalBackground}>
+                    {isSavingAddress ? t('common.loading') : t('participantDetail.profileModal.saveLocation')}
+                  </ButtonText>
+                </Button>
+              </HStack>
+            </ModalFooter>
+          )}
         </ModalContent>
       </GluestackModal>
     );
