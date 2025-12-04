@@ -119,7 +119,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
           <ModalBody {...profileStyles.modalBody}>
             <VStack space="lg">
               {/* Name Field */}
-              <VStack space="xs">
+              <VStack space="xs" {...profileStyles.fieldSection}>
                 <Text {...profileStyles.fieldLabel}>
                   {t('common.profileFields.name')}
                 </Text>
@@ -129,7 +129,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               </VStack>
 
               {/* ID Field */}
-              <VStack space="xs">
+              <VStack space="xs" {...profileStyles.fieldSection}>
                 <Text {...profileStyles.fieldLabel}>
                   {t('common.profileFields.id')}
                 </Text>
@@ -139,7 +139,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
               </VStack>
 
               {/* Contact Section */}
-              <VStack space="xs">
+              <VStack space="xs" {...(profile.address ? profileStyles.fieldSection : {})}>
                 <Text {...profileStyles.fieldLabel}>
                   {t('common.profileFields.contact')}
                 </Text>

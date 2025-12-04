@@ -87,5 +87,10 @@ export const profileStyles = {
     color: '$textForeground' as const,
     lineHeight: '$md' as const,
   },
+  fieldSection: {
+    borderBottomWidth: 1,
+    borderBottomColor: '$borderLight200' as const,
+    paddingBottom: '$4' as const,
+  },
 } as const;
 
