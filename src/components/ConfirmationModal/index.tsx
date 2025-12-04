@@ -23,15 +23,19 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
 import { ConfirmationModalProps } from '@app-types/components';
+import { LucideIcon } from '@ui';
+import { profileStyles, commonModalContentStyles, commonModalContainerStyles } from './profileStyles';
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   isOpen,
   onClose,
+  variant = 'confirmation',
   onConfirm,
   title,
+  subtitle,
   message,
-  confirmText,
-  cancelText,
+  confirmText = 'common.confirm',
+  cancelText = 'common.cancel',
   confirmButtonColor = theme.tokens.colors.primary500,
   confirmButtonVariant,
   maxWidth,
@@ -43,8 +47,12 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   inputRequired = false,
   inputValue: controlledInputValue,
   onInputChange,
+  profile,
+  onAddressEdit,
 }) => {
   const { t } = useLanguage();
+  
+  const isProfileVariant = variant === 'profile';
 
   // Internal state for input if not controlled
   const [internalInputValue, setInternalInputValue] = useState('');
@@ -64,34 +72,128 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
   }, [isOpen, controlledInputValue]);
 
   const handleConfirm = () => {
-    if (showInput) {
-      onConfirm(inputValue);
-    } else {
-      onConfirm();
+    if (onConfirm) {
+      if (showInput) {
+        onConfirm(inputValue);
+      } else {
+        onConfirm();
+      }
     }
   };
 
   const isConfirmDisabled = showInput && inputRequired && !inputValue.trim();
 
-  return (
-    <Modal isOpen={isOpen} onClose={onClose} marginTop={350}>
-      <ModalBackdrop bg={theme.tokens.colors.modalBackdrop} opacity={1} />
-      <ModalContent
-        maxWidth={maxWidth}
-        width="70%"
-        minWidth="$96"
-        $web-width="auto"
-        borderRadius="$xl"
-        bg={theme.tokens.colors.backgroundPrimary.light}
-        shadowColor="$black"
-        shadowOffset={{ width: 0, height: 4 }}
-        shadowOpacity={0.2}
-        shadowRadius={16}
-        elevation={24}
-        marginHorizontal="$4"
-        marginVertical="auto"
-        alignSelf="center"
+  // Profile Variant Rendering
+  if (isProfileVariant && profile) {
+    return (
+      <Modal 
+        isOpen={isOpen} 
+        onClose={onClose} 
+        size="md"
+        {...commonModalContainerStyles}
       >
+        <ModalBackdrop />
+          <ModalContent 
+            {...profileStyles.modalContent}
+          >
+          <ModalHeader {...profileStyles.modalHeader}>
+            <VStack space="xs" flex={1}>
+              <Text {...profileStyles.modalTitle}>
+                {t(title)}
+              </Text>
+              {subtitle && (
+                <Text {...profileStyles.modalSubtitle}>
+                  {t(subtitle)}
+                </Text>
+              )}
+            </VStack>
+            <Pressable onPress={onClose}>
+              <LucideIcon 
+                name="X" 
+                size={20} 
+                color={theme.tokens.colors.textForeground} 
+              />
+            </Pressable>
+          </ModalHeader>
+
+          <ModalBody {...profileStyles.modalBody}>
+            <VStack space="lg">
+              {/* Name Field */}
+              <VStack space="xs">
+                <Text {...profileStyles.fieldLabel}>
+                  {t('common.profileFields.name')}
+                </Text>
+                <Text {...profileStyles.fieldValue}>
+                  {profile.name}
+                </Text>
+              </VStack>
+
+              {/* ID Field */}
+              <VStack space="xs">
+                <Text {...profileStyles.fieldLabel}>
+                  {t('common.profileFields.id')}
+                </Text>
+                <Text {...profileStyles.fieldValue}>
+                  {profile.id}
+                </Text>
+              </VStack>
+
+              {/* Contact Section */}
+              <VStack space="xs">
+                <Text {...profileStyles.fieldLabel}>
+                  {t('common.profileFields.contact')}
+                </Text>
+                <VStack space="sm">
+                  <Text {...profileStyles.fieldValue}>
+                    {profile.phone}
+                  </Text>
+                  <Text {...profileStyles.fieldValue}>
+                    {profile.email}
+                  </Text>
+                </VStack>
+              </VStack>
+
+              {/* Address Section */}
+              {profile.address && (
+                <VStack space="xs">
+                  <HStack alignItems="center" justifyContent="space-between">
+                    <Text {...profileStyles.fieldLabel}>
+                      {t('common.profileFields.address')}
+                    </Text>
+                    {onAddressEdit && (
+                      <Pressable onPress={onAddressEdit}>
+                        <LucideIcon 
+                          name="Edit" 
+                          size={16} 
+                          color={theme.tokens.colors.primary500} 
+                        />
+                      </Pressable>
+                    )}
+                  </HStack>
+                  <Text {...profileStyles.fieldValue}>
+                    {profile.address}
+                  </Text>
+                </VStack>
+              )}
+            </VStack>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
+    );
+  }
+
+  // Confirmation Variant Rendering (Default)
+  return (
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      size="md"
+      {...commonModalContainerStyles}
+    >
+      <ModalBackdrop />
+        <ModalContent
+          {...commonModalContentStyles}
+        >
         {/* Header with Icon and Title */}
         <ModalHeader borderBottomWidth={0} padding="$6" paddingBottom="$4">
           <HStack space="md" alignItems="center" flex={1}>
@@ -140,13 +242,15 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
         <ModalBody padding="$6" paddingTop="$2" paddingBottom="$4">
           <VStack space="lg">
             {/* Description Message */}
-            <Text
-              {...TYPOGRAPHY.paragraph}
-              color={theme.tokens.colors.textSecondary}
-              lineHeight="$xl"
-            >
-              {t(message)}
-            </Text>
+            {message && (
+              <Text
+                {...TYPOGRAPHY.paragraph}
+                color={theme.tokens.colors.textSecondary}
+                lineHeight="$xl"
+              >
+                {t(message)}
+              </Text>
+            )}
 
             {/* Optional Input Field */}
             {showInput && (
@@ -232,23 +336,25 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
             </Button>
 
             {/* Confirm Button */}
-            <Button
-              variant={confirmButtonVariant}
-              bg={confirmButtonColor}
-              onPress={handleConfirm}
-              paddingHorizontal="$6"
-              paddingVertical="$3"
-              borderRadius="$md"
-              $hover-bg={confirmButtonColor}
-              $hover-opacity={0.9}
-              $web-cursor="pointer"
-              isDisabled={isConfirmDisabled}
-              opacity={isConfirmDisabled ? 0.5 : 1}
-            >
-              <ButtonText color={theme.tokens.colors.modalBackground}>
-                {t(confirmText)}
-              </ButtonText>
-            </Button>
+            {onConfirm && (
+              <Button
+                variant={confirmButtonVariant}
+                bg={confirmButtonColor}
+                onPress={handleConfirm}
+                paddingHorizontal="$6"
+                paddingVertical="$3"
+                borderRadius="$md"
+                $hover-bg={confirmButtonColor}
+                $hover-opacity={0.9}
+                $web-cursor="pointer"
+                isDisabled={isConfirmDisabled}
+                opacity={isConfirmDisabled ? 0.5 : 1}
+              >
+                <ButtonText color={theme.tokens.colors.modalBackground}>
+                  {t(confirmText)}
+                </ButtonText>
+              </Button>
+            )}
           </HStack>
         </ModalFooter>
       </ModalContent>

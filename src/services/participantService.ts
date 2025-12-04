@@ -1,5 +1,5 @@
 import { Participant } from '@app-types/screens';
-import type { ParticipantData } from '@app-types/participant';
+import type { ParticipantData, UnifiedParticipant } from '@app-types/participant';
 import { PARTICIPANTS_DATA } from '@constants/PARTICIPANTS_LIST';
 
 /**
@@ -34,5 +34,14 @@ export const getParticipantById = (id: string): ParticipantData | undefined => {
     graduationProgress: participant.graduationProgress,
     graduationDate: participant.graduationDate,
   };
+};
+
+/**
+ * Get participant profile data by ID
+ * Returns full participant data including contact info and address
+ * Currently uses mock data, will be replaced with API call later
+ */
+export const getParticipantProfile = (id: string): UnifiedParticipant | undefined => {
+  return PARTICIPANTS_DATA.find(p => p.id === id);
 };
 

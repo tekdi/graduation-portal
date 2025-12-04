@@ -3,7 +3,7 @@ import { useRoute, RouteProp } from '@react-navigation/native';
 import { VStack, HStack, Box, ScrollView } from '@ui';
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
-import { getParticipantById } from '../../services/participantService';
+import { getParticipantById, getParticipantProfile } from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
 import { TabButton } from '@components/Tabs';
@@ -12,6 +12,7 @@ import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
 import { theme } from '@config/theme';
 import type { ParticipantStatus } from '@app-types/participant';
+import ConfirmationModal from '@components/ConfirmationModal';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
@@ -37,6 +38,7 @@ export default function ParticipantDetail() {
   const route = useRoute<ParticipantDetailRouteProp>();
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<string>('intervention-plan');
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   
   // Extract the id parameter from the route
   const participantId = route.params?.id;
@@ -44,6 +46,7 @@ export default function ParticipantDetail() {
   // Fetch participant data from mock data by ID
   // Ensure participantId exists before calling getParticipantById
   const participant = participantId ? getParticipantById(participantId) : undefined;
+  const participantProfile = participantId ? getParticipantProfile(participantId) : undefined;
   
   // Error State: Participant Not Found
   if (!participant) {
@@ -62,7 +65,8 @@ export default function ParticipantDetail() {
   } = participant;
 
   return (
-    <Box flex={1} bg={theme.tokens.colors.accent100}>
+    <>
+      <Box flex={1} bg={theme.tokens.colors.accent100}>
       <ScrollView flex={1} showsVerticalScrollIndicator={false}>
         <VStack 
           {...participantDetailStyles.container} 
@@ -76,6 +80,7 @@ export default function ParticipantDetail() {
             pathway={pathway}
             graduationProgress={graduationProgress}
             graduationDate={graduationDate}
+            onViewProfile={() => setIsProfileModalOpen(true)}
           />
         </VStack>
         {/* Tabs */}
@@ -125,5 +130,27 @@ export default function ParticipantDetail() {
         </Box>
       </ScrollView>
     </Box>
+
+      {/* Profile Modal - Using ConfirmationModal with profile variant */}
+      {participantProfile && (
+        <ConfirmationModal
+          variant="profile"
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          title={t('participantDetail.profileModal.title')}
+          subtitle={t('participantDetail.profileModal.subtitle', { name: participantName })}
+          profile={{
+            id: id,
+            name: participantName,
+            email: participantProfile.email || '',
+            phone: participantProfile.phone || '',
+            address: participantProfile.address,
+          }}
+          onAddressEdit={() => {
+            // Handle address edit (future enhancement)
+          }}
+        />
+      )}
+    </>
   );
 }

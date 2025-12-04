@@ -1,6 +1,12 @@
 {
   "common": {
     "profile": "Profile",
+    "profileFields": {
+      "name": "Name",
+      "id": "ID",
+      "contact": "Contact",
+      "address": "Address"
+    },
     "settings": "Settings",
     "logout": "Logout",
     "loading": "Loading...",
@@ -164,6 +170,10 @@
       "graduationDateNotAvailable": "Graduation date not available",
       "participantDroppedOut": "Participant Dropped Out",
       "dropoutWarning": "This participant has dropped out of the program. You are viewing their records in read-only mode. No changes can be made."
+    },
+    "profileModal": {
+      "title": "Participant Profile",
+      "subtitle": "View basic profile information for {{name}}"
     },
     "pathways": {
       "employment": "Employment Pathway",

@@ -6,6 +6,7 @@ export interface Participant {
   progress: number;
   email: string;
   phone: string;
+  address?: string; // Optional address field
   status?: StatusType;
 }
 
