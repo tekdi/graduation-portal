@@ -25,12 +25,14 @@ export interface TabData {
   key: string;
   label: string;
   isDisabled?: boolean;
+  icon?: string; // Optional Lucide icon name
 }
 
 export interface TabButtonProps {
   tab: TabData;
   isActive: boolean;
   onPress: (tabKey: string) => void;
+  variant?: 'default' | 'ButtonTab'; // Variant to control styling
 }
 
 export interface ColumnDef<T> {

@@ -1,4 +1,12 @@
-import React, { useState, useEffect, Suspense, useMemo, Component, ErrorInfo, ReactNode } from 'react';
+import React, {
+  useState,
+  useEffect,
+  Suspense,
+  useMemo,
+  Component,
+  ErrorInfo,
+  ReactNode,
+} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { I18nManager } from 'react-native';
@@ -13,7 +21,9 @@ import UserManagementScreen from '../screens/UserManagement';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
+import ParticipantDetail from '../screens/ParticipantDetail';
 import ParticipantsList from '../screens/ParticipantsList/index';
+import ProjectPlayer from '../screens/ProjectPlayer';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -39,7 +49,9 @@ class NavigationErrorBoundary extends Component<
 
   render() {
     if (this.state.hasError) {
-      return this.props.fallback || <Spinner size="large" color="$primary500" />;
+      return (
+        this.props.fallback || <Spinner size="large" color="$primary500" />
+      );
     }
     return this.props.children;
   }
@@ -70,7 +82,9 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
+        { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
         { name: 'participants', component: ParticipantsList },
+        { name: 'project', component: ProjectPlayer },
       ];
     default:
       return []; // Always return an array, even if empty
@@ -93,21 +107,20 @@ const getLinkingConfig = (
       screens: {},
     },
   };
-// Dynamically generate nested routes from accessPages array
+  // Dynamically generate nested routes from accessPages array
   if (accessPages.length > 0) {
     const mainScreens: Record<string, string> = {};
     accessPages.forEach(page => {
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
         ? // Remove leading slash for react-navigation config consistency
-        page.path.startsWith('/')
+          page.path.startsWith('/')
           ? page.path.substr(1)
           : page.path
         : page.name;
 
-
-        // Special handling for LC role:
-        // If there are multiple pages (e.g., 'home' and 'home1') and this is 'home', map it to select-language
+      // Special handling for LC role:
+      // If there are multiple pages (e.g., 'home' and 'home1') and this is 'home', map it to select-language
       if (
         page.name === 'home' &&
         accessPages.length > 1 &&
@@ -115,6 +128,8 @@ const getLinkingConfig = (
       ) {
         mainScreens[page.name] = 'select-language';
       } else {
+        // Handle dynamic routes with parameters (e.g., /participants/:id)
+        // React Navigation will automatically extract parameters from the path
         mainScreens[page.name] = screenPath;
       }
     });
@@ -156,7 +171,7 @@ const AppNavigator: React.FC = () => {
   const { t, isRTL } = useLanguage();
   const { isLoggedIn, loading, user } = useAuth();
   const { isWeb } = usePlatform();
-// Generate accessPages based on user role
+  // Generate accessPages based on user role
   const accessPages = useMemo(() => getAccessPages(user?.role), [user?.role]);
 
   // Generate dynamic linking configuration based on accessPages
@@ -200,8 +215,8 @@ const AppNavigator: React.FC = () => {
   // when linking config changes
   // MUST be called before any conditional returns (Rules of Hooks)
   const navigationKey = useMemo(() => {
-    return isLoggedIn 
-      ? `nav-${user?.role || 'guest'}-${accessPages.length}` 
+    return isLoggedIn
+      ? `nav-${user?.role || 'guest'}-${accessPages.length}`
       : 'nav-login';
   }, [isLoggedIn, user?.role, accessPages.length]);
 
@@ -220,45 +235,45 @@ const AppNavigator: React.FC = () => {
             logger.log('Navigation container ready');
           }
         }}
-        onStateChange={(state) => {
+        onStateChange={state => {
           if (isWeb && state) {
             logger.log('Navigation state changed:', state);
           }
         }}
       >
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          cardStyle: isWeb
-            ? ({
-                width: '100%',
-                minHeight: '100vh',
-                height: 'auto',
-              } as any)
-            : ({ width: '100%' } as any),
-        }}
-      >
-        {!isLoggedIn ? (
-          // Show login screen when not logged in
-          <Stack.Screen
-            name="login"
-            component={LoginScreen}
-            options={{
-              title: t('login.logIn'),
-            }}
-          />
-        ) : (
-          // Show role-based navigator when logged in
-          <Stack.Screen
-            name="main"
-            component={RoleBasedNavigator}
-            options={{
-              title: t('navigation.menu'),
-            }}
-          />
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            cardStyle: isWeb
+              ? ({
+                  width: '100%',
+                  minHeight: '100vh',
+                  height: 'auto',
+                } as any)
+              : ({ width: '100%' } as any),
+          }}
+        >
+          {!isLoggedIn ? (
+            // Show login screen when not logged in
+            <Stack.Screen
+              name="login"
+              component={LoginScreen}
+              options={{
+                title: t('login.logIn'),
+              }}
+            />
+          ) : (
+            // Show role-based navigator when logged in
+            <Stack.Screen
+              name="main"
+              component={RoleBasedNavigator}
+              options={{
+                title: t('navigation.menu'),
+              }}
+            />
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
     </NavigationErrorBoundary>
   );
 };
