@@ -82,7 +82,7 @@ const Header: React.FC<{
     <Box
       {...stylesHeader.container}
       borderBottomColor={isDark ? '$borderDark200' : '$borderLight200'}
-      bg={isDark ? '$backgroundDark950' : '$backgroundLight0'}
+      bg={isDark ? '$backgroundDark950' : '$white'}
       shadowColor={isDark ? '$backgroundDark950' : '$black'}
     >
       <HStack {...stylesHeader.hStack}>
