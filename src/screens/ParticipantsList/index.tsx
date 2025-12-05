@@ -95,11 +95,12 @@ const ParticipantsList: React.FC = () => {
   return (
     <Box flex={1}>
       <ScrollView flex={1} bg={theme.tokens.colors.accent100}>
-        <VStack space="lg" padding="$6" flex={1}>
-            {/* Page Title */}
-            <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}>
+        <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground} bg="$white" padding="$4" my="$2">
               {t('participants.myParticipants')}
             </Heading>
+        <VStack space="lg" padding="$6" flex={1}>
+            {/* Page Title */}
+           
 
             {/* Search Bar */}
             <SearchBar
