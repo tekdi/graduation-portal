@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { VStack, HStack, Box, ScrollView } from '@ui';
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
-import { getParticipantById } from '../../services/participantService';
+import { getParticipantById, getParticipantProfile, updateParticipantAddress } from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
 import { TabButton } from '@components/Tabs';
 import { PARTICIPANT_DETAIL_TABS } from '@constants/TABS';
 import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
-import { theme } from '@config/theme';
-import type { ParticipantStatus } from '@app-types/participant';
+import type { ParticipantStatus, UnifiedParticipant } from '@app-types/participant';
+import { Modal, useAlert } from '@ui';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
@@ -36,14 +36,38 @@ type ParticipantDetailRouteProp = RouteProp<{
 export default function ParticipantDetail() {
   const route = useRoute<ParticipantDetailRouteProp>();
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<string>('intervention-plan');
+  const { showAlert } = useAlert();
   
   // Extract the id parameter from the route
   const participantId = route.params?.id;
   
+  const [activeTab, setActiveTab] = useState<string>('intervention-plan');
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [editedAddress, setEditedAddress] = useState<{
+    street: string;
+    province: string;
+    site: string;
+  }>({
+    street: '',
+    province: '',
+    site: '',
+  });
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
+  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<UnifiedParticipant | undefined>(
+    participantId ? getParticipantProfile(participantId) : undefined
+  );
+  
   // Fetch participant data from mock data by ID
   // Ensure participantId exists before calling getParticipantById
   const participant = participantId ? getParticipantById(participantId) : undefined;
+  
+  // Update currentParticipantProfile if participantId changes
+  useEffect(() => {
+    if (participantId) {
+      setCurrentParticipantProfile(getParticipantProfile(participantId));
+    }
+  }, [participantId]);
   
   // Error State: Participant Not Found
   if (!participant) {
@@ -62,7 +86,8 @@ export default function ParticipantDetail() {
   } = participant;
 
   return (
-    <Box flex={1} bg={theme.tokens.colors.accent100}>
+    <>
+      <Box flex={1} bg="$accent100">
       <ScrollView flex={1} showsVerticalScrollIndicator={false}>
         <VStack 
           {...participantDetailStyles.container} 
@@ -76,6 +101,7 @@ export default function ParticipantDetail() {
             pathway={pathway}
             graduationProgress={graduationProgress}
             graduationDate={graduationDate}
+            onViewProfile={() => setIsProfileModalOpen(true)}
           />
         </VStack>
         {/* Tabs */}
@@ -125,5 +151,86 @@ export default function ParticipantDetail() {
         </Box>
       </ScrollView>
     </Box>
+
+      {/* Profile Modal - Using Modal with profile variant */}
+      {currentParticipantProfile && (
+        <Modal
+          variant="profile"
+          isOpen={isProfileModalOpen}
+          onClose={() => {
+            setIsProfileModalOpen(false);
+            setIsEditingAddress(false);
+            setEditedAddress({
+              street: '',
+              province: '',
+              site: '',
+            });
+          }}
+          title={t('participantDetail.profileModal.title')}
+          subtitle={t('participantDetail.profileModal.subtitle', { name: participantName })}
+          profile={currentParticipantProfile}
+          onAddressEdit={() => {
+            // Initialize edit mode with current address or empty values
+            if (currentParticipantProfile?.address) {
+              // Parse existing address if it's a string, or use empty values
+              // For now, we'll start with empty and let user fill
+              setEditedAddress({
+                street: '',
+                province: '',
+                site: '',
+              });
+            }
+            setIsEditingAddress(true);
+          }}
+          isEditingAddress={isEditingAddress}
+          editedAddress={editedAddress}
+          onAddressChange={(field, value) => {
+            setEditedAddress(prev => ({
+              ...prev,
+              [field]: value,
+            }));
+          }}
+          onSaveAddress={async () => {
+            if (!editedAddress.street || !editedAddress.province || !editedAddress.site) {
+              showAlert('warning', t('participantDetail.profileModal.fillAllFields'), {
+                placement: 'bottom-right',
+              });
+              return;
+            }
+
+            setIsSavingAddress(true);
+            try {
+              const updated = await updateParticipantAddress(id, editedAddress);
+              if (updated) {
+                setCurrentParticipantProfile(updated);
+                setIsEditingAddress(false);
+                showAlert('success', t('participantDetail.profileModal.addressUpdated'), {
+                  placement: 'bottom-right',
+                });
+              } else {
+                showAlert('error', t('common.error'), {
+                  placement: 'bottom-right',
+                });
+              }
+            } catch (error) {
+              showAlert('error', t('common.error'), {
+                placement: 'bottom-right',
+              });
+            } finally {
+              setIsSavingAddress(false);
+            }
+          }}
+          onCancelEdit={() => {
+            setIsEditingAddress(false);
+            setEditedAddress({
+              street: '',
+              province: '',
+              site: '',
+            });
+          }}
+          isSavingAddress={isSavingAddress}
+        />
+      )}
+    </>
   );
 }

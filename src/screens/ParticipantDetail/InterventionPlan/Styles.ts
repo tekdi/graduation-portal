@@ -16,6 +16,7 @@ export const interventionPlanStyles = {
     space: '$4' as const,
   },
   iconContainer: {
+    mb: '$4',
   },
   iconColor: theme.tokens.colors.textMutedForeground,
   title: {
@@ -23,11 +24,13 @@ export const interventionPlanStyles = {
     fontWeight: '$normal',
     color: '$textForeground',
     textAlign: 'center' as const,
+    mb: '$3',
   },
   description: {
     fontSize: '$md',
     color: '$textMutedForeground',
     textAlign: 'center' as const,
+    mb: '$4',
   },
   button: {
     bg: '$btnPrimary',

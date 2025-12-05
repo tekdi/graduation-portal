@@ -14,6 +14,7 @@ import {
   ChevronDownIcon,
   SelectPortal,
 } from '@gluestack-ui/themed';
+import { getSelectTriggerStyles } from './Styles';
 
 type Option = {
   value: string;
@@ -30,6 +31,8 @@ type SelectProps = {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  bg?: string;
+  borderColor?: string;
 };
 
 export default function Select({
@@ -37,6 +40,8 @@ export default function Select({
   value,
   onChange,
   placeholder,
+  bg,
+  borderColor,
 }: SelectProps) {
   // Normalize options: handle strings, objects, or already normalized Option[]
   const normalizedOptions: Option[] = options.map((e: RawOption, index: number) => {
@@ -111,12 +116,14 @@ export default function Select({
       selectedValue={value}
       onValueChange={handleValueChange}
     >
-      <SelectTrigger variant="outline" size="md" width="$full">
+      <SelectTrigger {...(getSelectTriggerStyles(bg, borderColor) as any)}>
         <SelectInput
           placeholder={localizedPlaceholder}
           value={displayValue}
+          bg={bg}
+          backgroundColor={bg}
           // @ts-ignore - writingDirection is a valid style prop but may not be in types
-          style={{ writingDirection }}
+          style={{ writingDirection, backgroundColor: bg }}
         />
         <SelectIcon mr="$3">
           <ChevronDownIcon />

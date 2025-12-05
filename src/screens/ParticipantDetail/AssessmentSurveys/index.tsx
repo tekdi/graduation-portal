@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { VStack, Box, ScrollView, Text } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { assessmentSurveysStyles } from './Styles';
-import { AssessmentCard } from '@components/Cards';
+import { AssessmentCard } from '@components/ObservationCards';
 import { ASSESSMENT_SURVEY_CARDS } from '@constants/ASSESSMENT_SURVEY_CARDS';
 import type { ParticipantStatus } from '@app-types/participant';
 

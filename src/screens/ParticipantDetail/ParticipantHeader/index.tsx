@@ -19,6 +19,7 @@ interface ParticipantHeaderProps {
   pathway?: PathwayType;
   graduationProgress?: number;
   graduationDate?: string;
+  onViewProfile?: () => void; // Callback to open profile modal
 }
 
 /**
@@ -32,6 +33,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   pathway,
   graduationProgress,
   graduationDate,
+  onViewProfile,
 }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
@@ -67,129 +69,94 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   };
 
   /**
+   * Render View Profile Button
+   * Common button rendered for all statuses
+   */
+  const renderViewProfileButton = () => (
+    <Button
+      {...participantHeaderStyles.outlineButton}
+      onPress={onViewProfile}
+    >
+      <HStack {...participantHeaderStyles.outlineButtonContent}>
+        <LucideIcon name="User" size={16} color="#000" />
+        <ButtonText {...participantHeaderStyles.outlineButtonText}>
+          {t('participantDetail.header.viewProfile')}
+        </ButtonText>
+      </HStack>
+    </Button>
+  );
+
+  /**
+   * Render Second Action Button
+   * Conditionally renders based on participant status
+   */
+  const renderSecondButton = () => {
+    // Not Enrolled: Enroll Participant (disabled)
+    if (status === STATUS.NOT_ENROLLED) {
+      return (
+        <Button
+          {...participantHeaderStyles.solidButtonPrimary}
+          onPress={() => {}}
+          isDisabled={true}
+          $md-width="auto"
+        >
+          <HStack {...participantHeaderStyles.solidButtonContent}>
+            <LucideIcon name="User" size={16} color="#fff" />
+            <ButtonText {...participantHeaderStyles.solidButtonText}>
+              {t('participantDetail.header.enrollParticipant')}
+            </ButtonText>
+          </HStack>
+        </Button>
+      );
+    }
+
+    // Dropout: No second button
+    if (status === STATUS.DROPOUT) {
+      return null;
+    }
+
+    // Enrolled, In Progress, Completed: Log Visit
+    return (
+      <Button
+        {...participantHeaderStyles.solidButtonPrimary}
+        onPress={() => {}}
+        $md-width="auto"
+      >
+        <HStack {...participantHeaderStyles.solidButtonContent}>
+          <LucideIcon name="FileText" size={16} color="#fff" />
+          <ButtonText {...participantHeaderStyles.solidButtonText}>
+            {t('participantDetail.header.logVisit')}
+          </ButtonText>
+        </HStack>
+      </Button>
+    );
+  };
+
+  /**
    * Render Action Buttons
    * Displays action buttons based on participant status
    * 
    * @returns Action buttons JSX based on status
    */
   const renderActionButtons = () => {
-    // Not Enrolled: View Profile + Enroll Participant (disabled)
-    if (status === STATUS.NOT_ENROLLED) {
+    const secondButton = renderSecondButton();
+
+    // If there's a second button, wrap both in HStack
+    if (secondButton) {
       return (
         <HStack
           {...participantHeaderStyles.actionButtonsContainer}
           $md-flexDirection="row"
           $md-width="auto"
         >
-          <Button
-            variant="outline"
-            size="md"
-            borderColor="$borderLight300"
-            bg="$white"
-            borderRadius="$xl"
-            height="$9"
-            paddingHorizontal="$3"
-            paddingVertical="$2"
-            width="$full"
-            minWidth={120}
-            onPress={() => {}}
-            $md-width="auto"
-          >
-            <HStack {...participantHeaderStyles.outlineButtonContent}>
-              <LucideIcon name="User" size={16} color="#000" />
-              <ButtonText {...participantHeaderStyles.outlineButtonText}>
-                {t('participantDetail.header.viewProfile')}
-              </ButtonText>
-            </HStack>
-          </Button>
-
-          <Button
-            {...participantHeaderStyles.solidButtonPrimary}
-            onPress={() => {}}
-            isDisabled={true}
-            $md-width="auto"
-          >
-            <HStack {...participantHeaderStyles.solidButtonContent}>
-              <LucideIcon name="User" size={16} color="#fff" />
-              <ButtonText {...participantHeaderStyles.solidButtonText}>
-                {t('participantDetail.header.enrollParticipant')}
-              </ButtonText>
-            </HStack>
-          </Button>
+          {renderViewProfileButton()}
+          {secondButton}
         </HStack>
       );
     }
 
-    // Dropout: Only View Profile (read-only mode)
-    if (status === STATUS.DROPOUT) {
-      return (
-        <Button
-          variant="outline"
-          size="md"
-          borderColor="$borderLight300"
-          bg="$white"
-          borderRadius="$xl"
-          height="$9"
-          paddingHorizontal="$3"
-          paddingVertical="$2"
-          width="$full"
-          minWidth={120}
-          onPress={() => {}}
-          $md-width="auto"
-        >
-          <HStack {...participantHeaderStyles.outlineButtonContent}>
-            <LucideIcon name="User" size={16} color="#000" />
-            <ButtonText {...participantHeaderStyles.outlineButtonText}>
-              {t('participantDetail.header.viewProfile')}
-            </ButtonText>
-          </HStack>
-        </Button>
-      );
-    }
-
-    // Enrolled, In Progress, Completed: View Profile + Log Visit
-    return (
-      <HStack
-        {...participantHeaderStyles.actionButtonsContainer}
-        $md-flexDirection="row"
-        $md-width="auto"
-      >
-        <Button
-          variant="outline"
-          size="md"
-          borderColor="$borderLight300"
-          bg="$white"
-          borderRadius="$xl"
-          height="$9"
-          paddingHorizontal="$3"
-          paddingVertical="$2"
-          width="$full"
-          minWidth={120}
-          onPress={() => {}}
-          $md-width="auto"
-        >
-          <HStack {...participantHeaderStyles.outlineButtonContent}>
-            <LucideIcon name="User" size={16} color="#000" />
-            <ButtonText {...participantHeaderStyles.outlineButtonText}>
-              {t('participantDetail.header.viewProfile')}
-            </ButtonText>
-          </HStack>
-        </Button>
-
-        <Button
-          {...participantHeaderStyles.solidButtonPrimary}
-          onPress={() => {}}
-          $md-width="auto"
-        >
-          <HStack {...participantHeaderStyles.solidButtonContent}>
-            <LucideIcon name="FileText" size={16} color="#fff" />
-            <ButtonText {...participantHeaderStyles.solidButtonText}>
-              {t('participantDetail.header.logVisit')}
-            </ButtonText>
-          </HStack>
-        </Button>
-      </HStack>
-    );
+    // Otherwise, just render View Profile button
+    return renderViewProfileButton();
   };
 
 
@@ -261,6 +228,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
         graduationProgress={graduationProgress}
         graduationDate={graduationDate}
       />
+
     </VStack>
   );
 };

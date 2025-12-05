@@ -79,3 +79,22 @@ export interface AssessmentSurveyCardProps {
   card: AssessmentSurveyCardData;
 }
 
+/**
+ * Province Interface
+ * Defines the structure for province selection options
+ */
+export interface Province {
+  value: string;
+  label: string;
+}
+
+/**
+ * Site Interface
+ * Defines the structure for site selection options
+ */
+export interface Site {
+  value: string;
+  label: string;
+  type: 'Urban' | 'Rural' | 'Peri-urban';
+}
+

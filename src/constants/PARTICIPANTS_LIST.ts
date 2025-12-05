@@ -1,4 +1,36 @@
-import type { UnifiedParticipant } from '@app-types/participant';
+import type { UnifiedParticipant, Province, Site } from '@app-types/participant';
+
+/**
+ * South African Provinces
+ * Mock data for province selection dropdown
+ * TODO: Replace with API call in future
+ */
+
+export const PROVINCES: Province[] = [
+  { value: 'eastern-cape', label: 'Eastern Cape' },
+  { value: 'free-state', label: 'Free State' },
+  { value: 'gauteng', label: 'Gauteng' },
+  { value: 'kwazulu-natal', label: 'KwaZulu-Natal' },
+  { value: 'limpopo', label: 'Limpopo' },
+  { value: 'mpumalanga', label: 'Mpumalanga' },
+  { value: 'northern-cape', label: 'Northern Cape' },
+  { value: 'north-west', label: 'North West' },
+  { value: 'western-cape', label: 'Western Cape' },
+] as const;
+
+/**
+ * Site Options
+ * Mock data for site selection dropdown
+ * TODO: Replace with API call in future (may depend on selected province)
+ */
+export const SITES: Site[] = [
+  { value: 'site-a', label: 'Site A - Urban', type: 'Urban' },
+  { value: 'site-b', label: 'Site B - Urban', type: 'Urban' },
+  { value: 'site-c', label: 'Site C - Rural', type: 'Rural' },
+  { value: 'site-d', label: 'Site D - Rural', type: 'Rural' },
+  { value: 'site-e', label: 'Site E - Peri-urban', type: 'Peri-urban' },
+  { value: 'site-f', label: 'Site F - Peri-urban', type: 'Peri-urban' },
+] as const;
 
 /**
  * Mock Participants Data
@@ -12,6 +44,7 @@ export const PARTICIPANTS_DATA: UnifiedParticipant[] = [
     progress: 0,
     email: 'aisha@example.com',
     phone: '(555) 678-9012',
+    address: '123 Main Street, City, State',
     status: 'not_enrolled',
     pathway: undefined,
     graduationProgress: undefined,
@@ -23,6 +56,7 @@ export const PARTICIPANTS_DATA: UnifiedParticipant[] = [
     progress: 0,
     email: 'david@example.com',
     phone: '(555) 901-2345',
+    address: '456 Oak Avenue, City, State',
     status: 'enrolled',
     pathway: 'employment',
     graduationProgress: undefined,
@@ -34,6 +68,7 @@ export const PARTICIPANTS_DATA: UnifiedParticipant[] = [
     progress: 57,
     email: 'natasha@example.com',
     phone: '(555) 456-7890',
+    address: '789 Pine Road, City, State',
     status: 'in_progress',
     pathway: 'employment',
     graduationProgress: 57,
@@ -45,6 +80,7 @@ export const PARTICIPANTS_DATA: UnifiedParticipant[] = [
     progress: 100,
     email: 'tyler@example.com',
     phone: '(555) 901-2345',
+    address: '321 Elm Street, City, State',
     status: 'completed',
     pathway: 'entrepreneurship',
     graduationProgress: 100,
@@ -56,6 +92,7 @@ export const PARTICIPANTS_DATA: UnifiedParticipant[] = [
     progress: 10,
     email: 'john@example.com',
     phone: '(555) 901-2345',
+    address: '654 Maple Drive, City, State',
     status: 'dropout',
     pathway: 'entrepreneurship',
     graduationProgress: 50,

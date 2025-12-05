@@ -59,14 +59,14 @@ export interface DataTableProps<T> {
 export interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (inputValue?: string) => void;
-  title: string;
-  message: string;
-  confirmText: string;
-  cancelText: string;
+  variant?: 'confirmation' | 'profile'; // Variant type: confirmation (default) or profile
+  // Confirmation variant props
+  onConfirm?: (inputValue?: string) => void;
+  message?: string;
+  confirmText?: string;
+  cancelText?: string;
   confirmButtonColor?: string;
   confirmButtonVariant?: 'solid' | 'outline' | 'link';
-  maxWidth?: number;
   headerIcon?: ReactNode;
   showInput?: boolean;
   inputLabel?: string;
@@ -75,4 +75,42 @@ export interface ConfirmationModalProps {
   inputRequired?: boolean;
   inputValue?: string;
   onInputChange?: (value: string) => void;
+  // Common props
+  title: string;
+  subtitle?: string; // Used in profile variant
+  maxWidth?: number;
+  // Profile variant props
+  profile?: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string;
+    address?: string;
+  };
+  onAddressEdit?: () => void; // Used in profile variant
+  // Address edit mode props
+  isEditingAddress?: boolean;
+  editedAddress?: {
+    street: string;
+    province: string;
+    site: string;
+  };
+  onAddressChange?: (field: 'street' | 'province' | 'site', value: string) => void;
+  onSaveAddress?: () => void;
+  onCancelEdit?: () => void;
+  isSavingAddress?: boolean;
+}
+
+export type ToastPlacement =
+  | 'top'
+  | 'top-right'
+  | 'top-left'
+  | 'bottom'
+  | 'bottom-right'
+  | 'bottom-left';
+
+export interface AlertOptions {
+  variant?: 'solid' | 'outline' | 'accent';
+  placement?: ToastPlacement;
+  duration?: number;
 }

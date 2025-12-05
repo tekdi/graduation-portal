@@ -1,6 +1,17 @@
 {
   "common": {
     "profile": "Profile",
+    "profileFields": {
+      "name": "Name",
+      "id": "ID",
+      "contact": "Contact",
+      "address": "Address",
+      "addressFields": {
+        "street": "Street Address",
+        "province": "Province",
+        "site": "Site"
+      }
+    },
     "settings": "Settings",
     "logout": "Logout",
     "loading": "Loading...",
@@ -199,6 +210,16 @@
       "graduationDateNotAvailable": "Graduation date not available",
       "participantDroppedOut": "Participant Dropped Out",
       "dropoutWarning": "This participant has dropped out of the program. You are viewing their records in read-only mode. No changes can be made."
+    },
+    "profileModal": {
+      "title": "Participant Profile",
+      "subtitle": "View basic profile information for {{name}}",
+      "editAddress": "Edit Address",
+      "saveLocation": "Save Location",
+      "selectProvince": "Select province",
+      "selectSite": "Select site",
+      "addressUpdated": "Profile updated successfully",
+      "fillAllFields": "Please fill in all required fields (Street, Province, and Site) before saving."
     },
     "pathways": {
       "employment": "Employment Pathway",
