@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { StatusBar } from 'react-native';
 import { Box, SafeAreaView, useColorMode, Pressable, Icon, MenuIcon } from '@gluestack-ui/themed';
 import { useNavigation, useRoute } from '@react-navigation/native';
@@ -19,7 +19,6 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ title, children }) => {
   const mode = useColorMode();
   const isDark = mode === 'dark';
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { logout } = useAuth();
   const navigation = useNavigation();
   const route = useRoute();
@@ -45,7 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
   };
 
   const rightSideContent = (
-    <Pressable onPress={() => setIsDrawerOpen(!isDrawerOpen)}>
+    <Pressable>
       <Icon as={MenuIcon} />
     </Pressable>
   );
