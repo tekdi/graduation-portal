@@ -66,7 +66,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       } else if (email.toLowerCase().includes('supervisor')) {
         role = 'Supervisor';
       } else if (role === 'LC') {
-        // Set default name for LC users
+        // LC Header: Set default name for LC users to display in header (replaces email prefix)
         name = 'Lerato Mokoena';
       }
 

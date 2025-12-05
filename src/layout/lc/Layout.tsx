@@ -8,6 +8,7 @@ import { LC_MENU_OPTIONS } from '@constants/PROFILE_MENU_OPTIONS';
 import { useAuth } from '@contexts/AuthContext';
 import logger from '@utils/logger';
 
+// LC Layout: Configures Header with left-aligned profile menu, hamburger menu, and conditional Home menu visibility
 interface LayoutProps {
   title: string;
   children: React.ReactNode;

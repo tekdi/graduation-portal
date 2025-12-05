@@ -11,6 +11,7 @@ import {
 } from '@gluestack-ui/themed';
 import { useLanguage } from '@contexts/LanguageContext';
 
+// Menu component with support for icons, dividers, and custom menu items (used for LC hamburger menu)
 export interface MenuItemData {
   key: string;
   label: string;

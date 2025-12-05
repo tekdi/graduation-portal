@@ -3,6 +3,7 @@ import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
 import { MenuItemData } from '@components/ui/Menu';
 
+// Menu options for Admin and LC users: LC menu includes icons, dividers, and conditional Home menu item
 // Admin menu options (original)
 export const ADMIN_MENU_OPTIONS: MenuItemData[] = [
   {

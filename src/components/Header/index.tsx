@@ -34,6 +34,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 
+// Header component with LC-specific layout: profile menu on left, hamburger menu with dropdown, avatar with user icon
 const Header: React.FC<{
   title?: string;
   rightSideContent?: React.ReactNode;
