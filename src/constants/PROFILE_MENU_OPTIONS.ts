@@ -49,7 +49,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     key: 'serviceProviders',
     label: 'lc.menu.serviceProviders',
     textValue: 'serviceProviders',
-    iconElement: React.createElement(LucideIcon, { name: 'Building', size: 16, color: theme.tokens.colors.textForegroundColor }),
+    iconElement: React.createElement(LucideIcon, { name: 'Building2', size: 16, color: theme.tokens.colors.textForegroundColor }),
     showDividerAfter: true,
   },
   {
