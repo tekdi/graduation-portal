@@ -41,11 +41,17 @@
   "projectPlayer": {
     "status": "Status",
     "progress": "Progress",
+    "tasks": "tasks",
+    "pillars": "pillars",
+    "complete": "complete",
     "statusTypes": {
       "to-do": "To Do",
       "completed": "Completed"
     },
     "completeForm": "Complete Form",
+    "uploadFile": "Upload File",
+    "updateProfile": "Update Profile",
+    "viewTask": "View Task",
     "attachments": "Attachments",
     "uploading": "Uploading...",
     "clickToUpload": "📎 Click to upload files",

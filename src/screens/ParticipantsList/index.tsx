@@ -1,13 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-  Box,
-  VStack,
-  HStack,
-  Text,
-  Heading,
-  Pressable,
-  ScrollView,
-} from '@ui';
+import { Box, VStack, HStack, Text, Heading, Pressable, ScrollView } from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
 import DataTable from '@components/DataTable';
@@ -88,6 +80,7 @@ const ParticipantsList: React.FC = () => {
       navigation.navigate('participant-detail', {
         id: participant.id,
       });
+      // navigation.navigate('project');
     },
     [navigation],
   );
