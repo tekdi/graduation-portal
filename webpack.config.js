@@ -2,126 +2,203 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
 
-module.exports = {
-  entry: './index.web.js',
-  mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-  devtool:
-    process.env.NODE_ENV === 'production' ? 'source-map' : 'eval-source-map',
-  devServer: {
-    static: {
-      directory: path.join(__dirname, 'public'),
+module.exports = (env = {}, argv = {}) => {
+  const mode =
+    argv.mode || env.mode || process.env.NODE_ENV === 'production'
+      ? 'production'
+      : 'development';
+  const isProduction = mode === 'production';
+
+  return {
+    entry: './index.web.js',
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: isProduction ? 'js/[name].[contenthash:8].js' : 'js/[name].js',
+      chunkFilename: isProduction
+        ? 'js/[name].[contenthash:8].chunk.js'
+        : 'js/[name].chunk.js',
+      assetModuleFilename: 'assets/[name].[contenthash:8][ext]',
       publicPath: '/',
-      serveIndex: true,
+      clean: true,
     },
-    compress: true,
-    port: 3000,
-    hot: true,
-    historyApiFallback: true,
-    proxy: [
-      {
-        context: ['/api'],
-        target: 'https://qa-lap.prathamdigital.org',
-        changeOrigin: true,
-        secure: true,
-        logLevel: 'debug',
+    mode,
+    devtool: isProduction ? 'source-map' : 'eval-cheap-module-source-map',
+    optimization: {
+      minimize: isProduction,
+      minimizer: isProduction ? ['...'] : [],
+      usedExports: true,
+      sideEffects: false,
+      moduleIds: isProduction ? 'deterministic' : 'named',
+      chunkIds: isProduction ? 'deterministic' : 'named',
+      splitChunks: isProduction
+        ? {
+            chunks: 'all',
+            cacheGroups: {
+              default: false,
+              vendors: false,
+              // Vendor chunk for node_modules
+              vendor: {
+                name: 'vendor',
+                chunks: 'all',
+                test: /[\\/]node_modules[\\/]/,
+                priority: 20,
+              },
+              // Common chunk for shared code
+              common: {
+                name: 'common',
+                minChunks: 2,
+                chunks: 'all',
+                priority: 10,
+                reuseExistingChunk: true,
+                enforce: true,
+              },
+              // React and ReactDOM separate chunk
+              react: {
+                name: 'react',
+                test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+                chunks: 'all',
+                priority: 30,
+                enforce: true,
+              },
+            },
+          }
+        : false,
+      runtimeChunk: isProduction ? { name: 'runtime' } : false,
+    },
+    devServer: {
+      static: {
+        directory: path.join(__dirname, 'public'),
+        publicPath: '/',
       },
-      {
-        context: ['/assets'],
-        target: 'https://qa-lap.prathamdigital.org',
-        changeOrigin: true,
-        secure: true,
-        logLevel: 'debug',
-        onProxyReq: function (proxyReq, req, res) {
-          // Set proper headers for the proxied request
-          proxyReq.setHeader('Accept', '*/*');
-          proxyReq.removeHeader('origin');
-          proxyReq.removeHeader('referer');
-        },
-        bypass: function (req, res, proxyOptions) {
-          // Always proxy /assets requests, don't serve from static
-          console.log('Proxying asset request:', req.url);
-          return null;
+      compress: true,
+      port: 3000,
+      hot: true,
+      historyApiFallback: true,
+      client: {
+        overlay: {
+          errors: true,
+          warnings: false,
         },
       },
-    ],
-  },
-  module: {
-    rules: [
-      {
-        test: /\.(js|jsx|ts|tsx)$/,
-        exclude:
-          /node_modules\/(?!(@react-navigation|react-native-reanimated|@gluestack-ui|@gluestack-style|@gluestack|@expo))/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              '@babel/preset-env',
-              '@babel/preset-react',
-              '@babel/preset-typescript',
-            ],
-            plugins: ['react-native-web'],
-          },
-        },
+    },
+    cache: {
+      type: 'filesystem',
+      buildDependencies: {
+        // eslint-disable-next-line no-undef
+        config: [__filename],
       },
-      {
-        test: /\.(png|jpe?g|gif|svg)$/i,
-        use: [
-          {
-            loader: 'file-loader',
+    },
+    module: {
+      rules: [
+        {
+          test: /\.(js|jsx|ts|tsx)$/,
+          exclude:
+            /node_modules\/(?!(@react-navigation|react-native-reanimated|react-native-safe-area-context|@gluestack-ui|@gluestack-style|@expo))/,
+          use: {
+            loader: 'babel-loader',
             options: {
-              name: '[name].[ext]',
-              outputPath: 'assets/images/',
+              presets: [
+                [
+                  '@babel/preset-env',
+                  {
+                    modules: false,
+                  },
+                ],
+                '@babel/preset-react',
+                '@babel/preset-typescript',
+              ],
+              plugins: ['react-native-web'],
+              cacheDirectory: true,
+              cacheCompression: false,
             },
           },
-        ],
-      },
-    ],
-  },
-  resolve: {
-    alias: {
-      'react-native$': 'react-native-web',
-      // Mock native modules that don't work on web
-      'react-native-image-picker': path.resolve(
-        __dirname,
-        'src/mocks/imagePicker.js',
-      ),
-      'react-native-reanimated': path.resolve(
-        __dirname,
-        'src/mocks/reanimated',
-      ),
-      '@ui': path.resolve(__dirname, 'src/components/ui'),
-      '@components': path.resolve(__dirname, 'src/components'),
-      '@utils': path.resolve(__dirname, 'src/utils'),
-      '@config': path.resolve(__dirname, 'src/config'),
-      '@contexts': path.resolve(__dirname, 'src/contexts'),
-      '@app-types': path.resolve(__dirname, 'src/types'),
-      '@constants': path.resolve(__dirname, 'src/constants'),
-      '@layout': path.resolve(__dirname, 'src/layout'),
+        },
+        {
+          test: /\.(png|jpe?g|gif|svg|webp|ico)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/images/[name].[contenthash:8][ext]',
+          },
+        },
+        {
+          test: /\.(woff|woff2|eot|ttf|otf)$/i,
+          type: 'asset/resource',
+          generator: {
+            filename: 'assets/fonts/[name].[contenthash:8][ext]',
+          },
+        },
+      ],
     },
-    extensions: [
-      '.web.tsx',
-      '.web.ts',
-      '.web.jsx',
-      '.web.js',
-      '.tsx',
-      '.ts',
-      '.jsx',
-      '.js',
-      '.json',
+    resolve: {
+      alias: {
+        'react-native$': 'react-native-web',
+        // Mock native modules that don't work on web
+        'react-native-image-picker': path.resolve(
+          __dirname,
+          'src/mocks/imagePicker.js',
+        ),
+        '@react-native-community/netinfo': path.resolve(
+          __dirname,
+          'src/mocks/netinfo.js',
+        ),
+        'react-native-reanimated': path.resolve(
+          __dirname,
+          'src/mocks/reanimated',
+        ),
+        '@ui': path.resolve(__dirname, 'src/components/ui'),
+        '@components': path.resolve(__dirname, 'src/components'),
+        '@utils': path.resolve(__dirname, 'src/utils'),
+        '@config': path.resolve(__dirname, 'src/config'),
+        '@contexts': path.resolve(__dirname, 'src/contexts'),
+        '@types': path.resolve(__dirname, 'src/types'),
+        '@app-types': path.resolve(__dirname, 'src/types'),
+        '@constants': path.resolve(__dirname, 'src/constants'),
+        '@layout': path.resolve(__dirname, 'src/layout'),
+      },
+      extensions: [
+        '.web.tsx',
+        '.web.ts',
+        '.web.jsx',
+        '.web.js',
+        '.tsx',
+        '.ts',
+        '.jsx',
+        '.js',
+        '.json',
+      ],
+      modules: ['node_modules', path.resolve(__dirname, 'src')],
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: './public/index.html',
+        inject: true,
+        minify: isProduction
+          ? {
+              removeComments: true,
+              collapseWhitespace: true,
+              removeRedundantAttributes: true,
+              useShortDoctype: true,
+              removeEmptyAttributes: true,
+              removeStyleLinkTypeAttributes: true,
+              minifyJS: true,
+              minifyCSS: true,
+              minifyURLs: true,
+            }
+          : false,
+      }),
+      new webpack.DefinePlugin({
+        __DEV__: JSON.stringify(!isProduction),
+        'process.env.NODE_ENV': JSON.stringify(mode),
+      }),
+      // Ignore native-only modules entirely
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^react-native-(gesture-handler|screens)$/,
+      }),
     ],
-  },
-  plugins: [
-    new HtmlWebpackPlugin({
-      template: './public/index.html',
-      inject: true,
-    }),
-    new webpack.DefinePlugin({
-      __DEV__: JSON.stringify(process.env.NODE_ENV !== 'production'),
-    }),
-  ],
-  output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'bundle.js',
-    publicPath: '/',
-  },
+    performance: {
+      hints: isProduction ? 'warning' : false,
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000,
+    },
+  };
 };
