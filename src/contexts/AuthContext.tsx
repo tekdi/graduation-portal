@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       const mockUser: User = {
         id: Math.random().toString(36).substr(2, 9),
         email: email,
-        name: name,
+        name: email.split('@')[0],
         role: role,
       };
 
