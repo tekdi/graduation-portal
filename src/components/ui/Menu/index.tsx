@@ -9,6 +9,7 @@ import {
   Box,
   Divider,
 } from '@gluestack-ui/themed';
+import { LucideIcon } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 
 // Menu component with support for icons, dividers, and custom menu items (used for LC hamburger menu)
@@ -19,6 +20,9 @@ export interface MenuItemData {
   icon?: any;
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   iconElement?: React.ReactNode;
+  iconName?: string;
+  iconColor?: string;
+  iconSizeValue?: number;
   color?: string;
   showDividerAfter?: boolean;
 }
@@ -111,6 +115,14 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
             {item.iconElement ? (
               <Box mr="$2">
                 {item.iconElement}
+              </Box>
+            ) : item.iconName ? (
+              <Box mr="$2">
+                <LucideIcon 
+                  name={item.iconName} 
+                  size={item.iconSizeValue || 16} 
+                  color={item.iconColor} 
+                />
               </Box>
             ) : item.icon ? (
               <Icon as={item.icon} size={item.iconSize || 'sm'} me="$2" />
