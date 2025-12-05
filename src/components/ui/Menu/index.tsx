@@ -6,6 +6,8 @@ import {
   Icon,
   ButtonText,
   Button,
+  Box,
+  Divider,
 } from '@gluestack-ui/themed';
 import { useLanguage } from '@contexts/LanguageContext';
 
@@ -17,6 +19,7 @@ export interface MenuItemData {
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   iconElement?: React.ReactNode;
   color?: string;
+  showDividerAfter?: boolean;
 }
 
 export interface CustomMenuProps {
@@ -97,22 +100,44 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
       trigger={renderTrigger}
       {...menuProps}
     >
-      {items?.map((item: MenuItemData, index: number) => (
-        <MenuItem
-          key={item.key || index.toString()}
-          textValue={item.textValue}
-          onPress={() => handleMenuItemPress(item.key)}
-        >
-          {item.iconElement ? (
-            item.iconElement
-          ) : item.icon ? (
-            <Icon as={item.icon} size={item.iconSize || 'sm'} me="$2" />
-          ) : null}
-          <MenuItemLabel size="sm" color={item.color}>
-            {t(item.label)}
-          </MenuItemLabel>
-        </MenuItem>
-      ))}
+      {items?.map((item: MenuItemData, index: number) => {
+        const menuItem = (
+          <MenuItem
+            key={item.key || index.toString()}
+            textValue={item.textValue}
+            onPress={() => handleMenuItemPress(item.key)}
+          >
+            {item.iconElement ? (
+              <Box mr="$2">
+                {item.iconElement}
+              </Box>
+            ) : item.icon ? (
+              <Icon as={item.icon} size={item.iconSize || 'sm'} me="$2" />
+            ) : null}
+            <MenuItemLabel size="sm" color={item.color}>
+              {t(item.label)}
+            </MenuItemLabel>
+          </MenuItem>
+        );
+
+        if (item.showDividerAfter) {
+          return (
+            <React.Fragment key={item.key || index.toString()}>
+              {menuItem}
+              <MenuItem
+                key={`${item.key}-separator` || `separator-${index}`}
+                textValue="separator"
+                disabled={true}
+                onPress={() => {}} padding="$0"
+              >
+                <Box height={1} width="100%" bg="$borderLight200" my="$1" />
+              </MenuItem>
+            </React.Fragment>
+          );
+        }
+
+        return menuItem;
+      })}
     </Menu>
   );
 };

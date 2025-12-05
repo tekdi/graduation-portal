@@ -59,16 +59,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
       // Mock user data based on email
       let role: UserRole = 'LC';
+      let name: string = email.split('@')[0];
+      
       if (email.toLowerCase().includes('admin')) {
         role = 'Admin';
       } else if (email.toLowerCase().includes('supervisor')) {
         role = 'Supervisor';
+      } else if (role === 'LC') {
+        // Set default name for LC users
+        name = 'Lerato Mokoena';
       }
 
       const mockUser: User = {
         id: Math.random().toString(36).substr(2, 9),
         email: email,
-        name: email.split('@')[0],
+        name: name,
         role: role,
       };
 

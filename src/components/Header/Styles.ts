@@ -96,9 +96,9 @@ export const stylesHeader = {
     space: 'xs' as const,
   },
   userNameText: {
-    fontSize: '$sm' as const,
-    fontWeight: '$semibold' as const,
-    color: '$textLight900' as const,
+    fontSize: '$md' as const,
+    fontWeight: '$normal' as const,
+    color: '$textForegroundColor' as const,
   },
   userRoleContainer: {
     alignItems: 'center' as const,
