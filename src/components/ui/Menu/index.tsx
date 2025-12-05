@@ -126,7 +126,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
             <React.Fragment key={item.key || index.toString()}>
               {menuItem}
               <MenuItem
-                key={`${item.key}-separator` || `separator-${index}`}
+                key={item.key ? `${item.key}-separator` : `separator-${index}`}
                 textValue="separator"
                 disabled={true}
                 onPress={() => {}} padding="$0"

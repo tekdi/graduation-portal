@@ -33,6 +33,7 @@ import logger from '@utils/logger';
 import { useLanguage } from '@contexts/LanguageContext';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
+import { MenuItemData } from '@components/ui/Menu';
 
 // Header component with LC-specific layout: profile menu on left, hamburger menu with dropdown, avatar with user icon
 const Header: React.FC<{
@@ -48,7 +49,7 @@ const Header: React.FC<{
   // Control user menu position (left or right) - for LC layout
   userMenuPosition?: 'left' | 'right';
   // For LC: menu items and handler for hamburger menu
-  hamburgerMenuItems?: Array<{ key: string; label: string; textValue: string }>;
+  hamburgerMenuItems?: MenuItemData[];
   onHamburgerMenuSelect?: (key: string | undefined) => void;
 }> = ({
   title,
