@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'react-native';
-import { Box, SafeAreaView, useColorMode } from '@gluestack-ui/themed';
+import { Box, SafeAreaView, ScrollView, useColorMode } from '@gluestack-ui/themed';
 import Header from '@components/Header';
 import { stylesLayout } from './Styles';
 
@@ -34,7 +34,9 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
         {...stylesLayout.mainContent}
         bg={isDark ? '$backgroundDark950' : '$backgroundLight0'}
       >
-        {children}
+        <ScrollView flex={1}>
+          {children}
+        </ScrollView>
       </Box>
     </SafeAreaView>
   );

@@ -6,7 +6,7 @@ import {
   Text,
   Heading,
   Pressable,
-  ScrollView,
+  Container,
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
@@ -116,9 +116,10 @@ const ParticipantsList: React.FC = () => {
       </HStack>
 
       {/* Tab Content */}
-      <ScrollView flex={1} bg={theme.tokens.colors.accent100}>
-        {activeTab === 'participants' ? (
-          <VStack space="lg" padding="$6" flex={1}>
+      <Box flex={1} bg={theme.tokens.colors.accent100}>
+        <Container>
+          {activeTab === 'participants' ? (
+            <VStack space="lg" flex={1}>
             {/* Page Title */}
             <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}>
               {t('participants.myParticipants')}
@@ -239,7 +240,6 @@ const ParticipantsList: React.FC = () => {
           </VStack>
         ) : (
           <Box
-            padding="$6"
             alignItems="center"
             justifyContent="center"
             minHeight={400}
@@ -251,8 +251,9 @@ const ParticipantsList: React.FC = () => {
               {t('participants.dashboardComingSoon')}
             </Text>
           </Box>
-        )}
-      </ScrollView>
+          )}
+        </Container>
+      </Box>
     </Box>
   );
 };

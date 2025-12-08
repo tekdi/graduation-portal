@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text, Select, Card } from '@ui';
+import { Box, Text, Select, Card, Container } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import LANGUAGE_OPTIONS from '@constants/LANGUAGE_OPTIONS';
 import { stylesLanguage } from './Styles';
@@ -11,8 +11,9 @@ const SelectLanguageScreen: React.FC = () => {
   const { currentLanguage, changeLanguage, t } = useLanguage();
 
   return (
-    <Box {...stylesLanguage.container}>
-      <Card {...stylesLanguage.card}>
+    <Container>
+      <Box {...stylesLanguage.container}>
+        <Card {...stylesLanguage.card}>
         <Text {...stylesLanguage.title}>{t('settings.selectLanguage')}</Text>
 
         <Text {...stylesLanguage.description}>
@@ -25,7 +26,8 @@ const SelectLanguageScreen: React.FC = () => {
           onChange={changeLanguage}
         />
       </Card>
-    </Box>
+      </Box>
+    </Container>
   );
 };
 
