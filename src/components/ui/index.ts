@@ -5,6 +5,6 @@ import { useAlert } from './Alert';
 import { Input } from './Inputs/input';
 import LucideIcon from './LucideIcon';
 import Modal from './Modal';
-import { Container } from './Container';
+import Container from './Container';
 export { Select, Menu, useAlert, Input, LucideIcon, Modal, Container };
 export type { ToastPlacement, AlertOptions } from '@app-types/components';
