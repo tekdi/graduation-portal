@@ -57,11 +57,8 @@ export const participantHeaderStyles = {
   container: {
     space: 'md' as const,
     width: '$full' as const,
-    maxWidth: 1200 as const, // Use numeric value (pixels) - Gluestack doesn't support tokens for maxWidth
-    marginHorizontal: 'auto' as const,
-    px: '$4' as const, // Mobile: smaller padding
     pt: '$6' as const,
-    pb: '$0' as const, // No bottom padding to eliminate gap before tabs
+    pb: '$6' as const, // Mobile: increased bottom padding
   },
 
   // Back navigation link

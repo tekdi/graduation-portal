@@ -59,7 +59,7 @@ export interface DataTableProps<T> {
 export interface ConfirmationModalProps {
   isOpen: boolean;
   onClose: () => void;
-  variant?: 'confirmation' | 'profile'; // Variant type: confirmation (default) or profile
+  variant?: 'confirmation' | 'profile' | 'lcProfile'; // Variant type: confirmation (default), profile, or lcProfile
   // Confirmation variant props
   onConfirm?: (inputValue?: string) => void;
   message?: string;

@@ -25,10 +25,11 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { ConfirmationModalProps } from '@app-types/components';
 import { LucideIcon } from '@ui';
 import { usePlatform } from '@utils/platform';
-import { profileStyles, commonModalContentStyles, commonModalContainerStyles } from './Styles';
+import { profileStyles, commonModalContentStyles, commonModalContainerStyles, LCProfileStyles } from './Styles';
 import Select from '../Inputs/Select';
 import { PROVINCES } from '@constants/PARTICIPANTS_LIST';
 import { getSitesByProvince } from '../../../services/participantService';
+import { LC_PROFILE_MOCK } from '@constants/LC_PROFILE_MOCK';
 
 const Modal: React.FC<ConfirmationModalProps> = ({
   isOpen,
@@ -64,6 +65,7 @@ const Modal: React.FC<ConfirmationModalProps> = ({
   const { isWeb } = usePlatform();
   
   const isProfileVariant = variant === 'profile';
+  const isLcProfileVariant = variant === 'lcProfile';
 
   // Internal state for input if not controlled
   const [internalInputValue, setInternalInputValue] = useState('');
@@ -94,7 +96,174 @@ const Modal: React.FC<ConfirmationModalProps> = ({
 
   const isConfirmDisabled = showInput && inputRequired && !inputValue.trim();
 
-  // Profile Variant Rendering
+  // LC Profile Variant Rendering (lg for both web and mobile)
+  if (isLcProfileVariant && profile) {
+    // Use mock data for LC profile (will be replaced by API later)
+    const lcProfileData = LC_PROFILE_MOCK;
+    const profileDetails = lcProfileData.profileDetails;
+    const { isMobile } = usePlatform();
+
+    return (
+      <GluestackModal isOpen={isOpen} onClose={onClose} size="lg" {...commonModalContainerStyles}>
+        <ModalBackdrop />
+        <ModalContent {...profileStyles.modalContent}>
+
+          <ModalHeader {...profileStyles.modalHeader}>
+            <HStack space="md" alignItems="center" flex={1}>
+              <Box 
+                {...LCProfileStyles.headerAvatar}
+                bg={theme.tokens.colors.primary500}
+                $web-backgroundImage="linear-gradient(to right bottom, rgb(139, 40, 66) 0%, oklab(0.999994 0.0000455678 0.0000200868 / 0.9) 100%)"
+              >
+                <LucideIcon name="User" size={30} color="#fff" />
+              </Box>
+
+              <VStack flex={1}>
+                <Text {...profileStyles.modalTitle}>{t(title)}</Text>
+                {subtitle && <Text {...profileStyles.modalSubtitle}>{t(subtitle)}</Text>}
+              </VStack>
+            </HStack>
+
+            <Pressable onPress={onClose}>
+              <Box {...LCProfileStyles.closeBtn}>
+                <LucideIcon name="X" size={16} color={theme.tokens.colors.textForeground} />
+              </Box>
+            </Pressable>
+          </ModalHeader>
+
+          <ModalBody {...profileStyles.modalBody}>
+            
+            <VStack 
+              {...LCProfileStyles.lcProfileCard}
+              $md-p="$6"
+            >
+              <Box 
+                {...LCProfileStyles.lcFieldWrapper}
+                $md-flexDirection="row"
+                $md-gap="$6"
+              >
+
+                {/* Full Name */}
+                <Box {...LCProfileStyles.lcItem} $md-width="auto">
+                  <HStack mb="$2" space="sm">
+                    <LucideIcon name="User" size={16} color={theme.tokens.colors.textMutedForeground} />
+                    <Text {...profileStyles.fieldValue}>{t('lcProfile.fullName')}</Text>
+                  </HStack>
+                  <Box {...LCProfileStyles.lcValueField}>
+                    <Text {...profileStyles.fieldLabel}>{profileDetails.fullName}</Text>
+                  </Box>
+                </Box>
+
+                {/* LC ID */}
+                <Box {...LCProfileStyles.lcItem} $md-width="auto">
+                  <HStack mb="$2" space="sm">
+                    <LucideIcon name="Award" size={16} color={theme.tokens.colors.textMutedForeground} />
+                    <Text {...profileStyles.fieldValue}>{t('lcProfile.lcId')}</Text>
+                  </HStack>
+                  <Box {...LCProfileStyles.lcValueField}>
+                    <Text {...profileStyles.fieldLabel}>{profileDetails.lcId}</Text>
+                  </Box>
+                </Box>
+
+                {/* Email Address */}
+                <Box {...LCProfileStyles.lcItem} $md-width="auto">
+                  <HStack mb="$2" space="sm">
+                    <LucideIcon name="Mail" size={16} color={theme.tokens.colors.textMutedForeground} />
+                    <Text {...profileStyles.fieldValue}>{t('lcProfile.emailAddress')}</Text>
+                  </HStack>
+                  <Box {...LCProfileStyles.lcValueField}>
+                    <Text {...profileStyles.fieldLabel}>{profileDetails.emailAddress}</Text>
+                  </Box>
+                </Box>
+
+                {/* Phone Number */}
+                <Box {...LCProfileStyles.lcItem} $md-width="auto">
+                  <HStack mb="$2" space="sm">
+                    <LucideIcon name="Phone" size={16} color={theme.tokens.colors.textMutedForeground} />
+                    <Text {...profileStyles.fieldValue}>{t('lcProfile.phoneNumber')}</Text>
+                  </HStack>
+                  <Box {...LCProfileStyles.lcValueField}>
+                    <Text {...profileStyles.fieldLabel}>{profileDetails.phoneNumber}</Text>
+                  </Box>
+                </Box>
+
+                {/* Service Area - Full Width */}
+                <Box width="$full">
+                  <HStack mb="$2" space="sm">
+                    <LucideIcon name="MapPin" size={16} color={theme.tokens.colors.textMutedForeground} />
+                    <Text {...profileStyles.fieldValue}>{t('lcProfile.serviceArea')}</Text>
+                  </HStack>
+                  <Box {...LCProfileStyles.lcValueField}>
+                    <Text {...profileStyles.fieldLabel}>{profileDetails.serviceArea}</Text>
+                  </Box>
+                </Box>
+
+                {/* Start Date */}
+                <Box {...LCProfileStyles.lcItem} $md-width="auto">
+                  <HStack mb="$2" space="sm">
+                    <LucideIcon name="Calendar" size={16} color={theme.tokens.colors.textMutedForeground} />
+                    <Text {...profileStyles.fieldValue}>{t('lcProfile.startDate')}</Text>
+                  </HStack>
+                  <Box {...LCProfileStyles.lcValueField}>
+                    <Text {...profileStyles.fieldLabel}>{profileDetails.startDate}</Text>
+                  </Box>
+                </Box>
+
+                {/* Language Preference */}
+                <Box {...LCProfileStyles.lcItem} $md-width="auto">
+                  <HStack mb="$2" space="sm">
+                    <Text {...profileStyles.fieldValue}>{t('lcProfile.languagePreference')}</Text>
+                  </HStack>
+                  <HStack space="sm">
+                    <Pressable>
+                      <Box
+                        bg={profileDetails.languagePreference === 'en' ? theme.tokens.colors.primary500 : 'transparent'}
+                        borderWidth={profileDetails.languagePreference === 'en' ? 0 : 1}
+                        borderColor={theme.tokens.colors.primary500}
+                        px="$3"
+                        py="$1"
+                        borderRadius="$full"
+                      >
+                        <Text
+                          color={profileDetails.languagePreference === 'en' ? "#fff" : theme.tokens.colors.primary500}
+                          fontSize="$xs" fontWeight="$medium"
+                        >
+                          {t('languages.en')}
+                        </Text>
+                      </Box>
+                    </Pressable>
+                    <Pressable>
+                      <Box
+                        bg={profileDetails.languagePreference === 'es' ? theme.tokens.colors.primary500 : 'transparent'}
+                        borderWidth={profileDetails.languagePreference === 'es' ? 0 : 1}
+                        borderColor={theme.tokens.colors.primary500}
+                        px="$3"
+                        py="$1"
+                        borderRadius="$full"
+                      >
+                        <Text
+                          color={profileDetails.languagePreference === 'es' ? "#fff" : theme.tokens.colors.primary500}
+                          fontSize="$xs" 
+                          fontWeight="$medium"
+                        >
+                          {t('languages.es')}
+                        </Text>
+                      </Box>
+                    </Pressable>
+                  </HStack>
+                </Box>
+
+              </Box>
+            </VStack>
+
+          </ModalBody>
+        </ModalContent>
+      </GluestackModal>
+    );
+  }
+
+
+  // Profile Variant Rendering (Participant Profile: sm desktop, lg mobile)
   if (isProfileVariant && profile) {
     return (
       <GluestackModal 

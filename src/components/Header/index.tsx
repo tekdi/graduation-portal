@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import {
   Box,
@@ -20,6 +20,7 @@ import {
   SearchIcon,
   BellIcon,
   ChevronDownIcon,
+  Modal,
 } from '@ui';
 import { useGlobal } from '@contexts/GlobalContext';
 import { stylesHeader } from './Styles';
@@ -57,14 +58,47 @@ const Header: React.FC<{
   const { user, logout, isLoggedIn } = useAuth();
   const { isMobile } = usePlatform();
   const { t } = useLanguage();
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleMenuSelect = (key: string | undefined) => {
     // Handle menu item selection
     logger.log('Menu selected:', key);
-    if (key === 'logout') {
+    if (key === 'profile') {
+      setIsProfileModalOpen(true);
+    } else if (key === 'logout') {
       logout();
     }
   };
+
+  // Create profile data from user object
+  const userProfile = user
+    ? {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        phone: 'N/A', // User phone not available in current User type
+        address: undefined, // User address not available in current User type
+        // LC Profile specific fields
+        serviceArea: user.role === 'LC' ? 'District 5 - Central Region' : undefined,
+        startDate: user.role === 'LC' ? '15/01/2023' : undefined,
+        statistics: user.role === 'LC' ? {
+          activeParticipants: 12,
+          completedIdps: 8,
+          visitsLogged: 45,
+          pendingTasks: 2,
+        } : undefined,
+        certifications: user.role === 'LC' ? [
+          {
+            name: 'Linkage Champion Core Training',
+            completedDate: 'January 2023',
+            certified: true,
+          },
+        ] : undefined,
+      }
+    : undefined;
+
+  // Determine variant based on user role
+  const profileVariant = user?.role === 'LC' ? 'lcProfile' : 'profile';
 
   return (
     <Box
@@ -168,6 +202,18 @@ const Header: React.FC<{
         </HStack>
         {leftSideContent && leftSideContent}
       </HStack>
+
+      {/* Profile Modal */}
+      {userProfile && (
+        <Modal
+          variant={profileVariant}
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          title={user?.role === 'LC' ? t('lcProfile.myProfile') : t('common.profile')}
+          subtitle={user?.role === 'LC' ? t('lcProfile.linkageChampionProfile') : t('participantDetail.header.viewProfile')}
+          profile={userProfile}
+        />
+      )}
     </Box>
   );
 };

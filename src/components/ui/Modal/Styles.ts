@@ -104,3 +104,76 @@ export const profileStyles = {
   },
 } as const;
 
+export const LCProfileStyles = {
+  lcProfileCard: {
+    bg: '$white' as const,
+    p: '$4' as const,
+    borderRadius: '$lg' as const,
+    borderWidth: 1,
+    borderColor: '$borderLight300' as const,
+    width: '$full' as const,
+
+    // responsive layout for fields
+    sx: {
+      _web: {
+        maxWidth: '720px',      // popup width like reference UI
+        width: '100%',
+        margin: '0 auto',
+      },
+    },
+  },
+
+  // Wrapper for all profile detail items
+  lcFieldWrapper: {
+    flexDirection: 'column' as const,
+    flexWrap: 'wrap' as const,
+    gap: '$4' as const,
+
+    sx: {
+      _web: {
+        display: 'flex',
+      },
+    },
+  },
+
+  lcItem: {
+    width: '$full' as const,
+    flex: 1,
+    sx: {
+      _web: {
+        flexBasis: '45%',    // maintains two columns without minWidth
+      },
+    },
+  },
+
+  headerAvatar: {
+    width: '$16' as const,
+    height: '$16' as const,
+    borderRadius: '$full' as const,
+    bg: theme.tokens.colors.primary500,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+
+  closeBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: '$sm' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+
+  // Value field background for LC profile
+  lcValueField: {
+    bg: '$bgSidebar' as const,
+    py: '$1' as const,
+    px: '$3' as const,
+    minHeight: '$9' as const,
+    borderRadius: '$md' as const,
+    alignItems: 'flex-start' as const,
+    justifyContent: 'center' as const,
+    display: 'flex' as const,
+    opacity: 0.8,
+  },
+};
+
