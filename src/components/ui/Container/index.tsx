@@ -17,7 +17,7 @@ const Container = ({ children }: ContainerProps) => {
       $sm-maxWidth={containerSizes.sm}        // sm: 540px
       $md-maxWidth={containerSizes.md}        // md: 720px
       $lg-maxWidth={containerSizes.lg}        // lg: 960px
-      $xl-maxWidth={containerSizes.xl}       // xl: 1140px
+      $xl-maxWidth={containerSizes.xl}       // xl: 1280px
       $2xl-maxWidth={containerSizes['2xl']}      // 2xl: 1320px
       mx="auto"                   // center align horizontally
     >
