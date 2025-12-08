@@ -111,7 +111,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
         elevation={2}
       >
         <AccordionItem
-          value="project-tasks"
+          value={task._id}
           bg={theme.tokens.colors.backgroundPrimary.light}
           borderRadius="$lg"
           borderWidth={1}

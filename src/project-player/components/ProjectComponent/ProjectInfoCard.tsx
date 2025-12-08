@@ -95,7 +95,8 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
                 color={theme.tokens.colors.backgroundPrimary.light}
                 fontWeight="$semibold"
               >
-                {completedTasks} of {totalTasks} Steps Complete
+                {completedTasks} of {totalTasks}{' '}
+                {t('projectPlayer.stepsComplete')}
               </Text>
             </HStack>
           </Box>
