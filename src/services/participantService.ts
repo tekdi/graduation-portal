@@ -1,4 +1,4 @@
-import { Participant } from '@app-types/screens';
+import { Participant, ParticipantsQueryParams, StatusType } from '@app-types/screens';
 import type { ParticipantData, UnifiedParticipant, Province, Site } from '@app-types/participant';
 import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
 
@@ -110,5 +110,50 @@ export const getSitesByProvince = (provinceValue: string): Site[] => {
   // TODO: Replace with API call that filters sites by province
   // For now, return all sites
   return SITES;
+};
+
+export const getFilteredParticipants = (
+  params: ParticipantsQueryParams = {}
+): Participant[] => {
+  // TODO: Replace with actual API call
+  // Example: return await api.get('/participants', { params });
+  
+  const data = getParticipantsList();
+  const filters = params;
+  
+  return data.filter((item) => {
+    return Object.entries(filters).every(([key, value]) => {
+      if (value === undefined || value === null || value === '') return true;
+
+      const itemValue = item[key as keyof Participant];
+
+      // 1️⃣ If filter value is an array → match any value
+      if (Array.isArray(value)) {
+        if (typeof itemValue === 'string') {
+          return value
+            .map(v => String(v).toLowerCase())
+            .includes(itemValue.toLowerCase());
+        }
+        return value.includes(itemValue);
+      }
+
+      // 2️⃣ If filter value is a string
+      if (typeof value === 'string') {
+        // Exact match for status and id fields (enum/identifier values)
+        if (key === 'status' || key === 'id') {
+          return itemValue === value;
+        }
+        // Partial match for other string fields (name, email, etc.)
+        if (typeof itemValue === 'string') {
+          return itemValue.toLowerCase().includes(value.toLowerCase());
+        }
+        // Exact match for non-strings
+        return (itemValue as any) === value;
+      }
+
+      // 3️⃣ Boolean / number → strict match
+      return itemValue === value;
+    });
+  });
 };
 

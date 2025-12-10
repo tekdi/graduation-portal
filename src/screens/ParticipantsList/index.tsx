@@ -8,6 +8,7 @@ import {
   Pressable,
   Container,
   ScrollView,
+  Select,
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
@@ -15,26 +16,20 @@ import DataTable from '@components/DataTable';
 import { getParticipantsColumns } from '@components/DataTable/ParticipantsTableConfig';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
-import { Participant, StatusCount, StatusType } from '@app-types/screens';
+import { Participant, ParticipantsQueryParams, StatusCount, StatusType } from '@app-types/screens';
 import { useLanguage } from '@contexts/LanguageContext';
 import { getStatusItems } from '@constants/FILTERS';
-import { getParticipantsList } from '../../services/participantService';
+import { getFilteredParticipants, getParticipantsList } from '../../services/participantService';
 import { STATUS } from '@constants/app.constant';
+import { usePlatform } from '@utils/platform';
 
 const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
   const { t } = useLanguage();
+  const { isMobile } = usePlatform();
 
   // State management
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [statusCounts] = useState<StatusCount>({
-    not_enrolled: 5,
-    enrolled: 11,
-    in_progress: 13,
-    completed: 6,
-    dropped_out: 0,
-  });
-
   const [activeStatus, setActiveStatus] = useState<StatusType | ''>(
     STATUS.NOT_ENROLLED,
   );
@@ -43,8 +38,38 @@ const ParticipantsList: React.FC = () => {
   const [_page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
+  // Calculate status counts dynamically from participants data
+  const statusCounts = useMemo<StatusCount>(() => {
+    const counts: StatusCount = {
+      not_enrolled: 0,
+      enrolled: 0,
+      in_progress: 0,
+      completed: 0,
+      dropout: 0,
+    };
+
+    participants.forEach(participant => {
+      if (participant.status) {
+        const status = participant.status as StatusType;
+        if (status in counts) {
+          counts[status] = (counts[status] || 0) + 1;
+        }
+      }
+    });
+
+    return counts;
+  }, [participants]);
+
   // Get status items with current counts
   const statusItems = getStatusItems(statusCounts);
+
+  // Format status items for Select dropdown (mobile)
+  const selectOptions = useMemo(() => {
+    return statusItems.map(item => ({
+      label: `${t(item.label)} (${item.count})`,
+      value: item.key,
+    }));
+  }, [statusItems, t]);
 
   useEffect(() => {
     // Set mock participants data
@@ -54,18 +79,20 @@ const ParticipantsList: React.FC = () => {
   }, []);
 
   const filteredParticipants = useMemo(() => {
-    // Example placeholder logic until API integration:
-    const term = _searchKey.trim().toLowerCase();
-    const participants = getParticipantsList();
-    return participants.filter((p: Participant) => {
-      const matchesSearch =
-        !term ||
-        p.name.toLowerCase().includes(term) ||
-        p.id.toLowerCase().includes(term);
-      // If/when Participant has a status field, also filter on activeStatus here.
-      return matchesSearch;
-    });
-  }, [_searchKey]);
+    const params: ParticipantsQueryParams = {};
+    
+    // Add searchKey filter if provided (service handles empty strings)
+    if (_searchKey) {
+      params.searchKey = _searchKey;
+    }
+    
+    // Add status filter if provided (service handles empty strings)
+    if (activeStatus) {
+      params.status = activeStatus as StatusType;
+    }
+    
+    return getFilteredParticipants(params);
+  }, [_searchKey, activeStatus]);
 
   // Handlers
   const handleSearch = useCallback((text: string) => {
@@ -110,83 +137,96 @@ const ParticipantsList: React.FC = () => {
               debounceMs={500}
             />
 
-            {/* Status Filter Bar */}
-            <Box
-              bg="$backgroundLight50"
-              borderRadius="$lg"
-              padding="$1"
-              width="$full"
-            >
-              <HStack space="xs" width="$full">
-                {statusItems.map(item => {
-                  const isActive = activeStatus === item.key;
+            {/* Status Filter Bar - Desktop: Filter buttons, Mobile: Dropdown */}
+            {isMobile ? (
+              <Box width="$full">
+                <Select
+                  options={selectOptions}
+                  value={activeStatus}
+                  onChange={(value) => handleStatusChange(value as StatusType | '')}
+                  placeholder={t('participants.selectStatus') || 'Select Status'}
+                  bg="$white"
+                  borderColor="$borderLight300"
+                />
+              </Box>
+            ) : (
+              <Box
+                bg="$backgroundLight50"
+                borderRadius="$lg"
+                padding="$1"
+                width="$full"
+              >
+                <HStack space="xs" width="$full">
+                  {statusItems.map(item => {
+                    const isActive = activeStatus === item.key;
 
-                  return (
-                    <Pressable
-                      key={item.key}
-                      onPress={() => handleStatusChange(item.key)}
-                      flex={1}
-                      paddingVertical="$3"
-                      paddingHorizontal="$2"
-                      borderRadius="$md"
-                      bg={isActive ? '$white' : 'transparent'}
-                      $web-cursor="pointer"
-                      $web-transition="all 0.2s"
-                      sx={{
-                        ':hover': {
-                          opacity: 0.8,
-                        },
-                      }}
-                    >
-                      <HStack
-                        space="xs"
-                        alignItems="center"
-                        justifyContent="center"
+                    return (
+                      <Pressable
+                        key={item.key}
+                        onPress={() => handleStatusChange(item.key)}
+                        flex={1}
+                        paddingVertical="$3"
+                        paddingHorizontal="$2"
+                        borderRadius="$md"
+                        bg={isActive ? '$white' : 'transparent'}
+                        $web-cursor="pointer"
+                        $web-transition="all 0.2s"
+                        sx={{
+                          ':hover': {
+                            opacity: 0.8,
+                          },
+                        }}
                       >
-                        <Text
-                          fontSize="$sm"
-                          color={
-                            isActive
-                              ? theme.tokens.colors.primary500
-                              : theme.tokens.colors.mutedForeground
-                          }
-                          fontWeight={isActive ? '$medium' : '$normal'}
-                          textAlign="center"
-                        >
-                          {t(item.label)}
-                        </Text>
-                        <Box
-                          bg={
-                            isActive
-                              ? theme.tokens.colors.primary500
-                              : '$backgroundLight200'
-                          }
-                          borderRadius="$full"
-                          paddingHorizontal="$2"
-                          paddingVertical="$0.5"
-                          minWidth={24}
-                          height={20}
+                        <HStack
+                          space="xs"
                           alignItems="center"
                           justifyContent="center"
                         >
                           <Text
-                            fontSize="$xs"
+                            fontSize="$sm"
                             color={
                               isActive
-                                ? '$white'
+                                ? theme.tokens.colors.primary500
                                 : theme.tokens.colors.mutedForeground
                             }
-                            fontWeight="$semibold"
+                            fontWeight={isActive ? '$medium' : '$normal'}
+                            textAlign="center"
                           >
-                            {item.count}
+                            {t(item.label)}
                           </Text>
-                        </Box>
-                      </HStack>
-                    </Pressable>
-                  );
-                })}
-              </HStack>
-            </Box>
+                          <Box
+                            bg={
+                              isActive
+                                ? theme.tokens.colors.primary500
+                                : '$backgroundLight200'
+                            }
+                            borderRadius="$full"
+                            paddingHorizontal="$2"
+                            paddingVertical="$0.5"
+                            minWidth={24}
+                            height={20}
+                            alignItems="center"
+                            justifyContent="center"
+                          >
+                            <Text
+                              fontSize="$xs"
+                              color={
+                                isActive
+                                  ? '$white'
+                                  : theme.tokens.colors.mutedForeground
+                              }
+                              fontWeight="$semibold"
+                            >
+                              {item.count}
+                            </Text>
+                          </Box>
+                        </HStack>
+                      </Pressable>
+                    );
+                  })}
+                </HStack>
+              </Box>
+            )}
 
             {/* Participants Table */}
             <DataTable

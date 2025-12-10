@@ -33,6 +33,6 @@ export const getStatusItems = (
   {
     key: STATUS.DROPOUT,
     label: 'participants.droppedOut',
-    count: statusCounts.dropped_out,
+    count: statusCounts.dropout,
   },
 ];

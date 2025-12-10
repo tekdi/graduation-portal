@@ -38,3 +38,15 @@ export const CARD_STATUS = {
   COMPLETED: 'completed',
   GRADUATED: 'graduated',
 } as const;
+
+/**
+ * Participant Table Column Keys
+ * Defines the column keys used in the participants table
+ */
+export const PARTICIPANT_COLUMN_KEYS = {
+  NAME: 'name',
+  ID: 'id',
+  PROGRESS: 'progress',
+  GRADUATED: 'graduated',
+  PHONE: 'phone',
+} as const;
