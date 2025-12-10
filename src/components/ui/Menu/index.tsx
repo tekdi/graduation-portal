@@ -12,19 +12,27 @@ import {
 import { LucideIcon } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 
-// Menu component with support for icons, dividers, and custom menu items (used for LC hamburger menu)
+/**
+ * Menu Component - Enhanced with Icon and Divider Support
+ * 
+ * [PR #19 Changes]
+ * - Added `showDividerAfter` property to MenuItemData for visual menu organization
+ * - Added icon support: `iconElement` (custom ReactNode), `iconName` (LucideIcon name), `icon` (Gluestack Icon)
+ * - Added `iconColor` and `iconSizeValue` for fine-grained icon styling control
+ * - Dividers render as disabled MenuItem with Box separator for consistent menu structure
+ */
 export interface MenuItemData {
   key: string;
   label: string;
   textValue: string;
   icon?: any;
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  iconElement?: React.ReactNode;
-  iconName?: string;
-  iconColor?: string;
-  iconSizeValue?: number;
+  iconElement?: React.ReactNode; // [PR #19] Custom ReactNode for icon (e.g., React.createElement pattern)
+  iconName?: string; // [PR #19] LucideIcon name (e.g., 'Home', 'User', 'LogOut')
+  iconColor?: string; // [PR #19] Icon color value
+  iconSizeValue?: number; // [PR #19] Icon size in pixels
   color?: string;
-  showDividerAfter?: boolean;
+  showDividerAfter?: boolean; // [PR #19] Render divider after this menu item
 }
 
 export interface CustomMenuProps {
@@ -106,6 +114,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
       {...menuProps}
     >
       {items?.map((item: MenuItemData, index: number) => {
+        // [PR #19] Render menu item with icon support (priority: iconElement > iconName > icon)
         const menuItem = (
           <MenuItem
             key={item.key || index.toString()}
@@ -113,10 +122,12 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
             onPress={() => handleMenuItemPress(item.key)}
           >
             {item.iconElement ? (
+              // Custom ReactNode icon (used in constants for React.createElement pattern)
               <Box mr="$2">
                 {item.iconElement}
               </Box>
             ) : item.iconName ? (
+              // LucideIcon by name (flexible icon rendering)
               <Box mr="$2">
                 <LucideIcon 
                   name={item.iconName} 
@@ -125,6 +136,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
                 />
               </Box>
             ) : item.icon ? (
+              // Gluestack Icon component
               <Icon as={item.icon} size={item.iconSize || 'sm'} me="$2" />
             ) : null}
             <MenuItemLabel size="sm" color={item.color}>
@@ -133,6 +145,8 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
           </MenuItem>
         );
 
+        // [PR #19] Render divider after menu item if showDividerAfter is true
+        // Uses disabled MenuItem wrapper with Box separator for consistent menu structure
         if (item.showDividerAfter) {
           return (
             <React.Fragment key={item.key || index.toString()}>

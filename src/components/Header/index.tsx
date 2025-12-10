@@ -35,7 +35,16 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import { MenuItemData } from '@components/ui/Menu';
 
-// Header component with LC-specific layout: profile menu on left, hamburger menu with dropdown, avatar with user icon
+/**
+ * Header Component - Enhanced for LC Layout Support
+ * 
+ * [PR #19 Changes]
+ * - Added `userMenuPosition` prop to control profile menu placement (left for LC, right for Admin)
+ * - Added `hamburgerMenuItems` and `onHamburgerMenuSelect` props for LC hamburger menu integration
+ * - Conditional rendering: Shows hamburger menu when LC props provided, otherwise shows default rightSideContent
+ * - Left-aligned profile menu: When `userMenuPosition="left"`, displays avatar with gradient background and user icon
+ * - Gradient avatar: Uses `$web-style` for CSS gradient on web, solid color fallback on native platforms
+ */
 const Header: React.FC<{
   title?: string;
   rightSideContent?: React.ReactNode;
@@ -86,7 +95,12 @@ const Header: React.FC<{
       shadowColor={isDark ? '$backgroundDark950' : '$black'}
     >
       <HStack {...stylesHeader.hStack}>
-        {/* Hamburger Menu with Dropdown (for LC) */}
+        {/* 
+          [PR #19] Hamburger Menu with Dropdown (for LC)
+          - Conditionally renders hamburger menu when LC props (hamburgerMenuItems, onHamburgerMenuSelect) are provided
+          - Uses MenuIcon as trigger, opens menu at "bottom left" placement
+          - Falls back to default rightSideContent if LC props not provided (Admin layout)
+        */}
         {rightSideContent && hamburgerMenuItems && onHamburgerMenuSelect ? (
           <Menu
             items={hamburgerMenuItems}
@@ -103,7 +117,13 @@ const Header: React.FC<{
           rightSideContent && rightSideContent
         )}
         
-        {/* Left: Avatar Only (only if userMenuPosition is 'left') */}
+        {/* 
+          [PR #19] Left: Avatar with User Info (only if userMenuPosition is 'left' - LC layout)
+          - Displays avatar with gradient background on web, solid color on native
+          - Gradient: Uses $web-style prop for CSS linear-gradient (web only)
+          - Avatar contains User icon overlay positioned absolutely in center
+          - Shows user name next to avatar (role commented out for future use)
+        */}
         {isLoggedIn && userMenuPosition === 'left' && (
           <HStack {...stylesHeader.userMenuTrigger} alignItems="center" space="sm">
             <Avatar {...stylesHeader.userAvatar} $web-style={{

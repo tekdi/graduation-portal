@@ -8,7 +8,15 @@ import { LC_MENU_OPTIONS } from '@constants/PROFILE_MENU_OPTIONS';
 import { useAuth } from '@contexts/AuthContext';
 import logger from '@utils/logger';
 
-// LC Layout: Configures Header with left-aligned profile menu, hamburger menu, and conditional Home menu visibility
+/**
+ * LC Layout Component - Enhanced Header Integration
+ * 
+ * [PR #19 Changes]
+ * - Integrates Header component with LC-specific configuration (left-aligned profile menu, hamburger menu)
+ * - Conditional menu filtering: Hides "Home" menu item when on welcome screen to prevent redundant navigation
+ * - Menu selection handler: Navigates to welcome screen for 'home', handles logout for 'logout'
+ * - Uses useMemo to optimize menu filtering based on current route
+ */
 interface LayoutProps {
   title: string;
   children: React.ReactNode;
@@ -23,17 +31,18 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // Filter menu items based on current screen
+  // [PR #19] Filter menu items based on current screen - hides Home menu on welcome screen
   const filteredMenuItems = useMemo(() => {
     const isWelcomeScreen = route.name === 'welcome';
     if (isWelcomeScreen) {
-      // Hide Home menu when on welcome screen
+      // Hide Home menu when on welcome screen (prevents showing "Home" when already on home)
       return LC_MENU_OPTIONS.filter(item => item.key !== 'home');
     }
     // Show all menu items including Home when on other screens
     return LC_MENU_OPTIONS;
   }, [route.name]);
 
+  // [PR #19] Handle menu item selection - navigates to welcome for 'home', handles logout
   const handleMenuSelect = (key: string | undefined) => {
     logger.log('Menu selected:', key);
     if (key === 'home') {
@@ -41,6 +50,7 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
     } else if (key === 'logout') {
       logout();
     }
+    // Note: dashboard, myProfile, serviceProviders handlers can be added here as needed
   };
 
   const rightSideContent = (
@@ -60,7 +70,13 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
         backgroundColor={isDark ? '$backgroundDark950' : '$backgroundLight0'}
       />
 
-      {/* Header */}
+      {/* 
+        [PR #19] Header with LC-specific configuration
+        - userMenuPosition="left": Places profile menu on left side (LC layout)
+        - hamburgerMenuItems: Passes filtered menu items (conditionally hides Home)
+        - onHamburgerMenuSelect: Handles menu item selection (navigation/logout)
+        - showLanguage/showTheme: Disabled for LC layout
+      */}
       <Header 
         title={title} 
         showLanguage={false} 

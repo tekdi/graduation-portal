@@ -1,8 +1,17 @@
 import { theme } from '@config/theme';
 import { MenuItemData } from '@components/ui/Menu';
 
-// Menu options for Admin and LC users: LC menu includes icons, dividers, and conditional Home menu item
-// Admin menu options (original)
+/**
+ * Profile Menu Options - Enhanced for LC Support
+ * 
+ * [PR #19 Changes]
+ * - Separated LC_MENU_OPTIONS from ADMIN_MENU_OPTIONS for role-specific menu configurations
+ * - LC menu includes: icons (via iconName + iconColor), dividers (showDividerAfter), and i18n labels
+ * - Uses React.createElement pattern in constants for icon rendering (iconElement)
+ * - Dividers placed after Home and Service Providers for visual menu organization
+ * - Logout item uses error color (error600) to indicate destructive action
+ */
+// Admin menu options (original - backward compatible)
 export const ADMIN_MENU_OPTIONS: MenuItemData[] = [
   {
     key: 'profile',
@@ -21,16 +30,16 @@ export const ADMIN_MENU_OPTIONS: MenuItemData[] = [
   },
 ];
 
-// LC menu options (with icons)
+// [PR #19] LC menu options with icons, dividers, and i18n labels
 export const LC_MENU_OPTIONS: MenuItemData[] = [
   {
     key: 'home',
     label: 'lc.menu.home',
     textValue: 'home',
-    iconName: 'Home',
+    iconName: 'Home', // LucideIcon name
     iconSizeValue: 16,
     iconColor: theme.tokens.colors.textForegroundColor,
-    showDividerAfter: true,
+    showDividerAfter: true, // Divider after Home (separates navigation from profile actions)
   },
   {
     key: 'dashboard',
@@ -57,7 +66,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     iconName: 'Building2',
     iconSizeValue: 16,
     iconColor: theme.tokens.colors.textForegroundColor,
-    showDividerAfter: true,
+    showDividerAfter: true, // Divider after Service Providers (separates actions from logout)
   },
   {
     key: 'logout',
@@ -65,7 +74,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     textValue: 'logout',
     iconName: 'LogOut',
     iconSizeValue: 16,
-    iconColor: theme.tokens.colors.error600,
+    iconColor: theme.tokens.colors.error600, // Error color indicates destructive action
     showDividerAfter: false,
   },
 ];
