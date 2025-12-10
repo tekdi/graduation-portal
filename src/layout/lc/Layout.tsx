@@ -1,9 +1,19 @@
 import React from 'react';
 import { StatusBar } from 'react-native';
-import { Box, SafeAreaView, useColorMode } from '@gluestack-ui/themed';
+import { Box, SafeAreaView, ScrollView, useColorMode, Pressable, Icon, MenuIcon } from '@gluestack-ui/themed';
+import { useNavigation } from '@react-navigation/native';
 import Header from '@components/Header';
 import { stylesLayout } from './Styles';
+import { LC_MENU_OPTIONS } from '@constants/PROFILE_MENU_OPTIONS';
+import { useAuth } from '@contexts/AuthContext';
+import logger from '@utils/logger';
 
+/**
+ * LC Layout Component - Enhanced Header Integration
+ * 
+ * - Integrates Header component with LC-specific configuration (left-aligned profile menu, hamburger menu)
+ * - Menu selection handler: Uses navigation routes from LC_MENU_OPTIONS config, handles logout separately
+ */
 interface LayoutProps {
   title: string;
   children: React.ReactNode;
@@ -14,6 +24,30 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ title, children }) => {
   const mode = useColorMode();
   const isDark = mode === 'dark';
+  const { logout } = useAuth();
+  const navigation = useNavigation();
+
+  // Handle menu item selection - uses route from menu config for navigation
+  const handleMenuSelect = (key: string | undefined) => {
+    logger.log('Menu selected:', key);
+    
+    if (key === 'logout') {
+      logout();
+      return;
+    }
+    
+    // Find the menu item in LC_MENU_OPTIONS and use its route for navigation
+    const menuItem = LC_MENU_OPTIONS.find(item => item.key === key);
+    if (menuItem?.route) {
+      navigation.navigate(menuItem.route as never);
+    }
+  };
+
+  const rightSideContent = (
+    <Pressable>
+      <Icon as={MenuIcon} />
+    </Pressable>
+  );
 
   return (
     <SafeAreaView
@@ -26,15 +60,31 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
         backgroundColor={isDark ? '$backgroundDark950' : '$backgroundLight0'}
       />
 
-      {/* Header */}
-      <Header title={title} showLanguage={true} showTheme={true} />
+      {/* 
+        Header with LC-specific configuration
+        - userMenuPosition="left": Places profile menu on left side (LC layout)
+        - hamburgerMenuItems: Passes all LC menu items including Home
+        - onHamburgerMenuSelect: Handles menu item selection (navigation/logout)
+        - showLanguage/showTheme: Disabled for LC layout
+      */}
+      <Header 
+        title={title} 
+        showLanguage={false} 
+        showTheme={false} 
+        userMenuPosition="left"
+        rightSideContent={rightSideContent}
+        hamburgerMenuItems={LC_MENU_OPTIONS}
+        onHamburgerMenuSelect={handleMenuSelect}
+      />
 
       {/* Main Content */}
       <Box
         {...stylesLayout.mainContent}
         bg={isDark ? '$backgroundDark950' : '$backgroundLight0'}
       >
-        {children}
+        <ScrollView flex={1}>
+          {children}
+        </ScrollView>
       </Box>
     </SafeAreaView>
   );

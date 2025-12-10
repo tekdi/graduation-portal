@@ -301,6 +301,7 @@
     "dropoutReasonPlaceholder": "Enter reason for dropout...",
     "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
   },
+<<<<<<< HEAD
   "lcProfile": {
     "myProfile": "My Profile",
     "linkageChampionProfile": "Linkage Champion Profile",
@@ -321,5 +322,13 @@
     "completed": "Completed",
     "certified": "Certified",
     "notes": "Notes"
+  },
+  "lc": {
+    "menu": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "myProfile": "My Profile",
+      "serviceProviders": "Service Providers"
+    }
   }
 }

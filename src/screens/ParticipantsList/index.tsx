@@ -6,6 +6,7 @@ import {
   Text,
   Heading,
   Pressable,
+  Container,
   ScrollView,
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
@@ -16,8 +17,6 @@ import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { Participant, StatusCount, StatusType } from '@app-types/screens';
 import { useLanguage } from '@contexts/LanguageContext';
-import { TabButton } from '@components/Tabs';
-import { TABS } from '@constants/TABS';
 import { getStatusItems } from '@constants/FILTERS';
 import { getParticipantsList } from '../../services/participantService';
 import { STATUS } from '@constants/app.constant';
@@ -27,7 +26,6 @@ const ParticipantsList: React.FC = () => {
   const { t } = useLanguage();
 
   // State management
-  const [activeTab, setActiveTab] = useState<string>('participants');
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [statusCounts] = useState<StatusCount>({
     not_enrolled: 5,
@@ -49,13 +47,11 @@ const ParticipantsList: React.FC = () => {
   const statusItems = getStatusItems(statusCounts);
 
   useEffect(() => {
-    if (activeTab === 'participants') {
-      // Set mock participants data
-      const participants = getParticipantsList();
-      setParticipants(participants);
-      setTotalCount(participants.length);
-    }
-  }, [activeTab]);
+    // Set mock participants data
+    const participants = getParticipantsList();
+    setParticipants(participants);
+    setTotalCount(participants.length);
+  }, []);
 
   const filteredParticipants = useMemo(() => {
     // Example placeholder logic until API integration:
@@ -99,30 +95,13 @@ const ParticipantsList: React.FC = () => {
 
   return (
     <Box flex={1}>
-      {/* Tabs Header */}
-      <HStack
-        borderBottomWidth={1}
-        borderBottomColor="$borderLight300"
-        bg={theme.tokens.colors.backgroundPrimary.light}
-      >
-        {TABS?.map(tab => (
-          <TabButton
-            key={tab.key}
-            tab={tab}
-            isActive={activeTab === tab.key}
-            onPress={setActiveTab}
-          />
-        ))}
-      </HStack>
-
-      {/* Tab Content */}
       <ScrollView flex={1} bg={theme.tokens.colors.accent100}>
-        {activeTab === 'participants' ? (
-          <VStack space="lg" padding="$6" flex={1}>
+        <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground} bg="$white" padding="$4" my="$2">
+          {t('participants.myParticipants')}
+        </Heading>
+        <VStack space="lg" padding="$6" flex={1}>
             {/* Page Title */}
-            <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}>
-              {t('participants.myParticipants')}
-            </Heading>
+           
 
             {/* Search Bar */}
             <SearchBar
@@ -236,22 +215,7 @@ const ParticipantsList: React.FC = () => {
                 </Text>
               </Box>
             )}
-          </VStack>
-        ) : (
-          <Box
-            padding="$6"
-            alignItems="center"
-            justifyContent="center"
-            minHeight={400}
-          >
-            <Text
-              {...TYPOGRAPHY.paragraph}
-              color={theme.tokens.colors.mutedForeground}
-            >
-              {t('participants.dashboardComingSoon')}
-            </Text>
-          </Box>
-        )}
+        </VStack>
       </ScrollView>
     </Box>
   );
