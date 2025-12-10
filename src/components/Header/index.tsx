@@ -97,130 +97,6 @@ const Header: React.FC<{
   // Get profile details from mock data
   const profileDetails = LC_PROFILE_MOCK.profileDetails;
 
-  // LC Profile Modal Body Content
-  const lcProfileModalBody = (
-    <VStack
-      {...LCProfileStyles.lcProfileCard}
-      $md-p="$6"
-    >
-      <Box
-        {...LCProfileStyles.lcFieldWrapper}
-        $md-flexDirection="row"
-        $md-gap="$6"
-      >
-        {/* Full Name */}
-        <Box {...LCProfileStyles.lcItem} $md-width="auto">
-          <HStack mb="$2" space="sm">
-            <LucideIcon name="User" size={16} color={theme.tokens.colors.textMutedForeground} />
-            <Text {...profileStyles.fieldValue}>{t('lcProfile.fullName')}</Text>
-          </HStack>
-          <Box {...LCProfileStyles.lcValueField}>
-            <Text {...profileStyles.fieldLabel}>{profileDetails.fullName}</Text>
-          </Box>
-        </Box>
-
-            {/* LC ID */}
-        <Box {...LCProfileStyles.lcItem} $md-width="auto">
-          <HStack mb="$2" space="sm">
-            <LucideIcon name="Award" size={16} color={theme.tokens.colors.textMutedForeground} />
-            <Text {...profileStyles.fieldValue}>{t('lcProfile.lcId')}</Text>
-          </HStack>
-          <Box {...LCProfileStyles.lcValueField}>
-            <Text {...profileStyles.fieldLabel}>{profileDetails.lcId}</Text>
-          </Box>
-        </Box>
-
-        {/* Email Address */}
-        <Box {...LCProfileStyles.lcItem} $md-width="auto">
-          <HStack mb="$2" space="sm">
-            <LucideIcon name="Mail" size={16} color={theme.tokens.colors.textMutedForeground} />
-            <Text {...profileStyles.fieldValue}>{t('lcProfile.emailAddress')}</Text>
-          </HStack>
-          <Box {...LCProfileStyles.lcValueField}>
-            <Text {...profileStyles.fieldLabel}>{profileDetails.emailAddress}</Text>
-          </Box>
-        </Box>
-
-        {/* Phone Number */}
-        <Box {...LCProfileStyles.lcItem} $md-width="auto">
-          <HStack mb="$2" space="sm">
-            <LucideIcon name="Phone" size={16} color={theme.tokens.colors.textMutedForeground} />
-            <Text {...profileStyles.fieldValue}>{t('lcProfile.phoneNumber')}</Text>
-          </HStack>
-          <Box {...LCProfileStyles.lcValueField}>
-            <Text {...profileStyles.fieldLabel}>{profileDetails.phoneNumber}</Text>
-          </Box>
-        </Box>
-
-        {/* Service Area - Full Width */}
-        <Box width="$full">
-          <HStack mb="$2" space="sm">
-            <LucideIcon name="MapPin" size={16} color={theme.tokens.colors.textMutedForeground} />
-            <Text {...profileStyles.fieldValue}>{t('lcProfile.serviceArea')}</Text>
-          </HStack>
-          <Box {...LCProfileStyles.lcValueField}>
-            <Text {...profileStyles.fieldLabel}>{profileDetails.serviceArea}</Text>
-          </Box>
-        </Box>
-
-        {/* Start Date */}
-        <Box {...LCProfileStyles.lcItem} $md-width="auto">
-          <HStack mb="$2" space="sm">
-            <LucideIcon name="Calendar" size={16} color={theme.tokens.colors.textMutedForeground} />
-            <Text {...profileStyles.fieldValue}>{t('lcProfile.startDate')}</Text>
-          </HStack>
-          <Box {...LCProfileStyles.lcValueField}>
-            <Text {...profileStyles.fieldLabel}>{profileDetails.startDate}</Text>
-          </Box>
-        </Box>
-        {/* Language Preference */}
-        <Box {...LCProfileStyles.lcItem} $md-width="auto">
-          <HStack mb="$2" space="sm">
-            <Text {...profileStyles.fieldValue}>{t('lcProfile.languagePreference')}</Text>
-          </HStack>
-          <HStack space="sm">
-            <Pressable onPress={() => changeLanguage('en')}>
-              <Box
-                bg={currentLanguage === 'en' ? '$primary500' : 'transparent'}
-                borderWidth={currentLanguage === 'en' ? 0 : 1}
-                borderColor="$primary500"
-                px="$3"
-                py="$1"
-                borderRadius="$full"
-              >
-                <Text
-                  color={currentLanguage === 'en' ? "#fff" : "$primary500"}
-                  fontSize="$xs"
-                  fontWeight="$medium"
-                >
-                  {t('languages.en')}
-                </Text>
-              </Box>
-            </Pressable>
-            <Pressable onPress={() => changeLanguage('es')}>
-              <Box
-                bg={currentLanguage === 'es' ? '$primary500' : 'transparent'}
-                borderWidth={currentLanguage === 'es' ? 0 : 1}
-                borderColor="$primary500"
-                px="$3"
-                py="$1"
-                borderRadius="$full"
-              >
-                <Text
-                  color={currentLanguage === 'es' ? "#fff" : "$primary500"}
-                  fontSize="$xs"
-                  fontWeight="$medium"
-                >
-                  {t('languages.es')}
-                </Text>
-              </Box>
-            </Pressable>
-          </HStack>
-        </Box>
-      </Box>
-    </VStack>
-  );
-
 
   return (
     <Box
@@ -384,20 +260,133 @@ const Header: React.FC<{
         headerTitle={t('lcProfile.myProfile')}
         headerDescription={t('lcProfile.linkageChampionProfile')}
         headerIcon={
-          <Box
-            width={48}
-            height={48}
-            borderRadius="$full"
-            bg="$primary500"
-            alignItems="center"
-            justifyContent="center"
-          >
+          <Box {...stylesHeader.headerIcon}>
             <LucideIcon name="User" size={24} color="#ffffff" />
           </Box>
         }
         size="lg"
       >
-        {lcProfileModalBody}
+        <VStack
+          {...LCProfileStyles.lcProfileCard}
+          $md-p="$6"
+        >
+          <Box
+            {...LCProfileStyles.lcFieldWrapper}
+            $md-flexDirection="row"
+            $md-gap="$6"
+          >
+            {/* Full Name */}
+            <Box {...LCProfileStyles.lcItem} $md-width="auto">
+              <HStack mb="$2" space="sm">
+                <LucideIcon name="User" size={16} color={theme.tokens.colors.textMutedForeground} />
+                <Text {...profileStyles.fieldValue}>{t('lcProfile.fullName')}</Text>
+              </HStack>
+              <Box {...LCProfileStyles.lcValueField}>
+                <Text {...profileStyles.fieldLabel}>{profileDetails.fullName}</Text>
+              </Box>
+            </Box>
+
+            {/* LC ID */}
+            <Box {...LCProfileStyles.lcItem} $md-width="auto">
+              <HStack mb="$2" space="sm">
+                <LucideIcon name="Award" size={16} color={theme.tokens.colors.textMutedForeground} />
+                <Text {...profileStyles.fieldValue}>{t('lcProfile.lcId')}</Text>
+              </HStack>
+              <Box {...LCProfileStyles.lcValueField}>
+                <Text {...profileStyles.fieldLabel}>{profileDetails.lcId}</Text>
+              </Box>
+            </Box>
+
+            {/* Email Address */}
+            <Box {...LCProfileStyles.lcItem} $md-width="auto">
+              <HStack mb="$2" space="sm">
+                <LucideIcon name="Mail" size={16} color={theme.tokens.colors.textMutedForeground} />
+                <Text {...profileStyles.fieldValue}>{t('lcProfile.emailAddress')}</Text>
+              </HStack>
+              <Box {...LCProfileStyles.lcValueField}>
+                <Text {...profileStyles.fieldLabel}>{profileDetails.emailAddress}</Text>
+              </Box>
+            </Box>
+
+            {/* Phone Number */}
+            <Box {...LCProfileStyles.lcItem} $md-width="auto">
+              <HStack mb="$2" space="sm">
+                <LucideIcon name="Phone" size={16} color={theme.tokens.colors.textMutedForeground} />
+                <Text {...profileStyles.fieldValue}>{t('lcProfile.phoneNumber')}</Text>
+              </HStack>
+              <Box {...LCProfileStyles.lcValueField}>
+                <Text {...profileStyles.fieldLabel}>{profileDetails.phoneNumber}</Text>
+              </Box>
+            </Box>
+
+            {/* Service Area - Full Width */}
+            <Box width="$full">
+              <HStack mb="$2" space="sm">
+                <LucideIcon name="MapPin" size={16} color={theme.tokens.colors.textMutedForeground} />
+                <Text {...profileStyles.fieldValue}>{t('lcProfile.serviceArea')}</Text>
+              </HStack>
+              <Box {...LCProfileStyles.lcValueField}>
+                <Text {...profileStyles.fieldLabel}>{profileDetails.serviceArea}</Text>
+              </Box>
+            </Box>
+
+            {/* Start Date */}
+            <Box {...LCProfileStyles.lcItem} $md-width="auto">
+              <HStack mb="$2" space="sm">
+                <LucideIcon name="Calendar" size={16} color={theme.tokens.colors.textMutedForeground} />
+                <Text {...profileStyles.fieldValue}>{t('lcProfile.startDate')}</Text>
+              </HStack>
+              <Box {...LCProfileStyles.lcValueField}>
+                <Text {...profileStyles.fieldLabel}>{profileDetails.startDate}</Text>
+              </Box>
+            </Box>
+
+            {/* Language Preference */}
+            <Box {...LCProfileStyles.lcItem} $md-width="auto">
+              <HStack mb="$2" space="sm">
+                <Text {...profileStyles.fieldValue}>{t('lcProfile.languagePreference')}</Text>
+              </HStack>
+              <HStack space="sm">
+                <Pressable onPress={() => changeLanguage('en')}>
+                  <Box
+                    bg={currentLanguage === 'en' ? '$primary500' : 'transparent'}
+                    borderWidth={currentLanguage === 'en' ? 0 : 1}
+                    borderColor="$primary500"
+                    px="$3"
+                    py="$1"
+                    borderRadius="$full"
+                  >
+                    <Text
+                      color={currentLanguage === 'en' ? "#fff" : "$primary500"}
+                      fontSize="$xs"
+                      fontWeight="$medium"
+                    >
+                      {t('languages.en')}
+                    </Text>
+                  </Box>
+                </Pressable>
+                <Pressable onPress={() => changeLanguage('es')}>
+                  <Box
+                    bg={currentLanguage === 'es' ? '$primary500' : 'transparent'}
+                    borderWidth={currentLanguage === 'es' ? 0 : 1}
+                    borderColor="$primary500"
+                    px="$3"
+                    py="$1"
+                    borderRadius="$full"
+                  >
+                    <Text
+                      color={currentLanguage === 'es' ? "#fff" : "$primary500"}
+                      fontSize="$xs"
+                      fontWeight="$medium"
+                    >
+                      {t('languages.es')}
+                    </Text>
+                  </Box>
+                </Pressable>
+              </HStack>
+            </Box>
+          </Box>
+        </VStack>
       </Modal>
     </Box>
   );

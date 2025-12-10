@@ -102,63 +102,6 @@ const TableRow = <T,>({
     onActionClick?.(item);
   };
 
-  // Modal Body Content
-  const dropoutModalBody = (
-    <VStack space="lg">
-      {/* Message */}
-      <Text
-        {...TYPOGRAPHY.paragraph}
-        color={theme.tokens.colors.textSecondary}
-        lineHeight="$xl"
-      >
-        {t('actions.dropoutMessage', { name: itemName }) ||
-          `Mark ${itemName} as dropout from the program`}
-      </Text>
-
-      {/* Input Field */}
-      <VStack space="sm">
-        <Text
-          {...TYPOGRAPHY.label}
-          color={theme.tokens.colors.textPrimary}
-          fontWeight="$medium"
-        >
-          {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
-        </Text>
-        <Input
-          variant="outline"
-          size="lg"
-          borderWidth={2}
-          borderColor={theme.tokens.colors.inputBorder}
-          borderRadius="$md"
-          bg={theme.tokens.colors.modalBackground}
-          $focus-borderColor={theme.tokens.colors.inputFocusBorder}
-          $focus-borderWidth={2}
-          minHeight={80}
-        >
-          <InputField
-            placeholder={
-              t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
-            }
-            value={dropoutReason}
-            onChangeText={setDropoutReason}
-            multiline
-            numberOfLines={3}
-            textAlignVertical="top"
-            paddingTop="$3"
-            placeholderTextColor={theme.tokens.colors.textMuted}
-          />
-        </Input>
-        <Text
-          {...TYPOGRAPHY.bodySmall}
-          color={theme.tokens.colors.textSecondary}
-          lineHeight="$sm"
-        >
-          {t('actions.dropoutHint') ||
-            'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
-        </Text>
-      </VStack>
-    </VStack>
-  );
 
   const customTrigger = (triggerProps: any) => (
     <Pressable
@@ -310,7 +253,60 @@ const TableRow = <T,>({
         onConfirm={() => handleDropoutConfirm(dropoutReason)}
         confirmButtonColor={theme.tokens.colors.error.light}
       >
-        {dropoutModalBody}
+        <VStack space="lg">
+          {/* Message */}
+          <Text
+            {...TYPOGRAPHY.paragraph}
+            color={theme.tokens.colors.textSecondary}
+            lineHeight="$xl"
+          >
+            {t('actions.dropoutMessage', { name: itemName }) ||
+              `Mark ${itemName} as dropout from the program`}
+          </Text>
+
+          {/* Input Field */}
+          <VStack space="sm">
+            <Text
+              {...TYPOGRAPHY.label}
+              color={theme.tokens.colors.textPrimary}
+              fontWeight="$medium"
+            >
+              {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
+            </Text>
+            <Input
+              variant="outline"
+              size="lg"
+              borderWidth={2}
+              borderColor={theme.tokens.colors.inputBorder}
+              borderRadius="$md"
+              bg={theme.tokens.colors.modalBackground}
+              $focus-borderColor={theme.tokens.colors.inputFocusBorder}
+              $focus-borderWidth={2}
+              minHeight={80}
+            >
+              <InputField
+                placeholder={
+                  t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
+                }
+                value={dropoutReason}
+                onChangeText={setDropoutReason}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+                paddingTop="$3"
+                placeholderTextColor={theme.tokens.colors.textMuted}
+              />
+            </Input>
+            <Text
+              {...TYPOGRAPHY.bodySmall}
+              color={theme.tokens.colors.textSecondary}
+              lineHeight="$sm"
+            >
+              {t('actions.dropoutHint') ||
+                'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
+            </Text>
+          </VStack>
+        </VStack>
       </Modal>
     </>
   );
