@@ -8,7 +8,6 @@ import {
   ProgressFilledTrack,
 } from '@gluestack-ui/themed';
 import { ProjectInfoCardProps } from '../../types/components.types';
-import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -49,7 +48,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   return (
-    <Box bg={theme.tokens.colors.backgroundPrimary.light} padding="$6">
+    <Box bg="$backgroundPrimary.light" padding="$6">
       <HStack
         justifyContent="space-between"
         alignItems="flex-start"
@@ -58,7 +57,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
         {/* LEFT SIDE — Project Title + Description */}
         <VStack space="md" flex={1}>
           {/* Project Title */}
-          <Text {...TYPOGRAPHY.h3} color={theme.tokens.colors.textPrimary}>
+          <Text {...TYPOGRAPHY.h3} color="$textPrimary">
             {project.name}
           </Text>
 
@@ -66,7 +65,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
           {project.description && (
             <Text
               {...TYPOGRAPHY.paragraph}
-              color={theme.tokens.colors.textSecondary}
+              color="$textSecondary"
               lineHeight="$lg"
             >
               {project.description}
@@ -78,7 +77,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
         {!hasChildren && isEditOrReadOnly && (
           // No children + Edit/Read-only: Show steps complete badge
           <Box
-            bg={theme.tokens.colors.mutedForeground}
+            bg="$mutedForeground"
             borderRadius="$full"
             paddingHorizontal="$4"
             paddingVertical="$2"
@@ -92,7 +91,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
             <HStack space="xs" alignItems="center">
               <Text
                 {...TYPOGRAPHY.caption}
-                color={theme.tokens.colors.backgroundPrimary.light}
+                color="$backgroundPrimary.light"
                 fontWeight="$semibold"
               >
                 {completedTasks} of {totalTasks}{' '}
@@ -105,10 +104,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
         {!hasChildren && isPreview && (
           // No children + Preview: Show task count
           <Box>
-            <Text
-              {...TYPOGRAPHY.caption}
-              color={theme.tokens.colors.primary500}
-            >
+            <Text {...TYPOGRAPHY.caption} color="$primary500">
               {totalTasks} {t('projectPlayer.tasks')}
             </Text>
           </Box>
@@ -119,18 +115,14 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
           <VStack space="xs" marginLeft="$4" width={120}>
             <Text
               {...TYPOGRAPHY.caption}
-              color={theme.tokens.colors.primary500}
+              color="$primary500"
               fontWeight="$bold"
               textAlign="right"
             >
               {progressPercentage}%
             </Text>
-            <Progress
-              value={progressPercentage}
-              size="sm"
-              bg={theme.tokens.colors.inputBorder}
-            >
-              <ProgressFilledTrack bg={theme.tokens.colors.primary500} />
+            <Progress value={progressPercentage} size="sm" bg="$inputBorder">
+              <ProgressFilledTrack bg="$primary500" />
             </Progress>
           </VStack>
         )}
@@ -138,16 +130,10 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
         {hasChildren && isPreview && (
           // Has children + Preview: Show pillars and tasks count
           <VStack space="xs" marginLeft="$4" alignItems="flex-end">
-            <Text
-              {...TYPOGRAPHY.caption}
-              color={theme.tokens.colors.primary500}
-            >
+            <Text {...TYPOGRAPHY.caption} color="$primary500">
               {totalPillars} {t('projectPlayer.pillars')}
             </Text>
-            <Text
-              {...TYPOGRAPHY.caption}
-              color={theme.tokens.colors.primary500}
-            >
+            <Text {...TYPOGRAPHY.caption} color="$primary500">
               {totalChildTasks} {t('projectPlayer.tasks')}
             </Text>
           </VStack>

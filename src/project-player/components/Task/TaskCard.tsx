@@ -20,7 +20,6 @@ import { useTaskActions } from '../../hooks/useTaskActions';
 import { useLanguage } from '@contexts/LanguageContext';
 import { TASK_STATUS } from '../../../constants/app.constant';
 import { TaskCardProps } from '../../types/components.types';
-import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 const TaskCard: React.FC<TaskCardProps> = ({
@@ -151,7 +150,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   // Button icon helper
   const getButtonIcon = () => {
-    const iconColor = theme.tokens.colors.textSecondary;
+    const iconColor = '$textSecondary';
     const iconMap = {
       file: 'Upload',
       observation: 'FileText',
@@ -198,22 +197,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
           opacity={isReadOnly ? 0.6 : 1}
         >
           <CheckboxIndicator
-            borderColor={
-              isCompleted
-                ? theme.tokens.colors.primary500
-                : theme.tokens.colors.textMuted
-            }
-            bg={
-              isCompleted
-                ? theme.tokens.colors.primary500
-                : theme.tokens.colors.backgroundPrimary.light
-            }
+            borderColor={isCompleted ? '$primary500' : '$textMuted'}
+            bg={isCompleted ? '$primary500' : '$backgroundPrimary.light'}
           >
-            <CheckboxIcon color={theme.tokens.colors.backgroundPrimary.light}>
+            <CheckboxIcon color="$backgroundPrimary.light">
               <LucideIcon
                 name="Check"
                 size={12}
-                color={theme.tokens.colors.backgroundPrimary.light}
+                color="$backgroundPrimary.light"
                 strokeWidth={3}
               />
             </CheckboxIcon>
@@ -226,10 +217,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
     const circleSize = isChildOfProject ? 24 : 24;
     const checkSize = isChildOfProject ? 14 : 14;
     const circleColor = isChildOfProject
-      ? theme.tokens.colors.primary500
+      ? '$primary500'
       : isCompleted
-      ? theme.tokens.colors.accent200
-      : theme.tokens.colors.textMuted;
+      ? '$accent200'
+      : '$textMuted';
 
     return (
       <Box
@@ -240,8 +231,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
         borderColor={circleColor}
         bg={
           isCompleted && !isChildOfProject
-            ? theme.tokens.colors.accent200
-            : theme.tokens.colors.backgroundPrimary.light
+            ? '$accent200'
+            : '$backgroundPrimary.light'
         }
         justifyContent="center"
         alignItems="center"
@@ -251,9 +242,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             name="Check"
             size={checkSize}
             color={
-              isChildOfProject
-                ? theme.tokens.colors.primary500
-                : theme.tokens.colors.backgroundPrimary.light
+              isChildOfProject ? '$primary500' : '$backgroundPrimary.light'
             }
             strokeWidth={3}
           />
@@ -277,11 +266,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     return (
       <VStack flex={1} space="xs">
-        <Text
-          {...titleTypography}
-          color={theme.tokens.colors.textPrimary}
-          {...textStyle}
-        >
+        <Text {...titleTypography} color="$textPrimary" {...textStyle}>
           {task.name}
         </Text>
         {task.description && (
@@ -289,7 +274,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             {...(uiConfig.showAsCard
               ? TYPOGRAPHY.bodySmall
               : TYPOGRAPHY.paragraph)}
-            color={theme.tokens.colors.textSecondary}
+            color="$textSecondary"
             lineHeight="$lg"
             {...textStyle}
           >
@@ -306,12 +291,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     const buttonStyles = uiConfig.showAsCard
       ? {
-          borderColor: theme.tokens.colors.textSecondary,
-          hoverBg: theme.tokens.colors.primary100,
+          borderColor: '$textSecondary',
+          hoverBg: '$primary100',
         }
       : {
-          borderColor: theme.tokens.colors.inputBorder,
-          hoverBg: theme.tokens.colors.primary100,
+          borderColor: '$inputBorder',
+          hoverBg: '$primary100',
         };
 
     return (
@@ -322,13 +307,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
         isDisabled={isReadOnly || isUploading}
         borderRadius={uiConfig.showAsCard ? undefined : 10}
         borderColor={buttonStyles.borderColor}
-        bg={theme.tokens.colors.backgroundPrimary.light}
+        bg="$backgroundPrimary.light"
         ml="$3"
         opacity={isReadOnly || isUploading ? 0.5 : 1}
         sx={{
           ':hover': {
             bg: isEdit ? buttonStyles.hoverBg : 'transparent',
-            borderColor: theme.tokens.colors.primary500,
+            borderColor: '$primary500',
           },
         }}
       >
@@ -336,11 +321,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
           {getButtonIcon()}
           <ButtonText
             {...TYPOGRAPHY.button}
-            color={theme.tokens.colors.textSecondary}
+            color="$textSecondary"
             fontSize={uiConfig.showAsCard ? '$sm' : undefined}
             sx={{
               ':hover': {
-                color: theme.tokens.colors.primary500,
+                color: '$primary500',
               },
             }}
           >
@@ -358,7 +343,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     return (
       <Box
         height={1}
-        bg={theme.tokens.colors.inputBorder}
+        bg="$inputBorder"
         marginVertical={isChildOfProject && isPreview ? '$1' : undefined}
         marginHorizontal={!isChildOfProject ? '$5' : undefined}
       />
@@ -374,11 +359,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
         <Card
           size="md"
           variant="elevated"
-          bg={theme.tokens.colors.taskCardBg}
+          bg="$taskCardBg"
           borderRadius="$lg"
           marginBottom="$3"
           borderWidth={1}
-          borderColor={theme.tokens.colors.taskCardBorder}
+          borderColor="$taskCardBorder"
         >
           <Box padding="$4">
             <HStack alignItems="center" justifyContent="space-between">
@@ -417,11 +402,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   return (
     <>
       {renderFileInput()}
-      <Box
-        bg={theme.tokens.colors.backgroundPrimary.light}
-        padding="$5"
-        marginLeft={level * 16}
-      >
+      <Box bg="$backgroundPrimary.light" padding="$5" marginLeft={level * 16}>
         <HStack alignItems="center" justifyContent="space-between">
           <HStack flex={1} space="md" alignItems="center">
             <Box

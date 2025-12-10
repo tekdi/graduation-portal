@@ -15,8 +15,8 @@ import { LucideIcon } from '@ui/index';
 import { useLanguage } from '@contexts/LanguageContext';
 import { useProjectContext } from '../../context/ProjectContext';
 import TaskComponent from '../ProjectComponent/TaskComponent';
+import AddCustomTask from './AddCustomTask';
 import { TaskAccordionProps } from '../../types/components.types';
-import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
@@ -32,35 +32,32 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
         <Card
           size="md"
           variant="elevated"
-          bg={theme.tokens.colors.backgroundPrimary.light}
+          bg="$backgroundPrimary.light"
           borderRadius="$lg"
         >
           {/* Card Header */}
           <Box
             padding="$5"
             borderBottomWidth={1}
-            borderBottomColor={theme.tokens.colors.mutedBorder}
+            borderBottomColor="$mutedBorder"
           >
             <HStack justifyContent="space-between" alignItems="center">
               <VStack flex={1} space="xs">
                 <HStack alignItems="center" space="sm" flexWrap="wrap">
-                  <Text
-                    {...TYPOGRAPHY.h4}
-                    color={theme.tokens.colors.textPrimary}
-                  >
+                  <Text {...TYPOGRAPHY.h4} color="$textPrimary">
                     {task.name}
                   </Text>
                   <Box
-                    bg={theme.tokens.colors.primary100}
+                    bg="$primary100"
                     paddingHorizontal="$3"
                     paddingVertical="$1"
                     borderRadius="$full"
-                    borderColor={theme.tokens.colors.primary500}
+                    borderColor="$primary500"
                   >
                     <Text
                       fontSize="$xs"
                       fontWeight="$medium"
-                      color={theme.tokens.colors.primary500}
+                      color="$primary500"
                     >
                       {task.children?.length || 0} {t('projectPlayer.tasks')}
                     </Text>
@@ -69,7 +66,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                 {task.description && (
                   <Text
                     {...TYPOGRAPHY.paragraph}
-                    color={theme.tokens.colors.textSecondary}
+                    color="$textSecondary"
                     lineHeight="$lg"
                   >
                     {task.description}
@@ -91,6 +88,9 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                   isChildOfProject={true}
                 />
               ))}
+
+              {/* Add Custom Task Button */}
+              <AddCustomTask pillarId={task._id} _pillarName={task.name} />
             </VStack>
           </Box>
         </Card>
@@ -112,10 +112,10 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
       >
         <AccordionItem
           value={task._id}
-          bg={theme.tokens.colors.backgroundPrimary.light}
+          bg="$backgroundPrimary.light"
           borderRadius="$lg"
           borderWidth={1}
-          borderColor={theme.tokens.colors.mutedBorder}
+          borderColor="$mutedBorder"
         >
           {/* Accordion Header */}
           <AccordionHeader>
@@ -129,23 +129,20 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                   >
                     <VStack flex={1} space="xs">
                       <HStack alignItems="center" space="sm" flexWrap="wrap">
-                        <Text
-                          {...TYPOGRAPHY.h4}
-                          color={theme.tokens.colors.textPrimary}
-                        >
+                        <Text {...TYPOGRAPHY.h4} color="$textPrimary">
                           {task.name}
                         </Text>
                         <Box
-                          bg={theme.tokens.colors.primary100}
+                          bg="$primary100"
                           paddingHorizontal="$3"
                           paddingVertical="$1"
                           borderRadius="$full"
-                          borderColor={theme.tokens.colors.primary500}
+                          borderColor="$primary500"
                         >
                           <Text
                             fontSize="$xs"
                             fontWeight="$medium"
-                            color={theme.tokens.colors.primary500}
+                            color="$primary500"
                           >
                             {task.children?.length || 0}{' '}
                             {t('projectPlayer.tasks')}
@@ -155,7 +152,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                       {task.description && (
                         <Text
                           {...TYPOGRAPHY.paragraph}
-                          color={theme.tokens.colors.textSecondary}
+                          color="$textSecondary"
                           lineHeight="$lg"
                         >
                           {task.description}
@@ -168,7 +165,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                       <LucideIcon
                         name={isExpanded ? 'ChevronUp' : 'ChevronDown'}
                         size={20}
-                        color={theme.tokens.colors.textSecondary}
+                        color="$textSecondary"
                       />
                     </Box>
                   </HStack>
@@ -189,6 +186,9 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                   isChildOfProject={true}
                 />
               ))}
+
+              {/* Add Custom Task Button */}
+              <AddCustomTask pillarId={task._id} _pillarName={task.name} />
             </VStack>
           </AccordionContent>
         </AccordionItem>
