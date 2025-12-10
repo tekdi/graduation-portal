@@ -18,6 +18,7 @@ import TaskComponent from '../ProjectComponent/TaskComponent';
 import AddCustomTask from './AddCustomTask';
 import { TaskAccordionProps } from '../../types/components.types';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
+import { theme } from '@config/theme';
 
 const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
   const { t } = useLanguage();
@@ -165,7 +166,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                       <LucideIcon
                         name={isExpanded ? 'ChevronUp' : 'ChevronDown'}
                         size={20}
-                        color="$textSecondary"
+                        color={theme.tokens.colors.textSecondary}
                       />
                     </Box>
                   </HStack>

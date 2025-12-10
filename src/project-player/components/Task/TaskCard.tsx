@@ -21,6 +21,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { TASK_STATUS } from '../../../constants/app.constant';
 import { TaskCardProps } from '../../types/components.types';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
+import { theme } from '@config/theme';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
@@ -204,7 +205,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               <LucideIcon
                 name="Check"
                 size={12}
-                color="$backgroundPrimary.light"
+                color={theme.tokens.colors.backgroundPrimary.light}
                 strokeWidth={3}
               />
             </CheckboxIcon>
@@ -242,7 +243,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
             name="Check"
             size={checkSize}
             color={
-              isChildOfProject ? '$primary500' : '$backgroundPrimary.light'
+              isChildOfProject
+                ? theme.tokens.colors.primary500
+                : theme.tokens.colors.backgroundPrimary.light
             }
             strokeWidth={3}
           />
