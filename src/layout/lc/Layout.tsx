@@ -12,7 +12,7 @@ import logger from '@utils/logger';
  * LC Layout Component - Enhanced Header Integration
  * 
  * - Integrates Header component with LC-specific configuration (left-aligned profile menu, hamburger menu)
- * - Menu selection handler: Navigates to welcome screen for 'home', handles logout for 'logout'
+ * - Menu selection handler: Uses navigation routes from LC_MENU_OPTIONS config, handles logout separately
  */
 interface LayoutProps {
   title: string;
@@ -27,15 +27,20 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
   const { logout } = useAuth();
   const navigation = useNavigation();
 
-  // Handle menu item selection - navigates to welcome for 'home', handles logout
+  // Handle menu item selection - uses route from menu config for navigation
   const handleMenuSelect = (key: string | undefined) => {
     logger.log('Menu selected:', key);
-    if (key === 'home') {
-      navigation.navigate('welcome' as never);
-    } else if (key === 'logout') {
+    
+    if (key === 'logout') {
       logout();
+      return;
     }
-    // Note: dashboard, myProfile, serviceProviders handlers can be added here as needed
+    
+    // Find the menu item in LC_MENU_OPTIONS and use its route for navigation
+    const menuItem = LC_MENU_OPTIONS.find(item => item.key === key);
+    if (menuItem?.route) {
+      navigation.navigate(menuItem.route as never);
+    }
   };
 
   const rightSideContent = (

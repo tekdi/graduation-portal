@@ -39,6 +39,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     iconSizeValue: 16,
     iconColor: theme.tokens.colors.textForegroundColor,
     showDividerAfter: true, // Divider after Home (separates navigation from profile actions)
+    route: 'welcome', // Navigation route for home menu item
   },
   {
     key: 'dashboard',
@@ -48,6 +49,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     iconSizeValue: 16,
     iconColor: theme.tokens.colors.textForegroundColor,
     showDividerAfter: false,
+    route: 'dashboard', // Navigation route for dashboard menu item
   },
   {
     key: 'myProfile',
@@ -57,6 +59,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     iconSizeValue: 16,
     iconColor: theme.tokens.colors.textForegroundColor,
     showDividerAfter: false,
+    // route: 'myProfile', // Add route when myProfile screen is implemented
   },
   {
     key: 'serviceProviders',
@@ -66,6 +69,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     iconSizeValue: 16,
     iconColor: theme.tokens.colors.textForegroundColor,
     showDividerAfter: true, // Divider after Service Providers (separates actions from logout)
+    // route: 'serviceProviders', // Add route when serviceProviders screen is implemented
   },
   {
     key: 'logout',
@@ -75,6 +79,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     iconSizeValue: 16,
     iconColor: theme.tokens.colors.error600, // Error color indicates destructive action
     showDividerAfter: false,
+    // No route for logout - handled by logout function
   },
 ];
 

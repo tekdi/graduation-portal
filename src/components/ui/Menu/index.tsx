@@ -32,6 +32,7 @@ export interface MenuItemData {
   iconSizeValue?: number; // Icon size in pixels
   color?: string;
   showDividerAfter?: boolean; // Render divider after this menu item
+  route?: string; // Navigation route name for menu items that navigate
 }
 
 export interface CustomMenuProps {
