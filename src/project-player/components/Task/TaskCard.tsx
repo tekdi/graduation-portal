@@ -13,7 +13,7 @@ import {
   Toast,
   ToastTitle,
   useToast,
-} from '@gluestack-ui/themed';
+} from '@ui';
 import { LucideIcon } from '@ui/index';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useTaskActions } from '../../hooks/useTaskActions';
