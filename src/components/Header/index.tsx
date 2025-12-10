@@ -21,6 +21,9 @@ import {
   BellIcon,
   ChevronDownIcon,
   Modal,
+  LucideIcon,
+  Button,
+  ButtonText,
 } from '@ui';
 import { useGlobal } from '@contexts/GlobalContext';
 import { stylesHeader } from './Styles';
@@ -32,6 +35,8 @@ import logger from '@utils/logger';
 import { useLanguage } from '@contexts/LanguageContext';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
+import { profileStyles, LCProfileStyles } from '@components/ui/Modal/Styles';
+import { LC_PROFILE_MOCK } from '@constants/LC_PROFILE_MOCK';
 
 const Header: React.FC<{
   title?: string;
@@ -56,8 +61,8 @@ const Header: React.FC<{
   const { colorMode, setColorMode } = useGlobal();
   const isDark = colorMode === 'dark';
   const { user, logout, isLoggedIn } = useAuth();
-  const { isMobile } = usePlatform();
-  const { t } = useLanguage();
+  const { isMobile, isWeb } = usePlatform();
+  const { t, currentLanguage, changeLanguage } = useLanguage();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleMenuSelect = (key: string | undefined) => {
@@ -70,35 +75,133 @@ const Header: React.FC<{
     }
   };
 
-  // Create profile data from user object
-  const userProfile = user
-    ? {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: 'N/A', // User phone not available in current User type
-        address: undefined, // User address not available in current User type
-        // LC Profile specific fields
-        serviceArea: user.role === 'LC' ? 'District 5 - Central Region' : undefined,
-        startDate: user.role === 'LC' ? '15/01/2023' : undefined,
-        statistics: user.role === 'LC' ? {
-          activeParticipants: 12,
-          completedIdps: 8,
-          visitsLogged: 45,
-          pendingTasks: 2,
-        } : undefined,
-        certifications: user.role === 'LC' ? [
-          {
-            name: 'Linkage Champion Core Training',
-            completedDate: 'January 2023',
-            certified: true,
-          },
-        ] : undefined,
-      }
-    : undefined;
+  // Get profile details from mock data
+  const profileDetails = LC_PROFILE_MOCK.profileDetails;
 
-  // Determine variant based on user role
-  const profileVariant = user?.role === 'LC' ? 'lcProfile' : 'profile';
+  // LC Profile Modal Body Content
+  const lcProfileModalBody = (
+    <VStack
+      {...LCProfileStyles.lcProfileCard}
+      $md-p="$6"
+    >
+      <Box
+        {...LCProfileStyles.lcFieldWrapper}
+        $md-flexDirection="row"
+        $md-gap="$6"
+      >
+        {/* Full Name */}
+        <Box {...LCProfileStyles.lcItem} $md-width="auto">
+          <HStack mb="$2" space="sm">
+            <LucideIcon name="User" size={16} color={theme.tokens.colors.textMutedForeground} />
+            <Text {...profileStyles.fieldValue}>{t('lcProfile.fullName')}</Text>
+          </HStack>
+          <Box {...LCProfileStyles.lcValueField}>
+            <Text {...profileStyles.fieldLabel}>{profileDetails.fullName}</Text>
+          </Box>
+        </Box>
+
+            {/* LC ID */}
+        <Box {...LCProfileStyles.lcItem} $md-width="auto">
+          <HStack mb="$2" space="sm">
+            <LucideIcon name="Award" size={16} color={theme.tokens.colors.textMutedForeground} />
+            <Text {...profileStyles.fieldValue}>{t('lcProfile.lcId')}</Text>
+          </HStack>
+          <Box {...LCProfileStyles.lcValueField}>
+            <Text {...profileStyles.fieldLabel}>{profileDetails.lcId}</Text>
+          </Box>
+        </Box>
+
+        {/* Email Address */}
+        <Box {...LCProfileStyles.lcItem} $md-width="auto">
+          <HStack mb="$2" space="sm">
+            <LucideIcon name="Mail" size={16} color={theme.tokens.colors.textMutedForeground} />
+            <Text {...profileStyles.fieldValue}>{t('lcProfile.emailAddress')}</Text>
+          </HStack>
+          <Box {...LCProfileStyles.lcValueField}>
+            <Text {...profileStyles.fieldLabel}>{profileDetails.emailAddress}</Text>
+          </Box>
+        </Box>
+
+        {/* Phone Number */}
+        <Box {...LCProfileStyles.lcItem} $md-width="auto">
+          <HStack mb="$2" space="sm">
+            <LucideIcon name="Phone" size={16} color={theme.tokens.colors.textMutedForeground} />
+            <Text {...profileStyles.fieldValue}>{t('lcProfile.phoneNumber')}</Text>
+          </HStack>
+          <Box {...LCProfileStyles.lcValueField}>
+            <Text {...profileStyles.fieldLabel}>{profileDetails.phoneNumber}</Text>
+          </Box>
+        </Box>
+
+        {/* Service Area - Full Width */}
+        <Box width="$full">
+          <HStack mb="$2" space="sm">
+            <LucideIcon name="MapPin" size={16} color={theme.tokens.colors.textMutedForeground} />
+            <Text {...profileStyles.fieldValue}>{t('lcProfile.serviceArea')}</Text>
+          </HStack>
+          <Box {...LCProfileStyles.lcValueField}>
+            <Text {...profileStyles.fieldLabel}>{profileDetails.serviceArea}</Text>
+          </Box>
+        </Box>
+
+        {/* Start Date */}
+        <Box {...LCProfileStyles.lcItem} $md-width="auto">
+          <HStack mb="$2" space="sm">
+            <LucideIcon name="Calendar" size={16} color={theme.tokens.colors.textMutedForeground} />
+            <Text {...profileStyles.fieldValue}>{t('lcProfile.startDate')}</Text>
+          </HStack>
+          <Box {...LCProfileStyles.lcValueField}>
+            <Text {...profileStyles.fieldLabel}>{profileDetails.startDate}</Text>
+          </Box>
+        </Box>
+        {/* Language Preference */}
+        <Box {...LCProfileStyles.lcItem} $md-width="auto">
+          <HStack mb="$2" space="sm">
+            <Text {...profileStyles.fieldValue}>{t('lcProfile.languagePreference')}</Text>
+          </HStack>
+          <HStack space="sm">
+            <Pressable onPress={() => changeLanguage('en')}>
+              <Box
+                bg={currentLanguage === 'en' ? '$primary500' : 'transparent'}
+                borderWidth={currentLanguage === 'en' ? 0 : 1}
+                borderColor="$primary500"
+                px="$3"
+                py="$1"
+                borderRadius="$full"
+              >
+                <Text
+                  color={currentLanguage === 'en' ? "#fff" : "$primary500"}
+                  fontSize="$xs"
+                  fontWeight="$medium"
+                >
+                  {t('languages.en')}
+                </Text>
+              </Box>
+            </Pressable>
+            <Pressable onPress={() => changeLanguage('es')}>
+              <Box
+                bg={currentLanguage === 'es' ? '$primary500' : 'transparent'}
+                borderWidth={currentLanguage === 'es' ? 0 : 1}
+                borderColor="$primary500"
+                px="$3"
+                py="$1"
+                borderRadius="$full"
+              >
+                <Text
+                  color={currentLanguage === 'es' ? "#fff" : "$primary500"}
+                  fontSize="$xs"
+                  fontWeight="$medium"
+                >
+                  {t('languages.es')}
+                </Text>
+              </Box>
+            </Pressable>
+          </HStack>
+        </Box>
+      </Box>
+    </VStack>
+  );
+
 
   return (
     <Box
@@ -204,16 +307,27 @@ const Header: React.FC<{
       </HStack>
 
       {/* Profile Modal */}
-      {userProfile && (
-        <Modal
-          variant={profileVariant}
-          isOpen={isProfileModalOpen}
-          onClose={() => setIsProfileModalOpen(false)}
-          title={user?.role === 'LC' ? t('lcProfile.myProfile') : t('common.profile')}
-          subtitle={user?.role === 'LC' ? t('lcProfile.linkageChampionProfile') : t('participantDetail.header.viewProfile')}
-          profile={userProfile}
-        />
-      )}
+      <Modal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+        headerTitle={t('lcProfile.myProfile')}
+        headerDescription={t('lcProfile.linkageChampionProfile')}
+        headerIcon={
+          <Box
+            width={48}
+            height={48}
+            borderRadius="$full"
+            bg="$primary500"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <LucideIcon name="User" size={24} color="#ffffff" />
+          </Box>
+        }
+        size="lg"
+      >
+        {lcProfileModalBody}
+      </Modal>
     </Box>
   );
 };
