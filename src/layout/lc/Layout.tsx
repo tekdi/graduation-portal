@@ -11,7 +11,6 @@ import logger from '@utils/logger';
 /**
  * LC Layout Component - Enhanced Header Integration
  * 
- * [PR #19 Changes]
  * - Integrates Header component with LC-specific configuration (left-aligned profile menu, hamburger menu)
  * - Conditional menu filtering: Hides "Home" menu item when on welcome screen to prevent redundant navigation
  * - Menu selection handler: Navigates to welcome screen for 'home', handles logout for 'logout'
@@ -31,7 +30,7 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
   const navigation = useNavigation();
   const route = useRoute();
 
-  // [PR #19] Filter menu items based on current screen - hides Home menu on welcome screen
+  // Filter menu items based on current screen - hides Home menu on welcome screen
   const filteredMenuItems = useMemo(() => {
     const isWelcomeScreen = route.name === 'welcome';
     if (isWelcomeScreen) {
@@ -42,7 +41,7 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
     return LC_MENU_OPTIONS;
   }, [route.name]);
 
-  // [PR #19] Handle menu item selection - navigates to welcome for 'home', handles logout
+  // Handle menu item selection - navigates to welcome for 'home', handles logout
   const handleMenuSelect = (key: string | undefined) => {
     logger.log('Menu selected:', key);
     if (key === 'home') {
@@ -71,7 +70,7 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
       />
 
       {/* 
-        [PR #19] Header with LC-specific configuration
+        Header with LC-specific configuration
         - userMenuPosition="left": Places profile menu on left side (LC layout)
         - hamburgerMenuItems: Passes filtered menu items (conditionally hides Home)
         - onHamburgerMenuSelect: Handles menu item selection (navigation/logout)

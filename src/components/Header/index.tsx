@@ -38,7 +38,6 @@ import { MenuItemData } from '@components/ui/Menu';
 /**
  * Header Component - Enhanced for LC Layout Support
  * 
- * [PR #19 Changes]
  * - Added `userMenuPosition` prop to control profile menu placement (left for LC, right for Admin)
  * - Added `hamburgerMenuItems` and `onHamburgerMenuSelect` props for LC hamburger menu integration
  * - Conditional rendering: Shows hamburger menu when LC props provided, otherwise shows default rightSideContent
@@ -96,7 +95,7 @@ const Header: React.FC<{
     >
       <HStack {...stylesHeader.hStack}>
         {/* 
-          [PR #19] Hamburger Menu with Dropdown (for LC)
+          Hamburger Menu with Dropdown (for LC)
           - Conditionally renders hamburger menu when LC props (hamburgerMenuItems, onHamburgerMenuSelect) are provided
           - Uses MenuIcon as trigger, opens menu at "bottom left" placement
           - Falls back to default rightSideContent if LC props not provided (Admin layout)
@@ -118,7 +117,7 @@ const Header: React.FC<{
         )}
         
         {/* 
-          [PR #19] Left: Avatar with User Info (only if userMenuPosition is 'left' - LC layout)
+          Left: Avatar with User Info (only if userMenuPosition is 'left' - LC layout)
           - Displays avatar with gradient background on web, solid color on native
           - Gradient: Uses $web-style prop for CSS linear-gradient (web only)
           - Avatar contains User icon overlay positioned absolutely in center

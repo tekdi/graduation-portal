@@ -95,7 +95,7 @@ export const stylesHeader = {
   userInfoContainer: {
     space: 'xs' as const,
   },
-  // [PR #19] Updated typography for LC header: fontSize $sm → $md, fontWeight $semibold → $normal, color $textLight900 → $textForegroundColor
+  // Updated typography for LC header: fontSize $sm → $md, fontWeight $semibold → $normal, color $textLight900 → $textForegroundColor
   userNameText: {
     fontSize: '$md' as const,
     fontWeight: '$normal' as const,

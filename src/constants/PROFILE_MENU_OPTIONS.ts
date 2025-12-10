@@ -4,7 +4,6 @@ import { MenuItemData } from '@components/ui/Menu';
 /**
  * Profile Menu Options - Enhanced for LC Support
  * 
- * [PR #19 Changes]
  * - Separated LC_MENU_OPTIONS from ADMIN_MENU_OPTIONS for role-specific menu configurations
  * - LC menu includes: icons (via iconName + iconColor), dividers (showDividerAfter), and i18n labels
  * - Uses React.createElement pattern in constants for icon rendering (iconElement)
@@ -30,7 +29,7 @@ export const ADMIN_MENU_OPTIONS: MenuItemData[] = [
   },
 ];
 
-// [PR #19] LC menu options with icons, dividers, and i18n labels
+// LC menu options with icons, dividers, and i18n labels
 export const LC_MENU_OPTIONS: MenuItemData[] = [
   {
     key: 'home',

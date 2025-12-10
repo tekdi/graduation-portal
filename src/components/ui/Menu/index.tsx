@@ -15,7 +15,6 @@ import { useLanguage } from '@contexts/LanguageContext';
 /**
  * Menu Component - Enhanced with Icon and Divider Support
  * 
- * [PR #19 Changes]
  * - Added `showDividerAfter` property to MenuItemData for visual menu organization
  * - Added icon support: `iconElement` (custom ReactNode), `iconName` (LucideIcon name), `icon` (Gluestack Icon)
  * - Added `iconColor` and `iconSizeValue` for fine-grained icon styling control
@@ -27,12 +26,12 @@ export interface MenuItemData {
   textValue: string;
   icon?: any;
   iconSize?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  iconElement?: React.ReactNode; // [PR #19] Custom ReactNode for icon (e.g., React.createElement pattern)
-  iconName?: string; // [PR #19] LucideIcon name (e.g., 'Home', 'User', 'LogOut')
-  iconColor?: string; // [PR #19] Icon color value
-  iconSizeValue?: number; // [PR #19] Icon size in pixels
+  iconElement?: React.ReactNode; // Custom ReactNode for icon (e.g., React.createElement pattern)
+  iconName?: string; // LucideIcon name (e.g., 'Home', 'User', 'LogOut')
+  iconColor?: string; // Icon color value
+  iconSizeValue?: number; // Icon size in pixels
   color?: string;
-  showDividerAfter?: boolean; // [PR #19] Render divider after this menu item
+  showDividerAfter?: boolean; // Render divider after this menu item
 }
 
 export interface CustomMenuProps {
@@ -114,7 +113,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
       {...menuProps}
     >
       {items?.map((item: MenuItemData, index: number) => {
-        // [PR #19] Render menu item with icon support (priority: iconElement > iconName > icon)
+        // Render menu item with icon support (priority: iconElement > iconName > icon)
         const menuItem = (
           <MenuItem
             key={item.key || index.toString()}
@@ -145,7 +144,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
           </MenuItem>
         );
 
-        // [PR #19] Render divider after menu item if showDividerAfter is true
+        // Render divider after menu item if showDividerAfter is true
         // Uses disabled MenuItem wrapper with Box separator for consistent menu structure
         if (item.showDividerAfter) {
           return (
