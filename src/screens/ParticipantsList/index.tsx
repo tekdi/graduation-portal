@@ -6,6 +6,7 @@ import {
   Text,
   Heading,
   Pressable,
+  Container,
   ScrollView,
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
@@ -96,8 +97,8 @@ const ParticipantsList: React.FC = () => {
     <Box flex={1}>
       <ScrollView flex={1} bg={theme.tokens.colors.accent100}>
         <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground} bg="$white" padding="$4" my="$2">
-              {t('participants.myParticipants')}
-            </Heading>
+          {t('participants.myParticipants')}
+        </Heading>
         <VStack space="lg" padding="$6" flex={1}>
             {/* Page Title */}
            
