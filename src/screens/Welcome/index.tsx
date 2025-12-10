@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, VStack, ScrollView, Text, Heading } from '@gluestack-ui/themed';
+import { Box, VStack, Text, Heading } from '@gluestack-ui/themed';
+import { Container } from '@ui';
 import FeatureCard from '@components/FeatureCard';
 import { useAuth } from '@contexts/AuthContext';
 import { theme } from '@config/theme';
@@ -12,25 +13,16 @@ const WelcomePage: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <ScrollView
-      bg={theme.tokens.colors.accent100}
+    <Box
       flex={1}
-      contentContainerStyle={{
-        flexGrow: 1,
-      }}
+      justifyContent="center"
+      alignItems="center"
+      bg={theme.tokens.colors.accent100}
     >
-      <Box
-        padding="$6"
-        flex={1}
-        $md-padding="$8"
-        justifyContent="center"
-        alignItems="center"
-      >
+      <Container>
         <VStack
           space="2xl"
           width="$full"
-          maxWidth={1200}
-          alignSelf="center"
           alignItems="center"
         >
           {/* Welcome Header */}
@@ -56,7 +48,6 @@ const WelcomePage: React.FC = () => {
             gap="$5"
             $md-gap="$6"
             width="$full"
-            maxWidth={1100}
           >
             {WELCOME_CARDS.map(card => (
               <Box key={card.id} width="$full" $md-width="33.33%" $md-flex={1}>
@@ -65,8 +56,8 @@ const WelcomePage: React.FC = () => {
             ))}
           </Box>
         </VStack>
-      </Box>
-    </ScrollView>
+      </Container>
+    </Box>
   );
 };
 

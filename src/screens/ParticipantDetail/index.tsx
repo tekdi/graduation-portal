@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { VStack, HStack, Box, ScrollView } from '@ui';
+import { VStack, HStack, Box, Container } from '@ui';
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
 import { getParticipantById, getParticipantProfile, updateParticipantAddress } from '../../services/participantService';
@@ -88,29 +88,28 @@ export default function ParticipantDetail() {
   return (
     <>
       <Box flex={1} bg="$accent100">
-      <ScrollView flex={1} showsVerticalScrollIndicator={false}>
         <VStack 
           {...participantDetailStyles.container} 
           $web-boxShadow={participantDetailStyles.containerBoxShadow}
         >
-          {/* Participant Header with status-based variations */}
-          <ParticipantHeader
-            participantName={participantName}
-            participantId={id}
-            status={status}
-            pathway={pathway}
-            graduationProgress={graduationProgress}
-            graduationDate={graduationDate}
-            onViewProfile={() => setIsProfileModalOpen(true)}
-          />
+          <Container>
+            {/* Participant Header with status-based variations */}
+            <ParticipantHeader
+              participantName={participantName}
+              participantId={id}
+              status={status}
+              pathway={pathway}
+              graduationProgress={graduationProgress}
+              graduationDate={graduationDate}
+              onViewProfile={() => setIsProfileModalOpen(true)}
+            />
+          </Container>
         </VStack>
+        <Container>
         {/* Tabs */}
         <Box width="$full" mt="$4" mb="$6">
           <Box 
-            maxWidth={1200} 
-            width="$full" 
-            marginHorizontal="auto"
-            px="$6"
+            width="$full"
           >
             <HStack
               width="$full"
@@ -136,10 +135,7 @@ export default function ParticipantDetail() {
         {/* Tab Content */}
         <Box flex={1} mt="$3" mb="$6" bg="transparent">
           <Box
-            maxWidth={1200}
             width="$full"
-            marginHorizontal="auto"
-            px="$6"
           >
             <Box
               width="$full"
@@ -149,8 +145,8 @@ export default function ParticipantDetail() {
             </Box>
           </Box>
         </Box>
-      </ScrollView>
-    </Box>
+        </Container>
+      </Box>
 
       {/* Profile Modal - Using Modal with profile variant */}
       {currentParticipantProfile && (

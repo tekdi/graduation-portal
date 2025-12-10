@@ -53,6 +53,17 @@ export const theme = {
       taskCardBg: '#f8f9fa',
       taskCardBorder: '#e9ecef',
     },
+    sizes: {
+      ...((gluestackConfig.tokens as any).sizes || {}),
+      container: {
+        0: '100%',     // mobile
+        sm: '540px',   // bootstrap container sm
+        md: '720px',
+        lg: '960px',
+        xl: '1280px',
+        '2xl': '1320px',
+      },
+    },
   },
   components: {
     ...gluestackConfig.components,

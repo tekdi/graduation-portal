@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, VStack, Text } from '@ui';
+import { VStack, Text, Container } from '@ui';
 
 import { dashboardStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -11,14 +11,14 @@ const DashboardScreen = () => {
   const { t } = useLanguage();
 
   return (
-    <ScrollView {...dashboardStyles.scrollView}>
+    <Container>
       <VStack {...dashboardStyles.mainVStack}>
         <Text {...dashboardStyles.titleText}>{t('admin.dashboard')}</Text>
         <Text {...dashboardStyles.welcomeText}>
           {t('admin.dashboardDescription')}
         </Text>
       </VStack>
-    </ScrollView>
+    </Container>
   );
 };
 
