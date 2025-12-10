@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'react-native';
-import { Box, SafeAreaView, useColorMode, Pressable, Icon, MenuIcon } from '@gluestack-ui/themed';
+import { Box, SafeAreaView, ScrollView, useColorMode, Pressable, Icon, MenuIcon } from '@gluestack-ui/themed';
 import { useNavigation } from '@react-navigation/native';
 import Header from '@components/Header';
 import { stylesLayout } from './Styles';
@@ -77,7 +77,9 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
         {...stylesLayout.mainContent}
         bg={isDark ? '$backgroundDark950' : '$backgroundLight0'}
       >
-        {children}
+        <ScrollView flex={1}>
+          {children}
+        </ScrollView>
       </Box>
     </SafeAreaView>
   );
