@@ -300,5 +300,13 @@
     "dropoutReasonLabel": "Reason for Dropout",
     "dropoutReasonPlaceholder": "Enter reason for dropout...",
     "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
+  },
+  "lc": {
+    "menu": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "myProfile": "My Profile",
+      "serviceProviders": "Service Providers"
+    }
   }
 }

@@ -20,6 +20,8 @@ import {
   SearchIcon,
   BellIcon,
   ChevronDownIcon,
+  LucideIcon,
+  MenuIcon,
 } from '@ui';
 import { useGlobal } from '@contexts/GlobalContext';
 import { stylesHeader } from './Styles';
@@ -31,7 +33,17 @@ import logger from '@utils/logger';
 import { useLanguage } from '@contexts/LanguageContext';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
+import { MenuItemData } from '@components/ui/Menu';
 
+/**
+ * Header Component - Enhanced for LC Layout Support
+ * 
+ * - Added `userMenuPosition` prop to control profile menu placement (left for LC, right for Admin)
+ * - Added `hamburgerMenuItems` and `onHamburgerMenuSelect` props for LC hamburger menu integration
+ * - Conditional rendering: Shows hamburger menu when LC props provided, otherwise shows default rightSideContent
+ * - Left-aligned profile menu: When `userMenuPosition="left"`, displays avatar with gradient background and user icon
+ * - Gradient avatar: Uses `$web-style` for CSS gradient on web, solid color fallback on native platforms
+ */
 const Header: React.FC<{
   title?: string;
   rightSideContent?: React.ReactNode;
@@ -42,6 +54,11 @@ const Header: React.FC<{
   showLanguage?: boolean;
   showTheme?: boolean;
   showNotification?: boolean;
+  // Control user menu position (left or right) - for LC layout
+  userMenuPosition?: 'left' | 'right';
+  // For LC: menu items and handler for hamburger menu
+  hamburgerMenuItems?: MenuItemData[];
+  onHamburgerMenuSelect?: (key: string | undefined) => void;
 }> = ({
   title,
   rightSideContent,
@@ -51,6 +68,9 @@ const Header: React.FC<{
   showLanguage,
   showTheme,
   showNotification,
+  userMenuPosition = 'right',
+  hamburgerMenuItems,
+  onHamburgerMenuSelect,
 }) => {
   const { colorMode, setColorMode } = useGlobal();
   const isDark = colorMode === 'dark';
@@ -70,11 +90,63 @@ const Header: React.FC<{
     <Box
       {...stylesHeader.container}
       borderBottomColor={isDark ? '$borderDark200' : '$borderLight200'}
-      bg={isDark ? '$backgroundDark950' : '$backgroundLight0'}
+      bg={isDark ? '$backgroundDark950' : '$white'}
       shadowColor={isDark ? '$backgroundDark950' : '$black'}
     >
       <HStack {...stylesHeader.hStack}>
-        {rightSideContent && rightSideContent}
+        {/* 
+          Hamburger Menu with Dropdown (for LC)
+          - Conditionally renders hamburger menu when LC props (hamburgerMenuItems, onHamburgerMenuSelect) are provided
+          - Uses MenuIcon as trigger, opens menu at "bottom left" placement
+          - Falls back to default rightSideContent if LC props not provided (Admin layout)
+        */}
+        {rightSideContent && hamburgerMenuItems && onHamburgerMenuSelect ? (
+          <Menu
+            items={hamburgerMenuItems}
+            placement="bottom left"
+            offset={15}
+            trigger={triggerProps => (
+              <Pressable {...triggerProps}>
+                <Icon as={MenuIcon} />
+              </Pressable>
+            )}
+            onSelect={onHamburgerMenuSelect}
+          />
+        ) : (
+          rightSideContent && rightSideContent
+        )}
+        
+        {/* 
+          Left: Avatar with User Info (only if userMenuPosition is 'left' - LC layout)
+          - Displays avatar with gradient background on web, solid color on native
+          - Gradient: Uses $web-style prop for CSS linear-gradient (web only)
+          - Avatar contains User icon overlay positioned absolutely in center
+          - Shows user name next to avatar (role commented out for future use)
+        */}
+        {isLoggedIn && userMenuPosition === 'left' && (
+          <HStack {...stylesHeader.userMenuTrigger} alignItems="center" space="sm">
+            <Avatar {...stylesHeader.userAvatar} $web-style={{
+              backgroundImage: 'linear-gradient(to right bottom, rgb(139, 40, 66) 0%, oklab(0.999994 0.0000455678 0.0000200868 / 0.9) 100%)',
+            }}>
+              <AvatarFallbackText>
+                {' '}
+              </AvatarFallbackText>
+              <Box position="absolute" justifyContent="center" alignItems="center" width="100%" height="100%">
+                <LucideIcon name="User" size={20} color="#fff" />
+              </Box>
+            </Avatar>
+            <VStack {...stylesHeader.userInfoContainer}>
+              <Text {...stylesHeader.userNameText}>
+                {user?.name || ''}
+              </Text>
+              {/* <HStack {...stylesHeader.userRoleContainer}>
+                <Text {...stylesHeader.userRoleText}>
+                  {user?.role || ''}
+                </Text>
+              </HStack> */}
+            </VStack>
+          </HStack>
+        )}
         
         {/* Title */}
         {title && (
@@ -103,7 +175,7 @@ const Header: React.FC<{
             </Box>
           </>
         )}
-        {/* Right: Notifications & User */}
+        {/* Right: Notifications, Language & Theme */}
         <HStack {...stylesHeader.rightActionsContainer}>
           {/* Notifications */}
           {showNotification && (
@@ -125,8 +197,8 @@ const Header: React.FC<{
               }}
             />
           )}
-          {/* User Menu */}
-          {isLoggedIn && (
+          {/* Right: User Menu (only if userMenuPosition is 'right' or default) */}
+          {isLoggedIn && userMenuPosition === 'right' && (
             <Menu
               items={PROFILE_MENU_OPTIONS}
               placement="bottom right"
