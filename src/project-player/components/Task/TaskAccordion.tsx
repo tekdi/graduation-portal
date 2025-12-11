@@ -15,10 +15,11 @@ import { LucideIcon } from '@ui/index';
 import { useLanguage } from '@contexts/LanguageContext';
 import { useProjectContext } from '../../context/ProjectContext';
 import TaskComponent from '../ProjectComponent/TaskComponent';
-import AddCustomTask from './AddCustomTask';
+// import AddCustomTask from './AddCustomTask';
 import { TaskAccordionProps } from '../../types/components.types';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
+import { taskAccordionStyles } from './Styles';
 
 const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
   const { t } = useLanguage();
@@ -29,32 +30,17 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
   // For Edit/Read-Only modes: Show as Card (always expanded)
   if (!isPreview) {
     return (
-      <Box marginBottom="$3">
-        <Card
-          size="md"
-          variant="elevated"
-          bg="$backgroundPrimary.light"
-          borderRadius="$lg"
-        >
+      <Box {...taskAccordionStyles.container}>
+        <Card {...taskAccordionStyles.card}>
           {/* Card Header */}
-          <Box
-            padding="$5"
-            borderBottomWidth={1}
-            borderBottomColor="$mutedBorder"
-          >
-            <HStack justifyContent="space-between" alignItems="center">
+          <Box {...taskAccordionStyles.cardHeader}>
+            <HStack {...taskAccordionStyles.cardHeaderContent}>
               <VStack flex={1} space="xs">
                 <HStack alignItems="center" space="sm" flexWrap="wrap">
                   <Text {...TYPOGRAPHY.h4} color="$textPrimary">
                     {task.name}
                   </Text>
-                  <Box
-                    bg="$primary100"
-                    paddingHorizontal="$3"
-                    paddingVertical="$1"
-                    borderRadius="$full"
-                    borderColor="$primary500"
-                  >
+                  <Box {...taskAccordionStyles.taskBadge}>
                     <Text
                       fontSize="$xs"
                       fontWeight="$medium"
@@ -78,8 +64,8 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
           </Box>
 
           {/* Card Content - Always visible (no accordion) */}
-          <Box paddingHorizontal="$5" paddingBottom="$5">
-            <VStack space="md" paddingTop="$3">
+          <Box {...taskAccordionStyles.cardContent}>
+            <VStack {...taskAccordionStyles.cardContentStack}>
               {task.children?.map((childTask, index) => (
                 <TaskComponent
                   key={childTask._id}
@@ -90,8 +76,10 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                 />
               ))}
 
-              {/* Add Custom Task Button */}
-              <AddCustomTask pillarId={task._id} _pillarName={task.name} />
+              {/* Add Custom Task Button - Only in Preview Mode */}
+              {/* {isPreview && (
+                <AddCustomTask pillarId={task._id} _pillarName={task.name} />
+              )} */}
             </VStack>
           </Box>
         </Card>
@@ -101,45 +89,21 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
 
   // For Preview mode: Show as Accordion
   return (
-    <Box marginBottom="$3">
-      <Accordion
-        type="single"
-        variant="unfilled"
-        shadowColor="$backgroundLight900"
-        shadowOffset={{ width: 0, height: 1 }}
-        shadowOpacity={0.05}
-        shadowRadius={4}
-        elevation={2}
-      >
-        <AccordionItem
-          value={task._id}
-          bg="$backgroundPrimary.light"
-          borderRadius="$lg"
-          borderWidth={1}
-          borderColor="$mutedBorder"
-        >
+    <Box {...taskAccordionStyles.container}>
+      <Accordion {...taskAccordionStyles.accordion}>
+        <AccordionItem value={task._id} {...taskAccordionStyles.accordionItem}>
           {/* Accordion Header */}
           <AccordionHeader>
-            <AccordionTrigger padding="$5">
+            <AccordionTrigger {...taskAccordionStyles.accordionTrigger}>
               {({ isExpanded }: { isExpanded: boolean }) => (
                 <>
-                  <HStack
-                    flex={1}
-                    justifyContent="space-between"
-                    alignItems="center"
-                  >
+                  <HStack {...taskAccordionStyles.accordionHeaderContent}>
                     <VStack flex={1} space="xs">
                       <HStack alignItems="center" space="sm" flexWrap="wrap">
                         <Text {...TYPOGRAPHY.h4} color="$textPrimary">
                           {task.name}
                         </Text>
-                        <Box
-                          bg="$primary100"
-                          paddingHorizontal="$3"
-                          paddingVertical="$1"
-                          borderRadius="$full"
-                          borderColor="$primary500"
-                        >
+                        <Box {...taskAccordionStyles.taskBadge}>
                           <Text
                             fontSize="$xs"
                             fontWeight="$medium"
@@ -162,7 +126,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                     </VStack>
 
                     {/* Custom Lucide Icon */}
-                    <Box ml="$4">
+                    <Box {...taskAccordionStyles.accordionIconContainer}>
                       <LucideIcon
                         name={isExpanded ? 'ChevronUp' : 'ChevronDown'}
                         size={20}
@@ -176,8 +140,8 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
           </AccordionHeader>
 
           {/* Accordion Content - Collapsible in preview mode */}
-          <AccordionContent paddingHorizontal="$5" paddingBottom="$5">
-            <VStack space="md" paddingTop="$3">
+          <AccordionContent {...taskAccordionStyles.accordionContent}>
+            <VStack {...taskAccordionStyles.accordionContentStack}>
               {task.children?.map((childTask, index) => (
                 <TaskComponent
                   key={childTask._id}
@@ -189,7 +153,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
               ))}
 
               {/* Add Custom Task Button */}
-              <AddCustomTask pillarId={task._id} _pillarName={task.name} />
+              {/* <AddCustomTask pillarId={task._id} _pillarName={task.name} /> */}
             </VStack>
           </AccordionContent>
         </AccordionItem>

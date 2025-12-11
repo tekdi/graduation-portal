@@ -11,6 +11,7 @@ import { ProjectInfoCardProps } from '../../types/components.types';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useLanguage } from '@contexts/LanguageContext';
+import { projectInfoCardStyles } from './Styles';
 
 const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const { mode } = useProjectContext();
@@ -48,20 +49,13 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
     totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   return (
-    <Box bg="$backgroundPrimary.light" padding="$6">
-      <HStack
-        justifyContent="space-between"
-        alignItems="flex-start"
-        width="100%"
-      >
-        {/* LEFT SIDE — Project Title + Description */}
-        <VStack space="md" flex={1}>
-          {/* Project Title */}
+    <Box {...projectInfoCardStyles.container}>
+      <HStack {...projectInfoCardStyles.header}>
+        <VStack {...projectInfoCardStyles.leftSection}>
           <Text {...TYPOGRAPHY.h3} color="$textPrimary">
             {project.name}
           </Text>
 
-          {/* Project Description */}
           {project.description && (
             <Text
               {...TYPOGRAPHY.paragraph}
@@ -73,25 +67,12 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
           )}
         </VStack>
 
-        {/* RIGHT SIDE — Conditional rendering based on mode and hasChildren */}
-        {!hasChildren && isEditOrReadOnly && (
-          // No children + Edit/Read-only: Show steps complete badge
-          <Box
-            bg="$mutedForeground"
-            borderRadius="$full"
-            paddingHorizontal="$4"
-            paddingVertical="$2"
-            shadowColor="$backgroundLight900"
-            shadowOffset={{ width: 0, height: 1 }}
-            shadowOpacity={0.1}
-            shadowRadius={2}
-            elevation={2}
-            marginLeft="$4"
-          >
-            <HStack space="xs" alignItems="center">
+        {!hasChildren && (
+          <Box {...projectInfoCardStyles.stepsCompleteBadge}>
+            <HStack {...projectInfoCardStyles.stepsCompleteText}>
               <Text
                 {...TYPOGRAPHY.caption}
-                color="$backgroundPrimary.light"
+                color="$modalBackground"
                 fontWeight="$semibold"
               >
                 {completedTasks} of {totalTasks}{' '}
@@ -102,8 +83,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
         )}
 
         {!hasChildren && isPreview && (
-          // No children + Preview: Show task count
-          <Box>
+          <Box {...projectInfoCardStyles.taskCountPreview}>
             <Text {...TYPOGRAPHY.caption} color="$primary500">
               {totalTasks} {t('projectPlayer.tasks')}
             </Text>
@@ -111,25 +91,28 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
         )}
 
         {hasChildren && isEditOrReadOnly && (
-          // Has children + Edit/Read-only: Show progress bar
-          <VStack space="xs" marginLeft="$4" width={120}>
+          <VStack {...projectInfoCardStyles.progressContainer}>
             <Text
               {...TYPOGRAPHY.caption}
+              {...projectInfoCardStyles.progressPercentage}
               color="$primary500"
               fontWeight="$bold"
-              textAlign="right"
             >
               {progressPercentage}%
             </Text>
-            <Progress value={progressPercentage} size="sm" bg="$inputBorder">
-              <ProgressFilledTrack bg="$primary500" />
+            <Progress
+              value={progressPercentage}
+              {...projectInfoCardStyles.progressBar}
+            >
+              <ProgressFilledTrack
+                {...projectInfoCardStyles.progressFilledTrack}
+              />
             </Progress>
           </VStack>
         )}
 
         {hasChildren && isPreview && (
-          // Has children + Preview: Show pillars and tasks count
-          <VStack space="xs" marginLeft="$4" alignItems="flex-end">
+          <VStack {...projectInfoCardStyles.pillarsCountContainer}>
             <Text {...TYPOGRAPHY.caption} color="$primary500">
               {totalPillars} {t('projectPlayer.pillars')}
             </Text>

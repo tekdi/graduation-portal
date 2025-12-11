@@ -3,28 +3,25 @@ import { Box, VStack, Card, ScrollView } from '@gluestack-ui/themed';
 import { useProjectContext } from '../../context/ProjectContext';
 import ProjectInfoCard from './ProjectInfoCard';
 import TaskComponent from './TaskComponent';
+// import AddCustomTask from '../Task/AddCustomTask';
+import { projectComponentStyles } from './Styles';
 
 const ProjectComponent: React.FC = () => {
   const { projectData } = useProjectContext();
-
+  // mode
   if (!projectData) {
     return null;
   }
 
+  // const isEditMode = mode === 'edit';
+
   return (
-    <Box flex={1} bg="$backgroundLight0">
-      {/* ScrollView for overflow handling */}
-      <ScrollView
-        contentContainerStyle={{ padding: 16 }}
-        showsVerticalScrollIndicator={true}
-      >
-        {/* Single Card Container - Using Gluestack Card for cross-platform compatibility */}
-        <Card size="lg" variant="elevated" bg="$white" borderRadius="$lg">
+    <Box {...projectComponentStyles.container}>
+      <ScrollView {...projectComponentStyles.scrollView}>
+        <Card {...projectComponentStyles.card}>
           <VStack>
-            {/* Project Info Header */}
             <ProjectInfoCard project={projectData} />
 
-            {/* Task List */}
             {projectData.tasks?.map((task, index) => (
               <TaskComponent
                 key={task._id}
@@ -32,6 +29,12 @@ const ProjectComponent: React.FC = () => {
                 isLastTask={index === projectData.tasks.length - 1}
               />
             ))}
+
+            {/* {isEditMode && (
+              <Box {...projectComponentStyles.addTaskButtonContainer}>
+                <AddCustomTask />
+              </Box>
+            )} */}
           </VStack>
         </Card>
       </ScrollView>
