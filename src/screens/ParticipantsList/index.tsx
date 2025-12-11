@@ -87,13 +87,10 @@ const ParticipantsList: React.FC = () => {
     if (activeStatus) {
       filters.status = activeStatus;
     }
-    // Apply search filter (searches across name and id)
-    if(_searchKey) {
-      filters.name = _searchKey;
-    }
+    
     // Apply filters using helper function
     return applyFilters(participants, filters);
-  }, [participants, activeStatus, _searchKey]);
+  }, [participants, activeStatus]);
 
   // Handlers
   const handleSearch = useCallback((text: string) => {

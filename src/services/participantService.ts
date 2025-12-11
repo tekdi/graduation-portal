@@ -30,9 +30,9 @@ export const getParticipantById = (id: string): ParticipantData | undefined => {
     id: participant.id,
     name: participant.name,
     status: participant.status,
-    pathway: participant.pathway,
-    graduationProgress: participant.graduationProgress,
-    graduationDate: participant.graduationDate,
+    pathway: participant.pathway || undefined,
+    graduationProgress: participant.graduationProgress != null && !isNaN(Number(participant.graduationProgress)) ? participant.graduationProgress : undefined,
+    graduationDate: participant.graduationDate && participant.graduationDate !== '' ? participant.graduationDate : undefined,
   };
 };
 
