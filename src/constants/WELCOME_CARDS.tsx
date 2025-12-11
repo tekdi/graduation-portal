@@ -18,7 +18,7 @@ export const WELCOME_CARDS: FeatureCardData[] = [
     icon: 'TrendingUp',
     title: 'welcome.dashboard',
     description: 'welcome.dashboardDescription',
-    navigationUrl: 'my-dashboard',
+    navigationUrl: 'dashboard',
     isDisabled: false,
     pressableActionText: 'welcome.getStarted',
   },
