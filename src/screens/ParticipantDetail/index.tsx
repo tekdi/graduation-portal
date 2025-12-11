@@ -42,7 +42,7 @@ export default function ParticipantDetail() {
   const route = useRoute<ParticipantDetailRouteProp>();
   const { t } = useLanguage();
   const { showAlert } = useAlert();
-  
+  const { isWeb } = usePlatform();
   // Extract the id parameter from the route
   const participantId = route.params?.id;
   
@@ -90,7 +90,7 @@ export default function ParticipantDetail() {
     graduationDate,
   } = participant;
   
-  const { isWeb } = usePlatform();
+ 
 
   return (
     <>

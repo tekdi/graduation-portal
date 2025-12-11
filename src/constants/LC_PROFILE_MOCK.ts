@@ -9,7 +9,7 @@ export const LC_PROFILE_MOCK: LCProfileData = {
   profileDetails: {
     fullName: 'Lerato Mokoena',
     lcId: '001',
-    emailAddress: 'lerato.mokoena@linkagechampic',
+    emailAddress: 'lerato.mokoena@linkagechampion.org',
     phoneNumber: '+1 (555) 123-4567',
     serviceArea: 'District 5 - Central Region',
     startDate: '15/01/2023',
