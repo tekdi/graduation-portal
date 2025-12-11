@@ -41,17 +41,25 @@
   "projectPlayer": {
     "status": "Status",
     "progress": "Progress",
+    "tasks": "tasks",
+    "pillars": "pillars",
+    "complete": "complete",
+    "stepsComplete": "Steps Complete",
     "statusTypes": {
       "to-do": "To Do",
       "completed": "Completed"
     },
     "completeForm": "Complete Form",
+    "uploadFile": "Upload File",
+    "updateProfile": "Update Profile",
+    "viewTask": "View Task",
     "attachments": "Attachments",
     "uploading": "Uploading...",
     "clickToUpload": "📎 Click to upload files",
     "maxFileSize": "Max file size: {{size}}MB",
     "fileSizeError": "Some files exceed the maximum size of {{maxSize}}MB. Please choose smaller files.",
     "uploadFailed": "Upload failed. Please try again.",
+    "uploadSuccess": "Files uploaded successfully!",
     "uploadedFiles": "Uploaded Files",
     "observationForm": "Observation Form",
     "formId": "Form ID",
@@ -69,9 +77,7 @@
       "observation": "Observation",
       "project": "Project"
     },
-    "addTask": "Add Task",
-    "tasks": "tasks",
-    "complete": "complete"
+    "addTask": "Add Task"
   },
   "navigation": {
     "menu": "Menu",
@@ -300,5 +306,13 @@
     "dropoutReasonLabel": "Reason for Dropout",
     "dropoutReasonPlaceholder": "Enter reason for dropout...",
     "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
+  },
+  "lc": {
+    "menu": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "myProfile": "My Profile",
+      "serviceProviders": "Service Providers"
+    }
   }
 }
