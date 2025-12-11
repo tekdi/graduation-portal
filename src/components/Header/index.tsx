@@ -288,8 +288,13 @@ const Header: React.FC<{
                 <LucideIcon name="User" size={16} color={theme.tokens.colors.textMutedForeground} />
                 <Text {...profileStyles.fieldValue}>{t('lcProfile.fullName')}</Text>
               </HStack>
-              <Box {...LCProfileStyles.lcValueField}>
-                <Text {...profileStyles.fieldLabel}>{profileDetails.fullName}</Text>
+              <Box {...LCProfileStyles.lcValueField} width="$full" overflow="hidden">
+                <Text 
+                  {...profileStyles.fieldLabel}
+                  flexShrink={1}
+                >
+                  {profileDetails.fullName}
+                </Text>
               </Box>
             </Box>
 
@@ -299,8 +304,13 @@ const Header: React.FC<{
                 <LucideIcon name="Award" size={16} color={theme.tokens.colors.textMutedForeground} />
                 <Text {...profileStyles.fieldValue}>{t('lcProfile.lcId')}</Text>
               </HStack>
-              <Box {...LCProfileStyles.lcValueField}>
-                <Text {...profileStyles.fieldLabel}>{profileDetails.lcId}</Text>
+              <Box {...LCProfileStyles.lcValueField} width="$full" overflow="hidden">
+                <Text 
+                  {...profileStyles.fieldLabel}
+                  flexShrink={1}
+                >
+                  {profileDetails.lcId}
+                </Text>
               </Box>
             </Box>
 
@@ -310,8 +320,13 @@ const Header: React.FC<{
                 <LucideIcon name="Mail" size={16} color={theme.tokens.colors.textMutedForeground} />
                 <Text {...profileStyles.fieldValue}>{t('lcProfile.emailAddress')}</Text>
               </HStack>
-              <Box {...LCProfileStyles.lcValueField}>
-                <Text {...profileStyles.fieldLabel}>{profileDetails.emailAddress}</Text>
+              <Box {...LCProfileStyles.lcValueField} width="$full" overflow="hidden">
+                <Text 
+                  {...profileStyles.fieldLabel}
+                  flexShrink={1}
+                >
+                  {profileDetails.emailAddress}
+                </Text>
               </Box>
             </Box>
 
@@ -321,8 +336,13 @@ const Header: React.FC<{
                 <LucideIcon name="Phone" size={16} color={theme.tokens.colors.textMutedForeground} />
                 <Text {...profileStyles.fieldValue}>{t('lcProfile.phoneNumber')}</Text>
               </HStack>
-              <Box {...LCProfileStyles.lcValueField}>
-                <Text {...profileStyles.fieldLabel}>{profileDetails.phoneNumber}</Text>
+              <Box {...LCProfileStyles.lcValueField} width="$full" overflow="hidden">
+                <Text 
+                  {...profileStyles.fieldLabel}
+                  flexShrink={1}
+                >
+                  {profileDetails.phoneNumber}
+                </Text>
               </Box>
             </Box>
 
@@ -332,8 +352,13 @@ const Header: React.FC<{
                 <LucideIcon name="MapPin" size={16} color={theme.tokens.colors.textMutedForeground} />
                 <Text {...profileStyles.fieldValue}>{t('lcProfile.serviceArea')}</Text>
               </HStack>
-              <Box {...LCProfileStyles.lcValueField}>
-                <Text {...profileStyles.fieldLabel}>{profileDetails.serviceArea}</Text>
+              <Box {...LCProfileStyles.lcValueField} width="$full" overflow="hidden">
+                <Text 
+                  {...profileStyles.fieldLabel}
+                  flexShrink={1}
+                >
+                  {profileDetails.serviceArea}
+                </Text>
               </Box>
             </Box>
 
@@ -343,8 +368,13 @@ const Header: React.FC<{
                 <LucideIcon name="Calendar" size={16} color={theme.tokens.colors.textMutedForeground} />
                 <Text {...profileStyles.fieldValue}>{t('lcProfile.startDate')}</Text>
               </HStack>
-              <Box {...LCProfileStyles.lcValueField}>
-                <Text {...profileStyles.fieldLabel}>{profileDetails.startDate}</Text>
+              <Box {...LCProfileStyles.lcValueField} width="$full" overflow="hidden">
+                <Text 
+                  {...profileStyles.fieldLabel}
+                  flexShrink={1}
+                >
+                  {profileDetails.startDate}
+                </Text>
               </Box>
             </Box>
 

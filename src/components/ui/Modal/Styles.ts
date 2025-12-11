@@ -77,6 +77,14 @@ export const profileStyles = {
     paddingBottom: '$6' as const,
    
   },
+  headerIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: '$full' as const,
+    bg: theme.tokens.colors.iconBackground,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
   fieldLabel: {
     fontSize: '$sm' as const,
     fontWeight: '$medium' as const,
@@ -101,6 +109,24 @@ export const profileStyles = {
     borderColor: 'transparent' as const,
     borderRadius: '$md' as const,
     bg: '$white' as const,
+  },
+  cancelButton: {
+    variant: 'outline' as const,
+    borderWidth: 1,
+    borderColor: theme.tokens.colors.inputBorder,
+    bg: theme.tokens.colors.modalBackground,
+    paddingHorizontal: '$6' as const,
+    paddingVertical: '$3' as const,
+    borderRadius: '$md' as const,
+    $hoverBg: theme.tokens.colors.hoverBackground,
+    $webCursor: 'pointer' as const,
+  },
+  confirmButton: {
+    paddingHorizontal: '$6' as const,
+    paddingVertical: '$3' as const,
+    borderRadius: '$md' as const,
+    $hoverOpacity: 0.9,
+    $webCursor: 'pointer' as const,
   },
 } as const;
 

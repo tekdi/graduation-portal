@@ -22,7 +22,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
 import { ModalProps } from '@app-types/components';
-import { commonModalContentStyles, commonModalContainerStyles } from './Styles';
+import { commonModalContentStyles, commonModalContainerStyles, profileStyles } from './Styles';
 
 /**
  * Modal Component
@@ -101,14 +101,7 @@ const Modal: React.FC<ModalProps> = ({
             <HStack space="md" alignItems="center" flex={1}>
               {/* Header Icon Section */}
               {headerIcon && (
-                <Box
-                  width={48}
-                  height={48}
-                  borderRadius="$full"
-                  bg={theme.tokens.colors.iconBackground}
-                  alignItems="center"
-                  justifyContent="center"
-                >
+                <Box {...profileStyles.headerIconContainer}>
                   {headerIcon}
                 </Box>
               )}
@@ -138,7 +131,7 @@ const Modal: React.FC<ModalProps> = ({
 
               {/* Close Button */}
               {showCloseButton && (
-                <Pressable onPress={onClose}>
+                <Pressable onPress={onClose} accessibilityLabel={t('common.close')} accessibilityRole="button">
                   <Box
                     padding="$2"
                     borderRadius="$sm"
@@ -172,16 +165,8 @@ const Modal: React.FC<ModalProps> = ({
                 {/* Cancel Button */}
                 {cancelButtonText && (
                   <Button
-                    variant="outline"
+                    {...profileStyles.cancelButton}
                     onPress={handleCancel}
-                    borderWidth={1}
-                    borderColor={theme.tokens.colors.inputBorder}
-                    bg={theme.tokens.colors.modalBackground}
-                    paddingHorizontal="$6"
-                    paddingVertical="$3"
-                    borderRadius="$md"
-                    $hover-bg={theme.tokens.colors.hoverBackground}
-                    $web-cursor="pointer"
                   >
                     <ButtonText color={theme.tokens.colors.textPrimary} {...TYPOGRAPHY.button}>
                       {typeof cancelButtonText === 'string' ? t(cancelButtonText) : cancelButtonText}
@@ -191,15 +176,11 @@ const Modal: React.FC<ModalProps> = ({
                 {/* Confirm Button */}
                 {confirmButtonText && onConfirm && (
                   <Button
+                    {...profileStyles.confirmButton}
                     variant={confirmButtonVariant}
                     bg={confirmButtonColor}
                     onPress={onConfirm}
-                    paddingHorizontal="$6"
-                    paddingVertical="$3"
-                    borderRadius="$md"
                     $hover-bg={confirmButtonColor}
-                    $hover-opacity={0.9}
-                    $web-cursor="pointer"
                   >
                     <ButtonText color={theme.tokens.colors.modalBackground} {...TYPOGRAPHY.button}>
                       {typeof confirmButtonText === 'string' ? t(confirmButtonText) : confirmButtonText}
