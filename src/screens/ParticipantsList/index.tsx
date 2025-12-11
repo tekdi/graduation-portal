@@ -121,10 +121,16 @@ const ParticipantsList: React.FC = () => {
   return (
     <Box flex={1}>
       <ScrollView flex={1} bg={theme.tokens.colors.accent100}>
-        <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground} bg="$white" padding="$4" my="$2">
-          {t('participants.myParticipants')}
-        </Heading>
-        <VStack space="lg" padding="$6" flex={1}>
+        <VStack bg="$white">
+          <Container>
+            <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}  padding="$4" my="$2">
+              {t('participants.myParticipants')}
+            </Heading>
+          </Container>
+          </VStack>
+      
+        <Container>
+          <VStack space="lg" padding="$6" flex={1}>
             {/* Page Title */}
            
 
@@ -253,7 +259,8 @@ const ParticipantsList: React.FC = () => {
                 </Text>
               </Box>
             )}
-        </VStack>
+          </VStack>
+        </Container>
       </ScrollView>
     </Box>
   );
