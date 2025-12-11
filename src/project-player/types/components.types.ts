@@ -7,6 +7,8 @@ import { Task, ProjectData, Attachment, TaskStatus } from './project.types';
 export interface TaskCardProps {
   task: Task;
   level?: number;
+  isLastTask?: boolean;
+  isChildOfProject?: boolean;
 }
 
 export interface TaskStatusProps {
@@ -74,7 +76,7 @@ export interface ProjectContextValue {
   // Actions
   updateTask: (taskId: string, updates: Partial<Task>) => void;
   updateProjectInfo: (updates: Partial<ProjectData>) => void;
-  addTask: (task: Task) => void;
+  addTask: (pillarId: string, task: Task) => void; // Updated signature
   deleteTask: (taskId: string) => void;
   saveLocal: () => void;
   syncToServer: () => Promise<void>;
@@ -103,6 +105,7 @@ export interface ProjectPlayerConfig {
   baseUrl?: string;
   accessToken?: string;
   language?: string;
+  showAddCustomTaskButton?: boolean; // Config to show/hide AddCustomTask button
   profileInfo?: {
     id: number | string;
     name: string;

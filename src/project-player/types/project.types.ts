@@ -24,8 +24,10 @@ export interface Task {
   name: string;
   description?: string;
   type: 'simple' | 'file' | 'observation' | 'project' | 'profile-update';
-  status: TaskStatus;
-  isRequired: boolean;
+  status?: TaskStatus;
+  isRequired?: boolean;
+  isCustomTask?: boolean; // Flag to identify user-created custom tasks
+  serviceProvider?: string; // Service provider for custom tasks
   children?: Task[]; // For nested project tasks
   attachments?: Attachment[];
   observationFormId?: string;

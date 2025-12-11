@@ -3,6 +3,7 @@ import { Box, VStack, HStack, Text, Pressable } from '@gluestack-ui/themed';
 import { useLanguage } from '@contexts/LanguageContext';
 import TaskComponent from '../ProjectComponent/TaskComponent';
 import { getTaskProgress } from '../ProjectComponent/helpers';
+import AddCustomTask from './AddCustomTask';
 import { TaskAccordionProps } from '../../types/components.types';
 
 const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
@@ -58,6 +59,8 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
           </VStack>
         )}
       </VStack>
+      {/* Add Custom Task Button */}
+      <AddCustomTask pillarId={task._id} _pillarName={task.name} />
     </Box>
   );
 };

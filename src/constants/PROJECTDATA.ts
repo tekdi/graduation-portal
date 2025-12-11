@@ -593,6 +593,7 @@ export const PROJECT_PLAYER_CONFIGS = {
     baseUrl: 'https://api.example.com',
     accessToken: 'sample-token-abc123',
     language: 'en',
+    showAddCustomTaskButton: true, // Show button in edit mode
     profileInfo: {
       id: 123,
       name: 'John Doe',
@@ -617,6 +618,7 @@ export const PROJECT_PLAYER_CONFIGS = {
     maxFileSize: 10,
     baseUrl: 'https://api.example.com',
     language: 'en',
+    showAddCustomTaskButton: true, // Show button in preview mode (can be customized)
   },
 
   // Read-only mode
@@ -631,5 +633,6 @@ export const PROJECT_PLAYER_CONFIGS = {
     },
     baseUrl: 'https://api.example.com',
     language: 'en',
+    showAddCustomTaskButton: false, // Hide button in read-only mode
   },
 };

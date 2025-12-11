@@ -41,6 +41,10 @@
   "projectPlayer": {
     "status": "Status",
     "progress": "Progress",
+    "pillars": "pillars",
+    "pillar": "pillar",
+    "complete": "complete",
+    "stepsComplete": "Steps Complete",
     "statusTypes": {
       "to-do": "To Do",
       "completed": "Completed"
@@ -58,10 +62,22 @@
     "formFieldsPlaceholder": "Form fields will be rendered here",
     "submit": "Submit",
     "addCustomTask": "Add Custom Task",
+    "addCustomTaskSubtitle": "Create a custom task for this participant's intervention plan",
+    "editCustomTask": "Edit Custom Task",
+    "editCustomTaskSubtitle": "Update the details of this custom task",
+    "addTaskToPillar": "Add Task to This Pillar",
+    "selectPillar": "Select Pillar",
+    "selectPillarPlaceholder": "Choose a pillar for this task",
     "taskName": "Task Name",
+    "taskNamePlaceholder": "e.g., Complete housing application",
     "enterTaskName": "Enter task name",
+    "instructions": "Instructions",
+    "instructionsPlaceholder": "Provide detailed instructions for this task...",
     "description": "Description",
     "enterTaskDescription": "Enter task description",
+    "serviceProviderSelection": "Service Provider Selection (Optional)",
+    "serviceProvider": "Service Provider",
+    "selectServiceProvider": "Select service provider...",
     "taskType": "Task Type",
     "taskTypes": {
       "simple": "Simple",
@@ -71,7 +87,9 @@
     },
     "addTask": "Add Task",
     "tasks": "tasks",
-    "complete": "complete"
+    "updateTask": "Update Task",
+    "confirmDeleteTask": "Are you sure you want to delete '{{taskName}}'? This action cannot be undone.",
+    "taskDeleted": "Task deleted successfully"
   },
   "navigation": {
     "menu": "Menu",
@@ -232,7 +250,8 @@
     "interventionPlan": {
       "noPlanAssigned": "No Intervention Plan Assigned",
       "noPlanDescription": "Pillars and tasks will appear here once an intervention plan is assigned to this participant.",
-      "developPlan": "Develop Intervention Plan"
+      "developPlan": "Develop Intervention Plan",
+      "submitInterventionPlan": "Submit Intervention Plan"
     },
     "assessmentSurveys": {
       "title": "Assessment Surveys",
