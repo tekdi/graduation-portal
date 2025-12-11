@@ -384,42 +384,28 @@ const Header: React.FC<{
                 <Text {...profileStyles.fieldValue}>{t('lcProfile.languagePreference')}</Text>
               </HStack>
               <HStack space="sm">
-                <Pressable onPress={() => changeLanguage('en')}>
-                  <Box
-                    bg={currentLanguage === 'en' ? '$primary500' : 'transparent'}
-                    borderWidth={currentLanguage === 'en' ? 0 : 1}
-                    borderColor="$primary500"
-                    px="$3"
-                    py="$1"
-                    borderRadius="$full"
-                  >
-                    <Text
-                      color={currentLanguage === 'en' ? "#fff" : "$primary500"}
-                      fontSize="$xs"
-                      fontWeight="$medium"
-                    >
-                      {t('languages.en')}
-                    </Text>
-                  </Box>
-                </Pressable>
-                <Pressable onPress={() => changeLanguage('es')}>
-                  <Box
-                    bg={currentLanguage === 'es' ? '$primary500' : 'transparent'}
-                    borderWidth={currentLanguage === 'es' ? 0 : 1}
-                    borderColor="$primary500"
-                    px="$3"
-                    py="$1"
-                    borderRadius="$full"
-                  >
-                    <Text
-                      color={currentLanguage === 'es' ? "#fff" : "$primary500"}
-                      fontSize="$xs"
-                      fontWeight="$medium"
-                    >
-                      {t('languages.es')}
-                    </Text>
-                  </Box>
-                </Pressable>
+                {['en', 'es'].map((langCode) => {
+                  const isActive = currentLanguage === langCode;
+                  return (
+                    <Pressable key={langCode} onPress={() => changeLanguage(langCode)}>
+                      <Box
+                        {...profileStyles.languageButton}
+                        {...(isActive
+                          ? profileStyles.languageButtonActive
+                          : profileStyles.languageButtonInactive)}
+                      >
+                        <Text
+                          {...profileStyles.languageButtonText}
+                          {...(isActive
+                            ? profileStyles.languageButtonTextActive
+                            : profileStyles.languageButtonTextInactive)}
+                        >
+                          {t(`languages.${langCode}`)}
+                        </Text>
+                      </Box>
+                    </Pressable>
+                  );
+                })}
               </HStack>
             </Box>
           </Box>

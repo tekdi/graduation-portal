@@ -128,6 +128,30 @@ export const profileStyles = {
     $hoverOpacity: 0.9,
     $webCursor: 'pointer' as const,
   },
+  languageButton: {
+    px: '$3' as const,
+    py: '$1' as const,
+    borderRadius: '$full' as const,
+  },
+  languageButtonActive: {
+    bg: '$primary500' as const,
+    borderWidth: 0,
+  },
+  languageButtonInactive: {
+    bg: 'transparent' as const,
+    borderWidth: 1,
+    borderColor: '$primary500' as const,
+  },
+  languageButtonText: {
+    fontSize: '$xs' as const,
+    fontWeight: '$medium' as const,
+  },
+  languageButtonTextActive: {
+    color: '#fff' as const,
+  },
+  languageButtonTextInactive: {
+    color: '$primary500' as const,
+  },
 } as const;
 
 export const LCProfileStyles = {
