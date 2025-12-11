@@ -102,11 +102,6 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
 export const getParticipantsColumns = (
   status?: StatusType,
 ): ColumnDef<Participant>[] => {
-  console.log('status', status,allParticipantsColumns.filter(col => {
-    if (col.key === STATUS.IN_PROGRESS) return status === STATUS.IN_PROGRESS;
-    if (col.key === STATUS.COMPLETED) return status === STATUS.COMPLETED;
-    return true; // keep all other columns for any status
-  }));
   return allParticipantsColumns.filter(col => {
     if(([PARTICIPANT_COLUMN_KEYS.GRADUATED, PARTICIPANT_COLUMN_KEYS.PROGRESS] as string[]).includes(col.key)) {
       if(status === STATUS.IN_PROGRESS) {return true} else {return false}

@@ -96,7 +96,7 @@ export const PARTICIPANTS_DATA: UnifiedParticipant[] = [
     status: 'dropout',
     pathway: 'entrepreneurship',
     graduationProgress: 50,
-    graduationDate: 'undefined',
+    graduationDate: undefined,
   },
   {
     id: 'P-1002',

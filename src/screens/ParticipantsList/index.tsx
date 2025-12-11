@@ -87,10 +87,13 @@ const ParticipantsList: React.FC = () => {
     if (activeStatus) {
       filters.status = activeStatus;
     }
-    
+    // Apply search filter (searches across name and id)
+    if(_searchKey) {
+      filters.name = _searchKey;
+    }
     // Apply filters using helper function
     return applyFilters(participants, filters);
-  }, [participants, activeStatus]);
+  }, [participants, activeStatus, _searchKey]);
 
   // Handlers
   const handleSearch = useCallback((text: string) => {
@@ -246,14 +249,14 @@ const ParticipantsList: React.FC = () => {
             />
 
             {/* Pagination Info */}
-            {!isLoading && participants.length > 0 && (
+            {!isLoading && filteredParticipants.length > 0 && (
               <Box paddingVertical="$4">
                 <Text
                   {...TYPOGRAPHY.bodySmall}
                   color={theme.tokens.colors.mutedForeground}
                 >
                   {t('participants.showingParticipants', {
-                    count: participants.length,
+                    count: filteredParticipants.length,
                     total: totalCount,
                   })}{' '}
                 </Text>
