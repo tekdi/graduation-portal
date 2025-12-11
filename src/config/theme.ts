@@ -8,6 +8,7 @@ export const theme = {
       primary500: '#8B2842',
       primary600: '#A53E54',
       primary700: '#6B1E31',
+      primary100: '#fef2f2',
       info100: '#0ea5e9',
       accent100: '#F1F5F94D',
       accent200: '#10B981',
@@ -18,6 +19,7 @@ export const theme = {
       },
       foreground: 'oklch(0.145 0 0)',
       mutedForeground: '#717182',
+      mutedBorder: '#e0e0e0',
       error: {
         light: '#dc2626',
         dark: '#f87171',
@@ -35,7 +37,7 @@ export const theme = {
       hoverBackground: '#F9FAFB',
       textMutedForeground: '#64748b',
       textForeground: '#2d2d2d',
-      textForegroundColor:'#1e293b',
+      textForegroundColor: '#1e293b',
       bgSidebar: '#f8fafc',
       btnPrimary: '#8B2842',
       progressBarBackground: '#dbeafe',
@@ -47,6 +49,9 @@ export const theme = {
       error700: '#7f1d1d',
       error900: '#82181a',
       bgDestructive: '#ef4444',
+      // Task Card colors for nested project children
+      taskCardBg: '#f8f9fa',
+      taskCardBorder: '#e9ecef',
     },
     sizes: {
       ...((gluestackConfig.tokens as any).sizes || {}),

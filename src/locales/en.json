@@ -41,8 +41,8 @@
   "projectPlayer": {
     "status": "Status",
     "progress": "Progress",
-    "pillars": "pillars",
     "pillar": "pillar",
+    "pillars": "pillars",
     "complete": "complete",
     "stepsComplete": "Steps Complete",
     "statusTypes": {
@@ -50,12 +50,16 @@
       "completed": "Completed"
     },
     "completeForm": "Complete Form",
+    "uploadFile": "Upload File",
+    "updateProfile": "Update Profile",
+    "viewTask": "View Task",
     "attachments": "Attachments",
     "uploading": "Uploading...",
     "clickToUpload": "📎 Click to upload files",
     "maxFileSize": "Max file size: {{size}}MB",
     "fileSizeError": "Some files exceed the maximum size of {{maxSize}}MB. Please choose smaller files.",
     "uploadFailed": "Upload failed. Please try again.",
+    "uploadSuccess": "Files uploaded successfully!",
     "uploadedFiles": "Uploaded Files",
     "observationForm": "Observation Form",
     "formId": "Form ID",

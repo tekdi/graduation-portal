@@ -25,6 +25,8 @@ export interface TaskAccordionProps {
 export interface TaskComponentProps {
   task: Task;
   level?: number;
+  isLastTask?: boolean;
+  isChildOfProject?: boolean; // New prop
 }
 
 export interface UploadComponentProps {
@@ -51,20 +53,6 @@ export interface ProjectAsTaskComponentProps {
   task: Task;
   level?: number;
 }
-
-// ============================================
-// FORM COMPONENT PROPS
-// ============================================
-// Forms folder removed - not used currently
-
-// ============================================
-// UI COMPONENT PROPS
-// ============================================
-// UI folder removed - use global @ui components instead
-
-// ============================================
-// CONTEXT PROPS
-// ============================================
 
 export interface ProjectContextValue {
   projectData: ProjectData | null;
