@@ -8,15 +8,11 @@ import { theme } from '@config/theme';
 import { useProjectContext } from '../../context/ProjectContext';
 import AddCustomTaskModal from './AddCustomTaskModal';
 import { addCustomTaskStyles } from './Styles';
-
-interface AddCustomTaskProps {
-  pillarId?: string;
-  _pillarName?: string;
-}
+import { AddCustomTaskProps } from 'src/project-player/types';
 
 const AddCustomTask: React.FC<AddCustomTaskProps> = ({
   pillarId,
-  _pillarName,
+  pillarName,
 }) => {
   const { t } = useLanguage();
   const { config } = useProjectContext();
@@ -88,7 +84,7 @@ const AddCustomTask: React.FC<AddCustomTaskProps> = ({
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         pillarId={pillarId}
-        pillarName={_pillarName}
+        pillarName={pillarName}
         mode="add"
       />
     </>

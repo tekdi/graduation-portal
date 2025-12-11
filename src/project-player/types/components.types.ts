@@ -129,3 +129,8 @@ export interface ApiResponse<T> {
   data: T;
   error?: string;
 }
+
+export interface AddCustomTaskProps {
+  pillarId?: string;
+  pillarName?: string;
+}

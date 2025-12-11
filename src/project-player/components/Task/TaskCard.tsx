@@ -26,6 +26,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import AddCustomTaskModal from './AddCustomTaskModal';
 import { taskCardStyles } from './Styles';
+import Modal from '@ui/Modal';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
@@ -41,6 +42,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const isReadOnly = mode === 'read-only';
   const isPreview = mode === 'preview';
@@ -147,24 +149,28 @@ const TaskCard: React.FC<TaskCardProps> = ({
     setEditingTask(task);
   };
 
-  // Delete custom task handler
+  // Delete custom task handler - Opens confirmation dialog
   const handleDeleteTask = () => {
-    // Show confirmation toast
-    if (
-      window.confirm(
-        t('projectPlayer.confirmDeleteTask', { taskName: task.name }),
-      )
-    ) {
-      deleteTask(task._id);
-      toast.show({
-        placement: 'top',
-        render: ({ id }) => (
-          <Toast nativeID={id} action="success" variant="solid">
-            <ToastTitle>{t('projectPlayer.taskDeleted')}</ToastTitle>
-          </Toast>
-        ),
-      });
-    }
+    setIsDeleteDialogOpen(true);
+  };
+
+  // Confirm delete action
+  const handleConfirmDelete = () => {
+    setIsDeleteDialogOpen(false);
+    deleteTask(task._id);
+    toast.show({
+      placement: 'top',
+      render: ({ id }) => (
+        <Toast nativeID={id} action="success" variant="solid">
+          <ToastTitle>{t('projectPlayer.taskDeleted')}</ToastTitle>
+        </Toast>
+      ),
+    });
+  };
+
+  // Cancel delete action
+  const handleCancelDelete = () => {
+    setIsDeleteDialogOpen(false);
   };
 
   // // Close edit modal
@@ -449,6 +455,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
             mode="edit"
           />
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <Modal
+          isOpen={isDeleteDialogOpen}
+          onClose={handleCancelDelete}
+          variant="confirmation"
+          title="projectPlayer.deleteTask"
+          message={t('projectPlayer.confirmDeleteTask', {
+            taskName: task.name,
+          })}
+          onConfirm={handleConfirmDelete}
+          confirmText="common.delete"
+          cancelText="common.cancel"
+          confirmButtonColor={theme.tokens.colors.error500}
+        />
       </>
     );
   }
@@ -474,6 +495,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
             mode="edit"
           />
         )}
+
+        {/* Delete Confirmation Dialog */}
+        <Modal
+          isOpen={isDeleteDialogOpen}
+          onClose={handleCancelDelete}
+          variant="confirmation"
+          title="projectPlayer.deleteTask"
+          message={t('projectPlayer.confirmDeleteTask', {
+            taskName: task.name,
+          })}
+          onConfirm={handleConfirmDelete}
+          confirmText="common.delete"
+          cancelText="common.cancel"
+          confirmButtonColor={theme.tokens.colors.error500}
+        />
       </>
     );
   }
@@ -494,6 +530,31 @@ const TaskCard: React.FC<TaskCardProps> = ({
         </HStack>
       </Box>
       {renderDivider()}
+
+      {/* Edit Task Modal */}
+      {editingTask && (
+        <AddCustomTaskModal
+          isOpen={!!editingTask}
+          onClose={handleCloseEditModal}
+          task={editingTask}
+          mode="edit"
+        />
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      <Modal
+        isOpen={isDeleteDialogOpen}
+        onClose={handleCancelDelete}
+        variant="confirmation"
+        title="projectPlayer.deleteTask"
+        message={t('projectPlayer.confirmDeleteTask', {
+          taskName: task.name,
+        })}
+        onConfirm={handleConfirmDelete}
+        confirmText="common.delete"
+        cancelText="common.cancel"
+        confirmButtonColor={theme.tokens.colors.error500}
+      />
     </>
   );
 };

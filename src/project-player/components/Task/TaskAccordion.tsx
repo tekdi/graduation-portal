@@ -78,7 +78,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
 
               {/* Add Custom Task Button - Only in Preview Mode */}
               {isPreview && (
-                <AddCustomTask pillarId={task._id} _pillarName={task.name} />
+                <AddCustomTask pillarId={task._id} pillarName={task.name} />
               )}
             </VStack>
           </Box>
@@ -153,7 +153,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
               ))}
 
               {/* Add Custom Task Button */}
-              <AddCustomTask pillarId={task._id} _pillarName={task.name} />
+              <AddCustomTask pillarId={task._id} pillarName={task.name} />
             </VStack>
           </AccordionContent>
         </AccordionItem>

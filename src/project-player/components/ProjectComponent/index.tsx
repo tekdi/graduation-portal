@@ -7,13 +7,14 @@ import AddCustomTask from '../Task/AddCustomTask';
 import { projectComponentStyles } from './Styles';
 
 const ProjectComponent: React.FC = () => {
-  const { projectData, mode } = useProjectContext();
+  const { projectData, mode, config } = useProjectContext();
 
   if (!projectData) {
     return null;
   }
 
-  const isEditMode = mode === 'edit';
+  const isEditMode =
+    mode === 'edit' && config.showAddCustomTaskButton !== false;
 
   return (
     <Box {...projectComponentStyles.container}>

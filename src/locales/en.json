@@ -92,6 +92,7 @@
     "addTask": "Add Task",
     "tasks": "tasks",
     "updateTask": "Update Task",
+    "deleteTask": "Delete Task",
     "confirmDeleteTask": "Are you sure you want to delete '{{taskName}}'? This action cannot be undone.",
     "taskDeleted": "Task deleted successfully"
   },

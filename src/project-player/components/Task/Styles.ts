@@ -87,7 +87,7 @@ export const taskCardStyles = {
   deleteActionBox: {
     padding: '$1',
     borderRadius: '$sm',
-    hoverBg: '$error100' as const,
+    hoverBg: '$error200' as const,
   },
 } as const;
 
