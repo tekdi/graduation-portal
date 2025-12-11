@@ -22,8 +22,6 @@ import {
   ChevronDownIcon,
   Modal,
   LucideIcon,
-  Button,
-  ButtonText,
   MenuIcon,
 } from '@ui';
 import { useGlobal } from '@contexts/GlobalContext';
@@ -80,23 +78,32 @@ const Header: React.FC<{
   const { colorMode, setColorMode } = useGlobal();
   const isDark = colorMode === 'dark';
   const { user, logout, isLoggedIn } = useAuth();
-  const { isMobile, isWeb } = usePlatform();
+  const { isMobile } = usePlatform();
   const { t, currentLanguage, changeLanguage } = useLanguage();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
   const handleMenuSelect = (key: string | undefined) => {
     // Handle menu item selection
     logger.log('Menu selected:', key);
-    if (key === 'profile') {
+    if (key === 'myProfile') {
       setIsProfileModalOpen(true);
     } else if (key === 'logout') {
       logout();
     }
   };
 
+  // Wrapper for hamburger menu selection - handles myProfile in Header, passes others to parent
+  const handleHamburgerMenuSelect = (key: string | undefined) => {
+    if (key === 'myProfile') {
+      setIsProfileModalOpen(true);
+    } else if (onHamburgerMenuSelect) {
+      // Pass other menu items to parent handler (for navigation, logout, etc.)
+      onHamburgerMenuSelect(key);
+    }
+  };
+
   // Get profile details from mock data
   const profileDetails = LC_PROFILE_MOCK.profileDetails;
-
 
   return (
     <Box
@@ -122,10 +129,10 @@ const Header: React.FC<{
                 <Icon as={MenuIcon} />
               </Pressable>
             )}
-            onSelect={onHamburgerMenuSelect}
+            onSelect={handleHamburgerMenuSelect}
           />
         ) : (
-          rightSideContent && rightSideContent
+          rightSideContent
         )}
         
         {/* 
