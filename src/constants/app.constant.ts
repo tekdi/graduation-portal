@@ -4,6 +4,7 @@ export const STATUS = {
   IN_PROGRESS: 'in_progress',
   COMPLETED: 'completed',
   DROPOUT: 'dropout',
+  GRADUATED: 'graduated',
 };
 
 // Task Status Constants

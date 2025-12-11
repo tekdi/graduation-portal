@@ -31,6 +31,11 @@ export const getStatusItems = (
     count: statusCounts.completed,
   },
   {
+    key: STATUS.GRADUATED,
+    label: 'participants.graduatedStatus',
+    count: statusCounts.graduated,
+  },
+  {
     key: STATUS.DROPOUT,
     label: 'participants.droppedOut',
     count: statusCounts.dropout,

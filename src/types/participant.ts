@@ -10,7 +10,8 @@ export type ParticipantStatus =
   | 'enrolled'
   | 'in_progress'
   | 'completed'
-  | 'dropout';
+  | 'dropout'
+  | 'graduated';
 
 /**
  * Pathway Type
@@ -38,7 +39,7 @@ export interface ParticipantData {
  * Used as the single source of truth for participant data.
  */
 export interface UnifiedParticipant extends Participant {
-  status: 'not_enrolled' | 'enrolled' | 'in_progress' | 'completed' | 'dropout';
+  status: 'not_enrolled' | 'enrolled' | 'in_progress' | 'completed' | 'dropout' | 'graduated';
   pathway?: PathwayType;
   graduationProgress?: number;
   graduationDate?: string;

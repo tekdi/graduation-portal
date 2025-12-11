@@ -295,7 +295,8 @@
     "loadingParticipants": "Loading participants...",
     "dashboardComingSoon": "Dashboard coming soon...",
     "showingParticipants": "Showing {{count}} of {{total}} participants",
-    "graduated": "Graduated"
+    "graduated": "Ready to Graduate",
+    "graduatedStatus": "Graduated"
   },
   "actions": {
     "viewDetails": "View Details",
