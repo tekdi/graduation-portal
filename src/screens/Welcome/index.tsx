@@ -12,7 +12,6 @@ import { usePlatform } from '@utils/platform';
 const WelcomePage: React.FC = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const { isWeb } = usePlatform();
 
   return (
     <Box
