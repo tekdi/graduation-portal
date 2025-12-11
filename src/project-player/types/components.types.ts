@@ -131,6 +131,15 @@ export interface ApiResponse<T> {
 }
 
 export interface AddCustomTaskProps {
-  pillarId?: string;
-  pillarName?: string;
+  templateId?: string;
+  templateName?: string;
+}
+
+export interface AddCustomTaskModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  task?: Task; // If provided, we're in edit mode
+  templateId?: string;
+  templateName?: string;
+  mode?: 'add' | 'edit';
 }

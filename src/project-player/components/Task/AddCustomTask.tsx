@@ -11,8 +11,8 @@ import { addCustomTaskStyles } from './Styles';
 import { AddCustomTaskProps } from 'src/project-player/types';
 
 const AddCustomTask: React.FC<AddCustomTaskProps> = ({
-  pillarId,
-  pillarName,
+  templateId,
+  templateName,
 }) => {
   const { t } = useLanguage();
   const { config } = useProjectContext();
@@ -44,22 +44,8 @@ const AddCustomTask: React.FC<AddCustomTaskProps> = ({
         onHoverOut={() => setIsHovered(false)}
       >
         <Box
-          bg={isHovered ? '$primary100' : '$accent100'}
-          borderRadius={addCustomTaskStyles.button.borderRadius}
-          borderWidth={addCustomTaskStyles.button.borderWidth}
-          borderStyle={addCustomTaskStyles.button.borderStyle}
-          borderColor={addCustomTaskStyles.button.borderColor}
-          padding={addCustomTaskStyles.button.padding}
-          marginTop={addCustomTaskStyles.button.marginTop}
-          alignItems={addCustomTaskStyles.button.alignItems}
-          justifyContent={addCustomTaskStyles.button.justifyContent}
-          sx={{
-            cursor: 'pointer',
-            ':hover': {
-              bg: addCustomTaskStyles.button.hoverBg,
-              borderColor: addCustomTaskStyles.button.hoverBorderColor,
-            },
-          }}
+          {...addCustomTaskStyles.buttonBox}
+          {...(isHovered ? addCustomTaskStyles.buttonBoxHovered : {})}
         >
           <HStack {...addCustomTaskStyles.buttonContent}>
             <LucideIcon
@@ -83,8 +69,8 @@ const AddCustomTask: React.FC<AddCustomTaskProps> = ({
       <AddCustomTaskModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        pillarId={pillarId}
-        pillarName={pillarName}
+        templateId={templateId}
+        templateName={templateName}
         mode="add"
       />
     </>

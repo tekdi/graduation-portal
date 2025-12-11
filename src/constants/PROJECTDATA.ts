@@ -148,11 +148,6 @@ export const PROJECT_PLAYER_CONFIGS = {
     mode: 'edit' as const,
     solutionId: 'sol-community-health-001',
     projectId: 'proj-health-assessment-2024',
-    permissions: {
-      canEdit: true,
-      canAddTask: true,
-      canDelete: true,
-    },
     maxFileSize: 50,
     baseUrl: 'https://api.example.com',
     accessToken: 'sample-token-abc123',
@@ -174,11 +169,6 @@ export const PROJECT_PLAYER_CONFIGS = {
   previewMode: {
     mode: 'preview' as const,
     solutionId: 'sol-community-health-001',
-    permissions: {
-      canEdit: false,
-      canAddTask: false,
-      canDelete: false,
-    },
     maxFileSize: 10,
     baseUrl: 'https://api.example.com',
     language: 'en',
@@ -190,11 +180,6 @@ export const PROJECT_PLAYER_CONFIGS = {
     mode: 'read-only' as const,
     solutionId: 'sol-community-health-001',
     projectId: 'proj-health-assessment-2024',
-    permissions: {
-      canEdit: false,
-      canAddTask: false,
-      canDelete: false,
-    },
     baseUrl: 'https://api.example.com',
     language: 'en',
     showAddCustomTaskButton: false, // Hide button in read-only mode

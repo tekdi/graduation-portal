@@ -30,10 +30,6 @@ const ProjectComponent: React.FC = () => {
                 isLastTask={index === projectData.tasks.length - 1}
               />
             ))}
-
-            {projectData.tasks?.map(task => (
-              <TaskComponent key={task._id} task={task} />
-            ))}
           </VStack>
         </Card>
       </ScrollView>

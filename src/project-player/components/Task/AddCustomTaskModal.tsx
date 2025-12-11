@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Button,
   ButtonText,
@@ -20,22 +20,15 @@ import { useProjectContext } from '../../context/ProjectContext';
 import { Task } from '../../types/project.types';
 import { TASK_STATUS } from '../../../constants/app.constant';
 import { addCustomTaskModalStyles } from './Styles';
-
-interface AddCustomTaskModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  task?: Task; // If provided, we're in edit mode
-  pillarId?: string;
-  pillarName?: string;
-  mode?: 'add' | 'edit';
-}
+import { AddCustomTaskModalProps } from 'src/project-player/types';
+import { theme } from '@config/theme';
 
 export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
   isOpen,
   onClose,
   task,
-  pillarId: propPillarId,
-  pillarName: propPillarName,
+  templateId: propPillarId,
+  templateName: propPillarName,
   mode = 'add',
 }) => {
   const { t } = useLanguage();
@@ -46,25 +39,48 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
     mode: playerMode,
   } = useProjectContext();
 
-  // Form state
-  const [selectedPillar, setSelectedPillar] = useState('');
-  const [taskName, setTaskName] = useState('');
-  const [instructions, setInstructions] = useState('');
-  const [serviceProvider, setServiceProvider] = useState('');
+  // Form state - merged into single object
+  const [formData, setFormData] = useState({
+    selectedPillar: '',
+    taskName: '',
+    instructions: '',
+    serviceProvider: '',
+  });
 
   const isEditMode = mode === 'edit' && !!task;
   const isPreviewMode = playerMode === 'preview';
 
-  // Get all pillars (project type tasks) for the dropdown
-  const pillars =
-    projectData?.tasks
-      ?.filter(pillar => pillar.type === 'project')
-      .map(pillar => ({
-        label: `${pillar.name} (${pillar.children?.length || 0} ${t(
-          'projectPlayer.tasks',
-        )})`,
-        value: pillar._id,
-      })) || [];
+  // Helper to update form field
+  const updateFormField = useCallback(
+    (field: keyof typeof formData, value: string) => {
+      setFormData(prev => ({ ...prev, [field]: value }));
+    },
+    [],
+  );
+
+  // Helper to reset form
+  const resetForm = useCallback(() => {
+    setFormData({
+      selectedPillar: '',
+      taskName: '',
+      instructions: '',
+      serviceProvider: '',
+    });
+  }, []);
+
+  // Get all pillars (project type tasks) for the dropdown - memoized
+  const pillars = useMemo(
+    () =>
+      projectData?.tasks
+        ?.filter(pillar => pillar.type === 'project')
+        .map(pillar => ({
+          label: `${pillar.name} (${pillar.children?.length || 0} ${t(
+            'projectPlayer.tasks',
+          )})`,
+          value: pillar._id,
+        })) || [],
+    [projectData?.tasks, t],
+  );
 
   // Find parent pillar for a task
   const findParentPillar = useCallback(
@@ -81,40 +97,46 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
   useEffect(() => {
     if (isEditMode && task) {
       // Edit mode: populate with existing task data
-      setTaskName(task.name);
-      setInstructions(task.description || '');
-      setServiceProvider(task.serviceProvider || '');
-      // Find parent pillar
       const parentPillar = findParentPillar(task._id);
-      setSelectedPillar(parentPillar?._id || '');
+      setFormData({
+        selectedPillar: parentPillar?._id || '',
+        taskName: task.name,
+        instructions: task.description || '',
+        serviceProvider: task.serviceProvider || '',
+      });
     } else if (propPillarId) {
-      // Add mode: set pillar if provided
-      setSelectedPillar(propPillarId);
-      // Reset form fields for add mode
-      setTaskName('');
-      setInstructions('');
-      setServiceProvider('');
+      // Add mode: set pillar if provided, reset other fields
+      setFormData({
+        selectedPillar: propPillarId,
+        taskName: '',
+        instructions: '',
+        serviceProvider: '',
+      });
     } else {
       // Reset everything if no pillar provided
-      setSelectedPillar('');
-      setTaskName('');
-      setInstructions('');
-      setServiceProvider('');
+      resetForm();
     }
-  }, [isEditMode, task, propPillarId, findParentPillar]);
+  }, [isEditMode, task, propPillarId, findParentPillar, resetForm]);
 
-  const handleCloseModal = () => {
-    // Reset form when closing
-    setTaskName('');
-    setInstructions('');
-    setServiceProvider('');
+  const handleCloseModal = useCallback(() => {
+    // Reset form when closing (preserve pillar if provided in add mode)
     if (!propPillarId && !isEditMode) {
-      setSelectedPillar('');
+      resetForm();
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        taskName: '',
+        instructions: '',
+        serviceProvider: '',
+      }));
     }
     onClose();
-  };
+  }, [propPillarId, isEditMode, resetForm, onClose]);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(() => {
+    const { taskName, instructions, serviceProvider, selectedPillar } =
+      formData;
+
     if (isEditMode && task) {
       // Update existing task
       updateTask(task._id, {
@@ -138,11 +160,23 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
       addTask(pillarIdToUse, newTask);
     }
     handleCloseModal();
-  };
+  }, [
+    formData,
+    isEditMode,
+    task,
+    propPillarId,
+    updateTask,
+    addTask,
+    handleCloseModal,
+  ]);
 
   // Form validation: In preview mode, pillar is always provided. In edit mode, need to select pillar.
-  const isFormValid =
-    (isPreviewMode || propPillarId || selectedPillar) && taskName.trim();
+  const isFormValid = useMemo(
+    () =>
+      (isPreviewMode || propPillarId || formData.selectedPillar) &&
+      formData.taskName.trim(),
+    [isPreviewMode, propPillarId, formData.selectedPillar, formData.taskName],
+  );
 
   const parentPillarName =
     propPillarName || findParentPillar(task?._id || '')?.name;
@@ -204,8 +238,8 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
             ) : (
               <Select
                 options={pillars}
-                value={selectedPillar}
-                onChange={setSelectedPillar}
+                value={formData.selectedPillar}
+                onChange={value => updateFormField('selectedPillar', value)}
                 placeholder={t('projectPlayer.selectPillarPlaceholder')}
                 {...addCustomTaskModalStyles.select}
               />
@@ -224,8 +258,8 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
             <Input {...addCustomTaskModalStyles.input}>
               <InputField
                 placeholder={t('projectPlayer.taskNamePlaceholder')}
-                value={taskName}
-                onChangeText={setTaskName}
+                value={formData.taskName}
+                onChangeText={value => updateFormField('taskName', value)}
                 placeholderTextColor="$textMuted"
               />
             </Input>
@@ -243,8 +277,8 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
             <Textarea {...addCustomTaskModalStyles.textarea}>
               <TextareaInput
                 placeholder={t('projectPlayer.instructionsPlaceholder')}
-                value={instructions}
-                onChangeText={setInstructions}
+                value={formData.instructions}
+                onChangeText={value => updateFormField('instructions', value)}
                 placeholderTextColor="$textMuted"
               />
             </Textarea>
@@ -253,7 +287,11 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
           {/* Service Provider Selection (Optional) */}
           <VStack space="xs">
             <HStack alignItems="center" space="xs">
-              <LucideIcon name="Building2" size={16} color="$primary500" />
+              <LucideIcon
+                name="Building2"
+                size={16}
+                color={theme.tokens.colors.primary500}
+              />
               <Text
                 {...TYPOGRAPHY.label}
                 color="$textPrimary"
@@ -274,8 +312,8 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
                 { label: 'Service Provider 2', value: 'provider2' },
                 { label: 'Service Provider 3', value: 'provider3' },
               ]}
-              value={serviceProvider}
-              onChange={setServiceProvider}
+              value={formData.serviceProvider}
+              onChange={value => updateFormField('serviceProvider', value)}
               placeholder={t('projectPlayer.selectServiceProvider')}
               {...addCustomTaskModalStyles.select}
             />
@@ -307,7 +345,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
               <LucideIcon
                 name={isEditMode ? 'Check' : 'Plus'}
                 size={16}
-                color="$backgroundPrimary.light"
+                color={theme.tokens.colors.backgroundPrimary.light}
               />
               <ButtonText
                 color="$backgroundPrimary.light"
