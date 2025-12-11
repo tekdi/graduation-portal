@@ -12,13 +12,15 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useLanguage } from '@contexts/LanguageContext';
 import { projectInfoCardStyles } from './Styles';
+import { TASK_STATUS } from '@constants/app.constant';
 
 const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const { mode } = useProjectContext();
   const { t } = useLanguage();
 
   const completedTasks =
-    project.tasks?.filter(task => task.status === 'completed').length || 0;
+    project.tasks?.filter(task => task.status === TASK_STATUS.COMPLETED)
+      .length || 0;
   const totalTasks = project.tasks?.length || 0;
 
   // Check if any task is a project type (has children)
