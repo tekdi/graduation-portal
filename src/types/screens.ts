@@ -26,8 +26,7 @@ export interface ParticipantsResponse {
 
 export interface ParticipantsQueryParams {
   searchKey?: string;
-  status?: StatusType | '' | StatusType[]; // Single status or array of statuses
-  id?: string | string[]; // Single ID or array of IDs
+  status?: StatusType | '';
   page?: number;
   limit?: number;
 }

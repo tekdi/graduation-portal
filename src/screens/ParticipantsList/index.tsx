@@ -16,12 +16,13 @@ import DataTable from '@components/DataTable';
 import { getParticipantsColumns } from '@components/DataTable/ParticipantsTableConfig';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
-import { Participant, ParticipantsQueryParams, StatusCount, StatusType } from '@app-types/screens';
+import { Participant, StatusCount, StatusType } from '@app-types/screens';
 import { useLanguage } from '@contexts/LanguageContext';
 import { getStatusItems } from '@constants/FILTERS';
-import { getFilteredParticipants, getParticipantsList } from '../../services/participantService';
+import { getParticipantsList } from '../../services/participantService';
 import { STATUS } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
+import { applyFilters } from '@utils/helper';
 
 const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
@@ -79,20 +80,17 @@ const ParticipantsList: React.FC = () => {
   }, []);
 
   const filteredParticipants = useMemo(() => {
-    const params: ParticipantsQueryParams = {};
+    // Build filters object for applyFilters
+    const filters: Record<string, any> = {};
     
-    // Add searchKey filter if provided (service handles empty strings)
-    if (_searchKey) {
-      params.searchKey = _searchKey;
-    }
-    
-    // Add status filter if provided (service handles empty strings)
+    // Apply status filter if active
     if (activeStatus) {
-      params.status = activeStatus as StatusType;
+      filters.status = activeStatus;
     }
     
-    return getFilteredParticipants(params);
-  }, [_searchKey, activeStatus]);
+    // Apply filters using helper function
+    return applyFilters(participants, filters);
+  }, [participants, activeStatus]);
 
   // Handlers
   const handleSearch = useCallback((text: string) => {
