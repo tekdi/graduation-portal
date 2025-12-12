@@ -95,7 +95,7 @@
   "languages": {
     "en": "English",
     "ar": "العربية",
-    "es": "Español",
+    "es": "Spanish",
     "hi": "हिन्दी"
   },
   "admin": {
@@ -194,7 +194,9 @@
     "myLearningProgressDescription": "Access training materials, track your professional development",
     "connectWithExperts": "Connect with Experts",
     "connectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
-    "getStarted": "Get started"
+    "getStarted": "Get started",
+    "dashboard": "Dashboard",
+    "dashboardDescription": "View your dashboard and get a quick overview of your progress"
   },
   "participantDetail": {
     "notFound": {
@@ -307,6 +309,27 @@
     "dropoutReasonLabel": "Reason for Dropout",
     "dropoutReasonPlaceholder": "Enter reason for dropout...",
     "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
+  },
+  "lcProfile": {
+    "myProfile": "My Profile",
+    "linkageChampionProfile": "Linkage Champion Profile",
+    "profileDetails": "Profile Details",
+    "fullName": "Full Name",
+    "lcId": "LC ID",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "serviceArea": "Service Area",
+    "startDate": "Start Date",
+    "languagePreference": "Language Preference",
+    "programStatistics": "Program Statistics",
+    "activeParticipants": "Active Participants",
+    "completedIdps": "Completed IDPs",
+    "visitsLogged": "Visits Logged",
+    "pendingTasks": "Pending Tasks",
+    "certificationsTraining": "Certifications & Training",
+    "completed": "Completed",
+    "certified": "Certified",
+    "notes": "Notes"
   },
   "lc": {
     "menu": {
