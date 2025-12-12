@@ -164,7 +164,6 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     <VStack 
       {...participantHeaderStyles.container}
       // Responsive padding: keep mobile bottom padding, desktop uses default
-      $md-pb="$0"
     >
       {/* Back Navigation Link */}
       <Pressable onPress={handleBackPress}>

@@ -272,7 +272,7 @@ const Header: React.FC<{
           </Box>
         }
         size="lg"
-        closeOnOverlayClick={false}
+        
       >
         <VStack
           {...LCProfileStyles.lcProfileCard}

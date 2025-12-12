@@ -12,6 +12,8 @@ import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
 import type { ParticipantStatus, ParticipantData } from '@app-types/participant';
 import { Modal, useAlert } from '@ui';
+import { usePlatform } from '@utils/platform';
+import { profileStyles } from '@components/ui/Modal/Styles';
 
 /**
  * Route parameters type definition for ParticipantDetail screen

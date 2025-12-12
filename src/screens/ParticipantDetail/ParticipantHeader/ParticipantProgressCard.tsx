@@ -32,8 +32,8 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
     return null;
   }
 
-  const progress = graduationProgress != null && !isNaN(Number(graduationProgress)) ? Number(graduationProgress) : 0;
-  const date = graduationDate && graduationDate !== '' ? graduationDate : undefined;
+  const progress = graduationProgress ?? 0;
+  const date = graduationDate;
   // Dropout: Return warning content directly
   if (status === STATUS.DROPOUT) {
     return (
@@ -108,7 +108,7 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
               {t('participantDetail.header.graduatedComplete')}
             </Text>
             <Text {...participantHeaderStyles.completedDate}>
-            {date && date !== ''
+            {date
               ? t('participantDetail.header.graduatedOn', { date })
               : t('participantDetail.header.graduationDateNotAvailable')}
             </Text>

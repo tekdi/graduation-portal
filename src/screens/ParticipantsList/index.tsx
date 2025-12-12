@@ -131,7 +131,7 @@ const ParticipantsList: React.FC = () => {
           </VStack>
       
         <Container>
-          <VStack space="lg" padding="$6" flex={1}>
+          <VStack space="lg" padding="$0" $md-padding="$6" flex={1}>
             {/* Page Title */}
            
 
