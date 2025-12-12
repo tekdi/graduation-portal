@@ -10,13 +10,10 @@ import { TabButton } from '@components/Tabs';
 import { PARTICIPANT_DETAIL_TABS } from '@constants/TABS';
 import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
-import type { ParticipantStatus, UnifiedParticipant } from '@app-types/participant';
-import { Modal, useAlert, LucideIcon, Select } from '@ui';
-import { PROVINCES } from '@constants/PARTICIPANTS_LIST';
-import { theme } from '@config/theme';
-import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
-import { profileStyles } from '@components/ui/Modal/Styles';
+import type { ParticipantStatus, ParticipantData } from '@app-types/participant';
+import { Modal, useAlert } from '@ui';
 import { usePlatform } from '@utils/platform';
+import { profileStyles } from '@components/ui/Modal/Styles';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
@@ -59,7 +56,7 @@ export default function ParticipantDetail() {
     site: '',
   });
   const [isSavingAddress, setIsSavingAddress] = useState(false);
-  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<UnifiedParticipant | undefined>(
+  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<ParticipantData | undefined>(
     participantId ? getParticipantProfile(participantId) : undefined
   );
   
