@@ -71,7 +71,10 @@ const Modal: React.FC<ModalProps> = ({
   // Additional styling
   maxWidth,
   contentProps,
+  closeOnOverlayClick = true,
+  
   ...modalProps // Spread all other Gluestack Modal props
+  
 }) => {
   const { t } = useLanguage();
   
@@ -84,8 +87,9 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <GluestackModal 
       isOpen={isOpen} 
-      onClose={onClose} 
+      onClose={onClose}
       size={size}
+      closeOnOverlayClick={closeOnOverlayClick}
       {...commonModalContainerStyles}
       {...modalProps} // Pass through all Gluestack Modal props
     >
