@@ -300,6 +300,10 @@
     "showingParticipants": "Showing {{count}} of {{total}} participants",
     "graduated": "Ready to Graduate"
   },
+  "table": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} entries",
+    "itemsPerPage": "Items per page"
+  },
   "actions": {
     "viewDetails": "View Details",
     "logVisit": "Log Visit",

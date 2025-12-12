@@ -311,22 +311,13 @@ const ParticipantsList: React.FC = () => {
               showActions={true}
               emptyMessage={t('participants.noParticipantsFound')}
               loadingMessage={t('participants.loadingParticipants')}
+              pagination={{
+                enabled: true,
+                pageSize: 6,
+                showPageNumbers: true,
+                maxPageNumbers: 5,
+              }}
             />
-
-            {/* Pagination Info */}
-            {!isLoading && filteredParticipants.length > 0 && (
-              <Box paddingVertical="$4">
-                <Text
-                  {...TYPOGRAPHY.bodySmall}
-                  color={theme.tokens.colors.mutedForeground}
-                >
-                  {t('participants.showingParticipants', {
-                    count: filteredParticipants.length,
-                    total: totalCount,
-                  })}{' '}
-                </Text>
-              </Box>
-            )}
           </VStack>
         </Container>
       </ScrollView>
