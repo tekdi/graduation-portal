@@ -283,7 +283,7 @@ export const renderCustomTaskActions = ({
           <LucideIcon
             name="Trash2"
             size={16}
-            color={theme.tokens.colors.error500}
+            color={theme.tokens.colors.primary500}
           />
         </Box>
       </Pressable>
@@ -298,7 +298,7 @@ export const renderModals = ({
   modalState,
   onCloseModal,
   onConfirmDelete,
-  // taskName,
+  taskName,
   t,
 }: RenderModalsProps): React.ReactElement => {
   return (
@@ -319,11 +319,10 @@ export const renderModals = ({
         onClose={onCloseModal}
         variant="confirmation"
         title="projectPlayer.deleteTask"
-        message={t('projectPlayer.confirmDeleteTask')}
+        message={t('projectPlayer.confirmDeleteTask', { taskName })}
         onConfirm={onConfirmDelete}
         confirmText="common.delete"
         cancelText="common.cancel"
-        confirmButtonColor={theme.tokens.colors.error500}
       />
     </>
   );
