@@ -36,11 +36,6 @@ export const getStatusItems = (
     count: statusCounts['Graduated'],
   },
   {
-    key: STATUS.GRADUATED,
-    label: 'participants.graduatedStatus',
-    count: statusCounts.graduated,
-  },
-  {
     key: STATUS.DROPOUT,
     label: 'participants.droppedOut',
     count: statusCounts['Dropped out'],
