@@ -10,7 +10,7 @@ import { TabButton } from '@components/Tabs';
 import { PARTICIPANT_DETAIL_TABS } from '@constants/TABS';
 import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
-import type { ParticipantStatus, UnifiedParticipant } from '@app-types/participant';
+import type { ParticipantStatus, ParticipantData } from '@app-types/participant';
 import { Modal, useAlert } from '@ui';
 
 /**
@@ -54,7 +54,7 @@ export default function ParticipantDetail() {
     site: '',
   });
   const [isSavingAddress, setIsSavingAddress] = useState(false);
-  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<UnifiedParticipant | undefined>(
+  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<ParticipantData | undefined>(
     participantId ? getParticipantProfile(participantId) : undefined
   );
   

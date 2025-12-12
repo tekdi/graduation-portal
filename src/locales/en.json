@@ -286,6 +286,7 @@
     "inProgress": "In Progress",
     "completed": "Completed",
     "droppedOut": "Dropped out",
+    "graduatedStatus": "Graduated",
     "name": "Name",
     "participantID": "Participant ID",
     "overallProgress": "Overall Progress",

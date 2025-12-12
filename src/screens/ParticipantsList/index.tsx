@@ -42,11 +42,12 @@ const ParticipantsList: React.FC = () => {
   // Calculate status counts dynamically from participants data
   const statusCounts = useMemo<StatusCount>(() => {
     const counts: StatusCount = {
-      not_enrolled: 0,
-      enrolled: 0,
-      in_progress: 0,
-      completed: 0,
-      dropout: 0,
+      'Not Onboarded': 0,
+      'Onboarded': 0,
+      'In Progress': 0,
+      'Completed': 0,
+      'Dropped out': 0,
+      'Graduated': 0,
     };
 
     participants.forEach(participant => {

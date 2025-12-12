@@ -382,16 +382,13 @@ const DataTable = <T,>({
         </ScrollView>
       ) : (
         // Desktop: Wrap table in vertical scroll container (only if needed)
-        <Box
-          maxHeight={600}
-          overflow="hidden"
-          $web-style={{
-            overflowY: 'auto',
-            overflowX: 'hidden',
-          }}
-        >
+        <ScrollView
+            style={{ maxHeight: 550 }}
+            contentContainerStyle={{ flexGrow: 1 }}
+            showsVerticalScrollIndicator={true}
+          >
           {tableContent}
-        </Box>
+        </ScrollView>
       )}
     </Box>
   );
