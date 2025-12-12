@@ -9,7 +9,7 @@ import { DataTableProps, ColumnDef } from '@app-types/components';
 // import ActionsMenu from '@components/ActionsMenu';
 import { CustomMenu } from '@components/ui/Menu';
 import { LucideIcon } from '@components/ui';
-import { Modal } from '@ui';
+import { Modal, Input, InputField } from '@ui';
 import { usePlatform } from '@utils/platform';
 
 interface TableHeaderProps<T> {
@@ -111,6 +111,7 @@ const TableRow = <T,>({
     setDropoutReason(reason ?? ''); // Reset reason
     onActionClick?.(item);
   };
+
 
   const customTrigger = (triggerProps: any) => (
     <Pressable
@@ -245,15 +246,7 @@ const TableRow = <T,>({
           setShowDropoutModal(false);
           setDropoutReason(''); // Reset on close
         }}
-        onConfirm={handleDropoutConfirm}
-        title={t('actions.confirmDropout') || 'Confirm Dropout'}
-        message={
-          t('actions.dropoutMessage', { name: itemName }) ||
-          `Mark ${itemName} as dropout from the program`
-        }
-        confirmText={t('actions.confirmDropout') || 'Confirm Dropout'}
-        cancelText={t('common.cancel') || 'Cancel'}
-        confirmButtonColor={theme.tokens.colors.error.light}
+        headerTitle={t('actions.confirmDropout') || 'Confirm Dropout'}
         headerIcon={
           <LucideIcon
             name="UserX"
@@ -261,20 +254,71 @@ const TableRow = <T,>({
             color={theme.tokens.colors.error.light}
           />
         }
-        showInput
-        inputLabel={t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
-        inputPlaceholder={
-          t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
-        }
-        inputHint={
-          t('actions.dropoutHint') ||
-          'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'
-        }
-        inputValue={dropoutReason}
-        onInputChange={setDropoutReason}
-        inputRequired={false}
         maxWidth={500}
-      />
+        cancelButtonText={t('common.cancel') || 'Cancel'}
+        confirmButtonText={t('actions.confirmDropout') || 'Confirm Dropout'}
+        onCancel={() => {
+          setShowDropoutModal(false);
+          setDropoutReason('');
+        }}
+        onConfirm={() => handleDropoutConfirm(dropoutReason)}
+        confirmButtonColor={theme.tokens.colors.error.light}
+      >
+        <VStack space="lg">
+          {/* Message */}
+          <Text
+            {...TYPOGRAPHY.paragraph}
+            color={theme.tokens.colors.textSecondary}
+            lineHeight="$xl"
+          >
+            {t('actions.dropoutMessage', { name: itemName }) ||
+              `Mark ${itemName} as dropout from the program`}
+          </Text>
+
+          {/* Input Field */}
+          <VStack space="sm">
+            <Text
+              {...TYPOGRAPHY.label}
+              color={theme.tokens.colors.textPrimary}
+              fontWeight="$medium"
+            >
+              {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
+            </Text>
+            <Input
+              variant="outline"
+              size="lg"
+              borderWidth={2}
+              borderColor={theme.tokens.colors.inputBorder}
+              borderRadius="$md"
+              bg={theme.tokens.colors.modalBackground}
+              $focus-borderColor={theme.tokens.colors.inputFocusBorder}
+              $focus-borderWidth={2}
+              minHeight={80}
+            >
+              <InputField
+                placeholder={
+                  t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
+                }
+                value={dropoutReason}
+                onChangeText={setDropoutReason}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+                paddingTop="$3"
+                placeholderTextColor={theme.tokens.colors.textMuted}
+              />
+            </Input>
+            <Text
+              {...TYPOGRAPHY.bodySmall}
+              color={theme.tokens.colors.textSecondary}
+              lineHeight="$sm"
+            >
+              {t('actions.dropoutHint') ||
+                'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
+            </Text>
+          </VStack>
+        </VStack>
+      </Modal>
     </>
   );
 };
@@ -382,16 +426,13 @@ const DataTable = <T,>({
         </ScrollView>
       ) : (
         // Desktop: Wrap table in vertical scroll container (only if needed)
-        <Box
-          maxHeight={600}
-          overflow="hidden"
-          $web-style={{
-            overflowY: 'auto',
-            overflowX: 'hidden',
-          }}
-        >
+        <ScrollView
+            style={{ maxHeight: 550 }}
+            contentContainerStyle={{ flexGrow: 1 }}
+            showsVerticalScrollIndicator={true}
+          >
           {tableContent}
-        </Box>
+        </ScrollView>
       )}
     </Box>
   );

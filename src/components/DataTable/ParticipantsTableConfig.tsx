@@ -107,7 +107,7 @@ export const getParticipantsColumns = (
       if(status === STATUS.IN_PROGRESS) {return true} else {return false}
     }
     if(([PARTICIPANT_COLUMN_KEYS.GRADUATED] as string[]).includes(col.key)) {
-      if(status === STATUS.COMPLETED) {return true} else {return false}
+      if(status === STATUS.GRADUATED) {return true} else {return false}
     }
     return true; // keep all other columns for any status
   });
