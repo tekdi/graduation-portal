@@ -194,7 +194,9 @@
     "myLearningProgressDescription": "Access training materials, track your professional development",
     "connectWithExperts": "Connect with Experts",
     "connectWithExpertsDescription": "Get support, ask questions, and connect with specialists",
-    "getStarted": "Get started"
+    "getStarted": "Get started",
+    "dashboard": "Dashboard",
+    "dashboardDescription": "View your dashboard and get a quick overview of your progress"
   },
   "participantDetail": {
     "notFound": {
