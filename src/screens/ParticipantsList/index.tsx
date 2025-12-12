@@ -37,7 +37,6 @@ const ParticipantsList: React.FC = () => {
   const [_searchKey, setSearchKey] = useState('');
   const [activeFilter, setActiveFilter] = useState<'active' | 'inactive'>('active');
   const [isLoading] = useState(false);
-  const [_page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
   // Calculate status counts dynamically from participants data
@@ -147,12 +146,10 @@ const ParticipantsList: React.FC = () => {
   // Handlers
   const handleSearch = useCallback((text: string) => {
     setSearchKey(text);
-    setPage(1); // Reset to first page on search
   }, []);
 
   const handleStatusChange = useCallback((status: StatusType | '') => {
     setActiveStatus(status);
-    setPage(1); // Reset to first page on filter change
   }, []);
 
   const handleRowClick = useCallback(

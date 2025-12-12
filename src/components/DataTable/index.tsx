@@ -385,21 +385,25 @@ const DataTable = <T,>({
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(pagination?.pageSize || 10);
+  const [pageSize, setPageSize] = useState(() => Math.max(1, pagination?.pageSize ?? 10));
   
-  // Calculate pagination values
+  // Calculate pagination values with validation
   const isPaginationEnabled = pagination?.enabled ?? false;
-  const totalPages = isPaginationEnabled ? Math.ceil(data.length / pageSize) : 1;
-  const startIndex = isPaginationEnabled ? (currentPage - 1) * pageSize : 0;
-  const endIndex = isPaginationEnabled ? startIndex + pageSize : data.length;
+  const safePageSize = Math.max(1, pageSize);
+  const totalPages = isPaginationEnabled ? Math.max(1, Math.ceil(data.length / safePageSize)) : 1;
+  const startIndex = isPaginationEnabled ? (currentPage - 1) * safePageSize : 0;
+  const endIndex = isPaginationEnabled ? startIndex + safePageSize : data.length;
   const paginatedData = isPaginationEnabled ? data.slice(startIndex, endIndex) : data;
   
-  // Reset to page 1 when data changes
+  // Sync pageSize from props and reset to page 1 when data changes
   useEffect(() => {
-    if (isPaginationEnabled) {
+    if (!isPaginationEnabled) return;
+    
+    if (pagination?.pageSize && pagination.pageSize !== pageSize) {
+      setPageSize(Math.max(1, pagination.pageSize));
       setCurrentPage(1);
     }
-  }, [data.length, isPaginationEnabled]);
+  }, [isPaginationEnabled, pagination?.pageSize]);
   
   // Handle page change
   const handlePageChange = (newPage: number) => {
@@ -409,8 +413,9 @@ const DataTable = <T,>({
     }
   };
   
-  // Handle page size change
+  // Handle page size change with validation
   const handlePageSizeChange = (newPageSize: number) => {
+    if (!Number.isFinite(newPageSize) || newPageSize <= 0) return;
     setPageSize(newPageSize);
     setCurrentPage(1); // Reset to first page
   };

@@ -5,7 +5,6 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
 import { PaginationControlsProps } from '@app-types/components';
 import { LucideIcon } from '@components/ui';
-import { usePlatform } from '@utils/platform';
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
@@ -19,11 +18,12 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   config,
 }) => {
   const { t } = useLanguage();
-  const { isMobile } = usePlatform();
   
   // Generate page numbers to display
   const getPageNumbers = () => {
-    const maxPages = config.maxPageNumbers || 5;
+    // Clamp maxPageNumbers to minimum 3 to ensure valid pagination logic
+    // (first + last + at least 1 middle page = 3 minimum)
+    const maxPages = Math.max(3, config.maxPageNumbers ?? 5);
     const pages: (number | string)[] = [];
     
     if (totalPages <= maxPages) {
