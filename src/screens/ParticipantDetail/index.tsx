@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { VStack, HStack, Box, Container } from '@ui';
+import { VStack, HStack, Box, ScrollView, Text, Input, InputField, Pressable, Container } from '@ui';
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
-import { getParticipantById, getParticipantProfile, updateParticipantAddress } from '../../services/participantService';
+import { getParticipantById, getParticipantProfile, updateParticipantAddress, getSitesByProvince } from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
 import { TabButton } from '@components/Tabs';
@@ -11,7 +11,12 @@ import { PARTICIPANT_DETAIL_TABS } from '@constants/TABS';
 import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
 import type { ParticipantStatus, UnifiedParticipant } from '@app-types/participant';
-import { Modal, useAlert } from '@ui';
+import { Modal, useAlert, LucideIcon, Select } from '@ui';
+import { PROVINCES } from '@constants/PARTICIPANTS_LIST';
+import { theme } from '@config/theme';
+import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
+import { profileStyles } from '@components/ui/Modal/Styles';
+import { usePlatform } from '@utils/platform';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
@@ -37,7 +42,7 @@ export default function ParticipantDetail() {
   const route = useRoute<ParticipantDetailRouteProp>();
   const { t } = useLanguage();
   const { showAlert } = useAlert();
-  
+  const { isWeb } = usePlatform();
   // Extract the id parameter from the route
   const participantId = route.params?.id;
   
@@ -84,6 +89,8 @@ export default function ParticipantDetail() {
     graduationProgress,
     graduationDate,
   } = participant;
+  
+ 
 
   return (
     <>
@@ -148,10 +155,9 @@ export default function ParticipantDetail() {
         </Container>
       </Box>
 
-      {/* Profile Modal - Using Modal with profile variant */}
+      {/* Profile Modal */}
       {currentParticipantProfile && (
         <Modal
-          variant="profile"
           isOpen={isProfileModalOpen}
           onClose={() => {
             setIsProfileModalOpen(false);
@@ -162,31 +168,20 @@ export default function ParticipantDetail() {
               site: '',
             });
           }}
-          title={t('participantDetail.profileModal.title')}
-          subtitle={t('participantDetail.profileModal.subtitle', { name: participantName })}
-          profile={currentParticipantProfile}
-          onAddressEdit={() => {
-            // Initialize edit mode with current address or empty values
-            if (currentParticipantProfile?.address) {
-              // Parse existing address if it's a string, or use empty values
-              // For now, we'll start with empty and let user fill
-              setEditedAddress({
-                street: '',
-                province: '',
-                site: '',
-              });
-            }
-            setIsEditingAddress(true);
+          headerTitle={t('participantDetail.profileModal.title')}
+          headerDescription={t('participantDetail.profileModal.subtitle', { name: participantName })}
+          size={isWeb ? "sm" : "lg"}
+          cancelButtonText={isEditingAddress ? t('common.cancel') : undefined}
+          confirmButtonText={isEditingAddress ? t('participantDetail.profileModal.saveLocation') : undefined}
+          onCancel={() => {
+            setIsEditingAddress(false);
+            setEditedAddress({
+              street: '',
+              province: '',
+              site: '',
+            });
           }}
-          isEditingAddress={isEditingAddress}
-          editedAddress={editedAddress}
-          onAddressChange={(field, value) => {
-            setEditedAddress(prev => ({
-              ...prev,
-              [field]: value,
-            }));
-          }}
-          onSaveAddress={async () => {
+          onConfirm={async () => {
             if (!editedAddress.street || !editedAddress.province || !editedAddress.site) {
               showAlert('warning', t('participantDetail.profileModal.fillAllFields'), {
                 placement: 'bottom-right',
@@ -216,16 +211,137 @@ export default function ParticipantDetail() {
               setIsSavingAddress(false);
             }
           }}
-          onCancelEdit={() => {
-            setIsEditingAddress(false);
-            setEditedAddress({
-              street: '',
-              province: '',
-              site: '',
-            });
-          }}
-          isSavingAddress={isSavingAddress}
-        />
+        >
+          <VStack space="lg">
+            {/* Name Field */}
+            <VStack space="xs" {...profileStyles.fieldSection}>
+              <Text {...profileStyles.fieldLabel}>
+                {t('common.profileFields.name')}
+              </Text>
+              <Text {...profileStyles.fieldValue}>
+                {currentParticipantProfile!.name}
+              </Text>
+            </VStack>
+
+            {/* ID Field */}
+            <VStack space="xs" {...profileStyles.fieldSection}>
+              <Text {...profileStyles.fieldLabel}>
+                {t('common.profileFields.id')}
+              </Text>
+              <Text {...profileStyles.fieldValue}>
+                {currentParticipantProfile!.id}
+              </Text>
+            </VStack>
+
+            {/* Contact Section */}
+            <VStack space="xs" {...(currentParticipantProfile!.address ? profileStyles.fieldSection : {})}>
+              <Text {...profileStyles.fieldLabel}>
+                {t('common.profileFields.contact')}
+              </Text>
+              <VStack space="sm">
+                <Text {...profileStyles.fieldValue}>
+                  {currentParticipantProfile!.phone}
+                </Text>
+                <Text {...profileStyles.fieldValue}>
+                  {currentParticipantProfile!.email}
+                </Text>
+              </VStack>
+            </VStack>
+
+            {/* Address Section */}
+            {currentParticipantProfile!.address && (
+              <VStack space="xs">
+                {!isEditingAddress ? (
+                  <>
+                    <HStack alignItems="center" justifyContent="space-between">
+                      <Text {...profileStyles.fieldLabel}>
+                        {t('common.profileFields.address')}
+                      </Text>
+                      <Pressable onPress={() => {
+                        setEditedAddress({
+                          street: '',
+                          province: '',
+                          site: '',
+                        });
+                        setIsEditingAddress(true);
+                      }}>
+                        <LucideIcon 
+                          name="Pencil" 
+                          size={16} 
+                          color={theme.tokens.colors.primary500} 
+                        />
+                      </Pressable>
+                    </HStack>
+                    <Text {...profileStyles.fieldValue}>
+                      {currentParticipantProfile!.address}
+                    </Text>
+                  </>
+                ) : (
+                  <VStack space="sm">
+                    {/* Street Address Input */}
+                    <VStack space="xs">
+                      <Text {...profileStyles.fieldLabel}>
+                        {t('common.profileFields.address')}
+                      </Text>
+                      <Input
+                        {...profileStyles.input}
+                        $focus-borderColor={theme.tokens.colors.inputFocusBorder}
+                      >
+                        <InputField
+                          placeholder={t('common.profileFields.addressFields.street')}
+                          value={editedAddress?.street || ''}
+                          onChangeText={(value) => {
+                            setEditedAddress(prev => ({
+                              ...prev,
+                              street: value,
+                            }));
+                          }}
+                        />
+                      </Input>
+                    </VStack>
+
+                    {/* Province Dropdown */}
+                    <VStack space="xs">
+                      <Select 
+                        options={PROVINCES.map(p => ({ label: p.label, value: p.value }))}
+                        value={editedAddress?.province || ''}
+                        onChange={(value) => {
+                          setEditedAddress(prev => ({
+                            ...prev,
+                            province: value,
+                            site: '', // Reset site when province changes
+                          }));
+                        }}
+                        placeholder={t('participantDetail.profileModal.selectProvince')}
+                        bg="$white" borderColor="transparent"
+                      />
+                    </VStack>
+
+                    {/* Site Dropdown */}
+                    <VStack space="xs">
+                      <Select
+                        options={getSitesByProvince(editedAddress?.province || '').map(s => ({ 
+                          label: s.label, 
+                          value: s.value 
+                        }))}
+                        value={editedAddress?.site || ''}
+                        onChange={(value) => {
+                          setEditedAddress(prev => ({
+                            ...prev,
+                            site: value,
+                          }));
+                        }}
+                        placeholder={t('participantDetail.profileModal.selectSite')}
+                        bg="$white"
+                        borderColor="transparent"
+                      />
+                    </VStack>
+                  </VStack>
+                )}
+              </VStack>
+            )}
+          </VStack>
+        </Modal>
       )}
     </>
   );
