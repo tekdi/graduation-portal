@@ -82,9 +82,13 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
-        { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
+        {
+          name: 'participant-detail',
+          path: '/participants/:id',
+          component: ParticipantDetail,
+        },
         { name: 'participants', component: ParticipantsList },
-        { name: 'project', component: ProjectPlayer },
+        { name: 'project', path: '/project', component: ProjectPlayer },
       ];
     default:
       return []; // Always return an array, even if empty
