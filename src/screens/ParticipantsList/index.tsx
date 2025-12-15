@@ -195,8 +195,8 @@ const ParticipantsList: React.FC = () => {
               <Box width="$40" $md-width="$48">
                 <Select
                   options={[
-                    { label: `Active (${activeInactiveCounts.active})`, value: 'active' },
-                    { label: `Inactive (${activeInactiveCounts.inactive})`, value: 'inactive' },
+                    { label: `${t('participants.active')} (${activeInactiveCounts.active})`, value: 'active' },
+                    { label: `${t('participants.inactive')} (${activeInactiveCounts.inactive})`, value: 'inactive' },
                   ]}
                   value={activeFilter}
                   onChange={(value) => setActiveFilter(value as 'active' | 'inactive')}
@@ -311,7 +311,6 @@ const ParticipantsList: React.FC = () => {
               pagination={{
                 enabled: true,
                 pageSize: 6,
-                showPageNumbers: true,
                 maxPageNumbers: 5,
               }}
             />

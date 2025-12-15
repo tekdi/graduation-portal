@@ -298,7 +298,9 @@
     "loadingParticipants": "Loading participants...",
     "dashboardComingSoon": "Dashboard coming soon...",
     "showingParticipants": "Showing {{count}} of {{total}} participants",
-    "graduated": "Ready to Graduate"
+    "graduated": "Ready to Graduate",
+    "active": "Active",
+    "inactive": "Inactive"
   },
   "table": {
     "showing": "Showing {{start}} to {{end}} of {{total}} entries",
