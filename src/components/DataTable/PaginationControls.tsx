@@ -67,7 +67,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   };
   
   return (
-    <VStack space="md" padding="$4">
+    <VStack space="md" paddingVertical="$4">
       <HStack justifyContent="center" $md-justifyContent="space-between" alignItems="center" flexWrap="wrap" space="md">
         {/* Left Side: Page Info and Page Size Selector */}
         <HStack space="md" alignItems="center" flexWrap="wrap">
