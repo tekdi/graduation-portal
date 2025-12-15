@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Box, VStack, Text, Button, ButtonText, HStack } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
 import { interventionPlanStyles } from './Styles';
 import ProjectPlayer, {
   ProjectPlayerData,
+  ProjectPlayerConfig,
 } from '../../../project-player/index';
 import {
   COMPLEX_PROJECT_DATA,
@@ -21,51 +22,48 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   const [showPlayer, setShowPlayer] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
 
-  // Determine ProjectPlayer config and data based on participant status and edit mode
-  let configData;
-  let projectData;
-
-  // If ENROLLED and edit mode is triggered, use editMode config
-  if (participantStatus === STATUS.ENROLLED && isEditMode) {
-    configData = PROJECT_PLAYER_CONFIGS.editMode;
-    projectData = COMPLEX_PROJECT_DATA;
-  } else {
-    switch (participantStatus) {
-      case STATUS.ENROLLED:
-        configData = PROJECT_PLAYER_CONFIGS.previewMode;
-        projectData = COMPLEX_PROJECT_DATA;
-        break;
-      case STATUS.IN_PROGRESS:
-        configData = PROJECT_PLAYER_CONFIGS.editMode;
-        projectData = COMPLEX_PROJECT_DATA;
-        break;
-      case STATUS.COMPLETED:
-        configData = PROJECT_PLAYER_CONFIGS.editMode;
-        projectData = COMPLEX_PROJECT_DATA;
-        break;
-      case STATUS.DROPOUT:
-        configData = PROJECT_PLAYER_CONFIGS.readOnlyMode;
-        projectData = COMPLEX_PROJECT_DATA;
-        break;
-      default:
-        // Default to preview mode if status is unknown
-        configData = PROJECT_PLAYER_CONFIGS.previewMode;
-        projectData = COMPLEX_PROJECT_DATA;
+  // Memoize ProjectPlayer config based on status and edit mode
+  const config: ProjectPlayerConfig = useMemo(() => {
+    // Handle undefined participantStatus
+    if (!participantStatus) {
+      return PROJECT_PLAYER_CONFIGS.previewMode;
     }
-  }
 
-  const ProjectPlayerConfigData: ProjectPlayerData = {
-    solutionId: configData.solutionId,
-    projectId: 'projectId' in configData ? configData.projectId : undefined,
-    localData: projectData,
-  };
+    // Store in const to ensure TypeScript knows it's defined
+    const status = participantStatus;
 
-  // For IN_PROGRESS: Show empty state with button, then ProjectPlayer on click
+    // ENROLLED status: use editMode if isEditMode is true, otherwise previewMode
+    if (status === STATUS.ENROLLED) {
+      return isEditMode
+        ? PROJECT_PLAYER_CONFIGS.editMode
+        : PROJECT_PLAYER_CONFIGS.previewMode;
+    }
+
+    // Map other statuses to their respective configs
+    const statusConfigMap: Record<string, ProjectPlayerConfig> = {
+      [STATUS.IN_PROGRESS]: PROJECT_PLAYER_CONFIGS.editMode,
+      [STATUS.COMPLETED]: PROJECT_PLAYER_CONFIGS.editMode,
+      [STATUS.DROPOUT]: PROJECT_PLAYER_CONFIGS.readOnlyMode,
+    };
+
+    return statusConfigMap[status] || PROJECT_PLAYER_CONFIGS.previewMode;
+  }, [participantStatus, isEditMode]);
+
+  // Memoize ProjectPlayer data - all statuses use COMPLEX_PROJECT_DATA
+  const projectPlayerData: ProjectPlayerData = useMemo(
+    () => ({
+      solutionId: config.solutionId,
+      projectId: config.projectId,
+      localData: COMPLEX_PROJECT_DATA,
+    }),
+    [config.solutionId, config.projectId],
+  );
+
+  // Show empty state for ENROLLED status when player is not shown yet
   if (participantStatus === STATUS.ENROLLED && !showPlayer) {
     return (
       <Box {...interventionPlanStyles.container}>
         <VStack {...interventionPlanStyles.content}>
-          {/* Icon */}
           <Box {...interventionPlanStyles.iconContainer}>
             <LucideIcon
               name="FileText"
@@ -73,18 +71,12 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
               color={interventionPlanStyles.iconColor}
             />
           </Box>
-
-          {/* Title */}
           <Text {...interventionPlanStyles.title}>
             {t('participantDetail.interventionPlan.noPlanAssigned')}
           </Text>
-
-          {/* Description */}
           <Text {...interventionPlanStyles.description}>
             {t('participantDetail.interventionPlan.noPlanDescription')}
           </Text>
-
-          {/* Action Button */}
           <Button
             {...interventionPlanStyles.button}
             onPress={() => setShowPlayer(true)}
@@ -98,54 +90,46 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     );
   }
 
-  if (participantStatus === STATUS.ENROLLED) {
-    return (
-      <Box flex={1}>
-        <VStack flex={1}>
-          <Box flex={1}>
-            <ProjectPlayer config={configData} data={ProjectPlayerConfigData} />
-          </Box>
-
-          {/* Submit Intervention Plan Button - Only show in preview mode */}
-          {!isEditMode && (
-            <Box
-              padding="$4"
-              borderTopWidth={1}
-              borderTopColor="$borderLight300"
-              bg="$backgroundPrimary.light"
-            >
-              <HStack justifyContent="flex-end" width="$full">
-                <Button
-                  bg="$primary500"
-                  borderRadius="$md"
-                  paddingHorizontal="$6"
-                  paddingVertical="$3"
-                  onPress={() => setIsEditMode(true)}
-                  $hover-bg="$primary600"
-                  $web-cursor="pointer"
-                >
-                  <ButtonText
-                    color="$backgroundPrimary.light"
-                    {...TYPOGRAPHY.button}
-                    fontWeight="$semibold"
-                  >
-                    {t(
-                      'participantDetail.interventionPlan.submitInterventionPlan',
-                    )}
-                  </ButtonText>
-                </Button>
-              </HStack>
-            </Box>
-          )}
-        </VStack>
-      </Box>
-    );
-  }
-
-  // For other statuses: Show ProjectPlayer directly
+  // Single ProjectPlayer render point for all statuses
   return (
     <Box flex={1}>
-      <ProjectPlayer config={configData} data={ProjectPlayerConfigData} />
+      <VStack flex={1}>
+        <Box flex={1}>
+          <ProjectPlayer config={config} data={projectPlayerData} />
+        </Box>
+
+        {/* Submit Intervention Plan Button - Only show for ENROLLED status in preview mode */}
+        {participantStatus === STATUS.ENROLLED && !isEditMode && (
+          <Box
+            padding="$4"
+            borderTopWidth={1}
+            borderTopColor="$borderLight300"
+            bg="$backgroundPrimary.light"
+          >
+            <HStack justifyContent="flex-end" width="$full">
+              <Button
+                bg="$primary500"
+                borderRadius="$md"
+                paddingHorizontal="$6"
+                paddingVertical="$3"
+                onPress={() => setIsEditMode(true)}
+                $hover-bg="$primary600"
+                $web-cursor="pointer"
+              >
+                <ButtonText
+                  color="$backgroundPrimary.light"
+                  {...TYPOGRAPHY.button}
+                  fontWeight="$semibold"
+                >
+                  {t(
+                    'participantDetail.interventionPlan.submitInterventionPlan',
+                  )}
+                </ButtonText>
+              </Button>
+            </HStack>
+          </Box>
+        )}
+      </VStack>
     </Box>
   );
 };

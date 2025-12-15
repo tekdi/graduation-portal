@@ -84,7 +84,7 @@ export default function ParticipantDetail() {
     province: '',
     site: '',
   });
-  const [_isSavingAddress, setIsSavingAddress] = useState(false);
+  const [isSavingAddress, setIsSavingAddress] = useState(false);
   const [currentParticipantProfile, setCurrentParticipantProfile] = useState<
     ParticipantData | undefined
   >(participantId ? getParticipantProfile(participantId) : undefined);
@@ -186,7 +186,9 @@ export default function ParticipantDetail() {
                 <Box width="$full">
                   <Box width="$full">
                     {activeTab === 'intervention-plan' && (
-                      <InterventionPlan participantStatus={status} />
+                      <InterventionPlan
+                        participantStatus={status as ParticipantStatus}
+                      />
                     )}
                     {activeTab === 'assessment-surveys' && (
                       <AssessmentSurveys
