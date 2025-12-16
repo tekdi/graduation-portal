@@ -9,6 +9,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { logVisitStyles } from './Style';
+import NotFound from '@components/NotFound';
 
 /**
  * Route parameters type definition for LogVisit screen
@@ -34,7 +35,6 @@ const LogVisit: React.FC = () => {
   const { t } = useLanguage();
   const participantId = route.params?.id;
   const participant = participantId ? getParticipantById(participantId) : undefined;
-  const participantName = participant?.name || '';
 
   /**
    * Handle Back Navigation
@@ -44,6 +44,17 @@ const LogVisit: React.FC = () => {
     // @ts-ignore
     navigation.goBack();
   };
+
+  // Error State: Missing participant ID or participant not found
+  if (!participantId) {
+    return <NotFound message="participantDetail.notFound.noIdProvided" />;
+  }
+
+  if (!participant) {
+    return <NotFound message="participantDetail.notFound.title" />;
+  }
+
+  const participantName = participant.name;
 
   return (
     <Box flex={1} bg="$accent100">
