@@ -46,10 +46,6 @@ const LogVisit: React.FC = () => {
   };
 
   // Error State: Missing participant ID or participant not found
-  if (!participantId) {
-    return <NotFound message="participantDetail.notFound.noIdProvided" />;
-  }
-
   if (!participant) {
     return <NotFound message="participantDetail.notFound.title" />;
   }
