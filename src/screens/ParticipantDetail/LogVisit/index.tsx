@@ -60,7 +60,7 @@ const LogVisit: React.FC = () => {
                   />
                 </Pressable>
                 <VStack flex={1}>
-                  <Text {...TYPOGRAPHY.h3} color="$textForeground">
+                  <Text {...TYPOGRAPHY.h3} color="$textForeground" mb="$1">
                     {t('actions.logVisit')}
                   </Text>
                   <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
@@ -70,11 +70,7 @@ const LogVisit: React.FC = () => {
               </HStack>
               
               <Button
-                variant="outline"
-                padding="$3"
-                bg="$backgroundLight100"
-                borderColor="$borderLight300"
-                borderRadius="$xl"
+                {...logVisitStyles.viewCheckInsButton}
                 onPress={() => {
                   // Handle view check-ins navigation
                 }}
@@ -85,13 +81,7 @@ const LogVisit: React.FC = () => {
                     size={16}
                     color={theme.tokens.colors.textForeground}
                   />
-                  <ButtonText 
-                    color="$textForeground" 
-                    fontSize="$sm" 
-                    fontWeight="$medium"
-                    display="none"
-                    $md-display="flex"
-                  >
+                  <ButtonText {...logVisitStyles.viewCheckInsButtonText}>
                     {t('logVisit.viewCheckIns')}
                   </ButtonText>
                 </HStack>
@@ -104,15 +94,13 @@ const LogVisit: React.FC = () => {
        
 
         {/* Cards */}
-        <VStack space="md" padding="$4" $md-padding="$6"  marginHorizontal="$0"
-          $md-marginHorizontal="$24" gap="$4" alignItems="stretch" $md-alignItems="flex-start">
+        <VStack {...logVisitStyles.cardsContainer}>
           {LOG_VISIT_CARDS.map(card => (
             <AssessmentCard key={card.id} card={card} />
           ))}
         </VStack>
-        <VStack paddingHorizontal="$4" $md-paddingHorizontal="$6"  marginHorizontal="$0" 
-          $md-marginHorizontal="$24">
-           <HStack bg="$accent200" borderRadius="$lg" padding="$4" borderWidth="$1" borderColor="$borderLight300" gap="$2">
+        <VStack {...logVisitStyles.noteContainer}>
+           <HStack {...logVisitStyles.noteBox}>
             <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">Note:</Text>
             <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
               {t('logVisit.logVisitNote')}

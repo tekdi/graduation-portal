@@ -110,6 +110,7 @@ export const assessmentSurveyCardStyles = {
     fontSize: '$sm',
     color: '$textMutedForeground',
     fontStyle: 'normal' as const,
+    lineHeight: '$sm',
   },
   buttonPrimary: {
     ...buttonBaseStyles,
