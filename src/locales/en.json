@@ -331,6 +331,7 @@
   "logVisit": {
     "selectVisitType": "Select visit type for {{name}}",
     "viewCheckIns": "View Check-Ins",
+    "note": "Note:",
     "logVisitNote": "Individual/Enterprise visits are used for one-on-one coaching sessions. Group visits are for training sessions with multiple participants. Midline surveys track progress at key milestones.",
     "individualEnterpriseVisit": {
       "title": "Individual/Enterprise Visit",

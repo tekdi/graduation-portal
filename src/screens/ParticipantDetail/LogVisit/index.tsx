@@ -108,10 +108,12 @@ const LogVisit: React.FC = () => {
         </VStack>
         <VStack {...logVisitStyles.noteContainer}>
            <HStack {...logVisitStyles.noteBox}>
-            <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">Note:</Text>
-            <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
+            <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">{t('logVisit.note')}  
+              <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground" pl="$1">
               {t('logVisit.logVisitNote')}
+              </Text> 
             </Text>
+           
           </HStack>
         </VStack>
       </Container>
