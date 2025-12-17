@@ -110,16 +110,16 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
               size={16}
               color={
                 actionButton.variant === 'primary'
-                  ? '$white'
-                  : '$textForeground'
+                  ? theme.tokens.colors.white
+                  : theme.tokens.colors.textForeground
               }
             />
             <ButtonText
               {...assessmentSurveyCardStyles.buttonText}
               color={
                 actionButton.variant === 'primary'
-                  ? '$white'
-                  : '$textForeground'
+                  ? theme.tokens.colors.white
+                  : theme.tokens.colors.textForeground
               }
             >
               {t(actionButton.label)}
@@ -140,8 +140,8 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
                   size={12}
                   color={
                     status.type === CARD_STATUS.GRADUATED
-                      ? '$white'
-                      : '$success600'
+                      ? theme.tokens.colors.white
+                      : theme.tokens.colors.success600
                   }
                 />
               )}

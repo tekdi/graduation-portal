@@ -38,11 +38,17 @@ const LogVisit: React.FC = () => {
 
   /**
    * Handle Back Navigation
-   * Navigates to participant detail page
+   * Goes back to the previous screen in the navigation stack
+   * Falls back to navigating to participant-detail if goBack is not available
    */
   const handleBackPress = () => {
-    // @ts-ignore
-    navigation.navigate('participant-detail', { id: participantId });
+    if (navigation.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      // Fallback: Navigate to participant detail if there's no previous screen
+      // @ts-ignore
+      navigation.navigate('participant-detail', { id: participantId });
+    }
   };
 
   // Error State: Missing participant ID or participant not found
@@ -60,11 +66,13 @@ const LogVisit: React.FC = () => {
             <HStack {...logVisitStyles.headerContent}>
               <HStack alignItems="center" gap="$3" flex={1}>
                 <Pressable onPress={handleBackPress}>
-                  <LucideIcon
-                    name="ArrowLeft"
-                    size={20}
-                    color={theme.tokens.colors.textForeground}
-                  />
+                  <Box>
+                    <LucideIcon
+                      name="ArrowLeft"
+                      size={20}
+                      color={theme.tokens.colors.textForeground}
+                    />
+                  </Box>
                 </Pressable>
                 <VStack flex={1}>
                   <Text {...TYPOGRAPHY.h3} color="$textForeground" mb="$1">

@@ -12,7 +12,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     title: 'participantDetail.assessmentSurveys.householdProfile.title',
     description: 'participantDetail.assessmentSurveys.householdProfile.description',
     icon: 'Users',
-    iconColor: theme.tokens.colors.primary500,
+    iconColor: "$primary500",
     status: {
       type: CARD_STATUS.NOT_STARTED,
       label: 'participantDetail.assessmentSurveys.status.notStarted',
@@ -30,7 +30,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     description: 'participantDetail.assessmentSurveys.midlineSurvey.description',
     additionalInfo: 'participantDetail.assessmentSurveys.midlineSurvey.additionalInfo',
     icon: 'FileText',
-    iconColor: theme.tokens.colors.blue500,
+    iconColor: "$blue500",
     status: {
       type: CARD_STATUS.IN_PROGRESS,
       label: 'participantDetail.assessmentSurveys.status.percentComplete',
@@ -52,7 +52,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     description: 'participantDetail.assessmentSurveys.graduationReadiness.description',
     additionalInfo: 'participantDetail.assessmentSurveys.graduationReadiness.additionalInfo',
     icon: 'FileText',
-    iconColor: theme.tokens.colors.warning500,
+    iconColor: "$warning500",
     status: {
       type: CARD_STATUS.COMPLETED,
       label: 'participantDetail.assessmentSurveys.status.completed',
@@ -73,7 +73,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     description: 'participantDetail.assessmentSurveys.endlineSurvey.description',
     additionalInfo: 'participantDetail.assessmentSurveys.endlineSurvey.additionalInfo',
     icon: 'FileText',
-    iconColor: theme.tokens.colors.purple500,
+    iconColor: "$purple500",
     status: {
       type: CARD_STATUS.IN_PROGRESS,
       label: 'participantDetail.assessmentSurveys.status.percentComplete',
