@@ -290,5 +290,4 @@ const AppNavigator: React.FC = () => {
     </NavigationErrorBoundary>
   );
 };
-
 export default AppNavigator;

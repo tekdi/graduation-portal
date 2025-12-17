@@ -34,6 +34,7 @@ export interface ParticipantsQueryParams {
 export interface InterventionPlanProps {
   participantStatus?: StatusType;
 }
+
 export interface TemplateData {
   id: string;
   title: string;

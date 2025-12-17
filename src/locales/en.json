@@ -320,8 +320,6 @@
     "graduated": "Ready to Graduate",
     "active": "Active",
     "inactive": "Inactive"
-<<<<<<< HEAD
-=======
   },
   "table": {
     "showing": "Showing {{start}} to {{end}} of {{total}} entries",
@@ -383,7 +381,6 @@
       "myProfile": "My Profile",
       "serviceProviders": "Service Providers"
     }
->>>>>>> 01fcdba (en.json updated)
   },
   "table": {
     "showing": "Showing {{start}} to {{end}} of {{total}} entries",
@@ -467,11 +464,7 @@
       "tasks": "Tasks",
       "includedPillars": "Included Pillars:",
       "tasksLabel": "tasks"
-<<<<<<< HEAD
     },
     "loadError": "Failed to load templates. Please try again."
-=======
-    }
->>>>>>> 01fcdba (en.json updated)
   }
 }
