@@ -49,6 +49,7 @@ export const assessmentSurveyCardStyles = {
     borderRadius: '$2xl',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
+    color: '$white',
   },
   title: {
     fontSize: '$md',
@@ -85,7 +86,7 @@ export const assessmentSurveyCardStyles = {
   statusBadgeTextCompleted: {
     fontSize: '$xs',
     fontWeight: '$medium',
-    color: '$textForeground',
+    color: '$success600',
     $web: {
       whiteSpace: 'nowrap' as const,
     },
