@@ -42,6 +42,8 @@ export const assessmentSurveyCardStyles = {
   },
   cardHeader: {
     width: '$full',
+    justifyContent: "space-between" as const,
+    alignItems: "center" as const,
   },
   iconContainer: {
     width: '$12',

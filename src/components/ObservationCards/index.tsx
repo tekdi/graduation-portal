@@ -65,8 +65,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
       {/* Card Header with Icon, Title, Description, Action Button and Status Badge */}
       <HStack
         {...assessmentSurveyCardStyles.cardHeader}
-        justifyContent="space-between"
-        alignItems="center"
+       
       >
         <HStack alignItems="flex-start" gap="$4" flex={1}>
           <Box 
@@ -113,8 +112,8 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
               size={16}
               color={
                 actionButton.variant === 'primary'
-                  ? '#ffffff'
-                  : theme.tokens.colors.textForeground
+                  ? '$white'
+                  : '$textForeground'
               }
             />
             <ButtonText
@@ -122,7 +121,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
               color={
                 actionButton.variant === 'primary'
                   ? '$white'
-                  : theme.tokens.colors.textForeground
+                  : '$textForeground'
               }
             >
               {t(actionButton.label)}
