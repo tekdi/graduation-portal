@@ -38,11 +38,11 @@ const LogVisit: React.FC = () => {
 
   /**
    * Handle Back Navigation
-   * Navigates back to participant detail
+   * Navigates to participant detail page
    */
   const handleBackPress = () => {
     // @ts-ignore
-    navigation.goBack();
+    navigation.navigate('participant-detail', { id: participantId });
   };
 
   // Error State: Missing participant ID or participant not found
