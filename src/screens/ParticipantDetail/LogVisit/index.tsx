@@ -57,7 +57,6 @@ const LogVisit: React.FC = () => {
   }
 
   const participantName = participant.name;
-
   return (
     <Box flex={1} bg="$accent100">
        {/* Header */}
