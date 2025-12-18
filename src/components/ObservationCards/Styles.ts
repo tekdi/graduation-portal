@@ -41,15 +41,17 @@ export const assessmentSurveyCardStyles = {
     elevation: 0, // Remove shadow on React Native
   },
   cardHeader: {
-    mb: '$6',
     width: '$full',
+    justifyContent: "space-between" as const,
+    alignItems: "center" as const,
   },
   iconContainer: {
-    width: '$5',
-    height: '$5',
-    borderRadius: '$md',
+    width: '$12',
+    height: '$12',
+    borderRadius: '$2xl',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
+    color: '$white',
   },
   title: {
     fontSize: '$md',
@@ -86,7 +88,7 @@ export const assessmentSurveyCardStyles = {
   statusBadgeTextCompleted: {
     fontSize: '$xs',
     fontWeight: '$medium',
-    color: '$textForeground',
+    color: '$success600',
     $web: {
       whiteSpace: 'nowrap' as const,
     },
@@ -111,6 +113,7 @@ export const assessmentSurveyCardStyles = {
     fontSize: '$sm',
     color: '$textMutedForeground',
     fontStyle: 'normal' as const,
+    lineHeight: '$sm',
   },
   buttonPrimary: {
     ...buttonBaseStyles,
