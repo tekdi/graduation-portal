@@ -175,11 +175,11 @@ export default function ParticipantDetail() {
           confirmButtonText={isEditingAddress ? t('participantDetail.profileModal.saveLocation') : undefined}
           onCancel={() => {
             setIsEditingAddress(false);
-              setEditedAddress({
-                street: '',
-                province: '',
-                site: '',
-              });
+            setEditedAddress({
+              street: '',
+              province: '',
+              site: '',
+            });
           }}
           onConfirm={async () => {
             if (!editedAddress.street || !editedAddress.province || !editedAddress.site) {
@@ -258,11 +258,11 @@ export default function ParticipantDetail() {
                         {t('common.profileFields.address')}
                       </Text>
                       <Pressable onPress={() => {
-            setEditedAddress({
-              street: '',
-              province: '',
-              site: '',
-            });
+                        setEditedAddress({
+                          street: '',
+                          province: '',
+                          site: '',
+                        });
                         setIsEditingAddress(true);
                       }}>
                         <LucideIcon 

@@ -173,8 +173,8 @@ const ParticipantsList: React.FC = () => {
         <VStack bg="$white">
           <Container>
             <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}  padding="$4" my="$2">
-          {t('participants.myParticipants')}
-        </Heading>
+              {t('participants.myParticipants')}
+            </Heading>
           </Container>
           </VStack>
       
@@ -186,11 +186,11 @@ const ParticipantsList: React.FC = () => {
             {/* Search Bar and Active/Inactive Filter */}
             <HStack space="md" width="$full" alignItems="center">
               <Box flex={1}>
-            <SearchBar
-              placeholder={t('participants.searchByNameOrId')}
-              onSearch={handleSearch}
-              debounceMs={500}
-            />
+                <SearchBar
+                  placeholder={t('participants.searchByNameOrId')}
+                  onSearch={handleSearch}
+                  debounceMs={500}
+                />
               </Box>
               <Box width="$40" $md-width="$48">
                 <Select
@@ -314,7 +314,7 @@ const ParticipantsList: React.FC = () => {
                 maxPageNumbers: 5,
               }}
             />
-        </VStack>
+          </VStack>
         </Container>
       </ScrollView>
     </Box>
