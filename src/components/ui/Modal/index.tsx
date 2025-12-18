@@ -87,7 +87,7 @@ const Modal: React.FC<ModalProps> = ({
   return (
     <GluestackModal 
       isOpen={isOpen} 
-      onClose={onClose}
+      onClose={onClose} 
       size={size}
       closeOnOverlayClick={closeOnOverlayClick}
       {...commonModalContainerStyles}
