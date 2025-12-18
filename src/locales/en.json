@@ -326,6 +326,7 @@
   },
   "actions": {
     "viewDetails": "View Details",
+    "viewLog": "View Log",
     "logVisit": "Log Visit",
     "dropout": "Dropout",
     "confirmDropout": "Confirm Dropout",

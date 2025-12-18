@@ -6,58 +6,296 @@ import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
 import { DataTableProps, ColumnDef, PaginationConfig } from '@app-types/components';
-// import ActionsMenu from '@components/ActionsMenu';
 import { CustomMenu } from '@components/ui/Menu';
 import { LucideIcon } from '@components/ui';
 import { Modal, Input, InputField } from '@ui';
 import { usePlatform } from '@utils/platform';
 import PaginationControls from './PaginationControls';
+import { styles } from './Styles';
+
+/**
+ * Shared menu items configuration for actions menu
+ */
+const getMenuItems = (t: (key: string) => string) => [
+  {
+    key: 'view-log',
+    label: 'actions.viewLog',
+    textValue: 'View Log',
+    iconElement: (
+      <Box {...styles.menuIconContainer}>
+        <LucideIcon
+          name="FileText"
+          size={20}
+          color={theme.tokens.colors.mutedForeground}
+        />
+      </Box>
+    ),
+  },
+  {
+    key: 'log-visit',
+    label: 'actions.logVisit',
+    textValue: 'Log Visit',
+    iconElement: (
+      <Box {...styles.menuIconContainer}>
+        <LucideIcon
+          name="ClipboardCheck"
+          size={20}
+          color={theme.tokens.colors.mutedForeground}
+        />
+      </Box>
+    ),
+  },
+  {
+    key: 'dropout',
+    label: 'actions.dropout',
+    textValue: 'Dropout',
+    iconElement: (
+      <Box {...styles.menuIconContainer}>
+        <LucideIcon
+          name="UserX"
+          size={20}
+          color={theme.tokens.colors.error.light}
+        />
+      </Box>
+    ),
+    color: theme.tokens.colors.error.light,
+  },
+];
+
+/**
+ * Shared custom trigger for actions menu
+ */
+const getCustomTrigger = (triggerProps: any) => (
+  <Pressable {...triggerProps} {...styles.customTrigger}>
+    <LucideIcon
+      name="MoreVertical"
+      size={20}
+      color={theme.tokens.colors.textForeground}
+    />
+  </Pressable>
+);
 
 interface TableHeaderProps<T> {
   columns: ColumnDef<T>[];
   showActions?: boolean;
   minWidth?: number; // Minimum width for horizontal scroll on mobile
+  isMobile?: boolean; // Whether this is mobile view
 }
 
-const TableHeader = <T,>({ columns, showActions, minWidth }: TableHeaderProps<T>) => {
+const TableHeader = <T,>({ columns, showActions, minWidth, isMobile = false }: TableHeaderProps<T>) => {
   const { t } = useLanguage();
+
+  // Filter columns based on device-specific config
+  const visibleColumns = columns.filter(column => {
+    if (isMobile) {
+      // Mobile: mobileConfig.showColumn > default true
+      const mobileConfig = column.mobileConfig || {};
+      if (mobileConfig.showColumn !== undefined) {
+        return mobileConfig.showColumn;
+      }
+    } else {
+      // Desktop: desktopConfig.showColumn > default true
+      const desktopConfig = column.desktopConfig || {};
+      if (desktopConfig.showColumn !== undefined) {
+        return desktopConfig.showColumn;
+      }
+    }
+    // Default to true if not specified
+    return true;
+  });
 
   return (
     <HStack
-      bg="$backgroundLight50"
-      padding="$4"
-      borderBottomColor="$borderLight300"
-      space="md"
+      {...styles.tableHeader}
       minWidth={minWidth}
-      borderTopLeftRadius="$2xl"
-      borderTopRightRadius="$2xl"
     >
-      {columns.map(column => (
-        <Box
-          key={column.key}
-          flex={column.flex}
-          width={column.width}
-          alignItems={
-            column.align === 'center'
-              ? 'center'
-              : column.align === 'right'
-              ? 'flex-end'
-              : 'flex-start'
+      {visibleColumns.map(column => {
+        // Determine showLabel: device-specific config > default true
+        let showLabel = true;
+        if (isMobile) {
+          // Mobile: mobileConfig.showLabel > default true
+          if (column.mobileConfig?.showLabel !== undefined) {
+            showLabel = column.mobileConfig.showLabel;
           }
-        >
-          <Text {...TYPOGRAPHY.label} color={theme.tokens.colors.foreground}>
-            {t(column.label)}
-          </Text>
-        </Box>
-      ))}
+        } else {
+          // Desktop: desktopConfig.showLabel > default true
+          if (column.desktopConfig?.showLabel !== undefined) {
+            showLabel = column.desktopConfig.showLabel;
+          }
+        }
+
+        return (
+          <Box
+            key={column.key}
+            flex={column.flex}
+            width={column.width}
+            alignItems={
+              column.align === 'center'
+                ? 'center'
+                : column.align === 'right'
+                ? 'flex-end'
+                : 'flex-start'
+            }
+          >
+            {showLabel && (
+              <Text {...TYPOGRAPHY.label} color={theme.tokens.colors.foreground}>
+                {t(column.label)}
+              </Text>
+            )}
+          </Box>
+        );
+      })}
       {showActions && (
-        <Box width={60}>
+        <Box width={180}>
           <Text {...TYPOGRAPHY.label} color={theme.tokens.colors.foreground}>
             {t('common.actions')}
           </Text>
         </Box>
       )}
     </HStack>
+  );
+};
+
+/**
+ * Custom Hook for Row Actions
+ * Shared logic for handling menu actions and dropout modal
+ */
+function useRowActions<T>(item: T, onActionClick?: (item: T) => void) {
+  const navigation = useNavigation();
+  const [showDropoutModal, setShowDropoutModal] = useState(false);
+  const [dropoutReason, setDropoutReason] = useState('');
+
+  const itemName = (item as any)?.name || (item as any)?.id || 'participant';
+  const itemId = (item as any)?.id;
+
+  const handleViewDetails = () => {
+    // @ts-ignore - Navigation type inference
+    navigation.navigate('participant-detail', { participantId: itemId });
+  };
+
+  const handleMenuSelect = (key: string) => {
+    if (key === 'log-visit') {
+      // @ts-ignore - Navigation type inference
+      navigation.navigate('log-visit', { participantId: itemId });
+    } else if (key === 'view-log') {
+      // @ts-ignore - Navigation type inference
+      navigation.navigate('participant-detail', { id: itemId });
+    } else if (key === 'dropout') {
+      setShowDropoutModal(true);
+    }
+  };
+
+  const handleDropoutConfirm = (reason: string) => {
+    setShowDropoutModal(false);
+    setDropoutReason('');
+    onActionClick?.(item);
+  };
+
+  const handleCloseModal = () => {
+    setShowDropoutModal(false);
+    setDropoutReason('');
+  };
+
+  return {
+    itemName,
+    showDropoutModal,
+    dropoutReason,
+    setDropoutReason,
+    handleViewDetails,
+    handleMenuSelect,
+    handleDropoutConfirm,
+    handleCloseModal,
+  };
+}
+
+/**
+ * Dropout Confirmation Modal Component
+ * Shared modal component for both TableRow and CardView
+ */
+interface DropoutModalProps {
+  isOpen: boolean;
+  itemName: string;
+  dropoutReason: string;
+  onClose: () => void;
+  onConfirm: (reason: string) => void;
+  onReasonChange: (reason: string) => void;
+}
+
+const DropoutModal: React.FC<DropoutModalProps> = ({
+  isOpen,
+  itemName,
+  dropoutReason,
+  onClose,
+  onConfirm,
+  onReasonChange,
+}) => {
+  const { t } = useLanguage();
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      headerTitle={t('actions.confirmDropout') || 'Confirm Dropout'}
+      headerIcon={
+        <LucideIcon
+          name="UserX"
+          size={24}
+          color={theme.tokens.colors.error.light}
+        />
+      }
+      maxWidth={500}
+      cancelButtonText={t('common.cancel') || 'Cancel'}
+      confirmButtonText={t('actions.confirmDropout') || 'Confirm Dropout'}
+      onCancel={onClose}
+      onConfirm={() => onConfirm(dropoutReason)}
+      confirmButtonColor={theme.tokens.colors.error.light}
+    >
+      <VStack space="lg">
+        <Text
+          {...TYPOGRAPHY.paragraph}
+          color={theme.tokens.colors.textSecondary}
+          lineHeight="$xl"
+        >
+          {t('actions.dropoutMessage', { name: itemName }) ||
+            `Mark ${itemName} as dropout from the program`}
+        </Text>
+
+        <VStack space="sm">
+          <Text
+            {...TYPOGRAPHY.label}
+            color={theme.tokens.colors.textPrimary}
+            fontWeight="$medium"
+          >
+            {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
+          </Text>
+          <Input
+            {...styles.modalInput}
+            borderColor={theme.tokens.colors.inputBorder}
+            bg={theme.tokens.colors.modalBackground}
+            $focus-borderColor={theme.tokens.colors.inputFocusBorder}
+            $focus-borderWidth={2}
+          >
+            <InputField
+              placeholder={
+                t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
+              }
+              value={dropoutReason}
+              onChangeText={onReasonChange}
+              {...styles.modalInputField}
+              placeholderTextColor={theme.tokens.colors.textMuted}
+            />
+          </Input>
+          <Text
+            {...TYPOGRAPHY.bodySmall}
+            color={theme.tokens.colors.textSecondary}
+            lineHeight="$sm"
+          >
+            {t('actions.dropoutHint') ||
+              'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
+          </Text>
+        </VStack>
+      </VStack>
+    </Modal>
   );
 };
 
@@ -84,55 +322,16 @@ const TableRow = <T,>({
   isLast = false,
 }: TableRowProps<T>) => {
   const { t } = useLanguage();
-  const navigation = useNavigation();
-  const [showDropoutModal, setShowDropoutModal] = useState(false);
-  const [dropoutReason, setDropoutReason] = useState('');
-
-  // Get item name and ID for the modal
-  const itemName = (item as any)?.name || (item as any)?.id || 'participant';
-  const itemId = (item as any)?.id;
-
-  const handleMenuSelect = (key: string) => {
-    if (key === 'view-details') {
-      // @ts-ignore - Navigation type inference
-      navigation.navigate('participant-detail', { participantId: itemId });
-    } else if (key === 'log-visit') {
-      // @ts-ignore - Navigation type inference
-      navigation.navigate('log-visit', { participantId: itemId });
-    } else if (key === 'dropout') {
-      // Show confirmation modal
-      setTimeout(() => {
-        setShowDropoutModal(true);
-      }, 100);
-    }
-  };
-
-  const handleDropoutConfirm = (reason?: string) => {
-    setShowDropoutModal(false);
-    setDropoutReason(reason ?? ''); // Reset reason
-    onActionClick?.(item);
-  };
-
-
-  const customTrigger = (triggerProps: any) => (
-    <Pressable
-      {...triggerProps}
-      padding="$2"
-      borderRadius="$sm"
-      $web-cursor="pointer"
-      sx={{
-        ':hover': {
-          bg: '$backgroundLight100',
-        },
-      }}
-    >
-      <LucideIcon
-        name="MoreVertical"
-        size={20}
-        color={theme.tokens.colors.mutedForeground}
-      />
-    </Pressable>
-  );
+  const {
+    itemName,
+    showDropoutModal,
+    dropoutReason,
+    setDropoutReason,
+    handleViewDetails,
+    handleMenuSelect,
+    handleDropoutConfirm,
+    handleCloseModal,
+  } = useRowActions(item, onActionClick);
 
   return (
     <>
@@ -142,98 +341,69 @@ const TableRow = <T,>({
           $web-cursor={onRowClick ? 'pointer' : undefined}
         >
           <HStack
-            padding="$4"
-            borderBottomWidth={isLast ? 0 : 1}
-            borderBottomColor="$borderLight200"
-            space="md"
-            alignItems="center"
+            {...styles.tableRow}
+            borderBottomWidth={isLast ? styles.tableRowLast.borderBottomWidth : styles.tableRowNotLast.borderBottomWidth}
             minWidth={minWidth}
-            $web-transition="background-color 0.2s"
-            sx={{
-              ':hover': {
-                bg: '$backgroundLight50',
-              },
-            }}
           >
-            {columns.map(column => (
-              <Box
-                key={column.key}
-                flex={column.flex}
-                width={column.width}
-                alignItems={
-                  column.align === 'center'
-                    ? 'center'
-                    : column.align === 'right'
-                    ? 'flex-end'
-                    : 'flex-start'
+            {columns
+              .filter(column => {
+                // Filter columns for desktop: desktopConfig.showColumn > default true
+                const desktopConfig = column.desktopConfig || {};
+                if (desktopConfig.showColumn !== undefined) {
+                  return desktopConfig.showColumn;
                 }
-              >
-                {column.render ? (
-                  column.render(item)
-                ) : (
-                  <Text
-                    {...TYPOGRAPHY.paragraph}
-                    color={theme.tokens.colors.mutedForeground}
-                  >
-                    {String((item as any)[column.key] ?? '')}
-                  </Text>
-                )}
-              </Box>
-            ))}
+                return true; // Default to true if not specified
+              })
+              .map(column => (
+                <Box
+                  key={column.key}
+                  flex={column.flex}
+                  width={column.width}
+                  alignItems={
+                    column.align === 'center'
+                      ? 'center'
+                      : column.align === 'right'
+                      ? 'flex-end'
+                      : 'flex-start'
+                  }
+                >
+                  {column.render ? (
+                    column.render(item)
+                  ) : (
+                    <Text
+                      {...TYPOGRAPHY.paragraph}
+                      color={theme.tokens.colors.mutedForeground}
+                    >
+                      {String((item as any)[column.key] ?? '')}
+                    </Text>
+                  )}
+                </Box>
+              ))}
             {showActions && (
-              <Box width={60} alignItems="center">
-                {/* <ActionsMenu<T> item={item} onDropout={onActionClick} /> */}
+              <Box width={180}>
+                <HStack space="sm" alignItems="center">
+                  {/* View Details Button */}
+                  <Pressable
+                    onPress={handleViewDetails}
+                    {...styles.viewDetailsButton}
+                  >
+                    <Text
+                      {...TYPOGRAPHY.bodySmall}
+                      color="$primary500" fontWeight="$medium"
+                    >
+                      {t('actions.viewDetails')}
+                    </Text>
+                  </Pressable>
+                  
+                  {/* Actions Menu */}
                 <CustomMenu
-                  items={[
-                    {
-                      key: 'view-details',
-                      label: 'actions.viewDetails',
-                      textValue: 'View Details',
-                      iconElement: (
-                        <Box marginRight="$2">
-                          <LucideIcon
-                            name="Eye"
-                            size={20}
-                            color={theme.tokens.colors.mutedForeground}
-                          />
-                        </Box>
-                      ),
-                    },
-                    {
-                      key: 'log-visit',
-                      label: 'actions.logVisit',
-                      textValue: 'Log Visit',
-                      iconElement: (
-                        <Box marginRight="$2">
-                          <LucideIcon
-                            name="ClipboardCheck"
-                            size={20}
-                            color={theme.tokens.colors.mutedForeground}
-                          />
-                        </Box>
-                      ),
-                    },
-                    {
-                      key: 'dropout',
-                      label: 'actions.dropout',
-                      textValue: 'Dropout',
-                      iconElement: (
-                        <Box marginRight="$2">
-                          <LucideIcon
-                            name="UserX"
-                            size={20}
-                            color={theme.tokens.colors.error.light}
-                          />
-                        </Box>
-                      ),
-                      color: theme.tokens.colors.error.light,
-                    },
-                  ]}
+                  items={getMenuItems(t)}
                   placement="bottom right"
                   offset={5}
-                  trigger={customTrigger}
+                  trigger={getCustomTrigger}
                   onSelect={handleMenuSelect}
                 />
+                </HStack>
               </Box>
             )}
           </HStack>
@@ -241,85 +411,242 @@ const TableRow = <T,>({
       </Box>
 
       {/* Dropout Confirmation Modal */}
-      <Modal
+      <DropoutModal
         isOpen={showDropoutModal}
-        onClose={() => {
-          setShowDropoutModal(false);
-          setDropoutReason(''); // Reset on close
-        }}
-        headerTitle={t('actions.confirmDropout') || 'Confirm Dropout'}
-        headerIcon={
-          <LucideIcon
-            name="UserX"
-            size={24}
-            color={theme.tokens.colors.error.light}
-          />
-        }
-        maxWidth={500}
-        cancelButtonText={t('common.cancel') || 'Cancel'}
-        confirmButtonText={t('actions.confirmDropout') || 'Confirm Dropout'}
-        onCancel={() => {
-          setShowDropoutModal(false);
-          setDropoutReason('');
-        }}
-        onConfirm={() => handleDropoutConfirm(dropoutReason)}
-        confirmButtonColor={theme.tokens.colors.error.light}
-      >
-        <VStack space="lg">
-          {/* Message */}
-          <Text
-            {...TYPOGRAPHY.paragraph}
-            color={theme.tokens.colors.textSecondary}
-            lineHeight="$xl"
-          >
-            {t('actions.dropoutMessage', { name: itemName }) ||
-              `Mark ${itemName} as dropout from the program`}
-          </Text>
+        itemName={itemName}
+        dropoutReason={dropoutReason}
+        onClose={handleCloseModal}
+        onConfirm={handleDropoutConfirm}
+        onReasonChange={setDropoutReason}
+      />
+    </>
+  );
+};
 
-          {/* Input Field */}
-          <VStack space="sm">
-            <Text
-              {...TYPOGRAPHY.label}
-              color={theme.tokens.colors.textPrimary}
-              fontWeight="$medium"
-            >
-              {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
-            </Text>
-            <Input
-              variant="outline"
-              size="lg"
-              borderWidth={2}
-              borderColor={theme.tokens.colors.inputBorder}
-              borderRadius="$md"
-              bg={theme.tokens.colors.modalBackground}
-              $focus-borderColor={theme.tokens.colors.inputFocusBorder}
-              $focus-borderWidth={2}
-              minHeight={80}
-            >
-              <InputField
-                placeholder={
-                  t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
-                }
-                value={dropoutReason}
-                onChangeText={setDropoutReason}
-                multiline
-                numberOfLines={3}
-                textAlignVertical="top"
-                paddingTop="$3"
-                placeholderTextColor={theme.tokens.colors.textMuted}
+/**
+ * Prepare Final Layout Function
+ * Based on mobile_form_layout_development_approach.md
+ * Categorizes and sorts columns by leftRank, rightRank, and fullWidthRank
+ */
+function prepareFinalLayout<T>(columns: ColumnDef<T>[]): Array<Array<ColumnDef<T> | null> | ColumnDef<T>[]> {
+  const left: ColumnDef<T>[] = [];
+  const right: ColumnDef<T>[] = [];
+  const full: ColumnDef<T>[] = [];
+
+  // Filter columns that should be shown on mobile
+  const visibleColumns = columns.filter(col => {
+    // Mobile: mobileConfig.showColumn > default true
+    const mobileConfig = col.mobileConfig || {};
+    if (mobileConfig.showColumn !== undefined) {
+      return mobileConfig.showColumn;
+    }
+    return true; // Default to true if not specified
+  });
+
+  // Categorize columns based on priority: fullWidthRank > leftRank > rightRank
+  visibleColumns.forEach(col => {
+    const c = col.mobileConfig || {};
+
+    if (c.fullWidthRank !== undefined) {
+      full.push(col);
+    } else if (c.leftRank !== undefined) {
+      left.push(col);
+    } else if (c.rightRank !== undefined) {
+      right.push(col);
+    }
+  });
+
+  // Sort each array by its respective rank
+  left.sort((a, b) => (a.mobileConfig?.leftRank || 0) - (b.mobileConfig?.leftRank || 0));
+  right.sort((a, b) => (a.mobileConfig?.rightRank || 0) - (b.mobileConfig?.rightRank || 0));
+  full.sort((a, b) => (a.mobileConfig?.fullWidthRank || 0) - (b.mobileConfig?.fullWidthRank || 0));
+
+  // Create horizontal rows (left + right pairs)
+  const rows: Array<Array<ColumnDef<T> | null>> = [];
+  const maxRows = Math.max(left.length, right.length);
+
+  for (let i = 0; i < maxRows; i++) {
+    rows.push([left[i] || null, right[i] || null]);
+  }
+
+  // Add full-width fields at the end
+  if (full.length > 0) {
+    rows.push(full);
+  }
+
+  return rows;
+}
+
+/**
+ * Card View Component for Mobile
+ * Renders data in card format with left-right pairing and full-width fields
+ * View Details and Actions menu always remain at the bottom
+ */
+interface CardViewProps<T> {
+  item: T;
+  columns: ColumnDef<T>[];
+  onRowClick?: (item: T) => void;
+  onActionClick?: (item: T) => void;
+  showActions?: boolean;
+}
+
+const CardView = <T,>({
+  item,
+  columns,
+  onRowClick,
+  onActionClick,
+  showActions,
+}: CardViewProps<T>) => {
+  const { t } = useLanguage();
+  const {
+    itemName,
+    showDropoutModal,
+    dropoutReason,
+    setDropoutReason,
+    handleViewDetails,
+    handleMenuSelect,
+    handleDropoutConfirm,
+    handleCloseModal,
+  } = useRowActions(item, onActionClick);
+
+  const layout = prepareFinalLayout(columns);
+
+  return (
+    <>
+      <Box {...styles.cardContainer}>
+        <VStack {...styles.cardContent}>
+          {/* Render layout rows */}
+          {layout.map((row, rowIndex) => {
+            // Full width rows
+            if (Array.isArray(row) && row.length > 0 && row[0] && (row[0] as ColumnDef<T>).mobileConfig?.fullWidthRank !== undefined) {
+              return (
+                <VStack key={rowIndex} {...styles.cardFullWidthRow}>
+                  {row.map((col, colIndex) => {
+                    if (!col) return null;
+                    const mobileConfig = col.mobileConfig || {};
+                    // Use mobileConfig.showLabel if specified, otherwise default to true
+                    const showLabel = mobileConfig.showLabel !== undefined 
+                      ? mobileConfig.showLabel 
+                      : true;
+
+                    return (
+                      <VStack key={col.key || colIndex} {...styles.cardColumn}>
+                        {showLabel && (
+                          <Text
+                            {...TYPOGRAPHY.label}
+                            color={theme.tokens.colors.mutedForeground}
+                            fontSize="$xs"
+                          >
+                            {t(col.label)}
+                          </Text>
+                        )}
+                        <Box>
+                          {col.render ? col.render(item) : <Text {...TYPOGRAPHY.paragraph}>{(item as any)[col.key]}</Text>}
+                        </Box>
+                      </VStack>
+                    );
+                  })}
+                </VStack>
+              );
+            }
+
+            // Left + Right rows
+            return (
+              <HStack key={rowIndex} {...styles.cardLeftRightRow}>
+                {[0, 1].map(pos => {
+                  const col = row[pos] as ColumnDef<T> | null;
+                  if (!col) return <Box key={pos} flex={1} />;
+
+                  const mobileConfig = col.mobileConfig || {};
+                  const showLabel =
+                    mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
+
+                  const isRightColumn = pos === 1;
+
+                  return (
+                    <VStack
+                      key={col.key || pos}
+                      space="xs"
+                      alignItems={isRightColumn ? 'flex-end' : 'flex-start'}
+                      maxWidth="48%"
+                    >
+                      {showLabel && (
+                        <Text
+                          {...TYPOGRAPHY.label}
+                          color={theme.tokens.colors.mutedForeground}
+                          fontSize="$xs"
+                          textAlign={isRightColumn ? 'right' : 'left'}
+                        >
+                          {t(col.label)}
+                        </Text>
+                      )}
+
+                      <Box>
+                        {col.render ? (
+                          col.render(item)
+                        ) : (
+                          <Text
+                            {...TYPOGRAPHY.paragraph}
+                            textAlign={isRightColumn ? 'right' : 'left'}
+                          >
+                            {(item as any)[col.key]}
+                          </Text>
+                        )}
+                      </Box>
+                    </VStack>
+                  );
+                })}
+              </HStack>
+
+            );
+          })}
+
+          {/* Actions Section - Always at bottom */}
+          {showActions && (
+            <HStack {...styles.cardActionsSection}>
+              {/* View Details Button */}
+              <Pressable
+                onPress={handleViewDetails}
+                {...styles.viewDetailsButton}
+              >
+                <HStack space="sm" alignItems="center" justifyContent="center">
+                  <LucideIcon
+                    name="Eye"
+                    size={18}
+                    color="$textForeground"
+                  />
+                  <Text
+                    {...TYPOGRAPHY.bodySmall}
+                    color="$textForeground"
+                    fontWeight="$medium"
+                  >
+                    {t('actions.viewDetails')}
+                  </Text>
+                </HStack>
+              </Pressable>
+
+              {/* Actions Menu */}
+              <CustomMenu
+                items={getMenuItems(t)}
+                placement="bottom right"
+                offset={5}
+                trigger={getCustomTrigger}
+                onSelect={handleMenuSelect}
               />
-            </Input>
-            <Text
-              {...TYPOGRAPHY.bodySmall}
-              color={theme.tokens.colors.textSecondary}
-              lineHeight="$sm"
-            >
-              {t('actions.dropoutHint') ||
-                'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
-            </Text>
-          </VStack>
+            </HStack>
+          )}
         </VStack>
-      </Modal>
+      </Box>
+
+      {/* Dropout Confirmation Modal */}
+      <DropoutModal
+        isOpen={showDropoutModal}
+        itemName={itemName}
+        dropoutReason={dropoutReason}
+        onClose={handleCloseModal}
+        onConfirm={handleDropoutConfirm}
+        onReasonChange={setDropoutReason}
+      />
     </>
   );
 };
@@ -335,7 +662,7 @@ const EmptyState: React.FC<EmptyStateProps> = ({ message }) => {
   const { t } = useLanguage();
 
   return (
-    <Box padding="$8" alignItems="center">
+    <Box {...styles.emptyState}>
       <Text
         {...TYPOGRAPHY.paragraph}
         color={theme.tokens.colors.mutedForeground}
@@ -357,7 +684,7 @@ const LoadingState: React.FC<LoadingStateProps> = ({ message }) => {
   const { t } = useLanguage();
 
   return (
-    <Box padding="$8" alignItems="center">
+    <Box {...styles.loadingState}>
       <Text
         {...TYPOGRAPHY.paragraph}
         color={theme.tokens.colors.mutedForeground}
@@ -380,6 +707,7 @@ const DataTable = <T,>({
   getRowKey,
   pagination,
   onPageChange,
+  responsive = true, // Default to true
 }: DataTableProps<T>) => {
   const { isMobile } = usePlatform();
   
@@ -420,14 +748,16 @@ const DataTable = <T,>({
     setCurrentPage(1); // Reset to first page
   };
   
-  // Calculate minimum width for horizontal scroll on mobile
-  // This ensures all columns are visible when scrolling horizontally
-  const minTableWidth = isMobile ? 800 : undefined;
+  // Calculate minimum width for horizontal scroll on mobile (only when responsive is disabled)
+  const minTableWidth = isMobile && !responsive ? 800 : undefined;
 
-  // Single table content - used for both mobile and desktop
+  // Determine if we should show card view
+  const shouldShowCardView = responsive && isMobile;
+
+  // Table content for desktop or when responsive is disabled
   const tableContent = (
-    <VStack width="$full" minWidth={minTableWidth}>
-      <TableHeader columns={columns} showActions={showActions} minWidth={minTableWidth} />
+    <VStack {...styles.tableContentContainer} minWidth={minTableWidth}>
+      <TableHeader columns={columns} showActions={showActions} minWidth={minTableWidth} isMobile={false} />
       <Box>
         {isLoading ? (
           <LoadingState message={loadingMessage} />
@@ -451,22 +781,46 @@ const DataTable = <T,>({
     </VStack>
   );
 
+  // Card view content for mobile when responsive is enabled
+  const cardContent = (
+    <VStack {...styles.cardContentContainer}>
+      {isLoading ? (
+        <LoadingState message={loadingMessage} />
+      ) : paginatedData.length === 0 ? (
+        <EmptyState message={emptyMessage} />
+      ) : (
+        paginatedData.map((item) => (
+          <CardView
+            key={getRowKey(item)}
+            item={item}
+            columns={columns}
+            onRowClick={onRowClick}
+            onActionClick={onActionClick}
+            showActions={showActions}
+          />
+        ))
+      )}
+    </VStack>
+  );
+
   return (
-    <Box width="$full">
+    <Box {...styles.mainContainer}>
       <Box
         bg={theme.tokens.colors.backgroundPrimary.light}
-        borderRadius="$2xl"
-        borderWidth={1}
-        borderColor="$borderLight300"
-        overflow={isMobile ? 'hidden' : 'visible'}
+        {...styles.tableWrapper}
+        {...(!isMobile ? styles.tableWrapperWeb : {})}
+        overflow={shouldShowCardView ? 'hidden' : isMobile ? 'hidden' : 'visible'}
       >
-        {isMobile ? (
-          // Mobile: Wrap table in horizontal ScrollView
+        {shouldShowCardView ? (
+          // Mobile: Show card view when responsive is enabled
+          cardContent
+        ) : isMobile ? (
+          // Mobile: Wrap table in horizontal ScrollView when responsive is disabled
           <ScrollView horizontal showsHorizontalScrollIndicator>
             {tableContent}
           </ScrollView>
         ) : (
-          // Desktop: Wrap table in vertical scroll container (only if needed)
+          // Desktop: Show table view
           tableContent
         )}
       </Box>

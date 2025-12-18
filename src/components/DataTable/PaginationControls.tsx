@@ -5,6 +5,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
 import { PaginationControlsProps } from '@app-types/components';
 import { LucideIcon } from '@components/ui';
+import { styles } from './Styles';
 
 const PaginationControls: React.FC<PaginationControlsProps> = ({
   currentPage,
@@ -67,10 +68,10 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   };
   
   return (
-    <VStack space="md" paddingVertical="$4">
-      <HStack justifyContent="center" $md-justifyContent="space-between" alignItems="center" flexWrap="wrap" space="md">
+    <VStack {...styles.paginationContainer}>
+      <HStack {...styles.paginationMainRow} $md-justifyContent="space-between">
         {/* Left Side: Page Info and Page Size Selector */}
-        <HStack space="md" alignItems="center" flexWrap="wrap">
+        <HStack {...styles.paginationLeftSide}>
           <Text {...TYPOGRAPHY.bodySmall} color={theme.tokens.colors.mutedForeground}>
             {t('table.showing', {
               start: startIndex + 1,
@@ -81,11 +82,11 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
           
           {/* Page Size Selector (if enabled) */}
           {config.showPageSizeSelector && onPageSizeChange && (
-            <HStack space="sm" alignItems="center">
+            <HStack {...styles.paginationPageSizeContainer}>
               <Text {...TYPOGRAPHY.bodySmall} color={theme.tokens.colors.mutedForeground}>
                 {t('table.itemsPerPage')}:
               </Text>
-              <Box width="$20">
+              <Box {...styles.paginationPageSizeSelect}>
                 <Select
                   value={pageSize.toString()}
                   onChange={(value) => onPageSizeChange(Number(value))}
@@ -100,15 +101,13 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         </HStack>
         
         {/* Right Side: Pagination Controls */}
-        <HStack justifyContent="flex-end" alignItems="center" space="sm" flexWrap="wrap">
+        <HStack {...styles.paginationRightSide}>
         {/* Start/First Button */}
         <Pressable
           onPress={() => onPageChange(1)}
           disabled={currentPage === 1}
-          opacity={currentPage === 1 ? 0.5 : 1}
-          padding="$2"
-          borderRadius="$sm"
-          $web-cursor={currentPage === 1 ? undefined : 'pointer'}
+          {...styles.paginationButton}
+          {...(currentPage === 1 ? styles.paginationButtonDisabled : styles.paginationButtonEnabled)}
         >
           <LucideIcon
             name="ChevronsLeft"
@@ -121,10 +120,8 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         <Pressable
           onPress={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
-          opacity={currentPage === 1 ? 0.5 : 1}
-          padding="$2"
-          borderRadius="$sm"
-          $web-cursor={currentPage === 1 ? undefined : 'pointer'}
+          {...styles.paginationButton}
+          {...(currentPage === 1 ? styles.paginationButtonDisabled : styles.paginationButtonEnabled)}
         >
           <LucideIcon
             name="ChevronLeft"
@@ -135,11 +132,11 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         
         {/* Page Numbers */}
         {config.showPageNumbers !== false && (
-          <HStack space="xs" alignItems="center">
+          <HStack {...styles.paginationPageNumbers}>
             {getPageNumbers().map((page, index) => {
               if (page === '...') {
                 return (
-                  <Text key={`ellipsis-${index}`} paddingHorizontal="$2" color={theme.tokens.colors.mutedForeground}>
+                  <Text key={`ellipsis-${index}`} {...styles.paginationEllipsis} color={theme.tokens.colors.mutedForeground}>
                     ...
                   </Text>
                 );
@@ -152,14 +149,8 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
                 <Pressable
                   key={pageNum}
                   onPress={() => onPageChange(pageNum)}
-                  bg={isActive ? theme.tokens.colors.primary500 : 'transparent'}
-                  paddingHorizontal="$2"
-                  paddingVertical="$1"
-                  borderRadius="$sm"
-                  minWidth={25}
-                  alignItems="center"
-                  justifyContent="center"
-                  $web-cursor="pointer"
+                  {...styles.paginationPageNumber}
+                  {...(isActive ? styles.paginationPageNumberActive : styles.paginationPageNumberInactive)}
                 >
                   <Text
                     {...TYPOGRAPHY.bodySmall}
@@ -178,10 +169,8 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         <Pressable
           onPress={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
-          opacity={currentPage === totalPages ? 0.5 : 1}
-          padding="$2"
-          borderRadius="$sm"
-          $web-cursor={currentPage === totalPages ? undefined : 'pointer'}
+          {...styles.paginationButton}
+          {...(currentPage === totalPages ? styles.paginationButtonDisabled : styles.paginationButtonEnabled)}
         >
           <LucideIcon
             name="ChevronRight"
@@ -194,10 +183,8 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         <Pressable
           onPress={() => onPageChange(totalPages)}
           disabled={currentPage === totalPages}
-          opacity={currentPage === totalPages ? 0.5 : 1}
-          padding="$2"
-          borderRadius="$sm"
-          $web-cursor={currentPage === totalPages ? undefined : 'pointer'}
+          {...styles.paginationButton}
+          {...(currentPage === totalPages ? styles.paginationButtonDisabled : styles.paginationButtonEnabled)}
         >
           <LucideIcon
             name="ChevronsRight"
