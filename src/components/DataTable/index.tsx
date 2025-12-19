@@ -425,7 +425,6 @@ const TableRow = <T,>({
 
 /**
  * Prepare Final Layout Function
- * Based on mobile_form_layout_development_approach.md
  * Categorizes and sorts columns by leftRank, rightRank, and fullWidthRank
  */
 function prepareFinalLayout<T>(columns: ColumnDef<T>[]): Array<Array<ColumnDef<T> | null> | ColumnDef<T>[]> {

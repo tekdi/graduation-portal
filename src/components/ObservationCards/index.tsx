@@ -93,39 +93,39 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
 
       {/* Action Button */}
       {actionButton && (
-      <Button
-        {...getButtonStyle()}
-        onPress={() => {
-          if (actionButton.onPress) {
-            actionButton.onPress();
-          } else {
-            // Default action - can be customized
-            console.log(`Action: ${actionButton.label}`);
-          }
-        }}
-      >
-        <HStack alignItems="center" gap="$2">
-          <LucideIcon
-            name={actionButton.icon}
-            size={16}
-            color={
-              actionButton.variant === 'primary'
-                  ? theme.tokens.colors.white
-                : theme.tokens.colors.textForeground
+        <Button
+          {...getButtonStyle()}
+          onPress={() => {
+            if (actionButton.onPress) {
+              actionButton.onPress();
+            } else {
+              // Default action - can be customized
+              console.log(`Action: ${actionButton.label}`);
             }
-          />
-          <ButtonText
-            {...assessmentSurveyCardStyles.buttonText}
-            color={
-              actionButton.variant === 'primary'
-                ? '$white'
-                  : '$textForeground'
-            }
-          >
-            {t(actionButton.label)}
-          </ButtonText>
-        </HStack>
-      </Button>
+          }}
+        >
+          <HStack alignItems="center" gap="$2">
+            <LucideIcon
+              name={actionButton.icon}
+              size={16}
+              color={
+                actionButton.variant === 'primary'
+                    ? theme.tokens.colors.white
+                  : theme.tokens.colors.textForeground
+              }
+            />
+            <ButtonText
+              {...assessmentSurveyCardStyles.buttonText}
+              color={
+                actionButton.variant === 'primary'
+                  ? '$white'
+                    : '$textForeground'
+              }
+            >
+              {t(actionButton.label)}
+            </ButtonText>
+          </HStack>
+        </Button>
       )}
           </VStack>
         </HStack>
