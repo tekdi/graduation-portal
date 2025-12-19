@@ -77,19 +77,19 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
             />
           </Box>
           <VStack flex={1} space="md">
-          <Text {...assessmentSurveyCardStyles.title}>{t(title)}</Text>
+            <Text {...assessmentSurveyCardStyles.title}>{t(title)}</Text>
 
-      {/* Card Description */}
+            {/* Card Description */}
             <VStack space="sm">
               <Text {...assessmentSurveyCardStyles.additionalInfo}>
-          {t(description)}
-        </Text>
-        {additionalInfo && (
-          <Text {...assessmentSurveyCardStyles.additionalInfo}>
-            {t(additionalInfo)}
-          </Text>
-        )}
-      </VStack>
+                {t(description)}
+              </Text>
+              {additionalInfo && (
+                <Text {...assessmentSurveyCardStyles.additionalInfo}>
+                  {t(additionalInfo)}
+                </Text>
+              )}
+            </VStack>
 
       {/* Action Button */}
       {actionButton && (
@@ -110,7 +110,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
               size={16}
               color={
                 actionButton.variant === 'primary'
-                    ? theme.tokens.colors.white
+                  ? theme.tokens.colors.white
                   : theme.tokens.colors.textForeground
               }
             />
@@ -119,7 +119,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
               color={
                 actionButton.variant === 'primary'
                   ? '$white'
-                    : '$textForeground'
+                  : '$textForeground'
               }
             >
               {t(actionButton.label)}
