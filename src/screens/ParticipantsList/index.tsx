@@ -12,7 +12,7 @@ import {
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
-import DataTable from '@components/DataTable';
+import DataTable, { getActionsColumn } from '@components/DataTable';
 import { getParticipantsColumns } from './ParticipantsTableConfig';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
@@ -24,7 +24,13 @@ import { STATUS } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
 import { applyFilters } from '@utils/helper';
 import { styles } from './Styles';
+import DropoutModal from './DropoutModal';
 
+/**
+ * ParticipantsList Screen
+ * Handles all screen-specific logic: navigation, dropout modal, and action routing.
+ * DataTable component is generic and receives action handlers via onActionClick prop.
+ */
 const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
   const { t } = useLanguage();
@@ -39,6 +45,11 @@ const ParticipantsList: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<'active' | 'inactive'>('active');
   const [isLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
+  
+  // Dropout modal state
+  const [showDropoutModal, setShowDropoutModal] = useState(false);
+  const [dropoutReason, setDropoutReason] = useState('');
+  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
 
   // Calculate status counts dynamically from participants data
   const statusCounts = useMemo<StatusCount>(() => {
@@ -163,9 +174,48 @@ const ParticipantsList: React.FC = () => {
     [navigation],
   );
 
-  const handleDropout = useCallback((participant: Participant) => {
-    console.log('Dropout participant:', participant.id);
-    // TODO: Implement dropout logic - API call to mark participant as dropout
+  // Handle all table actions: navigation and modals are screen-specific, not in DataTable
+  const handleActionClick = useCallback((participant: Participant, actionKey?: string) => {
+    const participantId = participant.id;
+    
+    switch (actionKey) {
+      case 'view-details':
+        // @ts-ignore - Navigation type inference
+        navigation.navigate('participant-detail', { id: participantId });
+        break;
+      case 'log-visit':
+        // @ts-ignore - Navigation type inference
+        navigation.push('log-visit', { participantId });
+        break;
+      case 'view-log':
+        // @ts-ignore - Navigation type inference
+        navigation.navigate('participant-detail', { id: participantId });
+        break;
+      case 'dropout':
+        setSelectedParticipant(participant);
+        setShowDropoutModal(true);
+        break;
+      default:
+        console.log('Action:', actionKey, 'for participant:', participantId);
+    }
+  }, [navigation]);
+
+  const handleDropoutConfirm = useCallback((reason?: string) => {
+    if (!selectedParticipant) return;
+    
+    console.log('Dropout participant:', selectedParticipant.id, 'Reason:', reason);
+    // TODO: Implement dropout logic - API call to mark participant as dropout with reason
+    
+    // Close modal and reset state
+    setShowDropoutModal(false);
+    setDropoutReason('');
+    setSelectedParticipant(null);
+  }, [selectedParticipant]);
+
+  const handleCloseDropoutModal = useCallback(() => {
+    setShowDropoutModal(false);
+    setDropoutReason('');
+    setSelectedParticipant(null);
   }, []);
 
   return (
@@ -259,12 +309,11 @@ const ParticipantsList: React.FC = () => {
             {/* Participants Table */}
             <DataTable
               data={filteredParticipants}
-              columns={getParticipantsColumns(activeStatus)}
+              columns={[...getParticipantsColumns(activeStatus), getActionsColumn<Participant>()]}
               getRowKey={participant => participant.id}
               onRowClick={handleRowClick}
-              onActionClick={handleDropout}
+              onActionClick={handleActionClick}
               isLoading={isLoading}
-              showActions={true}
               emptyMessage={t('participants.noParticipantsFound')}
               loadingMessage={t('participants.loadingParticipants')}
               pagination={{
@@ -276,6 +325,16 @@ const ParticipantsList: React.FC = () => {
           </VStack>
         </Container>
       </ScrollView>
+      
+      {/* Dropout Confirmation Modal */}
+      <DropoutModal
+        isOpen={showDropoutModal}
+        itemName={selectedParticipant?.name || selectedParticipant?.id || 'participant'}
+        dropoutReason={dropoutReason}
+        onClose={handleCloseDropoutModal}
+        onConfirm={handleDropoutConfirm}
+        onReasonChange={setDropoutReason}
+      />
     </Box>
   );
 };

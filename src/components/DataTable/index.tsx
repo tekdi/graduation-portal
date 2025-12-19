@@ -1,66 +1,51 @@
+/**
+ * Generic DataTable Component
+ * Refactored to be fully reusable: all screen-specific logic (navigation, modals) moved to consuming screens.
+ * Actions are handled via onActionClick callback with configurable action keys.
+ */
 import React, { useState, useEffect } from 'react';
 import { Box, HStack, Text, Pressable, VStack } from '@ui';
 import { ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
 import { DataTableProps, ColumnDef, PaginationConfig } from '@app-types/components';
-import { CustomMenu } from '@components/ui/Menu';
+import { CustomMenu, MenuItemData } from '@components/ui/Menu';
 import { LucideIcon } from '@components/ui';
-import { Modal, Input, InputField } from '@ui';
 import { usePlatform } from '@utils/platform';
 import PaginationControls from './PaginationControls';
 import { styles } from './Styles';
+import { getDefaultMenuItems } from './constants';
 
 /**
- * Shared menu items configuration for actions menu
+ * Creates an actions column definition
+ * This column renders the View Details button and Actions menu
+ * Note: The actual rendering is handled in TableRow component
+ * 
+ * @param customMenuItems - Optional function that returns custom menu items.
+ *                          If not provided, uses default menu items (View Log, Log Visit, Dropout)
  */
-const getMenuItems = (t: (key: string) => string) => [
-  {
-    key: 'view-log',
-    label: 'actions.viewLog',
-    textValue: 'View Log',
-    iconElement: (
-      <Box {...styles.menuIconContainer}>
-        <LucideIcon
-          name="FileText"
-          size={20}
-          color={theme.tokens.colors.mutedForeground}
-        />
-      </Box>
-    ),
-  },
-  {
-    key: 'log-visit',
-    label: 'actions.logVisit',
-    textValue: 'Log Visit',
-    iconElement: (
-      <Box {...styles.menuIconContainer}>
-        <LucideIcon
-          name="ClipboardCheck"
-          size={20}
-          color={theme.tokens.colors.mutedForeground}
-        />
-      </Box>
-    ),
-  },
-  {
-    key: 'dropout',
-    label: 'actions.dropout',
-    textValue: 'Dropout',
-    iconElement: (
-      <Box {...styles.menuIconContainer}>
-        <LucideIcon
-          name="UserX"
-          size={20}
-          color={theme.tokens.colors.error.light}
-        />
-      </Box>
-    ),
-    color: theme.tokens.colors.error.light,
-  },
-];
+export const getActionsColumn = <T,>(
+  customMenuItems?: (t: (key: string) => string) => MenuItemData[]
+): ColumnDef<T> => {
+  return {
+    key: '__actions__',
+    label: 'common.actions',
+    width: 180,
+    align: 'right',
+    render: () => null, // Placeholder - actual rendering handled in TableRow
+    meta: {
+      menuItems: customMenuItems, // Store custom menu items function in meta
+    },
+    desktopConfig: {
+      showColumn: true,
+    },
+    mobileConfig: {
+      showColumn: false, // Actions are handled separately in mobile card view
+    },
+  };
+};
+
 
 /**
  * Shared custom trigger for actions menu
@@ -77,12 +62,11 @@ const getCustomTrigger = (triggerProps: any) => (
 
 interface TableHeaderProps<T> {
   columns: ColumnDef<T>[];
-  showActions?: boolean;
   minWidth?: number; // Minimum width for horizontal scroll on mobile
   isMobile?: boolean; // Whether this is mobile view
 }
 
-const TableHeader = <T,>({ columns, showActions, minWidth, isMobile = false }: TableHeaderProps<T>) => {
+const TableHeader = <T,>({ columns, minWidth, isMobile = false }: TableHeaderProps<T>) => {
   const { t } = useLanguage();
 
   // Filter columns based on device-specific config
@@ -145,159 +129,11 @@ const TableHeader = <T,>({ columns, showActions, minWidth, isMobile = false }: T
           </Box>
         );
       })}
-      {showActions && (
-        <Box width={180}>
-          <Text {...TYPOGRAPHY.label} color={theme.tokens.colors.foreground}>
-            {t('common.actions')}
-          </Text>
-        </Box>
-      )}
     </HStack>
   );
 };
 
-/**
- * Custom Hook for Row Actions
- * Shared logic for handling menu actions and dropout modal
- */
-function useRowActions<T>(item: T, onActionClick?: (item: T) => void) {
-  const navigation = useNavigation();
-  const [showDropoutModal, setShowDropoutModal] = useState(false);
-  const [dropoutReason, setDropoutReason] = useState('');
 
-  const itemName = (item as any)?.name || (item as any)?.id || 'participant';
-  const itemId = (item as any)?.id;
-
-  const handleViewDetails = () => {
-    // @ts-ignore - Navigation type inference
-    navigation.navigate('participant-detail', { id: itemId });
-  };
-
-  const handleMenuSelect = (key: string) => {
-    if (key === 'log-visit') {
-      // @ts-ignore - Navigation type inference
-      navigation.push('log-visit', { participantId: itemId });
-    } else if (key === 'view-log') {
-      // @ts-ignore - Navigation type inference
-      navigation.navigate('participant-detail', { id: itemId });
-    } else if (key === 'dropout') {
-      setShowDropoutModal(true);
-    }
-  };
-
-  const handleDropoutConfirm = (reason?: string) => {
-    setShowDropoutModal(false);
-    setDropoutReason(reason ?? ''); // Reset reason
-    onActionClick?.(item);
-  };
-
-  const handleCloseModal = () => {
-    setShowDropoutModal(false);
-    setDropoutReason('');
-  };
-
-  return {
-    itemName,
-    showDropoutModal,
-    dropoutReason,
-    setDropoutReason,
-    handleViewDetails,
-    handleMenuSelect,
-    handleDropoutConfirm,
-    handleCloseModal,
-  };
-}
-
-/**
- * Dropout Confirmation Modal Component
- * Shared modal component for both TableRow and CardView
- */
-interface DropoutModalProps {
-  isOpen: boolean;
-  itemName: string;
-  dropoutReason: string;
-  onClose: () => void;
-  onConfirm: (reason?: string) => void;
-  onReasonChange: (reason: string) => void;
-}
-
-const DropoutModal: React.FC<DropoutModalProps> = ({
-  isOpen,
-  itemName,
-  dropoutReason,
-  onClose,
-  onConfirm,
-  onReasonChange,
-}) => {
-  const { t } = useLanguage();
-
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      headerTitle={t('actions.confirmDropout') || 'Confirm Dropout'}
-      headerIcon={
-        <LucideIcon
-          name="UserX"
-          size={24}
-          color={theme.tokens.colors.error.light}
-        />
-      }
-      maxWidth={500}
-      cancelButtonText={t('common.cancel') || 'Cancel'}
-      confirmButtonText={t('actions.confirmDropout') || 'Confirm Dropout'}
-      onCancel={onClose}
-      onConfirm={() => onConfirm(dropoutReason)}
-      confirmButtonColor={theme.tokens.colors.error.light}
-    >
-      <VStack space="lg">
-        <Text
-          {...TYPOGRAPHY.paragraph}
-          color={theme.tokens.colors.textSecondary}
-          lineHeight="$xl"
-        >
-          {t('actions.dropoutMessage', { name: itemName }) ||
-            `Mark ${itemName} as dropout from the program`}
-        </Text>
-
-        <VStack space="sm">
-          <Text
-            {...TYPOGRAPHY.label}
-            color={theme.tokens.colors.textPrimary}
-            fontWeight="$medium"
-          >
-            {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
-          </Text>
-          <Input
-            {...styles.modalInput}
-            borderColor={theme.tokens.colors.inputBorder}
-            bg={theme.tokens.colors.modalBackground}
-            $focus-borderColor={theme.tokens.colors.inputFocusBorder}
-            $focus-borderWidth={2}
-          >
-            <InputField
-              placeholder={
-                t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
-              }
-              value={dropoutReason}
-              onChangeText={onReasonChange}
-              {...styles.modalInputField}
-              placeholderTextColor={theme.tokens.colors.textMuted}
-            />
-          </Input>
-          <Text
-            {...TYPOGRAPHY.bodySmall}
-            color={theme.tokens.colors.textSecondary}
-            lineHeight="$sm"
-          >
-            {t('actions.dropoutHint') ||
-              'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
-          </Text>
-        </VStack>
-      </VStack>
-    </Modal>
-  );
-};
 
 /**
  * Table Row Component
@@ -306,8 +142,8 @@ interface TableRowProps<T> {
   item: T;
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
-  onActionClick?: (item: T) => void;
-  showActions?: boolean;
+  onActionClick?: (item: T, actionKey?: string) => void;
+  viewDetailsActionKey?: string; // Action key for "View Details" button
   minWidth?: number; // Minimum width for horizontal scroll on mobile
   isLast?: boolean; // Whether this is the last row
 }
@@ -317,21 +153,20 @@ const TableRow = <T,>({
   columns,
   onRowClick,
   onActionClick,
-  showActions,
+  viewDetailsActionKey = 'view-details', // Default for backward compatibility
   minWidth,
   isLast = false,
 }: TableRowProps<T>) => {
   const { t } = useLanguage();
-  const {
-    itemName,
-    showDropoutModal,
-    dropoutReason,
-    setDropoutReason,
-    handleViewDetails,
-    handleMenuSelect,
-    handleDropoutConfirm,
-    handleCloseModal,
-  } = useRowActions(item, onActionClick);
+  
+  // Generic handlers - all actions go through onActionClick
+  const handleViewDetails = () => {
+    onActionClick?.(item, viewDetailsActionKey);
+  };
+  
+  const handleMenuSelect = (key: string) => {
+    onActionClick?.(item, key);
+  };
 
   return (
     <>
@@ -354,71 +189,68 @@ const TableRow = <T,>({
                 }
                 return true; // Default to true if not specified
               })
-              .map(column => (
-                <Box
-                  key={column.key}
-                  flex={column.flex}
-                  width={column.width}
-                  alignItems={
-                    column.align === 'center'
-                      ? 'center'
-                      : column.align === 'right'
-                      ? 'flex-end'
-                      : 'flex-start'
-                  }
-                >
-                  {column.render ? (
-                    column.render(item)
-                  ) : (
-                    <Text
-                      {...TYPOGRAPHY.paragraph}
-                      color={theme.tokens.colors.mutedForeground}
-                    >
-                      {String((item as any)[column.key] ?? '')}
-                    </Text>
-                  )}
-                </Box>
-              ))}
-            {showActions && (
-              <Box width={180}>
-                <HStack space="sm" alignItems="center">
-                  {/* View Details Button */}
-                  <Pressable
-                    onPress={handleViewDetails}
-                    {...styles.viewDetailsButton}
+              .map(column => {
+                // Check if this is the actions column
+                const isActionsColumn = column.key === '__actions__';
+                
+                // Get menu items from column meta if available, otherwise use default
+                const getMenuItemsForColumn = isActionsColumn && column.meta?.menuItems
+                  ? column.meta.menuItems
+                  : getDefaultMenuItems;
+                
+                return (
+                  <Box
+                    key={column.key}
+                    flex={column.flex}
+                    width={column.width}
+                    alignItems={
+                      column.align === 'center'
+                        ? 'center'
+                        : column.align === 'right'
+                        ? 'flex-end'
+                        : 'flex-start'
+                    }
                   >
-                    <Text
-                      {...TYPOGRAPHY.bodySmall}
-                      color="$primary500" fontWeight="$medium"
-                    >
-                      {t('actions.viewDetails')}
-                    </Text>
-                  </Pressable>
-                  
-                  {/* Actions Menu */}
-                <CustomMenu
-                  items={getMenuItems(t)}
-                  placement="bottom right"
-                  offset={5}
-                  trigger={getCustomTrigger}
-                  onSelect={handleMenuSelect}
-                />
-                </HStack>
-              </Box>
-            )}
+                    {isActionsColumn ? (
+                      <HStack space="sm" alignItems="center">
+                        {/* View Details Button */}
+                        <Pressable
+                          onPress={handleViewDetails}
+                          {...styles.viewDetailsButton}
+                        >
+                          <Text
+                            {...TYPOGRAPHY.bodySmall}
+                            color="$primary500" fontWeight="$medium"
+                          >
+                            {t('actions.viewDetails')}
+                          </Text>
+                        </Pressable>
+                        
+                        {/* Actions Menu */}
+                        <CustomMenu
+                          items={getMenuItemsForColumn(t)}
+                          placement="bottom right"
+                          offset={5}
+                          trigger={getCustomTrigger}
+                          onSelect={handleMenuSelect}
+                        />
+                      </HStack>
+                    ) : column.render ? (
+                      column.render(item)
+                    ) : (
+                      <Text
+                        {...TYPOGRAPHY.paragraph}
+                        color={theme.tokens.colors.mutedForeground}
+                      >
+                        {String((item as any)[column.key] ?? '')}
+                      </Text>
+                    )}
+                  </Box>
+                );
+              })}
           </HStack>
         </Pressable>
       </Box>
-
-      {/* Dropout Confirmation Modal */}
-      <DropoutModal
-        isOpen={showDropoutModal}
-        itemName={itemName}
-        dropoutReason={dropoutReason}
-        onClose={handleCloseModal}
-        onConfirm={handleDropoutConfirm}
-        onReasonChange={setDropoutReason}
-      />
     </>
   );
 };
@@ -485,8 +317,8 @@ interface CardViewProps<T> {
   item: T;
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
-  onActionClick?: (item: T) => void;
-  showActions?: boolean;
+  onActionClick?: (item: T, actionKey?: string) => void;
+  viewDetailsActionKey?: string; // Action key for "View Details" button
 }
 
 const CardView = <T,>({
@@ -494,21 +326,30 @@ const CardView = <T,>({
   columns,
   onRowClick,
   onActionClick,
-  showActions,
+  viewDetailsActionKey = 'view-details', // Default for backward compatibility
 }: CardViewProps<T>) => {
   const { t } = useLanguage();
-  const {
-    itemName,
-    showDropoutModal,
-    dropoutReason,
-    setDropoutReason,
-    handleViewDetails,
-    handleMenuSelect,
-    handleDropoutConfirm,
-    handleCloseModal,
-  } = useRowActions(item, onActionClick);
+  
+  // Generic handlers - all actions go through onActionClick
+  const handleViewDetails = () => {
+    onActionClick?.(item, viewDetailsActionKey);
+  };
+  
+  const handleMenuSelect = (key: string) => {
+    onActionClick?.(item, key);
+  };
 
-  const layout = prepareFinalLayout(columns);
+  // Filter out actions column from layout (it's handled separately)
+  const columnsWithoutActions = columns.filter(col => col.key !== '__actions__');
+  const actionsColumn = columns.find(col => col.key === '__actions__');
+  const hasActionsColumn = !!actionsColumn;
+  
+  // Get menu items from actions column meta if available, otherwise use default
+  const getMenuItemsForColumn = actionsColumn?.meta?.menuItems
+    ? actionsColumn.meta.menuItems
+    : getDefaultMenuItems;
+  
+  const layout = prepareFinalLayout(columnsWithoutActions);
 
   return (
     <>
@@ -601,7 +442,7 @@ const CardView = <T,>({
           })}
 
           {/* Actions Section - Always at bottom */}
-          {showActions && (
+          {hasActionsColumn && (
             <HStack {...styles.cardActionsSection}>
               {/* View Details Button */}
               <Pressable
@@ -626,7 +467,7 @@ const CardView = <T,>({
 
               {/* Actions Menu */}
               <CustomMenu
-                items={getMenuItems(t)}
+                items={getMenuItemsForColumn(t)}
                 placement="bottom right"
                 offset={5}
                 trigger={getCustomTrigger}
@@ -636,16 +477,6 @@ const CardView = <T,>({
           )}
         </VStack>
       </Box>
-
-      {/* Dropout Confirmation Modal */}
-      <DropoutModal
-        isOpen={showDropoutModal}
-        itemName={itemName}
-        dropoutReason={dropoutReason}
-        onClose={handleCloseModal}
-        onConfirm={handleDropoutConfirm}
-        onReasonChange={setDropoutReason}
-      />
     </>
   );
 };
@@ -702,11 +533,11 @@ const DataTable = <T,>({
   isLoading = false,
   emptyMessage,
   loadingMessage,
-  showActions = false,
   getRowKey,
   pagination,
   onPageChange,
   responsive = true, // Default to true
+  viewDetailsActionKey = 'view-details', // Default for backward compatibility
 }: DataTableProps<T>) => {
   const { isMobile } = usePlatform();
   
@@ -756,7 +587,7 @@ const DataTable = <T,>({
   // Table content for desktop or when responsive is disabled
   const tableContent = (
     <VStack {...styles.tableContentContainer} minWidth={minTableWidth}>
-      <TableHeader columns={columns} showActions={showActions} minWidth={minTableWidth} isMobile={false} />
+      <TableHeader columns={columns} minWidth={minTableWidth} isMobile={false} />
       <Box>
         {isLoading ? (
           <LoadingState message={loadingMessage} />
@@ -770,7 +601,7 @@ const DataTable = <T,>({
               columns={columns}
               onRowClick={onRowClick}
               onActionClick={onActionClick}
-              showActions={showActions}
+              viewDetailsActionKey={viewDetailsActionKey}
               minWidth={minTableWidth}
               isLast={index === paginatedData.length - 1}
             />
@@ -795,7 +626,7 @@ const DataTable = <T,>({
             columns={columns}
             onRowClick={onRowClick}
             onActionClick={onActionClick}
-            showActions={showActions}
+            viewDetailsActionKey={viewDetailsActionKey}
           />
         ))
       )}
@@ -841,3 +672,6 @@ const DataTable = <T,>({
 };
 
 export default DataTable;
+
+// Re-export constants for convenience
+export { getDefaultMenuItems } from './constants';

@@ -59,6 +59,8 @@ export interface ColumnDef<T> {
   // Device-specific configuration
   mobileConfig?: MobileConfig; // Mobile-specific layout and visibility configuration
   desktopConfig?: DesktopConfig; // Desktop-specific visibility configuration
+  // Custom metadata for column-specific data (e.g., menu items for actions column)
+  meta?: Record<string, any>;
 }
 
 export interface PaginationConfig {
@@ -74,17 +76,18 @@ export interface DataTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
-  onActionClick?: (item: T) => void;
+  onActionClick?: (item: T, actionKey?: string) => void;
   isLoading?: boolean;
   emptyMessage?: string;
   loadingMessage?: string;
-  showActions?: boolean;
   getRowKey: (item: T) => string;
   // Pagination props
   pagination?: PaginationConfig;
   onPageChange?: (page: number) => void;  // Optional callback when page changes
   // Responsive props
   responsive?: boolean;  // Enable responsive card view on mobile (default: true)
+  // Action configuration - made configurable to remove screen-specific hardcoded values
+  viewDetailsActionKey?: string;  // Action key for "View Details" button (default: 'view-details')
 }
 
 export interface PaginationControlsProps {
