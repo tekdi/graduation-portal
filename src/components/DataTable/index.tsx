@@ -170,13 +170,13 @@ function useRowActions<T>(item: T, onActionClick?: (item: T) => void) {
 
   const handleViewDetails = () => {
     // @ts-ignore - Navigation type inference
-    navigation.navigate('participant-detail', { participantId: itemId });
+    navigation.navigate('participant-detail', { id: itemId });
   };
 
   const handleMenuSelect = (key: string) => {
     if (key === 'log-visit') {
       // @ts-ignore - Navigation type inference
-      navigation.navigate('log-visit', { participantId: itemId });
+      navigation.push('log-visit', { participantId: itemId });
     } else if (key === 'view-log') {
       // @ts-ignore - Navigation type inference
       navigation.navigate('participant-detail', { id: itemId });
@@ -185,9 +185,9 @@ function useRowActions<T>(item: T, onActionClick?: (item: T) => void) {
     }
   };
 
-  const handleDropoutConfirm = (reason: string) => {
+  const handleDropoutConfirm = (reason?: string) => {
     setShowDropoutModal(false);
-    setDropoutReason('');
+    setDropoutReason(reason ?? ''); // Reset reason
     onActionClick?.(item);
   };
 
@@ -217,7 +217,7 @@ interface DropoutModalProps {
   itemName: string;
   dropoutReason: string;
   onClose: () => void;
-  onConfirm: (reason: string) => void;
+  onConfirm: (reason?: string) => void;
   onReasonChange: (reason: string) => void;
 }
 
@@ -613,7 +613,7 @@ const CardView = <T,>({
                   <LucideIcon
                     name="Eye"
                     size={18}
-                    color="$textForeground"
+                    color={theme.tokens.colors.textForeground}
                   />
                   <Text
                     {...TYPOGRAPHY.bodySmall}
