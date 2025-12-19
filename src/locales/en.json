@@ -335,50 +335,6 @@
     "dropoutReasonPlaceholder": "Enter reason for dropout...",
     "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
   },
-  "lcProfile": {
-    "myProfile": "My Profile",
-    "linkageChampionProfile": "Linkage Champion Profile",
-    "profileDetails": "Profile Details",
-    "fullName": "Full Name",
-    "lcId": "LC ID",
-    "emailAddress": "Email Address",
-    "phoneNumber": "Phone Number",
-    "serviceArea": "Service Area",
-    "startDate": "Start Date",
-    "languagePreference": "Language Preference",
-    "programStatistics": "Program Statistics",
-    "activeParticipants": "Active Participants",
-    "completedIdps": "Completed IDPs",
-    "visitsLogged": "Visits Logged",
-    "pendingTasks": "Pending Tasks",
-    "certificationsTraining": "Certifications & Training",
-    "completed": "Completed",
-    "certified": "Certified",
-    "notes": "Notes"
-  },
-  "lc": {
-    "menu": {
-      "home": "Home",
-      "dashboard": "Dashboard",
-      "myProfile": "My Profile",
-      "serviceProviders": "Service Providers"
-    }
-  },
-  "table": {
-    "showing": "Showing {{start}} to {{end}} of {{total}} entries",
-    "itemsPerPage": "Items per page"
-  },
-  "actions": {
-    "viewDetails": "View Details",
-    "viewLog": "View Log",
-    "logVisit": "Log Visit",
-    "dropout": "Dropout",
-    "confirmDropout": "Confirm Dropout",
-    "dropoutMessage": "Mark {{name}} as dropout from the program",
-    "dropoutReasonLabel": "Reason for Dropout",
-    "dropoutReasonPlaceholder": "Enter reason for dropout...",
-    "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
-  },
   "logVisit": {
     "selectVisitType": "Select visit type for {{name}}",
     "viewCheckIns": "View Check-Ins",
