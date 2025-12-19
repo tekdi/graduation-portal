@@ -23,6 +23,7 @@ import { getParticipantsList } from '../../services/participantService';
 import { STATUS } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
 import { applyFilters } from '@utils/helper';
+import { styles } from './Styles';
 
 const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
@@ -168,31 +169,31 @@ const ParticipantsList: React.FC = () => {
   }, []);
 
   return (
-    <Box flex={1}>
-      <ScrollView flex={1} bg={theme.tokens.colors.accent100}>
-        <VStack bg="$white">
+    <Box {...styles.mainContainer}>
+      <ScrollView {...styles.scrollView}>
+        <VStack {...styles.headerVStack}>
           <Container>
-            <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground}  padding="$4" my="$2">
+            <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground} {...styles.heading}>
               {t('participants.myParticipants')}
             </Heading>
           </Container>
           </VStack>
       
         <Container>
-          <VStack space="lg" padding="$0" $md-padding="$6" flex={1}>
+          <VStack {...styles.contentVStack}>
             {/* Page Title */}
            
 
             {/* Search Bar and Active/Inactive Filter */}
-            <HStack space="md" width="$full" alignItems="center">
-              <Box flex={1}>
+            <HStack {...styles.searchFilterHStack}>
+              <Box {...styles.searchBarContainer}>
                 <SearchBar
                   placeholder={t('participants.searchByNameOrId')}
                   onSearch={handleSearch}
                   debounceMs={500}
                 />
               </Box>
-              <Box width="$40" $md-width="$48">
+              <Box {...styles.selectContainer}>
                 <Select
                   options={[
                     { label: `${t('participants.active')} (${activeInactiveCounts.active})`, value: 'active' },
@@ -200,32 +201,25 @@ const ParticipantsList: React.FC = () => {
                   ]}
                   value={activeFilter}
                   onChange={(value) => setActiveFilter(value as 'active' | 'inactive')}
-                  bg="$white"
-                  borderColor="$borderLight300"
+                  {...styles.select}
                 />
               </Box>
             </HStack>
 
             {/* Status Filter Bar - Desktop: Filter buttons, Mobile: Dropdown */}
             {isMobile ? (
-              <Box width="$full">
+              <Box {...styles.mobileStatusSelectContainer}>
                 <Select
                   options={selectOptions}
                   value={activeStatus}
                   onChange={(value) => handleStatusChange(value as StatusType | '')}
                   placeholder={t('participants.selectStatus') || 'Select Status'}
-                  bg="$white"
-                  borderColor="$borderLight300"
+                  {...styles.select}
                 />
               </Box>
             ) : (
-              <Box
-                bg="$backgroundLight50"
-                borderRadius="$lg"
-                padding="$1"
-                width="$full"
-              >
-                <HStack space="xs" width="$full">
+              <Box {...styles.desktopFilterContainer}>
+                <HStack {...styles.desktopFilterHStack}>
                   {statusItems.map(item => {
                     const isActive = activeStatus === item.key;
 
@@ -233,58 +227,23 @@ const ParticipantsList: React.FC = () => {
                       <Pressable
                         key={item.key}
                         onPress={() => handleStatusChange(item.key)}
-                        flex={1}
-                        paddingVertical="$3"
-                        paddingHorizontal="$2"
-                        borderRadius="$md"
-                        bg={isActive ? '$white' : 'transparent'}
-                        $web-cursor="pointer"
-                        $web-transition="all 0.2s"
-                        sx={{
-                          ':hover': {
-                            opacity: 0.8,
-                          },
-                        }}
+                        {...styles.statusItemPressable}
+                        {...(isActive ? styles.statusItemPressableActive : styles.statusItemPressableInactive)}
                       >
-                        <HStack
-                          space="xs"
-                          alignItems="center"
-                          justifyContent="center"
-                        >
+                        <HStack {...styles.statusItemHStack}>
                           <Text
-                            fontSize="$sm"
-                            color={
-                              isActive
-                                ? theme.tokens.colors.primary500
-                                : theme.tokens.colors.mutedForeground
-                            }
-                            fontWeight={isActive ? '$medium' : '$normal'}
-                            textAlign="center"
+                            {...styles.statusLabelText}
+                            {...(isActive ? styles.statusLabelTextActive : styles.statusLabelTextInactive)}
                           >
                             {t(item.label)}
                           </Text>
                           <Box
-                            bg={
-                              isActive
-                                ? theme.tokens.colors.primary500
-                                : '$backgroundLight200'
-                            }
-                            borderRadius="$full"
-                            paddingHorizontal="$2"
-                            paddingVertical="$0.5"
-                            minWidth={24}
-                            height={20}
-                            alignItems="center"
-                            justifyContent="center"
+                            {...styles.countBadgeBox}
+                            {...(isActive ? styles.countBadgeBoxActive : styles.countBadgeBoxInactive)}
                           >
                             <Text
-                              fontSize="$xs"
-                              color={
-                                isActive
-                                  ? '$white'
-                                  : theme.tokens.colors.mutedForeground
-                              }
-                              fontWeight="$semibold"
+                              {...styles.countText}
+                              {...(isActive ? styles.countTextActive : styles.countTextInactive)}
                             >
                               {item.count}
                             </Text>
