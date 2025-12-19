@@ -13,7 +13,7 @@ export const styles = {
   // ScrollView
   scrollView: {
     flex: 1 as const,
-    bg: theme.tokens.colors.accent100 as const,
+    bg: '$accent100',
   },
 
   // Header VStack
@@ -125,12 +125,12 @@ export const styles = {
 
   // Status label Text - Active state
   statusLabelTextActive: {
-    color: theme.tokens.colors.primary500 as const,
+    color: '$primary500',
   },
 
   // Status label Text - Inactive state
   statusLabelTextInactive: {
-    color: theme.tokens.colors.mutedForeground as const,
+    color: '$mutedForeground',
   },
 
   // Count badge Box
@@ -146,12 +146,12 @@ export const styles = {
 
   // Count badge Box - Active state
   countBadgeBoxActive: {
-    bg: theme.tokens.colors.iconBackground as const,
+    bg: '$iconBackground',
   },
 
   // Count badge Box - Inactive state
   countBadgeBoxInactive: {
-    bg: '$backgroundLight200' as const,
+    bg: '$backgroundLight200',
   },
 
   // Count Text
@@ -162,12 +162,12 @@ export const styles = {
 
   // Count Text - Active state
   countTextActive: {
-    color: '$primary500' as const,
+    color: '$primary500',
   },
 
   // Count Text - Inactive state
   countTextInactive: {
-    color: theme.tokens.colors.mutedForeground as const,
+    color: '$mutedForeground',
   },
 } as const;
 
