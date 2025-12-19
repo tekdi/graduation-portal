@@ -112,6 +112,8 @@ interface TableRowProps<T> {
   item: T;
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
+  // Generic callback for handling table actions - passed to column render functions
+  // Allows columns (like actions column) to handle their own actions without DataTable needing special logic
   onActionClick?: (item: T, actionKey?: string) => void;
   minWidth?: number; // Minimum width for horizontal scroll on mobile
   isLast?: boolean; // Whether this is the last row
