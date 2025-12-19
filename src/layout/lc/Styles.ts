@@ -4,5 +4,6 @@ export const stylesLayout = {
   },
   mainContent: {
     flex: 1,
+    contentContainerStyle: { flexGrow: 1 },
   },
 } as const;

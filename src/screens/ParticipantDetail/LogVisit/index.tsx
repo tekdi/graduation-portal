@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { Box, Container, VStack, HStack, Text, Pressable, Button, ButtonText } from '@ui';
 import { LucideIcon } from '@ui';
@@ -10,6 +10,7 @@ import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { logVisitStyles } from './Style';
 import NotFound from '@components/NotFound';
+import { ParticipantData } from '@app-types/participant';
 
 /**
  * Route parameters type definition for LogVisit screen
@@ -31,10 +32,16 @@ type LogVisitRouteProp = RouteProp<{
  */
 const LogVisit: React.FC = () => {
   const route = useRoute<LogVisitRouteProp>();
+  const [participant, setParticipant] = useState<ParticipantData | undefined>(undefined);
   const navigation = useNavigation();
   const { t } = useLanguage();
-  const participantId = route.params?.id;
-  const participant = participantId ? getParticipantById(participantId) : undefined;
+
+  useEffect(() => {
+    if (route.params?.id) {
+      const participantData = getParticipantById(route.params?.id);
+      setParticipant(participantData);
+    }
+  }, [route.params?.id]);
 
   /**
    * Handle Back Navigation
@@ -47,7 +54,7 @@ const LogVisit: React.FC = () => {
     } else {
       // Fallback: Navigate to participant detail if there's no previous screen
       // @ts-ignore
-      navigation.navigate('participant-detail', { id: participantId });
+      navigation.navigate('participant-detail', { id: route.params?.id });
     }
   };
 
@@ -56,7 +63,6 @@ const LogVisit: React.FC = () => {
     return <NotFound message="participantDetail.notFound.title" />;
   }
 
-  const participantName = participant.name;
   return (
     <Box flex={1} bg="$accent100">
        {/* Header */}
@@ -78,7 +84,7 @@ const LogVisit: React.FC = () => {
                     {t('actions.logVisit')}
                   </Text>
                   <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
-                    {t('logVisit.selectVisitType', { name: participantName })}
+                    {t('logVisit.selectVisitType', { name: participant?.name || '' })}
                   </Text>
                 </VStack>
               </HStack>
@@ -120,7 +126,6 @@ const LogVisit: React.FC = () => {
               {t('logVisit.logVisitNote')}
               </Text> 
             </Text>
-           
           </HStack>
         </VStack>
       </Container>

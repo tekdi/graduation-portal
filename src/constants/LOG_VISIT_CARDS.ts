@@ -1,6 +1,4 @@
 import { AssessmentSurveyCardData } from '@app-types/participant';
-import { CARD_STATUS } from './app.constant';
-import { theme } from '@config/theme';
 
 /**
  * Log Visit Cards Constant
@@ -14,7 +12,7 @@ export const LOG_VISIT_CARDS: AssessmentSurveyCardData[] = [
     description: 'logVisit.individualEnterpriseVisit.description',
     icon: 'FileText',
     iconColor: "$primary500",
-    navigationUrl: 'individual-enterprise-visit',
+    navigationUrl: 'observation',
   },
   {
     id: 'group-visit-form',
@@ -22,7 +20,7 @@ export const LOG_VISIT_CARDS: AssessmentSurveyCardData[] = [
     description: 'logVisit.groupVisitForm.description',
     icon: 'Users',
     iconColor: "$blue500",
-    navigationUrl: 'group-visit-form',
+    navigationUrl: 'observation',
   },
   {
     id: 'midline-survey-form',
@@ -30,7 +28,7 @@ export const LOG_VISIT_CARDS: AssessmentSurveyCardData[] = [
     description: 'logVisit.midlineSurvey.description',
     icon: 'BarChart',
     iconColor: "$warning500",
-    navigationUrl: 'midline-survey',
+    navigationUrl: 'observation',
   },
 ];
 
