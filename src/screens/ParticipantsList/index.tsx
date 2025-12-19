@@ -12,7 +12,7 @@ import {
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
-import DataTable, { getActionsColumn } from '@components/DataTable';
+import DataTable from '@components/DataTable';
 import { getParticipantsColumns } from './ParticipantsTableConfig';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
@@ -309,7 +309,7 @@ const ParticipantsList: React.FC = () => {
             {/* Participants Table */}
             <DataTable
               data={filteredParticipants}
-              columns={[...getParticipantsColumns(activeStatus), getActionsColumn<Participant>()]}
+              columns={getParticipantsColumns(activeStatus)}
               getRowKey={participant => participant.id}
               onRowClick={handleRowClick}
               onActionClick={handleActionClick}

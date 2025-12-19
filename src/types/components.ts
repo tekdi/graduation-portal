@@ -49,18 +49,23 @@ export interface DesktopConfig {
   showColumn?: boolean;     // Override showColumn for desktop (optional, uses common config if not specified)
 }
 
+/**
+ * Column definition for DataTable
+ * Refactored to be fully generic: render function receives onActionClick callback, allowing columns to handle their own actions.
+ * Removed screen-specific config (menuItems, viewDetailsActionKey) - all column-specific logic is now in the render function.
+ */
 export interface ColumnDef<T> {
   key: string;
   label: string;
   flex?: number;
   width?: number;
-  render?: (item: T) => ReactNode;
+  // Render function receives item and optional onActionClick callback
+  // This allows columns (like actions column) to handle their own actions without DataTable needing special logic
+  render?: (item: T, onActionClick?: (item: T, actionKey?: string) => void) => ReactNode;
   align?: 'left' | 'center' | 'right';
   // Device-specific configuration
   mobileConfig?: MobileConfig; // Mobile-specific layout and visibility configuration
   desktopConfig?: DesktopConfig; // Desktop-specific visibility configuration
-  // Custom metadata for column-specific data (e.g., menu items for actions column)
-  meta?: Record<string, any>;
 }
 
 export interface PaginationConfig {
@@ -76,6 +81,8 @@ export interface DataTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
+  // Generic callback for handling table actions (view-details, menu items, etc.)
+  // This allows DataTable to remain generic - screen-specific action handling is done by the consumer
   onActionClick?: (item: T, actionKey?: string) => void;
   isLoading?: boolean;
   emptyMessage?: string;
@@ -86,8 +93,6 @@ export interface DataTableProps<T> {
   onPageChange?: (page: number) => void;  // Optional callback when page changes
   // Responsive props
   responsive?: boolean;  // Enable responsive card view on mobile (default: true)
-  // Action configuration - made configurable to remove screen-specific hardcoded values
-  viewDetailsActionKey?: string;  // Action key for "View Details" button (default: 'view-details')
 }
 
 export interface PaginationControlsProps {

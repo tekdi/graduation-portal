@@ -15,36 +15,6 @@ import { LucideIcon } from '@components/ui';
 import { usePlatform } from '@utils/platform';
 import PaginationControls from './PaginationControls';
 import { styles } from './Styles';
-import { getDefaultMenuItems } from './constants';
-
-/**
- * Creates an actions column definition
- * This column renders the View Details button and Actions menu
- * Note: The actual rendering is handled in TableRow component
- * 
- * @param customMenuItems - Optional function that returns custom menu items.
- *                          If not provided, uses default menu items (View Log, Log Visit, Dropout)
- */
-export const getActionsColumn = <T,>(
-  customMenuItems?: (t: (key: string) => string) => MenuItemData[]
-): ColumnDef<T> => {
-  return {
-    key: '__actions__',
-    label: 'common.actions',
-    width: 180,
-    align: 'right',
-    render: () => null, // Placeholder - actual rendering handled in TableRow
-    meta: {
-      menuItems: customMenuItems, // Store custom menu items function in meta
-    },
-    desktopConfig: {
-      showColumn: true,
-    },
-    mobileConfig: {
-      showColumn: false, // Actions are handled separately in mobile card view
-    },
-  };
-};
 
 
 /**
@@ -143,7 +113,6 @@ interface TableRowProps<T> {
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
   onActionClick?: (item: T, actionKey?: string) => void;
-  viewDetailsActionKey?: string; // Action key for "View Details" button
   minWidth?: number; // Minimum width for horizontal scroll on mobile
   isLast?: boolean; // Whether this is the last row
 }
@@ -153,16 +122,10 @@ const TableRow = <T,>({
   columns,
   onRowClick,
   onActionClick,
-  viewDetailsActionKey = 'view-details', // Default for backward compatibility
   minWidth,
   isLast = false,
 }: TableRowProps<T>) => {
   const { t } = useLanguage();
-  
-  // Generic handlers - all actions go through onActionClick
-  const handleViewDetails = () => {
-    onActionClick?.(item, viewDetailsActionKey);
-  };
   
   const handleMenuSelect = (key: string) => {
     onActionClick?.(item, key);
@@ -190,14 +153,6 @@ const TableRow = <T,>({
                 return true; // Default to true if not specified
               })
               .map(column => {
-                // Check if this is the actions column
-                const isActionsColumn = column.key === '__actions__';
-                
-                // Get menu items from column meta if available, otherwise use default
-                const getMenuItemsForColumn = isActionsColumn && column.meta?.menuItems
-                  ? column.meta.menuItems
-                  : getDefaultMenuItems;
-                
                 return (
                   <Box
                     key={column.key}
@@ -211,32 +166,8 @@ const TableRow = <T,>({
                         : 'flex-start'
                     }
                   >
-                    {isActionsColumn ? (
-                      <HStack space="sm" alignItems="center">
-                        {/* View Details Button */}
-                        <Pressable
-                          onPress={handleViewDetails}
-                          {...styles.viewDetailsButton}
-                        >
-                          <Text
-                            {...TYPOGRAPHY.bodySmall}
-                            color="$primary500" fontWeight="$medium"
-                          >
-                            {t('actions.viewDetails')}
-                          </Text>
-                        </Pressable>
-                        
-                        {/* Actions Menu */}
-                        <CustomMenu
-                          items={getMenuItemsForColumn(t)}
-                          placement="bottom right"
-                          offset={5}
-                          trigger={getCustomTrigger}
-                          onSelect={handleMenuSelect}
-                        />
-                      </HStack>
-                    ) : column.render ? (
-                      column.render(item)
+                    {column.render ? (
+                      column.render(item, onActionClick)
                     ) : (
                       <Text
                         {...TYPOGRAPHY.paragraph}
@@ -318,7 +249,6 @@ interface CardViewProps<T> {
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
   onActionClick?: (item: T, actionKey?: string) => void;
-  viewDetailsActionKey?: string; // Action key for "View Details" button
 }
 
 const CardView = <T,>({
@@ -326,30 +256,10 @@ const CardView = <T,>({
   columns,
   onRowClick,
   onActionClick,
-  viewDetailsActionKey = 'view-details', // Default for backward compatibility
 }: CardViewProps<T>) => {
   const { t } = useLanguage();
   
-  // Generic handlers - all actions go through onActionClick
-  const handleViewDetails = () => {
-    onActionClick?.(item, viewDetailsActionKey);
-  };
-  
-  const handleMenuSelect = (key: string) => {
-    onActionClick?.(item, key);
-  };
-
-  // Filter out actions column from layout (it's handled separately)
-  const columnsWithoutActions = columns.filter(col => col.key !== '__actions__');
-  const actionsColumn = columns.find(col => col.key === '__actions__');
-  const hasActionsColumn = !!actionsColumn;
-  
-  // Get menu items from actions column meta if available, otherwise use default
-  const getMenuItemsForColumn = actionsColumn?.meta?.menuItems
-    ? actionsColumn.meta.menuItems
-    : getDefaultMenuItems;
-  
-  const layout = prepareFinalLayout(columnsWithoutActions);
+  const layout = prepareFinalLayout(columns);
 
   return (
     <>
@@ -381,7 +291,7 @@ const CardView = <T,>({
                           </Text>
                         )}
                         <Box>
-                          {col.render ? col.render(item) : <Text {...TYPOGRAPHY.paragraph}>{(item as any)[col.key]}</Text>}
+                          {col.render ? col.render(item, onActionClick) : <Text {...TYPOGRAPHY.paragraph}>{(item as any)[col.key]}</Text>}
                         </Box>
                       </VStack>
                     );
@@ -423,7 +333,7 @@ const CardView = <T,>({
 
                       <Box>
                         {col.render ? (
-                          col.render(item)
+                          col.render(item, onActionClick)
                         ) : (
                           <Text
                             {...TYPOGRAPHY.paragraph}
@@ -440,41 +350,6 @@ const CardView = <T,>({
 
             );
           })}
-
-          {/* Actions Section - Always at bottom */}
-          {hasActionsColumn && (
-            <HStack {...styles.cardActionsSection}>
-              {/* View Details Button */}
-              <Pressable
-                onPress={handleViewDetails}
-                {...styles.viewDetailsButton}
-              >
-                <HStack space="sm" alignItems="center" justifyContent="center">
-                  <LucideIcon
-                    name="Eye"
-                    size={18}
-                    color={theme.tokens.colors.textForeground}
-                  />
-                  <Text
-                    {...TYPOGRAPHY.bodySmall}
-                    color="$textForeground"
-                    fontWeight="$medium"
-                  >
-                    {t('actions.viewDetails')}
-                  </Text>
-                </HStack>
-              </Pressable>
-
-              {/* Actions Menu */}
-              <CustomMenu
-                items={getMenuItemsForColumn(t)}
-                placement="bottom right"
-                offset={5}
-                trigger={getCustomTrigger}
-                onSelect={handleMenuSelect}
-              />
-            </HStack>
-          )}
         </VStack>
       </Box>
     </>
@@ -537,7 +412,6 @@ const DataTable = <T,>({
   pagination,
   onPageChange,
   responsive = true, // Default to true
-  viewDetailsActionKey = 'view-details', // Default for backward compatibility
 }: DataTableProps<T>) => {
   const { isMobile } = usePlatform();
   
@@ -601,7 +475,6 @@ const DataTable = <T,>({
               columns={columns}
               onRowClick={onRowClick}
               onActionClick={onActionClick}
-              viewDetailsActionKey={viewDetailsActionKey}
               minWidth={minTableWidth}
               isLast={index === paginatedData.length - 1}
             />
@@ -626,7 +499,6 @@ const DataTable = <T,>({
             columns={columns}
             onRowClick={onRowClick}
             onActionClick={onActionClick}
-            viewDetailsActionKey={viewDetailsActionKey}
           />
         ))
       )}
@@ -674,4 +546,3 @@ const DataTable = <T,>({
 export default DataTable;
 
 // Re-export constants for convenience
-export { getDefaultMenuItems } from './constants';
