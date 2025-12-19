@@ -169,5 +169,22 @@ export const styles = {
   countTextInactive: {
     color: '$mutedForeground',
   },
+
+  // Status Badge Box
+  statusBadgeBox: {
+    borderWidth: 1 as const,
+    paddingHorizontal: '$2' as const,
+    paddingVertical: '$1' as const,
+    borderRadius: '$full' as const,
+    alignSelf: 'flex-start' as const,
+    flexShrink: 0 as const,
+  },
+
+  // Status Badge Text
+  statusBadgeText: {
+    fontSize: '$xs' as const,
+    fontWeight: '$medium' as const,
+    numberOfLines: 1 as const,
+  },
 } as const;
 
