@@ -5,63 +5,14 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon, Menu } from '@ui';
-import { MenuItemData } from '@components/ui/Menu';
 import { Participant } from '@app-types/screens';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
+import { getParticipantsMenuItems } from '@constants/PARTICIPANTS_LIST';
 import DropoutModal from './DropoutModal';
 
 interface ActionColumnProps {
   participant: Participant;
 }
-
-/**
- * Menu items configuration for Participants actions menu
- */
-const getMenuItems = (t: (key: string) => string): MenuItemData[] => [
-  {
-    key: 'view-log',
-    label: 'actions.viewLog',
-    textValue: 'View Log',
-    iconElement: (
-      <Box {...dataTableStyles.menuIconContainer}>
-        <LucideIcon
-          name="FileText"
-          size={20}
-          color="$textMutedForeground"
-        />
-      </Box>
-    ),
-  },
-  {
-    key: 'log-visit',
-    label: 'actions.logVisit',
-    textValue: 'Log Visit',
-    iconElement: (
-      <Box {...dataTableStyles.menuIconContainer}>
-        <LucideIcon
-          name="ClipboardCheck"
-          size={20}
-          color={theme.tokens.colors.mutedForeground}
-        />
-      </Box>
-    ),
-  },
-  {
-    key: 'dropout',
-    label: 'actions.dropout',
-    textValue: 'Dropout',
-    iconElement: (
-      <Box {...dataTableStyles.menuIconContainer}>
-        <LucideIcon
-          name="UserX"
-          size={20}
-          color={theme.tokens.colors.error.light}
-        />
-      </Box>
-    ),
-    color: theme.tokens.colors.error.light,
-  },
-];
 
 /**
  * Custom trigger for actions menu
@@ -150,7 +101,7 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
           </HStack>
         </Pressable>
         <Menu
-          items={getMenuItems(t)}
+          items={getParticipantsMenuItems(t)}
           placement="bottom right"
           offset={5}
           trigger={getCustomTrigger}
