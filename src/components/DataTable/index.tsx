@@ -1,8 +1,3 @@
-/**
- * Generic DataTable Component
- * Refactored to be fully reusable: all screen-specific logic (navigation, modals) moved to consuming screens.
- * Actions are handled via column-specific onActionClick callback in column config, not as a generic table prop.
- */
 import React, { useState, useEffect } from 'react';
 import { Box, HStack, Text, Pressable, VStack } from '@ui';
 import { ScrollView } from 'react-native';
@@ -302,7 +297,6 @@ const CardView = <T,>({
           <Text
             {...TYPOGRAPHY.label}
             fontSize="$xs"
-            textAlign={isRightColumn ? 'right' : 'left'}
           >
             {t(col.label)}
           </Text>
@@ -314,7 +308,6 @@ const CardView = <T,>({
           ) : (
             <Text
               {...TYPOGRAPHY.paragraph}
-              textAlign={isRightColumn ? 'right' : 'left'}
             >
               {(item as any)[col.key]}
             </Text>
