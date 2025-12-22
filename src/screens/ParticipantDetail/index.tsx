@@ -42,7 +42,7 @@ import {
   DUMMY_PROJECT_DATA,
   PROJECT_PLAYER_CONFIGS,
 } from '@constants/PROJECTDATA';
-import { STATUS } from '@constants/app.constant';
+import { PARTICIPANT_DETAILS_TABS, STATUS } from '@constants/app.constant';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
@@ -127,7 +127,7 @@ export default function ParticipantDetail() {
   const ProjectPlayerConfigData: ProjectPlayerData = {
     solutionId: configData.solutionId,
     projectId: configData.projectId,
-    localData: DUMMY_PROJECT_DATA,
+    data: DUMMY_PROJECT_DATA,
   };
 
   return (
@@ -185,12 +185,14 @@ export default function ParticipantDetail() {
               <Box flex={1} mt="$3" mb="$6" bg="transparent">
                 <Box width="$full">
                   <Box width="$full">
-                    {activeTab === 'intervention-plan' && (
+                    {activeTab ===
+                      PARTICIPANT_DETAILS_TABS.INTERVENTION_PLAN && (
                       <InterventionPlan
                         participantStatus={status as ParticipantStatus}
                       />
                     )}
-                    {activeTab === 'assessment-surveys' && (
+                    {activeTab ===
+                      PARTICIPANT_DETAILS_TABS.ASSESSMENTS_SURVEYS && (
                       <AssessmentSurveys
                         participantStatus={status as ParticipantStatus}
                       />

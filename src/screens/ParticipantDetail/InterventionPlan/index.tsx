@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Box, VStack, Text, Button, ButtonText, HStack } from '@ui';
+import { Box, VStack, Text, Button, ButtonText } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
 import { interventionPlanStyles } from './Styles';
@@ -13,7 +13,6 @@ import {
 } from '@constants/PROJECTDATA';
 import { STATUS } from '@constants/app.constant';
 import type { InterventionPlanProps } from '../../../types/screens';
-import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 const InterventionPlan: React.FC<InterventionPlanProps> = ({
   participantStatus,
@@ -34,9 +33,20 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
 
     // ENROLLED status: use editMode if isEditMode is true, otherwise previewMode
     if (status === STATUS.ENROLLED) {
-      return isEditMode
+      const baseConfig = isEditMode
         ? PROJECT_PLAYER_CONFIGS.editMode
         : PROJECT_PLAYER_CONFIGS.previewMode;
+
+      // Add submit button config for ENROLLED status in preview mode
+      if (!isEditMode) {
+        return {
+          ...baseConfig,
+          showSubmitButton: true,
+          onSubmitInterventionPlan: () => setIsEditMode(true),
+        };
+      }
+
+      return baseConfig;
     }
 
     // Map other statuses to their respective configs
@@ -54,7 +64,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     () => ({
       solutionId: config.solutionId,
       projectId: config.projectId,
-      localData: COMPLEX_PROJECT_DATA,
+      data: COMPLEX_PROJECT_DATA,
     }),
     [config.solutionId, config.projectId],
   );
@@ -93,43 +103,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   // Single ProjectPlayer render point for all statuses
   return (
     <Box flex={1}>
-      <VStack flex={1}>
-        <Box flex={1}>
-          <ProjectPlayer config={config} data={projectPlayerData} />
-        </Box>
-
-        {/* Submit Intervention Plan Button - Only show for ENROLLED status in preview mode */}
-        {participantStatus === STATUS.ENROLLED && !isEditMode && (
-          <Box
-            padding="$4"
-            borderTopWidth={1}
-            borderTopColor="$borderLight300"
-            bg="$backgroundPrimary.light"
-          >
-            <HStack justifyContent="flex-end" width="$full">
-              <Button
-                bg="$primary500"
-                borderRadius="$md"
-                paddingHorizontal="$6"
-                paddingVertical="$3"
-                onPress={() => setIsEditMode(true)}
-                $hover-bg="$primary600"
-                $web-cursor="pointer"
-              >
-                <ButtonText
-                  color="$backgroundPrimary.light"
-                  {...TYPOGRAPHY.button}
-                  fontWeight="$semibold"
-                >
-                  {t(
-                    'participantDetail.interventionPlan.submitInterventionPlan',
-                  )}
-                </ButtonText>
-              </Button>
-            </HStack>
-          </Box>
-        )}
-      </VStack>
+      <ProjectPlayer config={config} data={projectPlayerData} />
     </Box>
   );
 };
