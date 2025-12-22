@@ -47,6 +47,17 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     navigation.navigate('participants');
   };
 
+  /**
+   * Handle Log Visit Navigation
+   * Navigates to the log visit screen for the current participant
+   */
+  const handleLogVisitPress = () => {
+    // Use push instead of navigate to ensure a new stack entry is created
+    // This allows goBack() to work properly in the LogVisit screen
+    // @ts-ignore
+    navigation.push('log-visit', { id: participantId });
+  };
+
 
 
   /**
@@ -119,7 +130,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     return (
       <Button
         {...participantHeaderStyles.solidButtonPrimary}
-        onPress={() => {}}
+        onPress={handleLogVisitPress}
         $md-width="auto"
       >
         <HStack {...participantHeaderStyles.solidButtonContent}>

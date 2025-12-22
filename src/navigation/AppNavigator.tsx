@@ -24,6 +24,7 @@ import WelcomePage from '../screens/Welcome/index';
 import ParticipantDetail from '../screens/ParticipantDetail';
 import ParticipantsList from '../screens/ParticipantsList/index';
 import ProjectPlayer from '../screens/ProjectPlayer';
+import LogVisit from '../screens/ParticipantDetail/LogVisit';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -86,6 +87,11 @@ const getAccessPages = (
           name: 'participant-detail',
           path: '/participants/:id',
           component: ParticipantDetail,
+        },
+        {
+          name: 'log-visit',
+          path: '/participants/:id/log-visit',
+          component: LogVisit,
         },
         { name: 'participants', component: ParticipantsList },
         { name: 'project', path: '/project', component: ProjectPlayer },
