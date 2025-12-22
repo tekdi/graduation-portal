@@ -292,7 +292,7 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
       </Text>
     ),
     mobileConfig: {
-      leftRank: 3, // Below ID
+      rightRank: 2, // Below ID
       showLabel: false, // Hide label on mobile
     },
   },
@@ -339,8 +339,9 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
 
 export const getParticipantsColumns = (
   status?: StatusType,
+  onActionClick?: (item: Participant, actionKey?: string) => void,
 ): ColumnDef<Participant>[] => {
-  return allParticipantsColumns.filter(col => {
+  const filteredColumns = allParticipantsColumns.filter(col => {
     if(([PARTICIPANT_COLUMN_KEYS.PROGRESS] as string[]).includes(col.key)) {
       if(status === STATUS.IN_PROGRESS) {return true} else {return false}
     }
@@ -348,6 +349,14 @@ export const getParticipantsColumns = (
       if(status === STATUS.COMPLETED) {return true} else {return false}
     }
     return true; // keep all other columns for any status
+  });
+  
+  // Set onActionClick on the actions column if provided
+  return filteredColumns.map(col => {
+    if (col.key === '__actions__' && onActionClick) {
+      return { ...col, onActionClick };
+    }
+    return col;
   });
 };
 

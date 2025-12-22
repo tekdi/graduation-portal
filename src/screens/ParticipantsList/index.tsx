@@ -29,7 +29,7 @@ import DropoutModal from './DropoutModal';
 /**
  * ParticipantsList Screen
  * Handles all screen-specific logic: navigation, dropout modal, and action routing.
- * DataTable component is generic and receives action handlers via onActionClick prop.
+ * DataTable component is generic. Action handlers are passed via column config (onActionClick in ColumnDef).
  */
 const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
@@ -309,10 +309,9 @@ const ParticipantsList: React.FC = () => {
             {/* Participants Table */}
             <DataTable
               data={filteredParticipants}
-              columns={getParticipantsColumns(activeStatus)}
+              columns={getParticipantsColumns(activeStatus, handleActionClick)}
               getRowKey={participant => participant.id}
               onRowClick={handleRowClick}
-              onActionClick={handleActionClick}
               isLoading={isLoading}
               emptyMessage={t('participants.noParticipantsFound')}
               loadingMessage={t('participants.loadingParticipants')}

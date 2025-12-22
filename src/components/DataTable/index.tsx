@@ -1,7 +1,7 @@
 /**
  * Generic DataTable Component
  * Refactored to be fully reusable: all screen-specific logic (navigation, modals) moved to consuming screens.
- * Actions are handled via onActionClick callback with configurable action keys.
+ * Actions are handled via column-specific onActionClick callback in column config, not as a generic table prop.
  */
 import React, { useState, useEffect } from 'react';
 import { Box, HStack, Text, Pressable, VStack } from '@ui';
@@ -10,25 +10,9 @@ import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
 import { DataTableProps, ColumnDef, PaginationConfig } from '@app-types/components';
-import { CustomMenu, MenuItemData } from '@components/ui/Menu';
-import { LucideIcon } from '@components/ui';
 import { usePlatform } from '@utils/platform';
 import PaginationControls from './PaginationControls';
 import { styles } from './Styles';
-
-
-/**
- * Shared custom trigger for actions menu
- */
-const getCustomTrigger = (triggerProps: any) => (
-  <Pressable {...triggerProps} {...styles.customTrigger}>
-    <LucideIcon
-      name="MoreVertical"
-      size={20}
-      color={theme.tokens.colors.textForeground}
-    />
-  </Pressable>
-);
 
 interface TableHeaderProps<T> {
   columns: ColumnDef<T>[];
@@ -112,9 +96,6 @@ interface TableRowProps<T> {
   item: T;
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
-  // Generic callback for handling table actions - passed to column render functions
-  // Allows columns (like actions column) to handle their own actions without DataTable needing special logic
-  onActionClick?: (item: T, actionKey?: string) => void;
   minWidth?: number; // Minimum width for horizontal scroll on mobile
   isLast?: boolean; // Whether this is the last row
 }
@@ -123,15 +104,10 @@ const TableRow = <T,>({
   item,
   columns,
   onRowClick,
-  onActionClick,
   minWidth,
   isLast = false,
 }: TableRowProps<T>) => {
   const { t } = useLanguage();
-  
-  const handleMenuSelect = (key: string) => {
-    onActionClick?.(item, key);
-  };
 
   return (
     <>
@@ -169,7 +145,7 @@ const TableRow = <T,>({
                     }
                   >
                     {column.render ? (
-                      column.render(item, onActionClick)
+                      column.render(item, column.onActionClick)
                     ) : (
                       <Text
                         {...TYPOGRAPHY.paragraph}
@@ -250,14 +226,12 @@ interface CardViewProps<T> {
   item: T;
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
-  onActionClick?: (item: T, actionKey?: string) => void;
 }
 
 const CardView = <T,>({
   item,
   columns,
   onRowClick,
-  onActionClick,
 }: CardViewProps<T>) => {
   const { t } = useLanguage();
   
@@ -292,9 +266,9 @@ const CardView = <T,>({
                             {t(col.label)}
                           </Text>
                         )}
-                        <Box>
-                          {col.render ? col.render(item, onActionClick) : <Text {...TYPOGRAPHY.paragraph}>{(item as any)[col.key]}</Text>}
-                        </Box>
+                      <Box>
+                        {col.render ? col.render(item, col.onActionClick) : <Text {...TYPOGRAPHY.paragraph}>{(item as any)[col.key]}</Text>}
+                      </Box>
                       </VStack>
                     );
                   })}
@@ -304,51 +278,52 @@ const CardView = <T,>({
 
             // Left + Right rows
             return (
-              <HStack key={rowIndex} {...styles.cardLeftRightRow}>
-                {[0, 1].map(pos => {
-                  const col = row[pos] as ColumnDef<T> | null;
-                  if (!col) return <Box key={pos} flex={1} />;
+              <HStack
+  {...styles.cardLeftRightRow}
+  justifyContent="space-between"
+>
+  {[0, 1].map(pos => {
+    const col = row[pos] as ColumnDef<T> | null;
+    if (!col) return <Box key={pos} flex={1} />;
 
-                  const mobileConfig = col.mobileConfig || {};
-                  const showLabel =
-                    mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
+    const isRightColumn = pos === 1;
+    const mobileConfig = col.mobileConfig || {};
+    const showLabel =
+      mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
 
-                  const isRightColumn = pos === 1;
+    return (
+      <VStack
+        key={col.key || pos}
+        flex={1}
+        space="xs"
+        alignItems={isRightColumn ? 'flex-end' : 'flex-start'}
+      >
+        {showLabel && (
+          <Text
+            {...TYPOGRAPHY.label}
+            fontSize="$xs"
+            textAlign={isRightColumn ? 'right' : 'left'}
+          >
+            {t(col.label)}
+          </Text>
+        )}
 
-                  return (
-                    <VStack
-                      key={col.key || pos}
-                      space="xs"
-                      alignItems={isRightColumn ? 'flex-end' : 'flex-start'}
-                      maxWidth="48%"
-                    >
-                      {showLabel && (
-                        <Text
-                          {...TYPOGRAPHY.label}
-                          color={theme.tokens.colors.mutedForeground}
-                          fontSize="$xs"
-                          textAlign={isRightColumn ? 'right' : 'left'}
-                        >
-                          {t(col.label)}
-                        </Text>
-                      )}
-
-                      <Box>
-                        {col.render ? (
-                          col.render(item, onActionClick)
-                        ) : (
-                          <Text
-                            {...TYPOGRAPHY.paragraph}
-                            textAlign={isRightColumn ? 'right' : 'left'}
-                          >
-                            {(item as any)[col.key]}
-                          </Text>
-                        )}
-                      </Box>
-                    </VStack>
-                  );
-                })}
-              </HStack>
+        <Box>
+          {col.render ? (
+            col.render(item, col.onActionClick)
+          ) : (
+            <Text
+              {...TYPOGRAPHY.paragraph}
+              textAlign={isRightColumn ? 'right' : 'left'}
+            >
+              {(item as any)[col.key]}
+            </Text>
+          )}
+        </Box>
+      </VStack>
+    );
+  })}
+</HStack>
 
             );
           })}
@@ -406,7 +381,6 @@ const DataTable = <T,>({
   data,
   columns,
   onRowClick,
-  onActionClick,
   isLoading = false,
   emptyMessage,
   loadingMessage,
@@ -476,7 +450,6 @@ const DataTable = <T,>({
               item={item}
               columns={columns}
               onRowClick={onRowClick}
-              onActionClick={onActionClick}
               minWidth={minTableWidth}
               isLast={index === paginatedData.length - 1}
             />
@@ -500,7 +473,6 @@ const DataTable = <T,>({
             item={item}
             columns={columns}
             onRowClick={onRowClick}
-            onActionClick={onActionClick}
           />
         ))
       )}

@@ -59,9 +59,11 @@ export interface ColumnDef<T> {
   label: string;
   flex?: number;
   width?: number;
-  // Render function receives item and optional onActionClick callback
+  // Render function receives item and optional onActionClick callback from column config
   // This allows columns (like actions column) to handle their own actions without DataTable needing special logic
   render?: (item: T, onActionClick?: (item: T, actionKey?: string) => void) => ReactNode;
+  // Column-specific action handler - only columns that need actions should define this
+  onActionClick?: (item: T, actionKey?: string) => void;
   align?: 'left' | 'center' | 'right';
   // Device-specific configuration
   mobileConfig?: MobileConfig; // Mobile-specific layout and visibility configuration
@@ -81,9 +83,6 @@ export interface DataTableProps<T> {
   data: T[];
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
-  // Generic callback for handling table actions (view-details, menu items, etc.)
-  // This allows DataTable to remain generic - screen-specific action handling is done by the consumer
-  onActionClick?: (item: T, actionKey?: string) => void;
   isLoading?: boolean;
   emptyMessage?: string;
   loadingMessage?: string;
