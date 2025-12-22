@@ -1,187 +1,114 @@
-import React, { useState, useEffect } from 'react';
-import { Box, HStack, Text, Pressable, VStack } from '@ui';
+/**
+ * DataTable Component
+ * 
+ * A generic, reusable table component that displays data in both table and card views.
+ * All calculations and business logic are handled in the parent component.
+ * Child components are pure presentational components that only render pre-computed data.
+ */
+
+import React, { useState, useEffect, useMemo, ReactNode } from 'react';
+import { Box, HStack, Text, Pressable, VStack, Card } from '@ui';
 import { ScrollView } from 'react-native';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useLanguage } from '@contexts/LanguageContext';
-import { DataTableProps, ColumnDef, PaginationConfig } from '@app-types/components';
+import { DataTableProps, ColumnDef } from '@app-types/components';
 import { usePlatform } from '@utils/platform';
 import PaginationControls from './PaginationControls';
 import { styles } from './Styles';
 
-interface TableHeaderProps<T> {
-  columns: ColumnDef<T>[];
-  minWidth?: number; // Minimum width for horizontal scroll on mobile
-  isMobile?: boolean; // Whether this is mobile view
+/**
+ * Pre-computed header column data for TableHeader component.
+ * All calculations (filtering, translation, showLabel) are done in parent DataTable.
+ */
+interface HeaderColumn {
+  key: string;
+  flex?: number;
+  width?: number;
+  align?: 'left' | 'center' | 'right';
+  label: string; // Pre-translated label
+  showLabel: boolean;
 }
 
-const TableHeader = <T,>({ columns, minWidth, isMobile = false }: TableHeaderProps<T>) => {
-  const { t } = useLanguage();
-
-  // Filter columns based on device-specific config
-  const visibleColumns = columns.filter(column => {
-    if (isMobile) {
-      // Mobile: mobileConfig.showColumn > default true
-      const mobileConfig = column.mobileConfig || {};
-      if (mobileConfig.showColumn !== undefined) {
-        return mobileConfig.showColumn;
-      }
-    } else {
-      // Desktop: desktopConfig.showColumn > default true
-      const desktopConfig = column.desktopConfig || {};
-      if (desktopConfig.showColumn !== undefined) {
-        return desktopConfig.showColumn;
-      }
-    }
-    // Default to true if not specified
-    return true;
-  });
-
-  return (
-    <HStack
-      {...styles.tableHeader}
-      minWidth={minWidth}
-    >
-      {visibleColumns.map(column => {
-        // Determine showLabel: device-specific config > default true
-        let showLabel = true;
-        if (isMobile) {
-          // Mobile: mobileConfig.showLabel > default true
-          if (column.mobileConfig?.showLabel !== undefined) {
-            showLabel = column.mobileConfig.showLabel;
-          }
-        } else {
-          // Desktop: desktopConfig.showLabel > default true
-          if (column.desktopConfig?.showLabel !== undefined) {
-            showLabel = column.desktopConfig.showLabel;
-          }
-        }
-
-        return (
-          <Box
-            key={column.key}
-            flex={column.flex}
-            width={column.width}
-            alignItems={
-              column.align === 'center'
-                ? 'center'
-                : column.align === 'right'
-                ? 'flex-end'
-                : 'flex-start'
-            }
-          >
-            {showLabel && (
-              <Text {...TYPOGRAPHY.label} color={theme.tokens.colors.foreground}>
-                {t(column.label)}
-              </Text>
-            )}
-          </Box>
-        );
-      })}
-    </HStack>
-  );
-};
-
-
+interface TableHeaderProps {
+  columns: HeaderColumn[];
+  minWidth?: number;
+}
 
 /**
- * Table Row Component
+ * Pre-computed table row column data for TableRow component.
+ * All column filtering and processing is done in parent DataTable.
  */
+interface TableRowColumn<T> {
+  key: string;
+  flex?: number;
+  width?: number;
+  align?: 'left' | 'center' | 'right';
+  render?: (item: T) => ReactNode; // Render function accesses onActionClick from column config via closure
+  defaultValue?: string;
+}
+
 interface TableRowProps<T> {
   item: T;
-  columns: ColumnDef<T>[];
+  columns: TableRowColumn<T>[];
   onRowClick?: (item: T) => void;
-  minWidth?: number; // Minimum width for horizontal scroll on mobile
-  isLast?: boolean; // Whether this is the last row
+  minWidth?: number;
+  isLast?: boolean;
 }
 
-const TableRow = <T,>({
-  item,
-  columns,
-  onRowClick,
-  minWidth,
-  isLast = false,
-}: TableRowProps<T>) => {
-  const { t } = useLanguage();
+interface CardLayoutRow<T> {
+  type: 'fullWidth' | 'leftRight';
+  columns: (CardColumn<T> | null)[];
+}
 
-  return (
-    <>
-      <Box position="relative">
-        <Pressable
-          onPress={() => onRowClick?.(item)}
-          $web-cursor={onRowClick ? 'pointer' : undefined}
-        >
-          <HStack
-            {...styles.tableRow}
-            borderBottomWidth={isLast ? styles.tableRowLast.borderBottomWidth : styles.tableRowNotLast.borderBottomWidth}
-            minWidth={minWidth}
-          >
-            {columns
-              .filter(column => {
-                // Filter columns for desktop: desktopConfig.showColumn > default true
-                const desktopConfig = column.desktopConfig || {};
-                if (desktopConfig.showColumn !== undefined) {
-                  return desktopConfig.showColumn;
-                }
-                return true; // Default to true if not specified
-              })
-              .map(column => {
-                return (
-                  <Box
-                    key={column.key}
-                    flex={column.flex}
-                    width={column.width}
-                    alignItems={
-                      column.align === 'center'
-                        ? 'center'
-                        : column.align === 'right'
-                        ? 'flex-end'
-                        : 'flex-start'
-                    }
-                  >
-                    {column.render ? (
-                      column.render(item, column.onActionClick)
-                    ) : (
-                      <Text
-                        {...TYPOGRAPHY.paragraph}
-                        color={theme.tokens.colors.mutedForeground}
-                      >
-                        {String((item as any)[column.key] ?? '')}
-                      </Text>
-                    )}
-                  </Box>
-                );
-              })}
-          </HStack>
-        </Pressable>
-      </Box>
-    </>
-  );
-};
+interface CardColumn<T> {
+  key: string;
+  label: string; // Pre-translated label
+  showLabel: boolean;
+  render?: (item: T) => ReactNode; // Render function accesses onActionClick from column config via closure
+  defaultValue?: string;
+  isRightColumn?: boolean;
+}
+
+interface CardViewProps<T> {
+  item: T;
+  layout: CardLayoutRow<T>[];
+  onRowClick?: (item: T) => void;
+}
+
+interface EmptyStateProps {
+  message: string; // Pre-translated message
+}
+
+interface LoadingStateProps {
+  message: string; // Pre-translated message
+}
+
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
 
 /**
- * Prepare Final Layout Function
- * Categorizes and sorts columns by leftRank, rightRank, and fullWidthRank
+ * Prepares card layout for mobile view by categorizing and organizing columns.
+ * Pure function that can be used outside the component.
  */
-function prepareFinalLayout<T>(columns: ColumnDef<T>[]): Array<Array<ColumnDef<T> | null> | ColumnDef<T>[]> {
+function prepareCardLayout<T>(
+  columns: ColumnDef<T>[],
+  translate: (key: string) => string
+): CardLayoutRow<T>[] {
   const left: ColumnDef<T>[] = [];
   const right: ColumnDef<T>[] = [];
   const full: ColumnDef<T>[] = [];
 
   // Filter columns that should be shown on mobile
   const visibleColumns = columns.filter(col => {
-    // Mobile: mobileConfig.showColumn > default true
     const mobileConfig = col.mobileConfig || {};
-    if (mobileConfig.showColumn !== undefined) {
-      return mobileConfig.showColumn;
-    }
-    return true; // Default to true if not specified
+    return mobileConfig.showColumn !== undefined ? mobileConfig.showColumn : true;
   });
 
   // Categorize columns based on priority: fullWidthRank > leftRank > rightRank
   visibleColumns.forEach(col => {
     const c = col.mobileConfig || {};
-
     if (c.fullWidthRank !== undefined) {
       full.push(col);
     } else if (c.leftRank !== undefined) {
@@ -196,180 +123,310 @@ function prepareFinalLayout<T>(columns: ColumnDef<T>[]): Array<Array<ColumnDef<T
   right.sort((a, b) => (a.mobileConfig?.rightRank || 0) - (b.mobileConfig?.rightRank || 0));
   full.sort((a, b) => (a.mobileConfig?.fullWidthRank || 0) - (b.mobileConfig?.fullWidthRank || 0));
 
-  // Create horizontal rows (left + right pairs)
-  const rows: Array<Array<ColumnDef<T> | null>> = [];
-  const maxRows = Math.max(left.length, right.length);
+  const rows: CardLayoutRow<T>[] = [];
 
+  // Create horizontal rows (left + right pairs)
+  const maxRows = Math.max(left.length, right.length);
   for (let i = 0; i < maxRows; i++) {
-    rows.push([left[i] || null, right[i] || null]);
+    const leftCol = left[i];
+    const rightCol = right[i];
+    
+    const cardColumns: (CardColumn<T> | null)[] = [];
+    if (leftCol) {
+      const mobileConfig = leftCol.mobileConfig || {};
+      const showLabel = mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
+      // Wrap render function to capture onActionClick from column config
+      const renderWrapper = leftCol.render && leftCol.onActionClick
+        ? (item: T) => leftCol.render!(item, leftCol.onActionClick)
+        : leftCol.render;
+      cardColumns.push({
+        key: leftCol.key,
+        label: translate(leftCol.label),
+        showLabel,
+        render: renderWrapper,
+        isRightColumn: false,
+      });
+    } else {
+      cardColumns.push(null);
+    }
+    
+    if (rightCol) {
+      const mobileConfig = rightCol.mobileConfig || {};
+      const showLabel = mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
+      // Wrap render function to capture onActionClick from column config
+      const renderWrapper = rightCol.render && rightCol.onActionClick
+        ? (item: T) => rightCol.render!(item, rightCol.onActionClick)
+        : rightCol.render;
+      cardColumns.push({
+        key: rightCol.key,
+        label: translate(rightCol.label),
+        showLabel,
+        render: renderWrapper,
+        isRightColumn: true,
+      });
+    } else {
+      cardColumns.push(null);
+    }
+    
+    rows.push({
+      type: 'leftRight',
+      columns: cardColumns,
+    });
   }
 
   // Add full-width fields at the end
   if (full.length > 0) {
-    rows.push(full);
+    const fullWidthColumns: CardColumn<T>[] = full.map(col => {
+      const mobileConfig = col.mobileConfig || {};
+      const showLabel = mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
+      // Wrap render function to capture onActionClick from column config
+      const renderWrapper = col.render && col.onActionClick
+        ? (item: T) => col.render!(item, col.onActionClick)
+        : col.render;
+      return {
+        key: col.key,
+        label: translate(col.label),
+        showLabel,
+        render: renderWrapper,
+      };
+    });
+    rows.push({
+      type: 'fullWidth',
+      columns: fullWidthColumns,
+    });
   }
 
   return rows;
 }
 
+// ============================================================================
+// CHILD COMPONENTS - Pure Presentational Components
+// ============================================================================
+
 /**
- * Card View Component for Mobile
- * Renders data in card format with left-right pairing and full-width fields
- * View Details and Actions menu always remain at the bottom
+ * TableHeader Component
+ * Pure presentational component that renders pre-computed column headers.
  */
-interface CardViewProps<T> {
-  item: T;
-  columns: ColumnDef<T>[];
-  onRowClick?: (item: T) => void;
-}
-
-const CardView = <T,>({
-  item,
-  columns,
-  onRowClick,
-}: CardViewProps<T>) => {
-  const { t } = useLanguage();
-  
-  const layout = prepareFinalLayout(columns);
-
+const TableHeader = ({ columns, minWidth }: TableHeaderProps) => {
   return (
-    <>
-      <Box {...styles.cardContainer}>
-        <VStack {...styles.cardContent}>
-          {/* Render layout rows */}
-          {layout.map((row, rowIndex) => {
-            // Full width rows
-            if (Array.isArray(row) && row.length > 0 && row[0] && (row[0] as ColumnDef<T>).mobileConfig?.fullWidthRank !== undefined) {
-              return (
-                <VStack key={rowIndex} {...styles.cardFullWidthRow}>
-                  {row.map((col, colIndex) => {
-                    if (!col) return null;
-                    const mobileConfig = col.mobileConfig || {};
-                    // Use mobileConfig.showLabel if specified, otherwise default to true
-                    const showLabel = mobileConfig.showLabel !== undefined 
-                      ? mobileConfig.showLabel 
-                      : true;
-
-                    return (
-                      <VStack key={col.key || colIndex} {...styles.cardColumn}>
-                        {showLabel && (
-                          <Text
-                            {...TYPOGRAPHY.label}
-                            color={theme.tokens.colors.mutedForeground}
-                            fontSize="$xs"
-                          >
-                            {t(col.label)}
-                          </Text>
-                        )}
-                      <Box>
-                        {col.render ? col.render(item, col.onActionClick) : <Text {...TYPOGRAPHY.paragraph}>{(item as any)[col.key]}</Text>}
-                      </Box>
-                      </VStack>
-                    );
-                  })}
-                </VStack>
-              );
-            }
-
-            // Left + Right rows
-            return (
-              <HStack
-  {...styles.cardLeftRightRow}
-  justifyContent="space-between"
->
-  {[0, 1].map(pos => {
-    const col = row[pos] as ColumnDef<T> | null;
-    if (!col) return <Box key={pos} flex={1} />;
-
-    const isRightColumn = pos === 1;
-    const mobileConfig = col.mobileConfig || {};
-    const showLabel =
-      mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
-
-    return (
-      <VStack
-        key={col.key || pos}
-        flex={1}
-        space="xs"
-        alignItems={isRightColumn ? 'flex-end' : 'flex-start'}
-      >
-        {showLabel && (
-          <Text
-            {...TYPOGRAPHY.label}
-            fontSize="$xs"
-          >
-            {t(col.label)}
-          </Text>
-        )}
-
-        <Box>
-          {col.render ? (
-            col.render(item, col.onActionClick)
-          ) : (
-            <Text
-              {...TYPOGRAPHY.paragraph}
-            >
-              {(item as any)[col.key]}
+    <HStack
+      {...styles.tableHeader}
+      minWidth={minWidth}
+    >
+      {columns.map(column => (
+        <Box
+          key={column.key}
+          flex={column.flex}
+          width={column.width}
+          alignItems={
+            column.align === 'center'
+              ? 'center'
+              : column.align === 'right'
+              ? 'flex-end'
+              : 'flex-start'
+          }
+        >
+          {column.showLabel && (
+            <Text {...TYPOGRAPHY.label} color={theme.tokens.colors.foreground}>
+              {column.label}
             </Text>
           )}
         </Box>
-      </VStack>
-    );
-  })}
-</HStack>
-
-            );
-          })}
-        </VStack>
-      </Box>
-    </>
+      ))}
+    </HStack>
   );
 };
 
 /**
- * Empty State Component
+ * TableRow Component
+ * Pure presentational component that renders a single table row with pre-computed columns.
  */
-interface EmptyStateProps {
-  message?: string;
-}
+const TableRow = <T,>({
+  item,
+  columns,
+  onRowClick,
+  minWidth,
+  isLast = false,
+}: TableRowProps<T>) => {
+  return (
+    <Box position="relative">
+      <Pressable
+        onPress={() => onRowClick?.(item)}
+        $web-cursor={onRowClick ? 'pointer' : undefined}
+      >
+        <HStack
+          {...styles.tableRow}
+          borderBottomWidth={isLast ? styles.tableRowLast.borderBottomWidth : styles.tableRowNotLast.borderBottomWidth}
+          minWidth={minWidth}
+        >
+          {columns.map(column => (
+            <Box
+              key={column.key}
+              flex={column.flex}
+              width={column.width}
+              alignItems={
+                column.align === 'center'
+                  ? 'center'
+                  : column.align === 'right'
+                  ? 'flex-end'
+                  : 'flex-start'
+              }
+            >
+              {column.render ? (
+                column.render(item)
+              ) : (
+                <Text
+                  {...TYPOGRAPHY.paragraph}
+                  color={theme.tokens.colors.mutedForeground}
+                >
+                  {column.defaultValue ?? String((item as any)[column.key] ?? '')}
+                </Text>
+              )}
+            </Box>
+          ))}
+        </HStack>
+      </Pressable>
+    </Box>
+  );
+};
 
-const EmptyState: React.FC<EmptyStateProps> = ({ message }) => {
-  const { t } = useLanguage();
+/**
+ * CardView Component
+ * Pure presentational component that renders data in card format for mobile view.
+ * Layout is pre-computed in parent DataTable.
+ */
+const CardView = <T,>({
+  item,
+  layout,
+  onRowClick,
+}: CardViewProps<T>) => {
+  return (
+    <Pressable onPress={() => onRowClick?.(item)}>
+      <Card {...styles.cardContainer}>
+        <VStack {...styles.cardContent}>
+        {layout.map((row, rowIndex) => {
+          // Full width rows
+          if (row.type === 'fullWidth') {
+            return (
+              <VStack key={rowIndex} {...styles.cardFullWidthRow}>
+                {row.columns.map((col, colIndex) => {
+                  if (!col) return null;
+                  return (
+                    <VStack key={col.key || colIndex} {...styles.cardColumn}>
+                      {col.showLabel && (
+                        <Text
+                          {...TYPOGRAPHY.label}
+                          color={theme.tokens.colors.mutedForeground}
+                          fontSize="$xs"
+                        >
+                          {col.label}
+                        </Text>
+                      )}
+                      <Box>
+                        {col.render ? (
+                          col.render(item)
+                        ) : (
+                          <Text {...TYPOGRAPHY.paragraph}>
+                            {col.defaultValue ?? String((item as any)[col.key] ?? '')}
+                          </Text>
+                        )}
+                      </Box>
+                    </VStack>
+                  );
+                })}
+              </VStack>
+            );
+          }
 
+          // Left + Right rows
+          return (
+            <HStack
+              key={rowIndex}
+              {...styles.cardLeftRightRow}
+              justifyContent="space-between"
+            >
+              {row.columns.map((col, pos) => {
+                if (!col) return <Box key={pos} flex={1} />;
+                return (
+                  <VStack
+                    key={col.key || pos}
+                    flex={1}
+                    space="xs"
+                    alignItems={col.isRightColumn ? 'flex-end' : 'flex-start'}
+                  >
+                    {col.showLabel && (
+                      <Text
+                        {...TYPOGRAPHY.label}
+                        fontSize="$xs"
+                      >
+                        {col.label}
+                      </Text>
+                    )}
+                    <Box>
+                      {col.render ? (
+                        col.render(item)
+                      ) : (
+                        <Text {...TYPOGRAPHY.paragraph}>
+                          {col.defaultValue ?? String((item as any)[col.key] ?? '')}
+                        </Text>
+                      )}
+                    </Box>
+                  </VStack>
+                );
+              })}
+            </HStack>
+          );
+        })}
+      </VStack>
+    </Card>
+    </Pressable>
+  );
+};
+
+/**
+ * EmptyState Component
+ * Pure presentational component that displays empty state message.
+ */
+const EmptyState = ({ message }: EmptyStateProps) => {
   return (
     <Box {...styles.emptyState}>
       <Text
         {...TYPOGRAPHY.paragraph}
         color={theme.tokens.colors.mutedForeground}
       >
-        {message ? t(message) : t('common.noDataFound')}
+        {message}
       </Text>
     </Box>
   );
 };
 
 /**
- * Loading State Component
+ * LoadingState Component
+ * Pure presentational component that displays loading message.
  */
-interface LoadingStateProps {
-  message?: string;
-}
-
-const LoadingState: React.FC<LoadingStateProps> = ({ message }) => {
-  const { t } = useLanguage();
-
+const LoadingState = ({ message }: LoadingStateProps) => {
   return (
     <Box {...styles.loadingState}>
       <Text
         {...TYPOGRAPHY.paragraph}
         color={theme.tokens.colors.mutedForeground}
       >
-        {message || t('common.loading')}
+        {message}
       </Text>
     </Box>
   );
 };
 
+// ============================================================================
+// MAIN COMPONENT - DataTable
+// ============================================================================
+
+/**
+ * DataTable Component
+ * 
+ * Main component that handles all business logic, calculations, and data processing.
+ * Child components are pure presentational and only receive pre-computed props.
+ */
 const DataTable = <T,>({
   data,
   columns,
@@ -380,21 +437,48 @@ const DataTable = <T,>({
   getRowKey,
   pagination,
   onPageChange,
-  responsive = true, // Default to true
+  responsive = true,
 }: DataTableProps<T>) => {
+  // ========================================================================
+  // HOOKS & INITIAL STATE
+  // ========================================================================
   const { isMobile } = usePlatform();
+  const { t } = useLanguage();
   
-  // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(() => Math.max(1, pagination?.pageSize ?? 10));
+  const [isPaginationEnabled, setIsPaginationEnabled] = useState(pagination?.enabled ?? false);
+
+  // Sync pagination enabled state from props
+  useEffect(() => {
+    setIsPaginationEnabled(pagination?.enabled ?? false);
+  }, [pagination?.enabled]);
+
+  // ========================================================================
+  // PAGINATION LOGIC
+  // ========================================================================
   
-  // Calculate pagination values with validation
-  const isPaginationEnabled = pagination?.enabled ?? false;
-  const safePageSize = Math.max(1, pageSize);
-  const totalPages = isPaginationEnabled ? Math.max(1, Math.ceil(data.length / safePageSize)) : 1;
-  const startIndex = isPaginationEnabled ? (currentPage - 1) * safePageSize : 0;
-  const endIndex = isPaginationEnabled ? startIndex + safePageSize : data.length;
-  const paginatedData = isPaginationEnabled ? data.slice(startIndex, endIndex) : data;
+  // Optimized pagination calculations - memoized to prevent recalculation on every render
+  const paginationConfig = useMemo(() => {
+    const safePageSize = Math.max(1, pageSize);
+    const totalPages = isPaginationEnabled 
+      ? Math.max(1, Math.ceil(data.length / safePageSize))
+      : 1;
+    const startIndex = isPaginationEnabled ? (currentPage - 1) * safePageSize : 0;
+    const endIndex = isPaginationEnabled ? startIndex + safePageSize : data.length;
+    const paginatedData = isPaginationEnabled 
+      ? data.slice(startIndex, endIndex)
+      : data;
+    
+    return {
+      isEnabled: isPaginationEnabled,
+      safePageSize,
+      totalPages,
+      startIndex,
+      endIndex,
+      paginatedData,
+    };
+  }, [isPaginationEnabled, pageSize, data.length, currentPage, data]);
   
   // Sync pageSize from props and reset to page 1 when data changes
   useEffect(() => {
@@ -404,11 +488,11 @@ const DataTable = <T,>({
       setPageSize(Math.max(1, pagination.pageSize));
       setCurrentPage(1);
     }
-  }, [isPaginationEnabled, pagination?.pageSize]);
+  }, [isPaginationEnabled, pagination?.pageSize, pageSize]);
   
   // Handle page change
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= totalPages) {
+    if (newPage >= 1 && newPage <= paginationConfig.totalPages) {
       setCurrentPage(newPage);
       onPageChange?.(newPage);
     }
@@ -420,34 +504,104 @@ const DataTable = <T,>({
     setPageSize(newPageSize);
     setCurrentPage(1); // Reset to first page
   };
-  
-  // Calculate minimum width for horizontal scroll on mobile (only when responsive is disabled)
-  const minTableWidth = isMobile && !responsive ? 800 : undefined;
 
-  // Determine if we should show card view
+  // ========================================================================
+  // COLUMN PROCESSING & LAYOUT PREPARATION
+  // ========================================================================
+
+  // Filter columns visible on desktop (reusable logic)
+  const visibleDesktopColumns = useMemo(() => {
+    return columns.filter(column => {
+      const desktopConfig = column.desktopConfig || {};
+      return desktopConfig.showColumn !== undefined ? desktopConfig.showColumn : true;
+    });
+  }, [columns]);
+
+  // Prepare header columns for desktop view
+  const headerColumns: HeaderColumn[] = useMemo(() => {
+    return visibleDesktopColumns.map(column => ({
+      key: column.key,
+      flex: column.flex,
+      width: column.width,
+      align: column.align,
+      label: t(column.label),
+      showLabel: column.desktopConfig?.showLabel ?? true,
+    }));
+  }, [visibleDesktopColumns, t]);
+
+  // Prepare table row columns for desktop view
+  const tableRowColumns: TableRowColumn<T>[] = useMemo(() => {
+    return visibleDesktopColumns.map(column => {
+      // Create a wrapper render function that captures onActionClick from column config
+      const renderWrapper = column.render && column.onActionClick
+        ? (item: T) => column.render!(item, column.onActionClick)
+        : column.render;
+      
+      return {
+        key: column.key,
+        flex: column.flex,
+        width: column.width,
+        align: column.align,
+        render: renderWrapper,
+      };
+    });
+  }, [visibleDesktopColumns]);
+
+  // Prepare card layout for mobile view
+  const cardLayout = useMemo(
+    () => prepareCardLayout(columns, t),
+    [columns, t]
+  );
+
+  // ========================================================================
+  // TRANSLATIONS & MESSAGES
+  // ========================================================================
+
+  const emptyStateMessage = useMemo(() => {
+    return emptyMessage ? t(emptyMessage) : t('common.noDataFound');
+  }, [emptyMessage, t]);
+
+  const loadingStateMessage = useMemo(() => {
+    return loadingMessage || t('common.loading');
+  }, [loadingMessage, t]);
+
+  // ========================================================================
+  // VIEW CONFIGURATION
+  // ========================================================================
+
+  const minTableWidth = isMobile && !responsive ? 800 : undefined;
   const shouldShowCardView = responsive && isMobile;
+
+  // ========================================================================
+  // RENDER
+  // ========================================================================
+
+  // Common data rendering logic - handles loading, empty, and data states
+  const renderDataContent = (renderItem: (item: T, index: number) => ReactNode) => {
+    if (isLoading) {
+      return <LoadingState message={loadingStateMessage} />;
+    }
+    if (paginationConfig.paginatedData.length === 0) {
+      return <EmptyState message={emptyStateMessage} />;
+    }
+    return paginationConfig.paginatedData.map((item, index) => renderItem(item, index));
+  };
 
   // Table content for desktop or when responsive is disabled
   const tableContent = (
     <VStack {...styles.tableContentContainer} minWidth={minTableWidth}>
-      <TableHeader columns={columns} minWidth={minTableWidth} isMobile={false} />
+      <TableHeader columns={headerColumns} minWidth={minTableWidth} />
       <Box>
-        {isLoading ? (
-          <LoadingState message={loadingMessage} />
-        ) : paginatedData.length === 0 ? (
-          <EmptyState message={emptyMessage} />
-        ) : (
-          paginatedData.map((item, index) => (
-            <TableRow
-              key={getRowKey(item)}
-              item={item}
-              columns={columns}
-              onRowClick={onRowClick}
-              minWidth={minTableWidth}
-              isLast={index === paginatedData.length - 1}
-            />
-          ))
-        )}
+        {renderDataContent((item, index) => (
+          <TableRow
+            key={getRowKey(item)}
+            item={item}
+            columns={tableRowColumns}
+            onRowClick={onRowClick}
+            minWidth={minTableWidth}
+            isLast={index === paginationConfig.paginatedData.length - 1}
+          />
+        ))}
       </Box>
     </VStack>
   );
@@ -455,20 +609,14 @@ const DataTable = <T,>({
   // Card view content for mobile when responsive is enabled
   const cardContent = (
     <VStack {...styles.cardContentContainer}>
-      {isLoading ? (
-        <LoadingState message={loadingMessage} />
-      ) : paginatedData.length === 0 ? (
-        <EmptyState message={emptyMessage} />
-      ) : (
-        paginatedData.map((item) => (
-          <CardView
-            key={getRowKey(item)}
-            item={item}
-            columns={columns}
-            onRowClick={onRowClick}
-          />
-        ))
-      )}
+      {renderDataContent((item) => (
+        <CardView
+          key={getRowKey(item)}
+          item={item}
+          layout={cardLayout}
+          onRowClick={onRowClick}
+        />
+      ))}
     </VStack>
   );
 
@@ -493,14 +641,14 @@ const DataTable = <T,>({
           tableContent
         )}
       </Box>
-      {isPaginationEnabled && totalPages > 1 && pagination && (
+      {paginationConfig.isEnabled && paginationConfig.totalPages > 1 && pagination && (
         <PaginationControls
           currentPage={currentPage}
-          totalPages={totalPages}
-          pageSize={pageSize}
+          totalPages={paginationConfig.totalPages}
+          pageSize={paginationConfig.safePageSize}
           totalItems={data.length}
-          startIndex={startIndex}
-          endIndex={endIndex}
+          startIndex={paginationConfig.startIndex}
+          endIndex={paginationConfig.endIndex}
           onPageChange={handlePageChange}
           onPageSizeChange={handlePageSizeChange}
           config={pagination}
@@ -511,5 +659,3 @@ const DataTable = <T,>({
 };
 
 export default DataTable;
-
-// Re-export constants for convenience
