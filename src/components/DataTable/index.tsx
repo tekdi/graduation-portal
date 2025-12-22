@@ -1,9 +1,6 @@
 /**
  * DataTable Component
- * 
- * A generic, reusable table component that displays data in both table and card views.
- * All calculations and business logic are handled in the parent component.
- * Child components are pure presentational components that only render pre-computed data.
+
  */
 
 import React, { useState, useEffect, useMemo, ReactNode } from 'react';
