@@ -292,7 +292,7 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
       </Text>
     ),
     mobileConfig: {
-      rightRank: 2, // Below ID
+      leftRank: 3, // Below ID
       showLabel: false, // Hide label on mobile
     },
   },
