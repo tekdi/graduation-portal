@@ -43,12 +43,12 @@ const DropoutModal: React.FC<DropoutModalProps> = ({
       confirmButtonText={t('actions.confirmDropout') || 'Confirm Dropout'}
       onCancel={onClose}
       onConfirm={() => onConfirm(dropoutReason)}
-      confirmButtonColor={theme.tokens.colors.error.light}
+      confirmButtonColor="$error500"
     >
       <VStack space="lg">
         <Text
           {...TYPOGRAPHY.paragraph}
-          color={theme.tokens.colors.textSecondary}
+          color="$textSecondary"
           lineHeight="$xl"
         >
           {t('actions.dropoutMessage', { name: itemName }) ||
@@ -58,16 +58,16 @@ const DropoutModal: React.FC<DropoutModalProps> = ({
         <VStack space="sm">
           <Text
             {...TYPOGRAPHY.label}
-            color={theme.tokens.colors.textPrimary}
+            color="$textPrimary"
             fontWeight="$medium"
           >
             {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
           </Text>
           <Input
             {...styles.modalInput}
-            borderColor={theme.tokens.colors.inputBorder}
-            bg={theme.tokens.colors.modalBackground}
-            $focus-borderColor={theme.tokens.colors.inputFocusBorder}
+            borderColor="$inputBorder"
+            bg="$modalBackground"
+            $focus-borderColor="$inputFocusBorder"
             $focus-borderWidth={2}
           >
             <InputField
@@ -77,12 +77,12 @@ const DropoutModal: React.FC<DropoutModalProps> = ({
               value={dropoutReason}
               onChangeText={onReasonChange}
               {...styles.modalInputField}
-              placeholderTextColor={theme.tokens.colors.textMuted}
+              placeholderTextColor="$textMutedForeground"  
             />
           </Input>
           <Text
             {...TYPOGRAPHY.bodySmall}
-            color={theme.tokens.colors.textSecondary}
+            color="$textSecondary"
             lineHeight="$sm"
           >
             {t('actions.dropoutHint') ||

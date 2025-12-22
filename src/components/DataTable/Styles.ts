@@ -19,15 +19,6 @@ export const styles = {
     bg: '$white' as const,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
-    // Desktop / larger screens: fall back to simple icon button
-    $md: {
-      paddingHorizontal: '$2' as const,
-      height: 'auto' as const,
-      borderWidth: 0,
-      borderColor: 'transparent' as const,
-      bg: 'transparent' as const,
-      borderRadius: '$sm' as const,
-    },
     $web: {
       cursor: 'pointer' as const,
     },
@@ -84,16 +75,6 @@ export const styles = {
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
     height: '$8' as const,
-    // Desktop / larger screens: keep it more compact and less pill-like
-    $md: {
-      paddingHorizontal: '$3' as const,
-      paddingVertical: '$2' as const,
-      borderRadius: '$sm' as const,
-      bg: 'transparent' as const,
-      borderWidth: 0,
-      borderColor: 'transparent' as const,
-      height: 'auto' as const,
-    },
     $web: {
       cursor: 'pointer' as const,
     },

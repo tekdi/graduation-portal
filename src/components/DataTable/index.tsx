@@ -44,7 +44,7 @@ interface TableRowColumn<T> {
   flex?: number;
   width?: number;
   align?: 'left' | 'center' | 'right';
-  render?: (item: T) => ReactNode; // Render function accesses onActionClick from column config via closure
+  render?: (item: T) => ReactNode;
   defaultValue?: string;
 }
 
@@ -65,7 +65,7 @@ interface CardColumn<T> {
   key: string;
   label: string; // Pre-translated label
   showLabel: boolean;
-  render?: (item: T) => ReactNode; // Render function accesses onActionClick from column config via closure
+  render?: (item: T) => ReactNode;
   defaultValue?: string;
   isRightColumn?: boolean;
 }
@@ -135,15 +135,11 @@ function prepareCardLayout<T>(
     if (leftCol) {
       const mobileConfig = leftCol.mobileConfig || {};
       const showLabel = mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
-      // Wrap render function to capture onActionClick from column config
-      const renderWrapper = leftCol.render && leftCol.onActionClick
-        ? (item: T) => leftCol.render!(item, leftCol.onActionClick)
-        : leftCol.render;
       cardColumns.push({
         key: leftCol.key,
         label: translate(leftCol.label),
         showLabel,
-        render: renderWrapper,
+        render: leftCol.render,
         isRightColumn: false,
       });
     } else {
@@ -153,15 +149,11 @@ function prepareCardLayout<T>(
     if (rightCol) {
       const mobileConfig = rightCol.mobileConfig || {};
       const showLabel = mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
-      // Wrap render function to capture onActionClick from column config
-      const renderWrapper = rightCol.render && rightCol.onActionClick
-        ? (item: T) => rightCol.render!(item, rightCol.onActionClick)
-        : rightCol.render;
       cardColumns.push({
         key: rightCol.key,
         label: translate(rightCol.label),
         showLabel,
-        render: renderWrapper,
+        render: rightCol.render,
         isRightColumn: true,
       });
     } else {
@@ -179,15 +171,11 @@ function prepareCardLayout<T>(
     const fullWidthColumns: CardColumn<T>[] = full.map(col => {
       const mobileConfig = col.mobileConfig || {};
       const showLabel = mobileConfig.showLabel !== undefined ? mobileConfig.showLabel : true;
-      // Wrap render function to capture onActionClick from column config
-      const renderWrapper = col.render && col.onActionClick
-        ? (item: T) => col.render!(item, col.onActionClick)
-        : col.render;
       return {
         key: col.key,
         label: translate(col.label),
         showLabel,
-        render: renderWrapper,
+        render: col.render,
       };
     });
     rows.push({
@@ -227,7 +215,7 @@ const TableHeader = ({ columns, minWidth }: TableHeaderProps) => {
           }
         >
           {column.showLabel && (
-            <Text {...TYPOGRAPHY.label} color={theme.tokens.colors.foreground}>
+            <Text {...TYPOGRAPHY.label} color="$textForeground">
               {column.label}
             </Text>
           )}
@@ -277,7 +265,7 @@ const TableRow = <T,>({
               ) : (
                 <Text
                   {...TYPOGRAPHY.paragraph}
-                  color={theme.tokens.colors.mutedForeground}
+                  color="$textMuted"
                 >
                   {column.defaultValue ?? String((item as any)[column.key] ?? '')}
                 </Text>
@@ -316,7 +304,7 @@ const CardView = <T,>({
                       {col.showLabel && (
                         <Text
                           {...TYPOGRAPHY.label}
-                          color={theme.tokens.colors.mutedForeground}
+                          color="$textMuted"
                           fontSize="$xs"
                         >
                           {col.label}
@@ -392,7 +380,7 @@ const EmptyState = ({ message }: EmptyStateProps) => {
     <Box {...styles.emptyState}>
       <Text
         {...TYPOGRAPHY.paragraph}
-        color={theme.tokens.colors.mutedForeground}
+        color="$textMuted"
       >
         {message}
       </Text>
@@ -409,7 +397,7 @@ const LoadingState = ({ message }: LoadingStateProps) => {
     <Box {...styles.loadingState}>
       <Text
         {...TYPOGRAPHY.paragraph}
-        color={theme.tokens.colors.mutedForeground}
+        color="$textMuted"
       >
         {message}
       </Text>
@@ -531,20 +519,13 @@ const DataTable = <T,>({
 
   // Prepare table row columns for desktop view
   const tableRowColumns: TableRowColumn<T>[] = useMemo(() => {
-    return visibleDesktopColumns.map(column => {
-      // Create a wrapper render function that captures onActionClick from column config
-      const renderWrapper = column.render && column.onActionClick
-        ? (item: T) => column.render!(item, column.onActionClick)
-        : column.render;
-      
-      return {
-        key: column.key,
-        flex: column.flex,
-        width: column.width,
-        align: column.align,
-        render: renderWrapper,
-      };
-    });
+    return visibleDesktopColumns.map(column => ({
+      key: column.key,
+      flex: column.flex,
+      width: column.width,
+      align: column.align,
+      render: column.render,
+    }));
   }, [visibleDesktopColumns]);
 
   // Prepare card layout for mobile view
@@ -623,7 +604,7 @@ const DataTable = <T,>({
   return (
     <Box {...styles.mainContainer}>
       <Box
-        bg={theme.tokens.colors.backgroundPrimary.light}
+        bg={theme.tokens.colors.backgroundPrimary.light}  
         {...styles.tableWrapper}
         {...(!isMobile ? styles.tableWrapperWeb : {})}
         overflow={shouldShowCardView ? 'hidden' : isMobile ? 'hidden' : 'visible'}

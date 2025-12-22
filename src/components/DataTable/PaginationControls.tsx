@@ -72,7 +72,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
       <HStack {...styles.paginationMainRow} $md-justifyContent="space-between">
         {/* Left Side: Page Info and Page Size Selector */}
         <HStack {...styles.paginationLeftSide}>
-          <Text {...TYPOGRAPHY.bodySmall} color={theme.tokens.colors.mutedForeground}>
+          <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForegroundForeground">
             {t('table.showing', {
               start: startIndex + 1,
               end: Math.min(endIndex, totalItems),
@@ -83,7 +83,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
           {/* Page Size Selector (if enabled) */}
           {config.showPageSizeSelector && onPageSizeChange && (
             <HStack {...styles.paginationPageSizeContainer}>
-              <Text {...TYPOGRAPHY.bodySmall} color={theme.tokens.colors.mutedForeground}>
+              <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
                 {t('table.itemsPerPage')}:
               </Text>
               <Box {...styles.paginationPageSizeSelect}>
@@ -112,7 +112,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
           <LucideIcon
             name="ChevronsLeft"
             size={20}
-            color={currentPage === 1 ? theme.tokens.colors.mutedForeground : theme.tokens.colors.foreground}
+            color={currentPage === 1 ? "" : theme.tokens.colors.foreground}
           />
         </Pressable>
         
@@ -136,7 +136,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
             {getPageNumbers().map((page, index) => {
               if (page === '...') {
                 return (
-                  <Text key={`ellipsis-${index}`} {...styles.paginationEllipsis} color={theme.tokens.colors.mutedForeground}>
+                  <Text key={`ellipsis-${index}`} {...styles.paginationEllipsis} color="$textMutedForeground"> 
                     ...
                   </Text>
                 );
@@ -154,7 +154,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
                 >
                   <Text
                     {...TYPOGRAPHY.bodySmall}
-                    color={isActive ? '$white' : theme.tokens.colors.foreground}
+                    color={isActive ? '$white' : "$textForeground"}
                     fontWeight={isActive ? '$semibold' : '$normal'}
                   >
                     {pageNum}
@@ -199,4 +199,3 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
 };
 
 export default PaginationControls;
-

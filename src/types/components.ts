@@ -51,19 +51,14 @@ export interface DesktopConfig {
 
 /**
  * Column definition for DataTable
- * Refactored to be fully generic: render function receives onActionClick callback, allowing columns to handle their own actions.
- * Removed screen-specific config (menuItems, viewDetailsActionKey) - all column-specific logic is now in the render function.
+ * Generic column configuration for table display
  */
 export interface ColumnDef<T> {
   key: string;
   label: string;
   flex?: number;
   width?: number;
-  // Render function receives item and optional onActionClick callback from column config
-  // This allows columns (like actions column) to handle their own actions without DataTable needing special logic
-  render?: (item: T, onActionClick?: (item: T, actionKey?: string) => void) => ReactNode;
-  // Column-specific action handler - only columns that need actions should define this
-  onActionClick?: (item: T, actionKey?: string) => void;
+  render?: (item: T) => ReactNode;
   align?: 'left' | 'center' | 'right';
   // Device-specific configuration
   mobileConfig?: MobileConfig; // Mobile-specific layout and visibility configuration

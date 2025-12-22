@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Text } from '@ui';
+import { Badge, BadgeText } from '@ui';
 import { STATUS } from '@constants/app.constant';
 import { styles } from './Styles';
 
@@ -70,18 +70,18 @@ export const StatusBadge: React.FC<{ status?: string }> = ({ status }) => {
   const colors = getStatusColors(status);
   
   return (
-    <Box
+    <Badge
       {...styles.statusBadgeBox}
       bg={colors.bg}
       borderColor={colors.border}
     >
-      <Text
+      <BadgeText
         {...styles.statusBadgeText}
         color={colors.text}
       >
         {status}
-      </Text>
-    </Box>
+      </BadgeText>
+    </Badge>
   );
 };
 

@@ -24,12 +24,10 @@ import { STATUS } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
 import { applyFilters } from '@utils/helper';
 import { styles } from './Styles';
-import DropoutModal from './DropoutModal';
 
 /**
  * ParticipantsList Screen
- * Handles all screen-specific logic: navigation, dropout modal, and action routing.
- * DataTable component is generic. Action handlers are passed via column config (onActionClick in ColumnDef).
+ * Handles all screen-specific logic: navigation and dropout modal.
  */
 const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
@@ -44,12 +42,7 @@ const ParticipantsList: React.FC = () => {
   const [_searchKey, setSearchKey] = useState('');
   const [activeFilter, setActiveFilter] = useState<'active' | 'inactive'>('active');
   const [isLoading] = useState(false);
-  const [totalCount, setTotalCount] = useState(0);
   
-  // Dropout modal state
-  const [showDropoutModal, setShowDropoutModal] = useState(false);
-  const [dropoutReason, setDropoutReason] = useState('');
-  const [selectedParticipant, setSelectedParticipant] = useState<Participant | null>(null);
 
   // Calculate status counts dynamically from participants data
   const statusCounts = useMemo<StatusCount>(() => {
@@ -129,7 +122,6 @@ const ParticipantsList: React.FC = () => {
     // Set mock participants data
     const participants = getParticipantsList();
     setParticipants(participants);
-    setTotalCount(participants.length);
   }, []);
 
   // When Active/Inactive filter changes, set default status
@@ -157,7 +149,7 @@ const ParticipantsList: React.FC = () => {
 
   // Handlers
   const handleSearch = useCallback((text: string) => {
-    setSearchKey(text);
+    // Search functionality can be implemented here when needed
   }, []);
 
   const handleStatusChange = useCallback((status: StatusType | '') => {
@@ -174,56 +166,14 @@ const ParticipantsList: React.FC = () => {
     [navigation],
   );
 
-  // Handle all table actions: navigation and modals are screen-specific, not in DataTable
-  const handleActionClick = useCallback((participant: Participant, actionKey?: string) => {
-    const participantId = participant.id;
-    
-    switch (actionKey) {
-      case 'view-details':
-        // @ts-ignore - Navigation type inference
-        navigation.navigate('participant-detail', { id: participantId });
-        break;
-      case 'log-visit':
-        // @ts-ignore - Navigation type inference
-        navigation.push('log-visit', { participantId });
-        break;
-      case 'view-log':
-        // @ts-ignore - Navigation type inference
-        navigation.navigate('participant-detail', { id: participantId });
-        break;
-      case 'dropout':
-        setSelectedParticipant(participant);
-        setShowDropoutModal(true);
-        break;
-      default:
-        console.log('Action:', actionKey, 'for participant:', participantId);
-    }
-  }, [navigation]);
 
-  const handleDropoutConfirm = useCallback((reason?: string) => {
-    if (!selectedParticipant) return;
-    
-    console.log('Dropout participant:', selectedParticipant.id, 'Reason:', reason);
-    // TODO: Implement dropout logic - API call to mark participant as dropout with reason
-    
-    // Close modal and reset state
-    setShowDropoutModal(false);
-    setDropoutReason('');
-    setSelectedParticipant(null);
-  }, [selectedParticipant]);
-
-  const handleCloseDropoutModal = useCallback(() => {
-    setShowDropoutModal(false);
-    setDropoutReason('');
-    setSelectedParticipant(null);
-  }, []);
 
   return (
     <Box {...styles.mainContainer}>
       <ScrollView {...styles.scrollView}>
         <VStack {...styles.headerVStack}>
           <Container>
-            <Heading {...TYPOGRAPHY.h4} color={theme.tokens.colors.foreground} {...styles.heading}>
+            <Heading {...TYPOGRAPHY.h4} color="text-foreground" {...styles.heading}>
               {t('participants.myParticipants')}
             </Heading>
           </Container>
@@ -231,9 +181,6 @@ const ParticipantsList: React.FC = () => {
       
         <Container>
           <VStack {...styles.contentVStack}>
-            {/* Page Title */}
-           
-
             {/* Search Bar and Active/Inactive Filter */}
             <HStack {...styles.searchFilterHStack}>
               <Box {...styles.searchBarContainer}>
@@ -309,7 +256,7 @@ const ParticipantsList: React.FC = () => {
             {/* Participants Table */}
             <DataTable
               data={filteredParticipants}
-              columns={getParticipantsColumns(activeStatus, handleActionClick)}
+              columns={getParticipantsColumns(activeStatus)}
               getRowKey={participant => participant.id}
               onRowClick={handleRowClick}
               isLoading={isLoading}
@@ -324,16 +271,6 @@ const ParticipantsList: React.FC = () => {
           </VStack>
         </Container>
       </ScrollView>
-      
-      {/* Dropout Confirmation Modal */}
-      <DropoutModal
-        isOpen={showDropoutModal}
-        itemName={selectedParticipant?.name || selectedParticipant?.id || 'participant'}
-        dropoutReason={dropoutReason}
-        onClose={handleCloseDropoutModal}
-        onConfirm={handleDropoutConfirm}
-        onReasonChange={setDropoutReason}
-      />
     </Box>
   );
 };

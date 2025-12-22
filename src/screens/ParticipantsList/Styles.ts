@@ -167,7 +167,7 @@ export const styles = {
 
   // Count Text - Inactive state
   countTextInactive: {
-    color: '$mutedForeground',
+    color: '$textMutedForeground',
   },
 
   // Status Badge Box
