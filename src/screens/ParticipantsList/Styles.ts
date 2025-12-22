@@ -1,4 +1,3 @@
-import { theme } from '@config/theme';
 
 /**
  * Styles for ParticipantsList screen component

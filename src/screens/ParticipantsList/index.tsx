@@ -14,7 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
 import DataTable from '@components/DataTable';
 import { getParticipantsColumns } from './ParticipantsTableConfig';
-import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { Participant, StatusCount, StatusType } from '@app-types/screens';
 import { useLanguage } from '@contexts/LanguageContext';
