@@ -23,7 +23,7 @@ interface HeaderColumn {
   flex?: number;
   width?: number;
   align?: 'left' | 'center' | 'right';
-  label: string; // Pre-translated label
+  label: string; // Translation key
   showLabel: boolean;
 }
 
@@ -32,22 +32,9 @@ interface TableHeaderProps {
   minWidth?: number;
 }
 
-/**
- * Pre-computed table row column data for TableRow component.
- * All column filtering and processing is done in parent DataTable.
- */
-interface TableRowColumn<T> {
-  key: string;
-  flex?: number;
-  width?: number;
-  align?: 'left' | 'center' | 'right';
-  render?: (item: T) => ReactNode;
-  defaultValue?: string;
-}
-
 interface TableRowProps<T> {
   item: T;
-  columns: TableRowColumn<T>[];
+  columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
   minWidth?: number;
   isLast?: boolean;
@@ -193,6 +180,8 @@ function prepareCardLayout<T>(
  * Pure presentational component that renders pre-computed column headers.
  */
 const TableHeader = ({ columns, minWidth }: TableHeaderProps) => {
+  const { t } = useLanguage();
+  
   return (
     <HStack
       {...styles.tableHeader}
@@ -213,7 +202,7 @@ const TableHeader = ({ columns, minWidth }: TableHeaderProps) => {
         >
           {column.showLabel && (
             <Text {...TYPOGRAPHY.label} color="$textForeground">
-              {column.label}
+              {t(column.label)}
             </Text>
           )}
         </Box>
@@ -264,7 +253,7 @@ const TableRow = <T,>({
                   {...TYPOGRAPHY.paragraph}
                   color="$textMuted"
                 >
-                  {column.defaultValue ?? String((item as any)[column.key] ?? '')}
+                  {String((item as any)[column.key] ?? '-')}
                 </Text>
               )}
             </Box>
@@ -502,26 +491,15 @@ const DataTable = <T,>({
     });
   }, [columns]);
 
-  // Prepare header columns for desktop view
+  // Prepare header columns for desktop view - only extract showLabel, translation done in TableHeader
   const headerColumns: HeaderColumn[] = useMemo(() => {
     return visibleDesktopColumns.map(column => ({
       key: column.key,
       flex: column.flex,
       width: column.width,
       align: column.align,
-      label: t(column.label),
+      label: column.label,
       showLabel: column.desktopConfig?.showLabel ?? true,
-    }));
-  }, [visibleDesktopColumns, t]);
-
-  // Prepare table row columns for desktop view
-  const tableRowColumns: TableRowColumn<T>[] = useMemo(() => {
-    return visibleDesktopColumns.map(column => ({
-      key: column.key,
-      flex: column.flex,
-      width: column.width,
-      align: column.align,
-      render: column.render,
     }));
   }, [visibleDesktopColumns]);
 
@@ -574,7 +552,7 @@ const DataTable = <T,>({
           <TableRow
             key={getRowKey(item)}
             item={item}
-            columns={tableRowColumns}
+            columns={visibleDesktopColumns}
             onRowClick={onRowClick}
             minWidth={minTableWidth}
             isLast={index === paginationConfig.paginatedData.length - 1}

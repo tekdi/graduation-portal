@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { HStack, Text, Pressable, Box } from '@ui';
+import { HStack, Text, Pressable, Box, VStack, Input, InputField, Modal } from '@ui';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -8,7 +8,6 @@ import { LucideIcon, Menu } from '@ui';
 import { Participant } from '@app-types/screens';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
 import { getParticipantsMenuItems } from '@constants/PARTICIPANTS_LIST';
-import DropoutModal from './DropoutModal';
 
 interface ActionColumnProps {
   participant: Participant;
@@ -110,14 +109,70 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
       </HStack>
 
       {/* Dropout Confirmation Modal */}
-      <DropoutModal
+      <Modal
         isOpen={showDropoutModal}
-        itemName={participant.name || participant.id || 'participant'}
-        dropoutReason={dropoutReason}
         onClose={handleCloseDropoutModal}
-        onConfirm={handleDropoutConfirm}
-        onReasonChange={setDropoutReason}
-      />
+        headerTitle={t('actions.confirmDropout') || 'Confirm Dropout'}
+        headerIcon={
+          <LucideIcon
+            name="UserX"
+            size={24}
+            color={theme.tokens.colors.error.light}
+          />
+        }
+        maxWidth={500}
+        cancelButtonText={t('common.cancel') || 'Cancel'}
+        confirmButtonText={t('actions.confirmDropout') || 'Confirm Dropout'}
+        onCancel={handleCloseDropoutModal}
+        onConfirm={() => handleDropoutConfirm(dropoutReason)}
+        confirmButtonColor="$error500"
+      >
+        <VStack space="lg">
+          <Text
+            {...TYPOGRAPHY.paragraph}
+            color="$textSecondary"
+            lineHeight="$xl"
+          >
+            {t('actions.dropoutMessage', { name: participant.name || participant.id || 'participant' }) ||
+              `Mark ${participant.name || participant.id || 'participant'} as dropout from the program`}
+          </Text>
+
+          <VStack space="sm">
+            <Text
+              {...TYPOGRAPHY.label}
+              color="$textPrimary"
+              fontWeight="$medium"
+            >
+              {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
+            </Text>
+            <Input
+              {...dataTableStyles.modalInput}
+              borderColor="$inputBorder"
+              bg="$modalBackground"
+              $focus-borderColor="$inputFocusBorder"
+              $focus-borderWidth={2}
+            >
+              <InputField
+                placeholder={
+                  t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
+                }
+                value={dropoutReason}
+                onChangeText={setDropoutReason}
+                {...dataTableStyles.modalInputField}
+                placeholderTextColor="$textMutedForeground"
+              />
+            </Input>
+            <Text
+              {...TYPOGRAPHY.bodySmall}
+              color="$textSecondary"
+              lineHeight="$sm"
+            >
+              {t('actions.dropoutHint') ||
+                'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
+            </Text>
+          </VStack>
+        </VStack>
+      </Modal>
     </Box>
   );
 };
