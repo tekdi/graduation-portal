@@ -18,17 +18,8 @@ import { styles } from './Styles';
  * Pre-computed header column data for TableHeader component.
  * All calculations (filtering, translation, showLabel) are done in parent DataTable.
  */
-interface HeaderColumn {
-  key: string;
-  flex?: number;
-  width?: number;
-  align?: 'left' | 'center' | 'right';
-  label: string; // Translation key
-  showLabel: boolean;
-}
-
-interface TableHeaderProps {
-  columns: HeaderColumn[];
+interface TableHeaderProps<T> {
+  columns: ColumnDef<T>[];
   minWidth?: number;
 }
 
@@ -179,7 +170,7 @@ function prepareCardLayout<T>(
  * TableHeader Component
  * Pure presentational component that renders pre-computed column headers.
  */
-const TableHeader = ({ columns, minWidth }: TableHeaderProps) => {
+const TableHeader = <T,>({ columns, minWidth }: TableHeaderProps<T>) => {
   const { t } = useLanguage();
   
   return (
@@ -187,26 +178,29 @@ const TableHeader = ({ columns, minWidth }: TableHeaderProps) => {
       {...styles.tableHeader}
       minWidth={minWidth}
     >
-      {columns.map(column => (
-        <Box
-          key={column.key}
-          flex={column.flex}
-          width={column.width}
-          alignItems={
-            column.align === 'center'
-              ? 'center'
-              : column.align === 'right'
-              ? 'flex-end'
-              : 'flex-start'
-          }
-        >
-          {column.showLabel && (
-            <Text {...TYPOGRAPHY.label} color="$textForeground">
-              {t(column.label)}
-            </Text>
-          )}
-        </Box>
-      ))}
+      {columns.map(column => {
+        const showLabel = column.desktopConfig?.showLabel ?? true;
+        return (
+          <Box
+            key={column.key}
+            flex={column.flex}
+            width={column.width}
+            alignItems={
+              column.align === 'center'
+                ? 'center'
+                : column.align === 'right'
+                ? 'flex-end'
+                : 'flex-start'
+            }
+          >
+            {showLabel && (
+              <Text {...TYPOGRAPHY.label} color="$textForeground">
+                {t(column.label)}
+              </Text>
+            )}
+          </Box>
+        );
+      })}
     </HStack>
   );
 };
@@ -491,17 +485,6 @@ const DataTable = <T,>({
     });
   }, [columns]);
 
-  // Prepare header columns for desktop view - only extract showLabel, translation done in TableHeader
-  const headerColumns: HeaderColumn[] = useMemo(() => {
-    return visibleDesktopColumns.map(column => ({
-      key: column.key,
-      flex: column.flex,
-      width: column.width,
-      align: column.align,
-      label: column.label,
-      showLabel: column.desktopConfig?.showLabel ?? true,
-    }));
-  }, [visibleDesktopColumns]);
 
   // Prepare card layout for mobile view
   const cardLayout = useMemo(
@@ -546,7 +529,7 @@ const DataTable = <T,>({
   // Table content for desktop or when responsive is disabled
   const tableContent = (
     <VStack {...styles.tableContentContainer} minWidth={minTableWidth}>
-      <TableHeader columns={headerColumns} minWidth={minTableWidth} />
+      <TableHeader columns={visibleDesktopColumns} minWidth={minTableWidth} />
       <Box>
         {renderDataContent((item, index) => (
           <TableRow
