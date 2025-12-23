@@ -9,7 +9,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { usePlatform } from '@utils/platform';
 import { StatusBadge } from './StatusBadge';
 import { ActionColumn } from './ActionColumn';
-
+import { theme } from '@config/theme';
 /**
  * Progress Bar Component for Participants Table
  * Desktop: Horizontal layout with bar and percentage side by side
@@ -75,13 +75,14 @@ const ReadyToGraduate: React.FC = () => {
       <Text
         {...TYPOGRAPHY.bodySmall}
         color="$textMutedForeground"
+        $md-display="none"
       >
         {t('participants.graduated')}
       </Text>
       <LucideIcon
         name="AlertCircle"
         size={20}
-        color="$warning500"
+        color={theme.tokens.colors.warning500}
       />
     </HStack>
   );
@@ -95,7 +96,7 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
   {
     key: 'name',
     label: 'participants.name',
-    flex: 2,
+    flex: 1.5,
     render: participant => (
       <Text {...TYPOGRAPHY.h4} color="$textForeground" lineHeight="$sm">
         {participant.name} 
@@ -140,26 +141,6 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
     },
   },
   {
-    key: 'phone',
-    label: 'participants.contact',
-    flex: 1.5,
-    render: participant => (
-      <Text
-        {...TYPOGRAPHY.bodySmall}
-        color="$textMutedForeground"
-        fontSize="$sm" 
-        $md-fontSize="$md"
-        marginTop="$3" $md-marginTop="$0"
-      >
-        {participant.phone}
-      </Text>
-    ),
-    mobileConfig: {
-      leftRank: 3, // Below ID
-      showLabel: false, // Hide label on mobile
-    },
-  },
-  {
     key: 'progress',
     label: 'participants.overallProgress',
     flex: 2,
@@ -185,9 +166,31 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
     },
   },
   {
+    key: 'phone',
+    label: 'participants.contact',
+    flex: 1.5,
+    render: participant => (
+      <Text
+        {...TYPOGRAPHY.bodySmall}
+        color="$textMutedForeground"
+        fontSize="$sm" 
+        $md-fontSize="$md"
+        marginTop="$3" $md-marginTop="$0"
+      >
+        {participant.phone}
+      </Text>
+    ),
+    mobileConfig: {
+      leftRank: 3, // Below ID
+      showLabel: false, // Hide label on mobile
+    },
+  },
+  //Graduated column
+ 
+  {
     key: 'actions',
     label: 'participants.actions',
-    flex: 1,
+    flex: 2,
     render: (participant) => <ActionColumn participant={participant} />,
     desktopConfig: {
       showColumn: true,
