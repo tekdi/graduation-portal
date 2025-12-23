@@ -223,7 +223,7 @@ const TableRow = <T,>({
   isLast = false,
 }: TableRowProps<T>) => {
   return (
-    <Box position="relative">
+    <Box>
       <Pressable
         onPress={() => onRowClick?.(item)}
         $web-cursor={onRowClick ? 'pointer' : undefined}
@@ -251,7 +251,7 @@ const TableRow = <T,>({
               ) : (
                 <Text
                   {...TYPOGRAPHY.paragraph}
-                  color="$textMuted"
+                  color="$textMutedForeground"
                 >
                   {String((item as any)[column.key] ?? '-')}
                 </Text>
@@ -290,7 +290,7 @@ const CardView = <T,>({
                       {col.showLabel && (
                         <Text
                           {...TYPOGRAPHY.label}
-                          color="$textMuted"
+                          color="$textMutedForeground"
                           fontSize="$xs"
                         >
                           {col.label}
@@ -366,7 +366,7 @@ const EmptyState = ({ message }: EmptyStateProps) => {
     <Box {...styles.emptyState}>
       <Text
         {...TYPOGRAPHY.paragraph}
-        color="$textMuted"
+        color="$textMutedForeground"
       >
         {message}
       </Text>
@@ -383,7 +383,7 @@ const LoadingState = ({ message }: LoadingStateProps) => {
     <Box {...styles.loadingState}>
       <Text
         {...TYPOGRAPHY.paragraph}
-        color="$textMuted"
+        color="$textMutedForeground"
       >
         {message}
       </Text>
