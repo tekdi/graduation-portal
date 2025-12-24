@@ -4,10 +4,10 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { assessmentSurveysStyles } from './Styles';
 import { AssessmentCard } from '@components/ObservationCards';
 import { ASSESSMENT_SURVEY_CARDS } from '@constants/ASSESSMENT_SURVEY_CARDS';
-import type { ParticipantStatus } from '@app-types/participant';
+import type { ParticipantData, ParticipantStatus } from '@app-types/participant';
 
 interface AssessmentSurveysProps {
-  participantStatus: ParticipantStatus;
+  participant: ParticipantData;
 }
 
 /**
@@ -15,7 +15,7 @@ interface AssessmentSurveysProps {
  * Displays assessment survey cards based on participant status
  */
 const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
-  participantStatus,
+  participant
 }) => {
   const { t } = useLanguage();
 
@@ -32,20 +32,20 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
       // Check hideForStatuses first
       if (
         visibilityRules.hideForStatuses &&
-        visibilityRules.hideForStatuses.includes(participantStatus)
+        visibilityRules.hideForStatuses.includes(participant?.status as ParticipantStatus)
       ) {
         return false;
       }
 
       // Check showForStatuses
       if (visibilityRules.showForStatuses) {
-        return visibilityRules.showForStatuses.includes(participantStatus);
+        return visibilityRules.showForStatuses.includes(participant?.status as ParticipantStatus);
       }
 
       // If only hideForStatuses is defined and status is not in it, show the card
       return true;
     });
-  }, [participantStatus]);
+  }, [participant]);
 
   if (visibleCards.length === 0) {
     return (
@@ -76,7 +76,7 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
     >
       <VStack {...assessmentSurveysStyles.cardsContainer} gap="$5">
         {visibleCards.map(card => (
-          <AssessmentCard key={card.id} card={card} />
+          <AssessmentCard key={card.id} card={card} userId={participant.id} />
         ))}
       </VStack>
     </ScrollView>

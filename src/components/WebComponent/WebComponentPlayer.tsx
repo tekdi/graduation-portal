@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
 import logger from '@utils/logger';
 
@@ -73,8 +73,7 @@ const WebComponentPlayer = ({ playerConfig, getProgress }: PlayerConfigProps) =>
             const createPlayer = function() {
               const player = document.createElement('questionnaire-player-main');
               try {
-              player.setAttribute('apiconfig', "${apiConfigStr}");
-              alert('player created', JSON.stringify(player));
+                player.setAttribute('apiconfig', "${apiConfigStr}");
               } catch (e) {
                 console.error('Failed to parse apiConfig in WebView:', e);
               }
@@ -162,14 +161,23 @@ const WebComponentPlayer = ({ playerConfig, getProgress }: PlayerConfigProps) =>
   };
 
   // Native platform: Use WebView
+  // For iOS, the HTML file should be copied to the iOS bundle during build
+  // The path format points to the bundle root where web-component/index.html should be located
+  const webViewSource = Platform.select({
+    android: {
+      uri: 'file:///android_asset/web-component/index.html',
+    },
+    ios: {
+      uri: 'file:///web-component/index.html',
+    },
+  }) || { uri: 'file:///android_asset/web-component/index.html' }; // Fallback to Android path
+
   return (
     <View style={styles.container}>
       <LoadingIndicator loading={loading} />
       <WebView
         ref={webViewRef}
-        source={{
-          uri: 'file:///android_asset/web-component/index.html',
-        }}
+        source={webViewSource}
         style={styles.webView}
         onLoadEnd={() => {
           logger.info('WebView loaded');
@@ -192,10 +200,6 @@ const WebComponentPlayer = ({ playerConfig, getProgress }: PlayerConfigProps) =>
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
-    backgroundColor: 'red',
-    height: '$100%' as '100%',
-    width: '$100%' as '100%',
   },
   webView: {
     flex: 1,

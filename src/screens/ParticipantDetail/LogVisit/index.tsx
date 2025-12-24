@@ -109,14 +109,12 @@ const LogVisit: React.FC = () => {
             </HStack>
             </Container>
           </VStack>
-      
-      <Container>
-       
+        <Container>
 
         {/* Cards */}
         <VStack {...logVisitStyles.cardsContainer}>
           {LOG_VISIT_CARDS.map(card => (
-            <AssessmentCard key={card.id} card={card} />
+            <AssessmentCard key={card.id} card={card} userId={participant?.id || ''} />
           ))}
         </VStack>
         <VStack {...logVisitStyles.noteContainer}>

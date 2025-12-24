@@ -58,10 +58,7 @@ export default function ParticipantDetail() {
     province: '',
     site: '',
   });
-  const [isSavingAddress, setIsSavingAddress] = useState(false);
-  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<ParticipantData | undefined>(
-    participantId ? getParticipantProfile(participantId) : undefined
-  );
+  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<ParticipantData | undefined>();
   
   // Fetch participant data from mock data by ID
   // Ensure participantId exists before calling getParticipantById
@@ -148,7 +145,7 @@ export default function ParticipantDetail() {
               width="$full"
             >
               {activeTab === 'intervention-plan' && <InterventionPlan />}
-              {activeTab === 'assessment-surveys' && <AssessmentSurveys participantStatus={status as ParticipantStatus} />}
+              {activeTab === 'assessment-surveys' && <AssessmentSurveys participant={currentParticipantProfile} />}
             </Box>
           </Box>
         </Box>
@@ -189,7 +186,6 @@ export default function ParticipantDetail() {
               return;
             }
 
-            setIsSavingAddress(true);
             try {
               const updated = await updateParticipantAddress(id, editedAddress);
               if (updated) {
@@ -207,8 +203,6 @@ export default function ParticipantDetail() {
               showAlert('error', t('common.error'), {
                 placement: 'bottom-right',
               });
-            } finally {
-              setIsSavingAddress(false);
             }
           }}
         >

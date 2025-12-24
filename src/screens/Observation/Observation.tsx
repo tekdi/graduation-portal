@@ -14,7 +14,7 @@ const Observation = () => {
       <WebComponentPlayer
         getProgress={getProgress}
         playerConfig={{
-          baseURL: 'https://qa.elevate-apis.shikshalokam.org',
+          baseURL: process.env.ELEVATE_API_URL || 'https://qa.elevate-apis.shikshalokam.org',
           fileSizeLimit: 50,
           userAuthToken:
             localStorage.getItem('accToken'),

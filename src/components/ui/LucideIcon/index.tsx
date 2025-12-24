@@ -47,11 +47,12 @@ const LucideIcon: React.FC<LucideIconProps> = ({
 
   return (
     <Box style={{ color: color } as any}>
-    <IconComponent
-      size={size}
-      strokeWidth={strokeWidth}
-      {...props}
-    />
+      <IconComponent
+        size={size}
+        strokeWidth={strokeWidth}
+        color={color}
+        {...props}
+      />
     </Box>
   );
 };
