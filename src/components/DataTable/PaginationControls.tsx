@@ -72,7 +72,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
       <HStack {...styles.paginationMainRow} $md-justifyContent="space-between">
         {/* Left Side: Page Info and Page Size Selector */}
         <HStack {...styles.paginationLeftSide}>
-          <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForegroundForeground">
+          <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForegroundColor">
             {t('table.showing', {
               start: startIndex + 1,
               end: Math.min(endIndex, totalItems),
@@ -112,7 +112,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
           <LucideIcon
             name="ChevronsLeft"
             size={20}
-            color={currentPage === 1 ? "" : theme.tokens.colors.foreground}
+            color={currentPage === 1 ? "$mutedForegroundColor" : "$foregroundColor"}
           />
         </Pressable>
         

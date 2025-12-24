@@ -501,7 +501,7 @@ const DataTable = <T,>({
   }, [emptyMessage, t]);
 
   const loadingStateMessage = useMemo(() => {
-    return loadingMessage || t('common.loading');
+    return loadingMessage ? t(loadingMessage) : t('common.loading');
   }, [loadingMessage, t]);
 
   // ========================================================================
