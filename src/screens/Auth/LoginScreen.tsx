@@ -23,9 +23,11 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { loginStyles } from './Styles';
 import logoImage from '../../assets/images/logo.png';
 import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
+import { login as loginService } from '../../services/authenticationService';
+import logger from '@utils/logger';
 
 const LoginScreen: React.FC = () => {
-  const { login } = useAuth();
+  const { setIsLoggedIn } = useAuth();
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -44,14 +46,23 @@ const LoginScreen: React.FC = () => {
     setLoading(true);
 
     try {
-      const success = await login(email, password);
+      // Call the authentication service API
+      const loginResponse = await loginService(email, password);
 
-      if (!success) {
+      if (loginResponse) {
+        // Update auth context with login success
+        // The login response data is already saved to offline storage by authenticationService
+        setIsLoggedIn(true);
+        // Optionally update user data in context if needed
+        // You can read from offline storage: await offlineStorage.read(STORAGE_KEYS.AUTH_USER)
+      } else {
         setError(t('login.invalidEmailOrPassword'));
       }
-    } catch (err) {
-      setError(t('login.anErrorOccurredDuringLogin'));
-      console.error('Login error:', err);
+    } catch (err: any) {
+      // Handle error from API
+      const errorMessage = err?.message || t('login.anErrorOccurredDuringLogin');
+      setError(errorMessage);
+      logger.error('Login error:', err);
     } finally {
       setLoading(false);
     }

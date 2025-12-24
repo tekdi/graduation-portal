@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const webpack = require('webpack');
+const Dotenv = require('dotenv-webpack');
 
 module.exports = (env = {}, argv = {}) => {
   const mode =
@@ -186,9 +187,19 @@ module.exports = (env = {}, argv = {}) => {
             }
           : false,
       }),
+      new Dotenv({
+        path: './.env', // Path to .env file
+        safe: false, // Set to true if you want to use .env.example
+        systemvars: true, // Load system environment variables
+        defaults: false, // Load .env.defaults
+      }),
       new webpack.DefinePlugin({
         __DEV__: JSON.stringify(!isProduction),
         'process.env.NODE_ENV': JSON.stringify(mode),
+        // API_BASE_URL will be loaded from .env file via Dotenv plugin
+        'process.env.API_BASE_URL': JSON.stringify(
+          process.env.API_BASE_URL || ''
+        ),
       }),
       // Ignore native-only modules entirely
       new webpack.IgnorePlugin({

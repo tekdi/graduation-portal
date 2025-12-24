@@ -18,5 +18,13 @@ module.exports = {
         },
       },
     ],
+    [
+      'dotenv-import',
+      {
+        moduleName: '@env',
+        path: '.env',
+        allowUndefined: true,
+      },
+    ],
   ],
 };
