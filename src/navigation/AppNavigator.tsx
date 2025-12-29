@@ -88,7 +88,7 @@ const getAccessPages = (
         { name: 'log-visit', path: '/participants/:id/log-visit', component: LogVisit },
         { name: 'observation', path: '/participants/:id/observation/:observationId', component: Observation },
         { name: 'participants', component: ParticipantsList },
-        { name: 'project', component: ProjectPlayer },
+        { name: 'project', path: '/project', component: ProjectPlayer },
       ];
     default:
       return []; // Always return an array, even if empty

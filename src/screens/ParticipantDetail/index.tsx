@@ -1,22 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { VStack, HStack, Box, ScrollView, Text, Input, InputField, Pressable, Container } from '@ui';
+import {
+  VStack,
+  HStack,
+  Box,
+  Text,
+  Input,
+  InputField,
+  Pressable,
+  Container,
+} from '@ui';
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
-import { getParticipantById, getParticipantProfile, updateParticipantAddress, getSitesByProvince } from '../../services/participantService';
+import {
+  getParticipantById,
+  getParticipantProfile,
+  updateParticipantAddress,
+  getSitesByProvince,
+} from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
 import { TabButton } from '@components/Tabs';
 import { PARTICIPANT_DETAIL_TABS } from '@constants/TABS';
-import { PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
+import { PROVINCES } from '@constants/PARTICIPANTS_LIST';
 import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
-import type { ParticipantStatus, ParticipantData, PathwayType } from '@app-types/participant';
+import type {
+  ParticipantStatus,
+  ParticipantData,
+  PathwayType,
+} from '@app-types/participant';
 import { Modal, useAlert, Select, LucideIcon } from '@ui';
 import { usePlatform } from '@utils/platform';
 import { profileStyles } from '@components/ui/Modal/Styles';
 import { theme } from '@config/theme';
-
+import ProjectPlayer, {
+  ProjectPlayerData,
+  ProjectPlayerConfig,
+} from '../../project-player/index';
+import {
+  DUMMY_PROJECT_DATA,
+  PROJECT_PLAYER_CONFIGS,
+} from '@constants/PROJECTDATA';
+import { PARTICIPANT_DETAILS_TABS, STATUS } from '@constants/app.constant';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
@@ -45,7 +71,7 @@ export default function ParticipantDetail() {
   const { isWeb } = usePlatform();
   // Extract the id parameter from the route
   const participantId = route.params?.id;
-  
+
   const [activeTab, setActiveTab] = useState<string>('intervention-plan');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -58,24 +84,28 @@ export default function ParticipantDetail() {
     province: '',
     site: '',
   });
-  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<ParticipantData | undefined>();
-  
+  const [currentParticipantProfile, setCurrentParticipantProfile] = useState<
+    ParticipantData | undefined
+  >();
+
   // Fetch participant data from mock data by ID
   // Ensure participantId exists before calling getParticipantById
-  const participant = participantId ? getParticipantById(participantId) : undefined;
-  
+  const participant = participantId
+    ? getParticipantById(participantId)
+    : undefined;
+
   // Update currentParticipantProfile if participantId changes
   useEffect(() => {
     if (participantId) {
       setCurrentParticipantProfile(getParticipantProfile(participantId));
     }
   }, [participantId]);
-  
+
   // Error State: Participant Not Found
   if (!participant) {
     return <NotFound message="participantDetail.notFound.title" />;
   }
-  
+
   // Extract participant data
   // Type assertion not needed as participant is guaranteed to exist here
   const {
@@ -86,14 +116,24 @@ export default function ParticipantDetail() {
     graduationProgress,
     graduationDate,
   } = participant;
-  
- 
+
+  // Determine ProjectPlayer config and data based on participant status
+  const configData: ProjectPlayerConfig = {
+    ...PROJECT_PLAYER_CONFIGS.editMode,
+    showAddCustomTaskButton: false,
+  };
+
+  const ProjectPlayerConfigData: ProjectPlayerData = {
+    solutionId: configData.solutionId,
+    projectId: configData.projectId,
+    data: DUMMY_PROJECT_DATA,
+  };
 
   return (
     <>
       <Box flex={1} bg="$accent100">
-        <VStack 
-          {...participantDetailStyles.container} 
+        <VStack
+          {...participantDetailStyles.container}
           $web-boxShadow={participantDetailStyles.containerBoxShadow}
         >
           <Container>
@@ -110,45 +150,59 @@ export default function ParticipantDetail() {
           </Container>
         </VStack>
         <Container>
-        {/* Tabs */}
-        <Box width="$full" mt="$4" mb="$6">
-          <Box 
-            width="$full"
-          >
-            <HStack
-              width="$full"
-              bg="$backgroundLight50"
-              borderRadius={50}
-              p={4}
-              gap={4}
-              alignItems="center"
-            >
-              {PARTICIPANT_DETAIL_TABS?.map(tab => (
-                <TabButton
-                  key={tab.key}
-                  tab={tab}
-                  isActive={activeTab === tab.key}
-                  onPress={setActiveTab}
-                  variant="ButtonTab"
-                />
-              ))}
-            </HStack>
-          </Box>
-        </Box>
+          {status === STATUS.NOT_ENROLLED ? (
+            // NOT_ENROLLED: Show ProjectPlayer directly with editMode
+            <ProjectPlayer config={configData} data={ProjectPlayerConfigData} />
+          ) : (
+            // ENROLLED, IN_PROGRESS, DROPOUT: Show tabs with ProjectPlayer in InterventionPlan
+            <>
+              {/* Tabs */}
+              <Box width="$full" mt="$4" mb="$6">
+                <Box width="$full">
+                  <HStack
+                    width="$full"
+                    bg="$backgroundLight50"
+                    borderRadius={50}
+                    p={4}
+                    gap={4}
+                    alignItems="center"
+                  >
+                    {PARTICIPANT_DETAIL_TABS?.map(tab => (
+                      <TabButton
+                        key={tab.key}
+                        tab={tab}
+                        isActive={activeTab === tab.key}
+                        onPress={setActiveTab}
+                        variant="ButtonTab"
+                      />
+                    ))}
+                  </HStack>
+                </Box>
+              </Box>
 
-        {/* Tab Content */}
-        <Box flex={1} mt="$3" mb="$6" bg="transparent">
-          <Box
-            width="$full"
-          >
-            <Box
-              width="$full"
-            >
-              {activeTab === 'intervention-plan' && <InterventionPlan />}
-              {activeTab === 'assessment-surveys' && <AssessmentSurveys participant={currentParticipantProfile} />}
-            </Box>
-          </Box>
-        </Box>
+              {/* Tab Content */}
+              <Box flex={1} mt="$3" mb="$6" bg="transparent">
+                <Box width="$full">
+                  <Box width="$full">
+                    {activeTab ===
+                      PARTICIPANT_DETAILS_TABS.INTERVENTION_PLAN && (
+                      <InterventionPlan
+                        participantStatus={status as ParticipantStatus}
+                      />
+                    )}
+                    {activeTab ===
+                      PARTICIPANT_DETAILS_TABS.ASSESSMENTS_SURVEYS && (
+                      <AssessmentSurveys
+                        participant={
+                          currentParticipantProfile as ParticipantData
+                        }
+                      />
+                    )}
+                  </Box>
+                </Box>
+              </Box>
+            </>
+          )}
         </Container>
       </Box>
 
@@ -166,10 +220,16 @@ export default function ParticipantDetail() {
             });
           }}
           headerTitle={t('participantDetail.profileModal.title')}
-          headerDescription={t('participantDetail.profileModal.subtitle', { name: participantName })}
-          size={isWeb ? "sm" : "lg"}
+          headerDescription={t('participantDetail.profileModal.subtitle', {
+            name: participantName,
+          })}
+          size={isWeb ? 'sm' : 'lg'}
           cancelButtonText={isEditingAddress ? t('common.cancel') : undefined}
-          confirmButtonText={isEditingAddress ? t('participantDetail.profileModal.saveLocation') : undefined}
+          confirmButtonText={
+            isEditingAddress
+              ? t('participantDetail.profileModal.saveLocation')
+              : undefined
+          }
           onCancel={() => {
             setIsEditingAddress(false);
             setEditedAddress({
@@ -179,10 +239,18 @@ export default function ParticipantDetail() {
             });
           }}
           onConfirm={async () => {
-            if (!editedAddress.street || !editedAddress.province || !editedAddress.site) {
-              showAlert('warning', t('participantDetail.profileModal.fillAllFields'), {
-                placement: 'bottom-right',
-              });
+            if (
+              !editedAddress.street ||
+              !editedAddress.province ||
+              !editedAddress.site
+            ) {
+              showAlert(
+                'warning',
+                t('participantDetail.profileModal.fillAllFields'),
+                {
+                  placement: 'bottom-right',
+                },
+              );
               return;
             }
 
@@ -191,9 +259,13 @@ export default function ParticipantDetail() {
               if (updated) {
                 setCurrentParticipantProfile(updated);
                 setIsEditingAddress(false);
-                showAlert('success', t('participantDetail.profileModal.addressUpdated'), {
-                  placement: 'bottom-right',
-                });
+                showAlert(
+                  'success',
+                  t('participantDetail.profileModal.addressUpdated'),
+                  {
+                    placement: 'bottom-right',
+                  },
+                );
               } else {
                 showAlert('error', t('common.error'), {
                   placement: 'bottom-right',
@@ -228,7 +300,12 @@ export default function ParticipantDetail() {
             </VStack>
 
             {/* Contact Section */}
-            <VStack space="xs" {...(currentParticipantProfile!.address ? profileStyles.fieldSection : {})}>
+            <VStack
+              space="xs"
+              {...(currentParticipantProfile!.address
+                ? profileStyles.fieldSection
+                : {})}
+            >
               <Text {...profileStyles.fieldLabel}>
                 {t('common.profileFields.contact')}
               </Text>
@@ -251,18 +328,20 @@ export default function ParticipantDetail() {
                       <Text {...profileStyles.fieldLabel}>
                         {t('common.profileFields.address')}
                       </Text>
-                      <Pressable onPress={() => {
-                        setEditedAddress({
-                          street: '',
-                          province: '',
-                          site: '',
-                        });
-                        setIsEditingAddress(true);
-                      }}>
-                        <LucideIcon 
-                          name="Pencil" 
-                          size={16} 
-                          color={theme.tokens.colors.primary500} 
+                      <Pressable
+                        onPress={() => {
+                          setEditedAddress({
+                            street: '',
+                            province: '',
+                            site: '',
+                          });
+                          setIsEditingAddress(true);
+                        }}
+                      >
+                        <LucideIcon
+                          name="Pencil"
+                          size={16}
+                          color={theme.tokens.colors.primary500}
                         />
                       </Pressable>
                     </HStack>
@@ -279,12 +358,16 @@ export default function ParticipantDetail() {
                       </Text>
                       <Input
                         {...profileStyles.input}
-                        $focus-borderColor={theme.tokens.colors.inputFocusBorder}
+                        $focus-borderColor={
+                          theme.tokens.colors.inputFocusBorder
+                        }
                       >
                         <InputField
-                          placeholder={t('common.profileFields.addressFields.street')}
+                          placeholder={t(
+                            'common.profileFields.addressFields.street',
+                          )}
                           value={editedAddress?.street || ''}
-                          onChangeText={(value) => {
+                          onChangeText={value => {
                             setEditedAddress(prev => ({
                               ...prev,
                               street: value,
@@ -296,36 +379,46 @@ export default function ParticipantDetail() {
 
                     {/* Province Dropdown */}
                     <VStack space="xs">
-                      <Select 
-                        options={PROVINCES.map(p => ({ label: p.label, value: p.value }))}
+                      <Select
+                        options={PROVINCES.map(p => ({
+                          label: p.label,
+                          value: p.value,
+                        }))}
                         value={editedAddress?.province || ''}
-                        onChange={(value) => {
+                        onChange={value => {
                           setEditedAddress(prev => ({
                             ...prev,
                             province: value,
                             site: '', // Reset site when province changes
                           }));
                         }}
-                        placeholder={t('participantDetail.profileModal.selectProvince')}
-                        bg="$white" borderColor="transparent"
+                        placeholder={t(
+                          'participantDetail.profileModal.selectProvince',
+                        )}
+                        bg="$white"
+                        borderColor="transparent"
                       />
                     </VStack>
 
                     {/* Site Dropdown */}
                     <VStack space="xs">
                       <Select
-                        options={getSitesByProvince(editedAddress?.province || '').map(s => ({ 
-                          label: s.label, 
-                          value: s.value 
+                        options={getSitesByProvince(
+                          editedAddress?.province || '',
+                        ).map(s => ({
+                          label: s.label,
+                          value: s.value,
                         }))}
                         value={editedAddress?.site || ''}
-                        onChange={(value) => {
+                        onChange={value => {
                           setEditedAddress(prev => ({
                             ...prev,
                             site: value,
                           }));
                         }}
-                        placeholder={t('participantDetail.profileModal.selectSite')}
+                        placeholder={t(
+                          'participantDetail.profileModal.selectSite',
+                        )}
                         bg="$white"
                         borderColor="transparent"
                       />

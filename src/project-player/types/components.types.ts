@@ -94,6 +94,8 @@ export interface ProjectPlayerConfig {
   accessToken?: string;
   language?: string;
   showAddCustomTaskButton?: boolean; // Config to show/hide AddCustomTask button
+  showSubmitButton?: boolean; // Config to show/hide Submit Intervention Plan button
+  onSubmitInterventionPlan?: () => void; // Callback for Submit Intervention Plan button
   profileInfo?: {
     id: number | string;
     name: string;
@@ -112,7 +114,7 @@ export interface ProjectPlayerConfig {
 export interface ProjectPlayerData {
   solutionId?: string;
   projectId?: string;
-  localData?: ProjectData;
+  data?: ProjectData;
 }
 
 export interface ProjectPlayerProps {
