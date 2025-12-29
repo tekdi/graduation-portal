@@ -176,4 +176,3 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
     </Box>
   );
 };
-
