@@ -320,6 +320,70 @@
     "graduated": "Ready to Graduate",
     "active": "Active",
     "inactive": "Inactive"
+<<<<<<< HEAD
+=======
+  },
+  "table": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} entries",
+    "itemsPerPage": "Items per page"
+  },
+  "actions": {
+    "viewDetails": "View Details",
+    "logVisit": "Log Visit",
+    "dropout": "Dropout",
+    "confirmDropout": "Confirm Dropout",
+    "dropoutMessage": "Mark {{name}} as dropout from the program",
+    "dropoutReasonLabel": "Reason for Dropout",
+    "dropoutReasonPlaceholder": "Enter reason for dropout...",
+    "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
+  },
+  "logVisit": {
+    "selectVisitType": "Select visit type for {{name}}",
+    "viewCheckIns": "View Check-Ins",
+    "note": "Note:",
+    "logVisitNote": "Individual/Enterprise visits are used for one-on-one coaching sessions. Group visits are for training sessions with multiple participants. Midline surveys track progress at key milestones.",
+    "individualEnterpriseVisit": {
+      "title": "Individual/Enterprise Visit",
+      "description": "Log a one-on-one visit with the participant or visit to their enterprise"
+    },
+    "groupVisitForm": {
+      "title": "Group Visit Form",
+      "description": "Log a group session or training attended by multiple participants"
+    },
+    "midlineSurvey": {
+      "title": "Midline Survey",
+      "description": "Conduct a midline assessment survey to track progress"
+    }
+  },
+  "lcProfile": {
+    "myProfile": "My Profile",
+    "linkageChampionProfile": "Linkage Champion Profile",
+    "profileDetails": "Profile Details",
+    "fullName": "Full Name",
+    "lcId": "LC ID",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "serviceArea": "Service Area",
+    "startDate": "Start Date",
+    "languagePreference": "Language Preference",
+    "programStatistics": "Program Statistics",
+    "activeParticipants": "Active Participants",
+    "completedIdps": "Completed IDPs",
+    "visitsLogged": "Visits Logged",
+    "pendingTasks": "Pending Tasks",
+    "certificationsTraining": "Certifications & Training",
+    "completed": "Completed",
+    "certified": "Certified",
+    "notes": "Notes"
+  },
+  "lc": {
+    "menu": {
+      "home": "Home",
+      "dashboard": "Dashboard",
+      "myProfile": "My Profile",
+      "serviceProviders": "Service Providers"
+    }
+>>>>>>> 01fcdba (en.json updated)
   },
   "table": {
     "showing": "Showing {{start}} to {{end}} of {{total}} entries",
@@ -403,7 +467,11 @@
       "tasks": "Tasks",
       "includedPillars": "Included Pillars:",
       "tasksLabel": "tasks"
+<<<<<<< HEAD
     },
     "loadError": "Failed to load templates. Please try again."
+=======
+    }
+>>>>>>> 01fcdba (en.json updated)
   }
 }
