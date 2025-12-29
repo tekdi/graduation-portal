@@ -30,3 +30,7 @@ export interface ParticipantsQueryParams {
   page?: number;
   limit?: number;
 }
+
+export interface InterventionPlanProps {
+  participantStatus?: StatusType;
+}
