@@ -95,7 +95,6 @@ const getAccessPages = (
           component: LogVisit,
         },
         { name: 'template', path: '/participants/:id/template', component: TemplateScreen },
-        { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
         { name: 'participants', component: ParticipantsList },
         { name: 'project', path: '/project', component: ProjectPlayer },
       ];
@@ -127,7 +126,7 @@ const getLinkingConfig = (
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
         ? // Remove leading slash for react-navigation config consistency
-         page.path.startsWith('/')
+        page.path.startsWith('/')
           ? page.path.slice(1)
           : page.path
         : page.name;
@@ -259,10 +258,10 @@ const AppNavigator: React.FC = () => {
             headerShown: false,
             cardStyle: isWeb
               ? ({
-                  width: '100%',
-                  minHeight: '100vh',
-                  height: 'auto',
-                } as any)
+                width: '100%',
+                minHeight: '100vh',
+                height: 'auto',
+              } as any)
               : ({ width: '100%' } as any),
           }}
         >
