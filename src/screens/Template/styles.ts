@@ -43,9 +43,9 @@ export const templateStyles = {
   },
   pillarsSection: {
     pt: '$4',
-    borderTopWidth: '$px',
-    borderTopColor: '$borderLight200',
-    mt: '$2',
+    borderTopWidth: 1,
+    borderTopColor: '$borderLight300',
+    mt: '$3',
   },
   modalHeaderIcon: {
     width: '$10',
