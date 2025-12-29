@@ -107,12 +107,12 @@ const DevelopInterventionPlan: React.FC = () => {
                 <HStack space="sm" alignItems="center" flexWrap="wrap" mt="$2">
                   <Box
                     {...(templateStyles.badge as any)}
-                    bg={pathway.tag === 'Employment' ? '$badgeInfoBg' : '$badgeSuccessBg'}
+                    bg={pathway.badgeBg || '$badgeSuccessBg'}
                   >
                     <Text
                       {...TYPOGRAPHY.caption}
                       fontWeight="$medium"
-                      color={pathway.tag === 'Employment' ? '$badgeInfoText' : '$badgeSuccessText'}
+                      color={pathway.badgeTextColor || '$badgeSuccessText'}
                     >
                       {pathway.tag}
                     </Text>

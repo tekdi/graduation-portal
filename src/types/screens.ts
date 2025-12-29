@@ -40,6 +40,8 @@ export interface TemplateData {
   title: string;
   description: string;
   tag: string;
+  badgeBg?: string; // Badge background color token
+  badgeTextColor?: string; // Badge text color token
   pillarsCount: number;
   tasksCount: number;
   version: string;
