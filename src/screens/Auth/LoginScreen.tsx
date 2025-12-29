@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { ScrollView } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { ScrollView, Animated } from 'react-native';
 import {
   Box,
   VStack,
@@ -23,17 +23,19 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { loginStyles } from './Styles';
 import logoImage from '../../assets/images/logo.png';
 import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
-import { login as loginService } from '../../services/authenticationService';
 import logger from '@utils/logger';
 
 const LoginScreen: React.FC = () => {
-  const { setIsLoggedIn } = useAuth();
+  const { login, adminLogin } = useAuth();
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [adminLoading, setAdminLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isAdminMode, setIsAdminMode] = useState(false);
+  const flashAnim = useRef(new Animated.Value(1)).current;
 
   const handleLogin = async () => {
     setError('');
@@ -46,21 +48,17 @@ const LoginScreen: React.FC = () => {
     setLoading(true);
 
     try {
-      // Call the authentication service API
-      const loginResponse = await loginService(email, password);
+      // Use the login function from AuthContext which handles the API call
+      const success = await login(email, password);
 
-      if (loginResponse) {
-        // Update auth context with login success
-        // The login response data is already saved to offline storage by authenticationService
-        setIsLoggedIn(true);
-        // Optionally update user data in context if needed
-        // You can read from offline storage: await offlineStorage.read(STORAGE_KEYS.AUTH_USER)
-      } else {
+      if (!success) {
         setError(t('login.invalidEmailOrPassword'));
       }
+      // AuthContext already handles setting isLoggedIn and user state on success
     } catch (err: any) {
       // Handle error from API
-      const errorMessage = err?.message || t('login.anErrorOccurredDuringLogin');
+      const errorMessage =
+        err?.message || t('login.anErrorOccurredDuringLogin');
       setError(errorMessage);
       logger.error('Login error:', err);
     } finally {
@@ -68,99 +66,205 @@ const LoginScreen: React.FC = () => {
     }
   };
 
+  const handleAdminLoginClick = () => {
+    // Trigger fade out/in animation for full page
+    Animated.sequence([
+      // Fade out
+      Animated.timing(flashAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      // Switch to admin mode during fade out
+      // Using setTimeout to ensure state update happens mid-animation
+    ]).start(() => {
+      // Switch to admin mode
+      setIsAdminMode(true);
+      // Fade in
+      Animated.timing(flashAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
+
+  const handleCancelAdminMode = () => {
+    // Fade out animation
+    Animated.sequence([
+      Animated.timing(flashAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // Reset state during fade out
+      setIsAdminMode(false);
+      setError('');
+      setEmail('');
+      setPassword('');
+      // Fade in
+      Animated.timing(flashAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    });
+  };
+
+  const handleAdminLogin = async () => {
+    setError('');
+
+    if (!email || !password) {
+      setError(t('login.pleaseEnterBothEmailAndPassword'));
+      return;
+    }
+
+    setAdminLoading(true);
+
+    try {
+      // Use the adminLogin function from AuthContext which handles the API call
+      const success = await adminLogin(email, password);
+
+      if (!success) {
+        setError(t('login.adminLoginFailed'));
+      }
+      // AuthContext already handles setting isLoggedIn and user state on success
+    } catch (err: any) {
+      // Handle error from API
+      const errorMessage =
+        err?.message ||
+        t('login.anErrorOccurredDuringLogin') ||
+        'An error occurred during admin login';
+      setError(errorMessage);
+      logger.error('Admin login error:', err);
+    } finally {
+      setAdminLoading(false);
+    }
+  };
+
   return (
     <ScrollView {...loginStyles.scrollView}>
       <Box {...loginStyles.container}>
+        {/* @ts-ignore - LanguageSelector accepts menuTriggerProps */}
         <LanguageSelector menuTriggerProps={loginStyles.languageSelector} />
         <Box {...loginStyles.box}>
-          <VStack {...loginStyles.vstack}>
-            {/* Logo/Brand */}
-            {/* Placeholder for logo - replace with actual logo */}
-            <Image {...loginStyles.imageLogo} source={logoImage} />
+          <Animated.View style={{ opacity: flashAnim }}>
+            <VStack {...loginStyles.vstack}>
+              {/* Logo/Brand */}
+              {/* Placeholder for logo - replace with actual logo */}
+              <Image {...loginStyles.imageLogo} source={logoImage} />
 
-            {/* Tagline */}
-            <Heading {...loginStyles.heading}>{t('login.title')}</Heading>
+              {/* Tagline */}
+              <Heading {...loginStyles.heading}>{t('login.title')}</Heading>
 
-            {/* Welcome Text */}
-            <VStack {...loginStyles.vstack2}>
-              <Text {...loginStyles.text2}>
-                {t('login.welcomeToYourAccount')}
-              </Text>
-              <Text {...loginStyles.text3}>{t('login.logInToContinue')}</Text>
-            </VStack>
+              {/* Welcome Text */}
+              <VStack {...loginStyles.vstack2}>
+                <Text {...loginStyles.text2}>
+                  {isAdminMode
+                    ? t('login.welcomeToYourAccountAdmin') ||
+                      'Welcome To Your Account Admin / Supervisor'
+                    : t('login.welcomeToYourAccount')}
+                </Text>
+                <Text {...loginStyles.text3}>{t('login.logInToContinue')}</Text>
+              </VStack>
 
-            {/* Email Input */}
-            <VStack {...loginStyles.vstack3}>
-              <Text {...loginStyles.text4}>{t('login.username')}</Text>
-              <Input isDisabled={loading}>
-                <InputField
-                  placeholder="your.email@brac.net"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </Input>
-            </VStack>
+              {/* Email Input */}
+              <VStack {...loginStyles.vstack3}>
+                <Text {...loginStyles.text4}>{t('login.username')}</Text>
+                <Input isDisabled={loading || adminLoading}>
+                  <InputField
+                    placeholder="your.email@brac.net"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </Input>
+              </VStack>
 
-            {/* Password Input */}
-            <VStack {...loginStyles.vstack4}>
-              <Text {...loginStyles.text5}>{t('login.password')}</Text>
-              <Input isDisabled={loading}>
-                <InputField
-                  placeholder="••••••••"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry
-                />
-              </Input>
-            </VStack>
+              {/* Password Input */}
+              <VStack {...loginStyles.vstack4}>
+                <Text {...loginStyles.text5}>{t('login.password')}</Text>
+                <Input isDisabled={loading || adminLoading}>
+                  <InputField
+                    placeholder="••••••••"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry
+                  />
+                </Input>
+              </VStack>
 
-            {/* Remember Me Checkbox */}
-            <HStack {...loginStyles.hstack}>
-              <Checkbox
-                value="remember"
-                isChecked={rememberMe}
-                onChange={setRememberMe}
-                aria-label={t('login.rememberMe')}
+              {/* Remember Me Checkbox */}
+              <HStack {...loginStyles.hstack}>
+                <Checkbox
+                  value="remember"
+                  isChecked={rememberMe}
+                  onChange={setRememberMe}
+                  aria-label={t('login.rememberMe')}
+                >
+                  <CheckboxIndicator mr="$2">
+                    <CheckboxIcon as={CheckIcon} />
+                  </CheckboxIndicator>
+                  <CheckboxLabel>{t('login.rememberMe')}</CheckboxLabel>
+                </Checkbox>
+              </HStack>
+
+              {/* Error Message */}
+              {error ? (
+                <Box {...loginStyles.errorBox}>
+                  <Text {...loginStyles.errorText}>{error}</Text>
+                </Box>
+              ) : null}
+
+              {/* Login Button */}
+              <Button
+                {...loginStyles.button}
+                onPress={isAdminMode ? handleAdminLogin : handleLogin}
+                isDisabled={loading || adminLoading}
               >
-                <CheckboxIndicator mr="$2">
-                  <CheckboxIcon as={CheckIcon} />
-                </CheckboxIndicator>
-                <CheckboxLabel>{t('login.rememberMe')}</CheckboxLabel>
-              </Checkbox>
-            </HStack>
+                {loading || adminLoading ? (
+                  <Spinner color="$white" />
+                ) : (
+                  <ButtonText {...loginStyles.buttonText}>
+                    {isAdminMode ? t('login.adminLogin') : t('login.logIn')}
+                  </ButtonText>
+                )}
+              </Button>
 
-            {/* Error Message */}
-            {error ? (
-              <Box {...loginStyles.errorBox}>
-                <Text {...loginStyles.errorText}>{error}</Text>
-              </Box>
-            ) : null}
-
-            {/* Login Button */}
-            <Button
-              {...loginStyles.button}
-              onPress={handleLogin}
-              isDisabled={loading}
-            >
-              {loading ? (
-                <Spinner color="$white" />
+              {/* Admin Login Link / Cancel Link */}
+              {!isAdminMode ? (
+                <Button
+                  variant="link"
+                  onPress={handleAdminLoginClick}
+                  isDisabled={loading || adminLoading}
+                >
+                  <ButtonText {...loginStyles.adminLinkText}>
+                    {t('login.adminLogin')}
+                  </ButtonText>
+                </Button>
               ) : (
-                <ButtonText {...loginStyles.buttonText}>
-                  {t('login.logIn')}
-                </ButtonText>
+                <Button
+                  variant="link"
+                  onPress={handleCancelAdminMode}
+                  isDisabled={loading || adminLoading}
+                >
+                  <ButtonText {...loginStyles.adminLinkText}>
+                    {t('login.backToLogin') || 'Back to Login'}
+                  </ButtonText>
+                </Button>
               )}
-            </Button>
 
-            {/* Helper Text */}
-            <VStack {...loginStyles.vstack5}>
-              <Text {...loginStyles.text6}>{t('login.testAccounts')}</Text>
-              <Text {...loginStyles.text7}>
-                {t('login.testAccountsCredentials')}
-              </Text>
+              {/* Helper Text */}
+              {/* <VStack {...loginStyles.vstack5}>
+                  <Text {...loginStyles.text6}>{t('login.testAccounts')}</Text>
+                  <Text {...loginStyles.text7}>
+                    {t('login.testAccountsCredentials')}
+                  </Text>
+                </VStack> */}
             </VStack>
-          </VStack>
+          </Animated.View>
         </Box>
       </Box>
     </ScrollView>

@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import logger from '@utils/logger';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import { API_BASE_URL } from '@config/env';
+import offlineStorage from './offlineStorage';
 
 const TOKEN_STORAGE_KEY = STORAGE_KEYS.AUTH_TOKEN;
 
@@ -74,18 +75,23 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Clear stored token
+        // Clear stored token and user data to force re-login
         await AsyncStorage.removeItem(TOKEN_STORAGE_KEY);
+        
+        // Clear user data from offline storage
+        await offlineStorage.remove(STORAGE_KEYS.AUTH_USER);
+        await offlineStorage.remove('@auth_refresh_token');
+        await offlineStorage.remove('@auth_response');
         
         // Log out user or redirect to login
         logger.warn('Session expired. User needs to login again.');
         
-        // You can dispatch a logout action here if using Redux/Context
-        // Example: store.dispatch(logout());
+        // Note: AuthContext will detect missing token/user on next check/reload
+        // and automatically redirect to login screen
         
         return Promise.reject(error);
       } catch (storageError) {
-        logger.error('Error clearing token:', storageError);
+        logger.error('Error clearing authentication data:', storageError);
         return Promise.reject(error);
       }
     }
