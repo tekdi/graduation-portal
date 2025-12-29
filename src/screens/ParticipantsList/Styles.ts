@@ -186,3 +186,4 @@ export const styles = {
     numberOfLines: 1 as const,
   },
 } as const;
+

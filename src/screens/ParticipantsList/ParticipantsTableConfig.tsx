@@ -222,3 +222,4 @@ export const getParticipantsColumns = (
  * Shows all columns including progress
  */
 export const participantsColumns = allParticipantsColumns;
+
