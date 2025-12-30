@@ -32,7 +32,7 @@ const DevelopInterventionPlan: React.FC = () => {
 
   // Get participant data from ID
   const participant = participantId ? getParticipantById(participantId) : null;
-  const participantName = participant?.name || t('common.participant');
+  const participantName = participant?.name || '-';
 
   const handleConfirm = () => {
     if (category && subcategory) {
