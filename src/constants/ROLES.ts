@@ -4,5 +4,5 @@
  */
 export const ADMIN_ROLES: readonly string[] = ['admin'] as const;
 
-export const LC_ROLES: readonly string[] = ['mentee'] as const;
+export const LC_ROLES: readonly string[] = ['session_manager'] as const;
 

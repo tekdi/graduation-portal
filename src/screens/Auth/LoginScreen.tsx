@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ScrollView, Animated } from 'react-native';
+import { ScrollView, Animated, Pressable } from 'react-native';
 import {
   Box,
   VStack,
@@ -17,6 +17,7 @@ import {
   CheckboxLabel,
   CheckIcon,
   Image,
+  LucideIcon,
 } from '@ui';
 import { useAuth } from '@contexts/AuthContext';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -35,6 +36,7 @@ const LoginScreen: React.FC = () => {
   const [adminLoading, setAdminLoading] = useState(false);
   const [error, setError] = useState('');
   const [isAdminMode, setIsAdminMode] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const flashAnim = useRef(new Animated.Value(1)).current;
 
   const handleLogin = async () => {
@@ -186,14 +188,28 @@ const LoginScreen: React.FC = () => {
               {/* Password Input */}
               <VStack {...loginStyles.vstack4}>
                 <Text {...loginStyles.text5}>{t('login.password')}</Text>
-                <Input isDisabled={loading || adminLoading}>
-                  <InputField
-                    placeholder="••••••••"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                  />
-                </Input>
+                <Box position="relative">
+                  <Input isDisabled={loading || adminLoading}>
+                    <InputField
+                      placeholder="••••••••"
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={!showPassword}
+                      pr="$12"
+                    />
+                  </Input>
+                  <Pressable
+                    onPress={() => setShowPassword(!showPassword)}
+                    disabled={loading || adminLoading}
+                    style={loginStyles.eyeIconButton}
+                  >
+                    <LucideIcon
+                      name={showPassword ? 'EyeOff' : 'Eye'}
+                      size={20}
+                      color="#6B7280"
+                    />
+                  </Pressable>
+                </Box>
               </VStack>
 
               {/* Remember Me Checkbox */}

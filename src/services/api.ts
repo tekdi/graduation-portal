@@ -2,8 +2,15 @@ import axios, { AxiosInstance, InternalAxiosRequestConfig, AxiosResponse, AxiosE
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import logger from '@utils/logger';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
-import { API_BASE_URL } from '@config/env';
+// import { API_BASE_URL, ORIGIN } from '@config/env';
 import offlineStorage from './offlineStorage';
+
+// Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
+declare const process: {
+  env: {
+    [key: string]: string | undefined;
+  };
+} | undefined;
 
 const TOKEN_STORAGE_KEY = STORAGE_KEYS.AUTH_TOKEN;
 
@@ -11,12 +18,16 @@ const TOKEN_STORAGE_KEY = STORAGE_KEYS.AUTH_TOKEN;
  * Create axios instance with base configuration
  * baseURL is loaded from .env file via @config/env
  */
+
 const api: AxiosInstance = axios.create({
-  baseURL: API_BASE_URL,
+  // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+  baseURL: typeof process !== 'undefined' && process.env ? process.env.API_BASE_URL : undefined,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json, text/plain, */*',
+    // @ts-ignore - process.env is injected by webpack DefinePlugin on web
+    "origin": typeof process !== 'undefined' && process.env ? process.env.ORIGIN : undefined,
   },
 });
 

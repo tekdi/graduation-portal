@@ -58,4 +58,5 @@ export const loginStyles = {
   vstack5: { space: 'xs', mt: '$4', alignItems: 'center' },
   text6: { fontSize: '$xs', color: '$textDark500', textAlign: 'center' },
   text7: { fontSize: '$xs', color: '$textDark500' },
+  eyeIconButton: {position: 'absolute', right: 12, top: '50%', transform: [{ translateY: -12 }], padding: 4, zIndex: 1},
 } as const;
