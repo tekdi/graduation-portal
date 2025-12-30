@@ -12,7 +12,10 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(config => {
   const token =
-    typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+    typeof window !== 'undefined'
+      ? localStorage.getItem('accessToken') ||
+        PROJECT_PLAYER_CONFIGS.accessToken
+      : null;
 
   if (token) {
     config.headers['X-auth-token'] = token;
