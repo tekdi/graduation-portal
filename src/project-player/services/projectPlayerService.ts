@@ -3,15 +3,34 @@ import { PROJECT_PLAYER_CONFIGS } from '../../constants/PROJECTDATA';
 import { ApiResponse } from '../types/components.types';
 import { API_ENDPOINTS } from './apiEndpoints';
 
-const config = PROJECT_PLAYER_CONFIGS;
-
 export const apiClient = axios.create({
-  baseURL: config.baseUrl,
+  baseURL: PROJECT_PLAYER_CONFIGS.baseUrl,
   headers: {
     'Content-Type': 'application/json',
-    'X-auth-token': config.accessToken,
   },
 });
+
+apiClient.interceptors.request.use(config => {
+  const token =
+    typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+
+  if (token) {
+    config.headers['X-auth-token'] = token;
+  }
+
+  return config;
+});
+
+apiClient.interceptors.response.use(
+  res => res,
+  error => {
+    if (error.response?.status === 401) {
+      window.location.href =
+        PROJECT_PLAYER_CONFIGS.redirectionLinks.unauthorizedRedirectUrl;
+    }
+    return Promise.reject(error);
+  },
+);
 
 export const handleApiError = (error: unknown): ApiResponse<null> => {
   if (axios.isAxiosError(error)) {

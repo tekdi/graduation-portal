@@ -33,6 +33,7 @@ export const useProjectLoader = (
           if (error) {
             console.error('Failed to load project templates:', error);
             setProjectData(null);
+            setError(new Error(error));
             return;
           }
 
@@ -43,8 +44,9 @@ export const useProjectLoader = (
 
           setProjectData({
             ...template,
-            tasks: template.tasks.map((id: any) => ({
-              _id: id,
+            tasks: template.tasks.map((task: any) => ({
+              ...task,
+              _id: task.id,
             })),
           });
         } else if (data.solutionId) {

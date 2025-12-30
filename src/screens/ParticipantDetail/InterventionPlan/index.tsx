@@ -32,7 +32,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     if (status === STATUS.ENROLLED) {
       const baseConfig = isEditMode ? MODE.editMode : MODE.previewMode;
       const showAddCustomTaskButton =
-        STATUS.ENROLLED || STATUS.IN_PROGRESS ? true : false;
+        status === STATUS.ENROLLED || status === STATUS.IN_PROGRESS;
       // Add submit button config for ENROLLED status in preview mode
       if (!isEditMode) {
         return {
