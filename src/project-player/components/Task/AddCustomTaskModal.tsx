@@ -185,13 +185,12 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={handleCloseModal}
-      variant="custom"
-      title={
+      headerTitle={
         isEditMode
           ? 'projectPlayer.editCustomTask'
           : 'projectPlayer.addCustomTask'
       }
-      subtitle={
+      headerDescription={
         isEditMode
           ? 'projectPlayer.editCustomTaskSubtitle'
           : 'projectPlayer.addCustomTaskSubtitle'
