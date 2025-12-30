@@ -3,7 +3,7 @@ import { ProjectData } from '../project-player/types/project.types';
 export const DUMMY_PROJECT_DATA: ProjectData = {
   _id: 'Onboarding the Participant',
   solutionId: 'sol-community-health-001',
-  name: 'Onboarding the Participant',
+  title: 'Onboarding the Participant',
   description: 'Complete all required steps before enrolling the participant',
   status: 'in-progress',
   progress: 58,
@@ -55,7 +55,7 @@ export const DUMMY_PROJECT_DATA: ProjectData = {
 export const COMPLEX_PROJECT_DATA: ProjectData = {
   _id: 'Employment Pathway',
   solutionId: 'sol-community-health-001',
-  name: 'Employment Pathway',
+  title: 'Employment Pathway',
   description:
     'Comprehensive intervention plan for participants seeking formal employment with full support across all pillars',
   status: 'in-progress',
@@ -142,46 +142,40 @@ export const COMPLEX_PROJECT_DATA: ProjectData = {
   ],
 };
 
+const baseUrl = 'https://brac-dev.tekdinext.com/api/project/v1';
+const accessToken =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJkYXRhIjp7ImlkIjozMDg3LCJuYW1lIjoiRmFyYWJpIEFobWVkdWxsYWgiLCJzZXNzaW9uX2lkIjoyMjkwNCwib3JnYW5pemF0aW9uX2lkcyI6WyI2NyJdLCJvcmdhbml6YXRpb25fY29kZXMiOlsiYnJhY19nYmwiXSwidGVuYW50X2NvZGUiOiJicmFjIiwib3JnYW5pemF0aW9ucyI6W3siaWQiOjY3LCJuYW1lIjoiQlJBQyBHQkwgb3JnIiwiY29kZSI6ImJyYWNfZ2JsIiwiZGVzY3JpcHRpb24iOiJCUkFDIEdCTCBvcmciLCJzdGF0dXMiOiJBQ1RJVkUiLCJyZWxhdGVkX29yZ3MiOm51bGwsInRlbmFudF9jb2RlIjoiYnJhYyIsIm1ldGEiOm51bGwsImNyZWF0ZWRfYnkiOm51bGwsInVwZGF0ZWRfYnkiOjEsInJvbGVzIjpbeyJpZCI6MjEzLCJ0aXRsZSI6InNlc3Npb25fbWFuYWdlciIsImxhYmVsIjoiTGlua2FnZSBDaGFtcGlvbiIsInVzZXJfdHlwZSI6MCwic3RhdHVzIjoiQUNUSVZFIiwib3JnYW5pemF0aW9uX2lkIjo2NywidmlzaWJpbGl0eSI6IlBVQkxJQyIsInRlbmFudF9jb2RlIjoiYnJhYyIsInRyYW5zbGF0aW9ucyI6bnVsbH0seyJpZCI6MjE1LCJ0aXRsZSI6InVzZXIiLCJsYWJlbCI6IlBhcnRpY2lwYW50IiwidXNlcl90eXBlIjowLCJzdGF0dXMiOiJBQ1RJVkUiLCJvcmdhbml6YXRpb25faWQiOjY3LCJ2aXNpYmlsaXR5IjoiUFVCTElDIiwidGVuYW50X2NvZGUiOiJicmFjIiwidHJhbnNsYXRpb25zIjpudWxsfV19XX0sImlhdCI6MTc2NzA4NzQ3MiwiZXhwIjoxNzY3MTczODcyfQ.wKGJmjtOuOm0AXSEAW0Tzmv5LqTyNkC6Jp7af5AbJBA';
+
 export const PROJECT_PLAYER_CONFIGS = {
+  maxFileSize: 50,
+  baseUrl: baseUrl,
+  accessToken: localStorage.getItem('accessToken') || accessToken,
+  language: 'en',
+  profileInfo: {
+    id: 123,
+    name: 'John Doe',
+  },
+  redirectionLinks: {
+    unauthorizedRedirectUrl: '/unauthorized',
+  },
+  data: {
+    solutionId: 'solution_001',
+    projectId: 'GBL_P01_ONBOARDING',
+  },
+};
+
+export const MODE = {
   // Edit mode with full permissions
   editMode: {
     mode: 'edit' as const,
-    solutionId: 'sol-community-health-001',
-    projectId: 'proj-health-assessment-2024',
-    maxFileSize: 50,
-    baseUrl: 'https://api.example.com',
-    accessToken: 'sample-token-abc123',
-    language: 'en',
-    showAddCustomTaskButton: true, // Show button in edit mode
-    profileInfo: {
-      id: 123,
-      name: 'John Doe',
-      email: 'john.doe@brac.org',
-      role: 'LC',
-      district: 'District-A',
-    },
-    redirectionLinks: {
-      unauthorizedRedirectUrl: '/unauthorized',
-    },
   },
-
   // Preview mode (template view)
   previewMode: {
     mode: 'preview' as const,
-    solutionId: 'sol-community-health-001',
-    maxFileSize: 10,
-    baseUrl: 'https://api.example.com',
-    language: 'en',
-    showAddCustomTaskButton: true, // Show button in preview mode (can be customized)
   },
 
   // Read-only mode
   readOnlyMode: {
     mode: 'read-only' as const,
-    solutionId: 'sol-community-health-001',
-    projectId: 'proj-health-assessment-2024',
-    baseUrl: 'https://api.example.com',
-    language: 'en',
-    showAddCustomTaskButton: false, // Hide button in read-only mode
   },
 };

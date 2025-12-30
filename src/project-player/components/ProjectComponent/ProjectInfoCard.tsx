@@ -55,7 +55,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
       <HStack {...projectInfoCardStyles.header}>
         <VStack {...projectInfoCardStyles.leftSection}>
           <Text {...TYPOGRAPHY.h3} color="$textPrimary">
-            {project.name}
+            {project.title}
           </Text>
 
           {project.description && (

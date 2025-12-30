@@ -9,7 +9,7 @@ export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
 export interface ProjectData {
   _id: string;
   solutionId: string;
-  name: string;
+  title: string;
   description: string;
   status: (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS];
   progress: number;

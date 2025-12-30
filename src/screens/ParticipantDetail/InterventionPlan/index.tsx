@@ -7,10 +7,7 @@ import ProjectPlayer, {
   ProjectPlayerData,
   ProjectPlayerConfig,
 } from '../../../project-player/index';
-import {
-  COMPLEX_PROJECT_DATA,
-  PROJECT_PLAYER_CONFIGS,
-} from '@constants/PROJECTDATA';
+import { COMPLEX_PROJECT_DATA, MODE } from '@constants/PROJECTDATA';
 import { STATUS } from '@constants/app.constant';
 import type { InterventionPlanProps } from '../../../types/screens';
 
@@ -25,7 +22,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   const config: ProjectPlayerConfig = useMemo(() => {
     // Handle undefined participantStatus
     if (!participantStatus) {
-      return PROJECT_PLAYER_CONFIGS.previewMode;
+      return MODE.previewMode;
     }
 
     // Store in const to ensure TypeScript knows it's defined
@@ -33,10 +30,9 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
 
     // ENROLLED status: use editMode if isEditMode is true, otherwise previewMode
     if (status === STATUS.ENROLLED) {
-      const baseConfig = isEditMode
-        ? PROJECT_PLAYER_CONFIGS.editMode
-        : PROJECT_PLAYER_CONFIGS.previewMode;
-
+      const baseConfig = isEditMode ? MODE.editMode : MODE.previewMode;
+      const showAddCustomTaskButton =
+        STATUS.ENROLLED || STATUS.IN_PROGRESS ? true : false;
       // Add submit button config for ENROLLED status in preview mode
       if (!isEditMode) {
         return {
@@ -46,17 +42,20 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
         };
       }
 
-      return baseConfig;
+      return {
+        ...baseConfig,
+        showAddCustomTaskButton,
+      };
     }
 
     // Map other statuses to their respective configs
     const statusConfigMap: Record<string, ProjectPlayerConfig> = {
-      [STATUS.IN_PROGRESS]: PROJECT_PLAYER_CONFIGS.editMode,
-      [STATUS.COMPLETED]: PROJECT_PLAYER_CONFIGS.editMode,
-      [STATUS.DROPOUT]: PROJECT_PLAYER_CONFIGS.readOnlyMode,
+      [STATUS.IN_PROGRESS]: MODE.editMode,
+      [STATUS.COMPLETED]: MODE.editMode,
+      [STATUS.DROPOUT]: MODE.readOnlyMode,
     };
 
-    return statusConfigMap[status] || PROJECT_PLAYER_CONFIGS.previewMode;
+    return statusConfigMap[status] || MODE.previewMode;
   }, [participantStatus, isEditMode]);
 
   // Memoize ProjectPlayer data - all statuses use COMPLEX_PROJECT_DATA

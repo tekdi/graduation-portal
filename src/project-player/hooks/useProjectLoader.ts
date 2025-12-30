@@ -4,6 +4,7 @@ import {
   ProjectPlayerConfig,
   ProjectPlayerData,
 } from '../types/components.types';
+import { getProjectTemplatesList } from '../services/projectPlayerService';
 
 export const useProjectLoader = (
   config: ProjectPlayerConfig,
@@ -25,13 +26,27 @@ export const useProjectLoader = (
           return;
         }
 
-        // Determine which API to call based on mode and available IDs
+        // config.mode = "edit" and data contains both solutionId and projectId.
         if (config.mode === 'edit' && data.projectId) {
-          // Load project instance
-          // TODO: Implement API call
-          // const response = await fetch(`/api/project/details/${data.projectId}`);
-          // For now, set to null until API is implemented
-          setProjectData(null);
+          const { data: templates, error } = await getProjectTemplatesList();
+
+          if (error) {
+            console.error('Failed to load project templates:', error);
+            setProjectData(null);
+            return;
+          }
+
+          const selectTemplate = (templates: any[]) =>
+            templates.find(t => t.externalId === data.projectId);
+
+          const template = selectTemplate(templates);
+
+          setProjectData({
+            ...template,
+            tasks: template.tasks.map((id: any) => ({
+              _id: id,
+            })),
+          });
         } else if (data.solutionId) {
           // Load template
           // TODO: Implement API call

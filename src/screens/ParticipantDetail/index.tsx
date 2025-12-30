@@ -34,12 +34,10 @@ import { Modal, useAlert, Select, LucideIcon } from '@ui';
 import { usePlatform } from '@utils/platform';
 import { profileStyles } from '@components/ui/Modal/Styles';
 import { theme } from '@config/theme';
-import ProjectPlayer, {
-  ProjectPlayerData,
-  ProjectPlayerConfig,
-} from '../../project-player/index';
+import ProjectPlayer, { ProjectPlayerData } from '../../project-player/index';
 import {
-  DUMMY_PROJECT_DATA,
+  MODE,
+  // DUMMY_PROJECT_DATA,
   PROJECT_PLAYER_CONFIGS,
 } from '@constants/PROJECTDATA';
 import { PARTICIPANT_DETAILS_TABS, STATUS } from '@constants/app.constant';
@@ -119,15 +117,19 @@ export default function ParticipantDetail() {
   } = participant;
 
   // Determine ProjectPlayer config and data based on participant status
-  const configData: ProjectPlayerConfig = {
-    ...PROJECT_PLAYER_CONFIGS.editMode,
+  const config = PROJECT_PLAYER_CONFIGS;
+  const selectedMode = MODE.editMode;
+
+  const configData = {
+    ...config,
+    ...selectedMode,
     showAddCustomTaskButton: false,
   };
 
   const ProjectPlayerConfigData: ProjectPlayerData = {
-    solutionId: configData.solutionId,
-    projectId: configData.projectId,
-    data: DUMMY_PROJECT_DATA,
+    solutionId: config.data.solutionId,
+    projectId: config.data.projectId,
+    // data: DUMMY_PROJECT_DATA,
   };
 
   return (
