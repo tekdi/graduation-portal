@@ -25,6 +25,7 @@ import ParticipantDetail from '../screens/ParticipantDetail';
 import ParticipantsList from '../screens/ParticipantsList/index';
 import ProjectPlayer from '../screens/ProjectPlayer';
 import LogVisit from '../screens/ParticipantDetail/LogVisit';
+import TemplateScreen from '../screens/Template';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -93,6 +94,7 @@ const getAccessPages = (
           path: '/participants/:id/log-visit',
           component: LogVisit,
         },
+        { name: 'template', path: '/participants/:id/template', component: TemplateScreen },
         { name: 'participants', component: ParticipantsList },
         { name: 'project', path: '/project', component: ProjectPlayer },
       ];
@@ -124,8 +126,8 @@ const getLinkingConfig = (
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
         ? // Remove leading slash for react-navigation config consistency
-          page.path.startsWith('/')
-          ? page.path.substr(1)
+        page.path.startsWith('/')
+          ? page.path.slice(1)
           : page.path
         : page.name;
 
@@ -256,10 +258,10 @@ const AppNavigator: React.FC = () => {
             headerShown: false,
             cardStyle: isWeb
               ? ({
-                  width: '100%',
-                  minHeight: '100vh',
-                  height: 'auto',
-                } as any)
+                width: '100%',
+                minHeight: '100vh',
+                height: 'auto',
+              } as any)
               : ({ width: '100%' } as any),
           }}
         >
@@ -287,5 +289,4 @@ const AppNavigator: React.FC = () => {
     </NavigationErrorBoundary>
   );
 };
-
 export default AppNavigator;

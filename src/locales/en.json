@@ -16,6 +16,7 @@
     "logout": "Logout",
     "loading": "Loading...",
     "save": "Save",
+    "saving": "Saving...",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -36,7 +37,8 @@
     "placeholder": "Search users, templates, logs...",
     "actions": "Actions",
     "noDataFound": "No data found",
-    "optional": "(Optional)"
+    "optional": "(Optional)",
+    "participant": "Participant"
   },
   "projectPlayer": {
     "status": "Status",
@@ -94,7 +96,31 @@
     "updateTask": "Update Task",
     "deleteTask": "Delete Task",
     "confirmDeleteTask": "Are you sure you want to delete '{{taskName}}'? This action cannot be undone.",
-    "taskDeleted": "Task deleted successfully"
+    "taskDeleted": "Task deleted successfully",
+    "graduationReadiness": "Graduation Readiness",
+    "previousProgress": "Previous: {{percent}}%",
+    "saveProgress": "Save Progress",
+    "taskUpdated": "{{count}} task updated",
+    "tasksUpdated": "{{count}} tasks updated",
+    "progressSaved": "Progress saved successfully",
+    "toDo": "To Do",
+    "done": "Done",
+    "addToPlan": "Add to Plan",
+    "remove": "Remove",
+    "file": "file",
+    "files": "files",
+    "uploadEvidence": "Upload Evidence",
+    "uploadConsent": "Upload Consent",
+    "uploadSLA": "Upload SLA",
+    "completeProfile": "Complete Profile",
+    "evidenceUploaded": "Evidence uploaded successfully",
+    "consentUploaded": "Consent uploaded successfully",
+    "slaUploaded": "SLA uploaded successfully",
+    "evidencePreview": "Evidence Preview",
+    "viewAllUploadedEvidence": "View all uploaded evidence for this task",
+    "imagePreviewPlaceholder": "Image preview",
+    "noFilesUploaded": "No files uploaded",
+    "uploadedBy": "Uploaded by {{name}}"
   },
   "navigation": {
     "menu": "Menu",
@@ -258,7 +284,9 @@
       "noPlanAssigned": "No Intervention Plan Assigned",
       "noPlanDescription": "Pillars and tasks will appear here once an intervention plan is assigned to this participant.",
       "developPlan": "Develop Intervention Plan",
-      "submitInterventionPlan": "Submit Intervention Plan"
+      "submitInterventionPlan": "Submit Intervention Plan",
+      "changePathway": "Change Pathway",
+      "socialProtectionWarning": "Please add Social Protection tasks to your plan before submitting."
     },
     "assessmentSurveys": {
       "title": "Assessment Surveys",
@@ -326,7 +354,6 @@
   },
   "actions": {
     "viewDetails": "View Details",
-    "viewLog": "View Log",
     "logVisit": "Log Visit",
     "dropout": "Dropout",
     "confirmDropout": "Confirm Dropout",
@@ -381,5 +408,28 @@
       "myProfile": "My Profile",
       "serviceProviders": "Service Providers"
     }
+  },
+  "template": {
+    "categoryModal": {
+      "title": "Select Livelihood Category",
+      "forParticipant": "For participant: {{name}}",
+      "description": "Please select the livelihood category and subcategory for this pathway. This helps track and support the specific business type.",
+      "categoryLabel": "Category of Livelihoods *",
+      "categoryPlaceholder": "Select a category...",
+      "subCategoryLabel": "Sub-Category of Livelihoods *",
+      "subCategoryPlaceholder": "Select a sub-category...",
+      "subCategoryPlaceholderDisabled": "First select a category",
+      "selectedLabel": "Selected: {{category}} - {{subcategory}}",
+      "selectedDescription": "This information will be used to tailor support and track progress for this specific business type.",
+      "confirmButton": "Confirm & Continue",
+      "cancelButton": "Cancel"
+    },
+    "pathwayCard": {
+      "pillars": "Pillars",
+      "tasks": "Tasks",
+      "includedPillars": "Included Pillars:",
+      "tasksLabel": "tasks"
+    },
+    "loadError": "Failed to load templates. Please try again."
   }
 }

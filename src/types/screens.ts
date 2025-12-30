@@ -34,3 +34,19 @@ export interface ParticipantsQueryParams {
 export interface InterventionPlanProps {
   participantStatus?: StatusType;
 }
+
+export interface TemplateData {
+  id: string;
+  title: string;
+  description: string;
+  tag: string;
+  badgeBg?: string; // Badge background color token
+  badgeTextColor?: string; // Badge text color token
+  pillarsCount: number;
+  tasksCount: number;
+  version: string;
+  includedPillars: {
+    name: string;
+    tasks: number;
+  }[];
+}
