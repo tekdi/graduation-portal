@@ -130,3 +130,14 @@ export const adminLogin = async (
     throw error;
   }
 };
+
+
+export const getUserProfile = async (): Promise<any> => {
+  try {
+    const response = await api.get(API_ENDPOINTS.USER_PROFILE);
+    return response.data.result || {};
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};

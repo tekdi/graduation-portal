@@ -35,6 +35,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { theme } from '@config/theme';
 import { profileStyles, LCProfileStyles } from '@components/ui/Modal/Styles';
 import { MenuItemData } from '@components/ui/Menu';
+import { getUserProfile } from '../../services/authenticationService';
 
 /**
  * Header Component - Enhanced for LC Layout Support
@@ -80,20 +81,21 @@ const Header: React.FC<{
   const { t, currentLanguage, changeLanguage } = useLanguage();
   const [authUser, setAuthUser] = useState<User | null>(null);
 
-  const handleMenuSelect = (key: string | undefined) => {
+  const handleMenuSelect = async (key: string | undefined) => {
     // Handle menu item selection
     logger.log('Menu selected:', key);
     if (key === 'myProfile') {
-      setAuthUser(user);
+      const userProfile = await getUserProfile();
+      setAuthUser(userProfile);
     } else if (key === 'logout') {
       logout();
     }
   };
-
   // Wrapper for hamburger menu selection - handles myProfile in Header, passes others to parent
-  const handleHamburgerMenuSelect = (key: string | undefined) => {
+  const handleHamburgerMenuSelect = async (key: string | undefined) => {
     if (key === 'myProfile') {
-      setAuthUser(user);
+      const userProfile = await getUserProfile();
+      setAuthUser(userProfile);
     } else if (onHamburgerMenuSelect) {
       // Pass other menu items to parent handler (for navigation, logout, etc.)
       onHamburgerMenuSelect(key);
@@ -354,7 +356,7 @@ const Header: React.FC<{
                   {...profileStyles.fieldLabel}
                   flexShrink={1}
                 >
-                  {authUser?.serviceArea}
+                  {authUser?.location}
                 </Text>
               </Box>
             </Box>

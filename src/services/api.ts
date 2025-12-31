@@ -44,6 +44,7 @@ api.interceptors.request.use(
       // Add token to Authorization header if available
       if (token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
+        config.headers['x-auth-token'] = token;
       }
 
       // Log request details (optional - can be removed in production)
