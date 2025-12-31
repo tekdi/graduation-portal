@@ -19,6 +19,7 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  languages?: string[] | null;
   [key: string]: any; // Allow additional user properties from API
 }
 
