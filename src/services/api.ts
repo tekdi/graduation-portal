@@ -21,13 +21,13 @@ const TOKEN_STORAGE_KEY = STORAGE_KEYS.AUTH_TOKEN;
 
 const api: AxiosInstance = axios.create({
   // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
-  baseURL: typeof process !== 'undefined' && process.env ? process.env.API_BASE_URL : undefined,
+  baseURL: process.env.API_BASE_URL || '',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json, text/plain, */*',
     // @ts-ignore - process.env is injected by webpack DefinePlugin on web
-    "origin": typeof process !== 'undefined' && process.env ? process.env.ORIGIN : undefined,
+    origin: process.env.ORIGIN || '',
   },
 });
 
@@ -47,10 +47,10 @@ api.interceptors.request.use(
       }
 
       // Log request details (optional - can be removed in production)
-      logger.info(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
-        headers: config.headers,
-        data: config.data,
-      });
+      // logger.info(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
+      //   headers: config.headers,
+      //   data: config.data,
+      // });
 
       return config;
     } catch (error) {

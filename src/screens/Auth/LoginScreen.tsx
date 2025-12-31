@@ -164,8 +164,7 @@ const LoginScreen: React.FC = () => {
               <VStack {...loginStyles.vstack2}>
                 <Text {...loginStyles.text2}>
                   {isAdminMode
-                    ? t('login.welcomeToYourAccountAdmin') ||
-                      'Welcome To Your Account Admin / Supervisor'
+                    ? t('login.welcomeToYourAccountAdmin') 
                     : t('login.welcomeToYourAccount')}
                 </Text>
                 <Text {...loginStyles.text3}>{t('login.logInToContinue')}</Text>

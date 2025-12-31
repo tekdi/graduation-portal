@@ -171,18 +171,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // Validate that user data is not empty
         if (!userData || (typeof userData === 'object' && Object.keys(userData).length === 0)) {
           logger.warn('Login response contains empty user object');
-          // Use email as fallback to create a minimal user object
-          const fallbackUser: User = {
-            id: email,
-            email: email,
-            name: email.split('@')[0],
-            role: 'LC' as UserRole,
-          };
-          await offlineStorage.create(STORAGE_KEYS.AUTH_USER, fallbackUser);
-          setUser(fallbackUser);
-          setIsLoggedIn(true);
-          logger.info('User logged in successfully with fallback user:', email);
-          return true;
+          // Do NOT create a fallback user; treat this as a failed login requiring valid user and role check
+          logger.error('Login failed: No user data returned from authentication service');
+          return false;
         }
         
         // Determine role based on organizations and roles (admin priority first)
@@ -198,9 +189,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // Map API user data to User interface
         // Adjust these mappings based on your actual API user structure
         const mappedUser: User = {
-          id: userData.id || userData._id || email,
-          email: userData.email || email,
-          name: userData.name || userData.fullName || userData.username || email.split('@')[0],
           role: determinedRole,
           ...userData, // Include any additional properties from API
         };
@@ -226,6 +214,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         return false;
       }
     } catch (error: any) {
+       // @ts-ignore - Allow throwing error (so UI can show the error message)
       logger.error('Login error:', error);
       return false;
     }
