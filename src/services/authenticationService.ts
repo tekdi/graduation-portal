@@ -1,4 +1,5 @@
 import api, { saveToken } from './api';
+import { API_ENDPOINTS } from './apiEndpoints';
 import offlineStorage from './offlineStorage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import logger from '@utils/logger';
@@ -25,7 +26,7 @@ export const login = async (
   password: string
 ): Promise<LoginResponse> => {
   try {
-    const response = await api.post<LoginResponse>('/user/v1/account/login', {
+    const response = await api.post<LoginResponse>(API_ENDPOINTS.LOGIN, {
       identifier,
       password,
     });
@@ -84,7 +85,7 @@ export const adminLogin = async (
 ): Promise<LoginResponse> => {
   try {
     // Admin login uses the same endpoint but is a separate function to distinguish admin login flow
-    const response = await api.post<LoginResponse>('/user/v1/admin/login', {
+    const response = await api.post<LoginResponse>(API_ENDPOINTS.ADMIN_LOGIN, {
       identifier,
       password,
     });
