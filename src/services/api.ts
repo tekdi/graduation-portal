@@ -92,8 +92,7 @@ api.interceptors.response.use(
         
         // Clear user data from offline storage
         await offlineStorage.remove(STORAGE_KEYS.AUTH_USER);
-        await offlineStorage.remove('@auth_refresh_token');
-        await offlineStorage.remove('@auth_response');
+        await offlineStorage.remove(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
         
         // Log out user or redirect to login
         logger.warn('Session expired. User needs to login again.');

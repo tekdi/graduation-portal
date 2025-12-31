@@ -27,13 +27,12 @@ import LanguageSelector from '@components/LanguageSelector/LanguageSelector';
 import logger from '@utils/logger';
 
 const LoginScreen: React.FC = () => {
-  const { login, adminLogin } = useAuth();
+  const { login } = useAuth();
   const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [adminLoading, setAdminLoading] = useState(false);
   const [error, setError] = useState('');
   const [isAdminMode, setIsAdminMode] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -50,19 +49,20 @@ const LoginScreen: React.FC = () => {
     setLoading(true);
 
     try {
-      // Use the login function from AuthContext which handles the API call
-      const success = await login(email, password);
+      // Use the login function from AuthContext with isAdmin flag based on current mode
+      const success = await login(email, password, isAdminMode);
 
       if (!success) {
-        setError(t('login.invalidEmailOrPassword'));
+        setError(isAdminMode ? t('login.adminLoginFailed') : t('login.invalidEmailOrPassword'));
       }
       // AuthContext already handles setting isLoggedIn and user state on success
     } catch (err: any) {
       // Handle error from API
       const errorMessage =
-        err?.message || t('login.anErrorOccurredDuringLogin');
+        err?.message ||
+        t('login.anErrorOccurredDuringLogin');
       setError(errorMessage);
-      logger.error('Login error:', err);
+      logger.error(`${isAdminMode ? 'Admin ' : ''}Login error:`, err);
     } finally {
       setLoading(false);
     }
@@ -114,36 +114,6 @@ const LoginScreen: React.FC = () => {
     });
   };
 
-  const handleAdminLogin = async () => {
-    setError('');
-
-    if (!email || !password) {
-      setError(t('login.pleaseEnterBothEmailAndPassword'));
-      return;
-    }
-
-    setAdminLoading(true);
-
-    try {
-      // Use the adminLogin function from AuthContext which handles the API call
-      const success = await adminLogin(email, password);
-
-      if (!success) {
-        setError(t('login.adminLoginFailed'));
-      }
-      // AuthContext already handles setting isLoggedIn and user state on success
-    } catch (err: any) {
-      // Handle error from API
-      const errorMessage =
-        err?.message ||
-        t('login.anErrorOccurredDuringLogin') ||
-        'An error occurred during admin login';
-      setError(errorMessage);
-      logger.error('Admin login error:', err);
-    } finally {
-      setAdminLoading(false);
-    }
-  };
 
   return (
     <ScrollView {...loginStyles.scrollView}>
@@ -173,7 +143,7 @@ const LoginScreen: React.FC = () => {
               {/* Email Input */}
               <VStack {...loginStyles.vstack3}>
                 <Text {...loginStyles.text4}>{t('login.username')}</Text>
-                <Input isDisabled={loading || adminLoading}>
+                <Input isDisabled={loading}>
                   <InputField
                     placeholder="your.email@brac.net"
                     value={email}
@@ -188,7 +158,7 @@ const LoginScreen: React.FC = () => {
               <VStack {...loginStyles.vstack4}>
                 <Text {...loginStyles.text5}>{t('login.password')}</Text>
                 <Box position="relative">
-                  <Input isDisabled={loading || adminLoading}>
+                  <Input isDisabled={loading}>
                     <InputField
                       placeholder="••••••••"
                       value={password}
@@ -199,7 +169,7 @@ const LoginScreen: React.FC = () => {
                   </Input>
                   <Pressable
                     onPress={() => setShowPassword(!showPassword)}
-                    disabled={loading || adminLoading}
+                    disabled={loading}
                     style={loginStyles.eyeIconButton}
                   >
                     <LucideIcon
@@ -236,10 +206,10 @@ const LoginScreen: React.FC = () => {
               {/* Login Button */}
               <Button
                 {...loginStyles.button}
-                onPress={isAdminMode ? handleAdminLogin : handleLogin}
-                isDisabled={loading || adminLoading}
+                onPress={handleLogin}
+                isDisabled={loading}
               >
-                {loading || adminLoading ? (
+                {loading ? (
                   <Spinner color="$white" />
                 ) : (
                   <ButtonText {...loginStyles.buttonText}>
@@ -253,7 +223,7 @@ const LoginScreen: React.FC = () => {
                 <Button
                   variant="link"
                   onPress={handleAdminLoginClick}
-                  isDisabled={loading || adminLoading}
+                  isDisabled={loading}
                 >
                   <ButtonText {...loginStyles.adminLinkText}>
                     {t('login.adminLogin')}
@@ -263,7 +233,7 @@ const LoginScreen: React.FC = () => {
                 <Button
                   variant="link"
                   onPress={handleCancelAdminMode}
-                  isDisabled={loading || adminLoading}
+                  isDisabled={loading}
                 >
                   <ButtonText {...loginStyles.adminLinkText}>
                     {t('login.backToLogin') || 'Back to Login'}

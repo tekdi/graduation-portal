@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 import logger from '@utils/logger';
-import { login as loginService, adminLogin as adminLoginService } from '../services/authenticationService';
+import { login as loginService } from '../services/authenticationService';
 import offlineStorage from '../services/offlineStorage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import { getToken, removeToken } from '../services/api';
@@ -26,8 +26,7 @@ export interface User {
 interface AuthContextType {
   isLoggedIn: boolean;
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
-  adminLogin: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string, isAdmin?: boolean) => Promise<boolean>;
   logout: () => Promise<void>;
   setIsLoggedIn: (value: boolean) => void;
   loading: boolean;
@@ -44,23 +43,6 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  * @throws Error if user doesn't have any authorized role
  */
 const determineUserRole = (userData: any): UserRole => {
-  // Check if user has organizations array
-  if (!userData?.organizations || !Array.isArray(userData.organizations)) {
-    // If no organizations, check if user has a direct role property
-    const directRole = userData?.role || userData?.userRole;
-    if (directRole) {
-      const roleLower = String(directRole).toLowerCase();
-      const roleString = String(directRole);
-      if (roleLower === 'admin' || ADMIN_ROLES.includes(roleString)) {
-        return 'Admin';
-      }
-      if (roleLower === 'lc' || LC_ROLES.includes(roleString)) {
-        return 'LC';
-      }
-    }
-    // If no organizations and no valid direct role, throw error
-    throw new Error('Unauthorized: This role is not authorized to access the system');
-  }
 
   // Check for admin roles first (priority)
   const adminOrganizations = userData.organizations.filter((org: any) => {
@@ -134,8 +116,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           
           // Clear all auth data
           await offlineStorage.remove(STORAGE_KEYS.AUTH_USER);
-          await offlineStorage.remove('@auth_refresh_token');
-          await offlineStorage.remove('@auth_response');
+          await offlineStorage.remove(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
           if (token) {
             await removeToken();
           }
@@ -155,143 +136,50 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     loadUser();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string, isAdmin: boolean = false): Promise<boolean> => {
     try {
       if (!email || !password) {
-        logger.warn('Login attempted with empty credentials');
+        logger.warn(`${isAdmin ? 'Admin ' : ''}Login attempted with empty credentials`);
         return false;
       }
 
-      // Call the authentication service
-      const loginResponse = await loginService(email, password);
+      // Call the authentication service with the isAdmin flag
+      const loginResponse = await loginService(email, password, isAdmin);
 
-      // Check if login was successful
-      if (loginResponse.responseCode === 'OK' && loginResponse.result?.user) {
+      // Check if login response has user data
+      if (loginResponse.result?.user) {
         const userData = loginResponse.result.user;
-        
-        // Validate that user data is not empty
-        if (!userData || (typeof userData === 'object' && Object.keys(userData).length === 0)) {
-          logger.warn('Login response contains empty user object');
-          // Do NOT create a fallback user; treat this as a failed login requiring valid user and role check
-          logger.error('Login failed: No user data returned from authentication service');
-          return false;
-        }
-        
-        // Determine role based on organizations and roles (admin priority first)
-        // This will throw an error if user doesn't have authorized role
+        // Determine user role (admin priority), throws if unauthorized
         let determinedRole: UserRole;
         try {
           determinedRole = determineUserRole(userData);
         } catch (roleError: any) {
-          logger.warn('User role not authorized:', roleError.message);
+          logger.warn(`${isAdmin ? 'Admin ' : ''}User role not authorized:`, roleError.message);
           throw new Error(roleError.message || 'Unauthorized: This role is not authorized to access the system');
         }
         
         // Map API user data to User interface
-        // Adjust these mappings based on your actual API user structure
         const mappedUser: User = {
           role: determinedRole,
           ...userData, // Include any additional properties from API
         };
 
-        // Validate mapped user has at least email or id
-        if (!mappedUser.id && !mappedUser.email) {
-          logger.error('Mapped user object is invalid - missing id and email');
-          return false;
-        }
-
-        // Save the mapped user data to storage (overwrite the raw user data saved by authenticationService)
-        // This ensures the correct structure is always persisted
+        // Save the mapped user data to storage in one line
         await offlineStorage.create(STORAGE_KEYS.AUTH_USER, mappedUser);
         
         // Update the context state
         setUser(mappedUser);
         setIsLoggedIn(true);
         
-        logger.info('User logged in successfully:', mappedUser.email || mappedUser.id);
+        logger.info(`${isAdmin ? 'Admin ' : ''}User logged in successfully:`, mappedUser.email || mappedUser.id);
         return true;
       } else {
-        logger.warn('Login failed:', loginResponse.message);
+        logger.warn(`${isAdmin ? 'Admin ' : ''}Login failed:`, loginResponse.message || 'No user data in response');
         return false;
       }
     } catch (error: any) {
-       // @ts-ignore - Allow throwing error (so UI can show the error message)
-      logger.error('Login error:', error);
-      return false;
-    }
-  };
-
-  const adminLogin = async (email: string, password: string): Promise<boolean> => {
-    try {
-      if (!email || !password) {
-        logger.warn('Admin login attempted with empty credentials');
-        return false;
-      }
-
-      // Call the admin authentication service
-      const loginResponse = await adminLoginService(email, password);
-
-      // Check if login was successful
-      if (loginResponse.responseCode === 'OK' && loginResponse.result?.user) {
-        const userData = loginResponse.result.user;
-        
-        // Validate that user data is not empty
-        if (!userData || (typeof userData === 'object' && Object.keys(userData).length === 0)) {
-          logger.warn('Admin login response contains empty user object');
-          // Use admin email as fallback to create a minimal user object
-          const fallbackUser: User = {
-            id: email,
-            email: email,
-            name: email.split('@')[0],
-            role: 'Admin' as UserRole,
-          };
-          await offlineStorage.create(STORAGE_KEYS.AUTH_USER, fallbackUser);
-          setUser(fallbackUser);
-          setIsLoggedIn(true);
-          logger.info('Admin logged in successfully with fallback user:', email);
-          return true;
-        }
-        
-        // Determine role based on organizations and roles (admin priority first)
-        // This will throw an error if user doesn't have authorized role
-        let determinedRole: UserRole;
-        try {
-          determinedRole = determineUserRole(userData);
-        } catch (roleError: any) {
-          logger.warn('Admin user role not authorized:', roleError.message);
-          throw new Error(roleError.message || 'Unauthorized: This role is not authorized to access the system');
-        }
-        
-        // Map API user data to User interface
-        const mappedUser: User = {
-          id: userData.id || userData._id || email,
-          email: userData.email || email,
-          name: userData.name || userData.fullName || userData.username || email.split('@')[0],
-          role: determinedRole,
-          ...userData, // Include any additional properties from API
-        };
-
-        // Validate mapped user has at least email or id
-        if (!mappedUser.id && !mappedUser.email) {
-          logger.error('Mapped admin user object is invalid - missing id and email');
-          return false;
-        }
-
-        // Save the mapped user data to storage
-        await offlineStorage.create(STORAGE_KEYS.AUTH_USER, mappedUser);
-        
-        // Update the context state
-        setUser(mappedUser);
-        setIsLoggedIn(true);
-        
-        logger.info('Admin logged in successfully:', mappedUser.email || mappedUser.id);
-        return true;
-      } else {
-        logger.warn('Admin login failed:', loginResponse.message);
-        return false;
-      }
-    } catch (error: any) {
-      logger.error('Admin login error:', error);
+      // @ts-ignore - Allow throwing error (so UI can show the error message)
+      logger.error(`${isAdmin ? 'Admin ' : ''}Login error:`, error);
       return false;
     }
   };
@@ -303,8 +191,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       
       // Remove user data from storage
       await offlineStorage.remove(STORAGE_KEYS.AUTH_USER);
-      await offlineStorage.remove('@auth_refresh_token');
-      await offlineStorage.remove('@auth_response');
+      await offlineStorage.remove(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
       
       // Clear context state
       setUser(null);
@@ -318,7 +205,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
 
   return (
     <AuthContext.Provider
-      value={{ isLoggedIn, user, login, adminLogin, logout, setIsLoggedIn, loading }}
+      value={{ isLoggedIn, user, login, logout, setIsLoggedIn, loading }}
     >
       {children}
     </AuthContext.Provider>
