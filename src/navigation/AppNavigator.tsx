@@ -15,6 +15,7 @@ import { useAuth } from '@contexts/AuthContext';
 import { Spinner } from '@ui';
 import logger from '@utils/logger';
 import { isWeb, usePlatform } from '@utils/platform';
+import { navigationRef } from './navigationRef';
 import AccessBaseNavigator from './navigators/AccessBaseNavigator';
 import HomeScreen from '../screens/Home';
 import UserManagementScreen from '../screens/UserManagement';
@@ -239,6 +240,7 @@ const AppNavigator: React.FC = () => {
   return (
     <NavigationErrorBoundary>
       <NavigationContainer
+        ref={navigationRef}
         key={navigationKey}
         linking={linking}
         fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}

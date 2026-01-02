@@ -1,4 +1,14 @@
 import { ProjectData } from '../project-player/types/project.types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from './STORAGE_KEYS';
+
+declare const process:
+  | {
+      env: {
+        [key: string]: string | undefined;
+      };
+    }
+  | undefined;
 
 export const DUMMY_PROJECT_DATA: ProjectData = {
   _id: 'Onboarding the Participant',
@@ -142,19 +152,38 @@ export const COMPLEX_PROJECT_DATA: ProjectData = {
   ],
 };
 
-const baseUrl = 'https://brac-dev.tekdinext.com/api/project/v1';
+// Default base URL fallback - used only if env variable is not set
+const DEFAULT_BASE_URL = 'https://brac-dev.tekdinext.com';
+
+// Get baseUrl from environment variable, fallback to default if not set
+const baseUrl =
+  typeof process !== 'undefined' && process?.env?.API_BASE_URL
+    ? process.env.API_BASE_URL
+    : DEFAULT_BASE_URL;
+
+// Helper function to get access token from AsyncStorage
+export const getAccessToken = async (): Promise<string | null> => {
+  try {
+    const token = await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    return token;
+  } catch (error) {
+    console.error('Error getting token from AsyncStorage:', error);
+    return null;
+  }
+};
 
 export const PROJECT_PLAYER_CONFIGS = {
   maxFileSize: 50,
   baseUrl: baseUrl,
-  accessToken: localStorage.getItem('accessToken'),
+  // accessToken is a function that fetches token from AsyncStorage
+  accessToken: getAccessToken,
   language: 'en',
   profileInfo: {
     id: 123,
     name: 'John Doe',
   },
   redirectionLinks: {
-    unauthorizedRedirectUrl: '/unauthorized',
+    unauthorizedRedirectUrl: '/login',
   },
   data: {
     solutionId: 'solution_001',
