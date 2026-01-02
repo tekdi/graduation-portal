@@ -70,7 +70,7 @@ export const FilterOptions: ReadonlyArray<FilterConfig> = [
     attr: 'province',
     type: 'select',
     data: [
-      { label: 'All Provinces', value: 'all-provinces' },
+      { labelKey: 'admin.filters.allProvinces', value: 'all-provinces' },
       ...PROVINCES.map(province => ({
         label: province.label,
         value: province.value,
@@ -82,7 +82,7 @@ export const FilterOptions: ReadonlyArray<FilterConfig> = [
     attr: 'district',
     type: 'select',
     data: [
-      { label: 'All Districts', value: 'all-districts' },
+      { labelKey: 'admin.filters.allDistricts', value: 'all-districts' },
       ...DISTRICTS.map(district => ({
         label: district.label,
         value: district.value,

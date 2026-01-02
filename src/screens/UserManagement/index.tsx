@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { VStack, HStack, Button, Text, Image, Box } from '@ui';
 import { View } from 'react-native';
 import { LucideIcon } from '@ui/index';
@@ -72,14 +72,14 @@ const UserManagementScreen = () => {
     return applyFilters(result, filtersForHelper);
   }, [filters]);
 
-  const handleFilterChange = (newFilters: Record<string, any>) => {
+  const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
-  };
+  }, []);
 
-  const handleRowClick = (user: User) => {
+  const handleRowClick = useCallback((user: User) => {
     // Handle row click - navigate to user details
     console.log('User clicked:', user);
-  };
+  }, []);
 
   return (
     <VStack space="md" width="100%">
@@ -195,7 +195,7 @@ const UserManagementScreen = () => {
             <Button
                 {...titleHeaderStyles.outlineButton}
                 onPress={() => {
-                  // Handle bulk upload
+                  // Handle Export CSV
                 }}
               >
               <HStack space="xs" alignItems="center">

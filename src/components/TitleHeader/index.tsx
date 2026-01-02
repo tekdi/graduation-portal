@@ -16,10 +16,10 @@ const TitleHeader: React.FC<TitleHeaderProps> = ({ title, description, right }) 
   
   return (
     <HStack 
-      $md-justifyContent="space-between" 
-      $md-alignItems="flex-start" 
+      justifyContent={isMobile ? "flex-start" : "space-between"}
+      alignItems={isMobile ? "flex-start" : "center"}
+      flexWrap="wrap"
       width="100%"
-      $md-flexWrap="wrap"
       flexDirection={isMobile ? "column" : "row"}
       space={isMobile ? "md" : undefined}
     >

@@ -177,7 +177,9 @@
       "participant": "Participant",
       "allStatus": "All Status",
       "active": "Active",
-      "deactivated": "Deactivated"
+      "deactivated": "Deactivated",
+      "allProvinces": "All Provinces",
+      "allDistricts": "All Districts"
     },
     "users": {
       "allUsers": "All Users",
