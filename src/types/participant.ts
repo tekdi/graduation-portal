@@ -105,6 +105,7 @@ export interface ParticipantSearchParams {
   type?: string;
   page?: number;
   limit?: number;
+  search?: string;
 }
 
 export interface ParticipantSearchResponse {

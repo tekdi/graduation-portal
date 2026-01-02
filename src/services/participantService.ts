@@ -18,7 +18,8 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       tenant_code = 'brac',
       type = 'user',
       page = 1,
-      limit = 20,
+      limit = 20, 
+      search,
     } = params;
 
     // Build query string
@@ -27,6 +28,7 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       type,
       page: page.toString(),
       limit: limit.toString(),
+      search: search || '',
     });
 
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;

@@ -38,7 +38,7 @@ const ParticipantsList: React.FC = () => {
   const [activeStatus, setActiveStatus] = useState<StatusType | ''>(
     STATUS.NOT_ENROLLED,
   );
-  const [_searchKey, setSearchKey] = useState('');
+  const [searchKey, setSearchKey] = useState('');
   const [activeFilter, setActiveFilter] = useState<'active' | 'inactive'>('active');
   const [isLoading] = useState(false);
 
@@ -124,12 +124,13 @@ const ParticipantsList: React.FC = () => {
         type: 'user',
         page: 1,
         limit: 20,
+        search: searchKey,
       });
       
       setParticipants(response.result.data || []);
     };
     fetchParticipants();
-  }, []);
+  }, [searchKey]);
 
   // When Active/Inactive filter changes, set default status
   useEffect(() => {
@@ -157,6 +158,7 @@ const ParticipantsList: React.FC = () => {
   // Handlers
   const handleSearch = useCallback((text: string) => {
     // Search functionality can be implemented here when needed
+    setSearchKey(text);
   }, []);
 
   const handleStatusChange = useCallback((status: StatusType | '') => {
@@ -172,8 +174,6 @@ const ParticipantsList: React.FC = () => {
     },
     [navigation],
   );
-
-
 
   return (
     <Box {...styles.mainContainer}>
@@ -195,6 +195,7 @@ const ParticipantsList: React.FC = () => {
                   placeholder={t('participants.searchByNameOrId')}
                   onSearch={handleSearch}
                   debounceMs={500}
+                  defaultValue={searchKey}
                 />
               </Box>
               <Box {...styles.selectContainer}>
