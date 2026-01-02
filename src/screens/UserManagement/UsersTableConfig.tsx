@@ -76,7 +76,7 @@ const DetailsCell: React.FC<{ details: User['details'] }> = ({ details }) => {
   return (
     <HStack {...styles.detailsProgressContainer}>
       <Progress value={details.value} flex={1} size="sm" bg="$progressBarBackground">
-        <ProgressFilledTrack bg="$primary500" />
+        <ProgressFilledTrack bg="$progressBarFillColor" />
       </Progress>
       <Text
         {...TYPOGRAPHY.bodySmall}

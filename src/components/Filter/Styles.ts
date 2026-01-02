@@ -81,7 +81,7 @@ export const filterStyles = {
   },
   clearLinkText: {
     fontSize: '$sm' as const,
-    color: '$primary500' as const,
+    color: '$textMutedForeground' as const,
     fontWeight: '$medium' as const,
     textDecorationLine: 'none' as const,
   },
