@@ -94,3 +94,21 @@ export interface Site {
   type: 'Urban' | 'Rural' | 'Peri-urban';
 }
 
+/**
+ * Participant Service
+ * Handles participant data operations and transformations
+ */
+
+export interface ParticipantSearchParams {
+  user_ids?: string[] | null;
+  tenant_code?: string;
+  type?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface ParticipantSearchResponse {
+  responseCode: string;
+  message: string;
+  result: any;
+}

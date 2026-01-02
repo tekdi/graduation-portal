@@ -41,7 +41,6 @@ const ParticipantsList: React.FC = () => {
   const [_searchKey, setSearchKey] = useState('');
   const [activeFilter, setActiveFilter] = useState<'active' | 'inactive'>('active');
   const [isLoading] = useState(false);
-  
 
   // Calculate status counts dynamically from participants data
   const statusCounts = useMemo<StatusCount>(() => {
@@ -118,9 +117,18 @@ const ParticipantsList: React.FC = () => {
   }, [statusItems, t]);
 
   useEffect(() => {
+    const fetchParticipants = async () => {
     // Set mock participants data
-    const participants = getParticipantsList();
-    setParticipants(participants);
+      const response = await getParticipantsList({
+        tenant_code: 'brac',
+        type: 'user',
+        page: 1,
+        limit: 20,
+      });
+      
+      setParticipants(response.result.data || []);
+    };
+    fetchParticipants();
   }, []);
 
   // When Active/Inactive filter changes, set default status
@@ -254,7 +262,7 @@ const ParticipantsList: React.FC = () => {
 
             {/* Participants Table */}
             <DataTable
-              data={filteredParticipants}
+              data={participants}
               columns={getParticipantsColumns(activeStatus)}
               getRowKey={participant => participant.id}
               onRowClick={handleRowClick}

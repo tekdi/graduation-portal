@@ -1,26 +1,45 @@
-import { Participant } from '@app-types/screens';
-import type { ParticipantData, Province, Site } from '@app-types/participant';
+import type { ParticipantData, ParticipantSearchParams, ParticipantSearchResponse, Site } from '@app-types/participant';
 import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
+import api from './api';
+import { API_ENDPOINTS } from './apiEndpoints';
 
-/**
- * Participant Service
- * Handles participant data operations and transformations
- */
 
 /**
  * Get participants list for table view
- * Maps ParticipantData[] to Participant[] format by converting contact to phone
+ * Searches users by user IDs and returns the search response
+ *
+ * @param params - Search parameters including user_ids array and optional query params
+ * @returns A promise resolving to the search response from the API
  */
-export const getParticipantsList = (): Participant[] => {
-  return PARTICIPANTS_DATA.map((participant) => ({
-    id: participant.id,
-    name: participant.name,
-    phone: participant.contact, // Map contact to phone
-    email: participant.email || '',
-    address: participant.address,
-    progress: participant.progress ?? 0,
-    status: participant.status as Participant['status'], // Use display status directly
-  }));
+export const getParticipantsList = async (params: ParticipantSearchParams): Promise<ParticipantSearchResponse> => {
+  try {
+    const {
+      user_ids,
+      tenant_code = 'brac',
+      type = 'user',
+      page = 1,
+      limit = 20,
+    } = params;
+
+    // Build query string
+    const queryParams = new URLSearchParams({
+      tenant_code,
+      type,
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
+
+    const response = await api.post<ParticipantSearchResponse>(endpoint, {
+      user_ids,
+    });
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
 };
 
 /**
