@@ -1,28 +1,136 @@
 export const projectComponentStyles = {
   container: {
     flex: 1,
-    bg: '$backgroundLight0',
   },
   scrollView: {
-    contentContainerStyle: { padding: 16 },
     showsVerticalScrollIndicator: true,
+    paddingTop: '$7',
   },
   card: {
     size: 'lg' as const,
     variant: 'elevated' as const,
     bg: '$white',
-    borderRadius: '$lg',
+    borderRadius: '$2xl',
+    borderWidth: 1,
+    borderColor: '$borderLight300',
+    maxWidth: 1200,
+    width: '$full',
+    alignSelf: 'center' as const,
   },
   addTaskButtonContainer: {
-    padding: '$5',
+    padding: '$3',
     paddingTop: '$3',
+  },
+  // Progress card section
+  progressCardContainer: {
+    paddingHorizontal: '$5',
+    paddingVertical: '$4',
+  },
+  progressCard: {
+    borderWidth: 1,
+    borderColor: '$borderLight200',
+    borderRadius: '$lg',
+    padding: '$4',
+    bg: '$white',
+  },
+  progressHeader: {
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    marginBottom: '$2',
+  },
+  progressBarBackground: {
+    height: '$1.5',
+    bg: '$progressBarBackground',
+    borderRadius: '$full',
+    overflow: 'hidden' as const,
+  },
+  progressBarFill: {
+    height: '$full',
+    bg: '$progressBarFillColor',
+    borderRadius: '$full',
+  },
+  previousProgressText: {
+    marginTop: '$1',
+  },
+  // Save Progress button
+  saveProgressButton: {
+    marginTop: '$4',
+  },
+  saveProgressButtonInner: {
+    bg: '$primary500',
+    paddingHorizontal: '$4',
+    paddingVertical: '$3',
+    borderRadius: '$lg',
+    alignItems: 'center' as const,
+    space: 'sm' as const,
+    alignSelf: 'flex-start' as const,
+  },
+  // Add Custom Task button
+  addCustomTaskContainer: {
+    paddingHorizontal: '$5',
+    paddingVertical: '$4',
+  },
+  addCustomTaskButton: {
+    borderWidth: 1,
+    borderStyle: 'dashed' as const,
+    borderColor: '$mutedBorder',
+    borderRadius: '$md',
+    padding: '$3',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    bg: '$accent100',
+  },
+  addCustomTaskButtonHovered: {
+    borderColor: '$primary500',
+    bg: '$primary100',
+  },
+  toast: {
+    bg: '$backgroundLight100',
+    borderRadius: '$lg',
+    marginBottom: '$4',
+    marginRight: '$4',
+  },
+  toastContent: {
+    space: 'sm' as const,
+    alignItems: 'center' as const,
+    padding: '$2',
+  },
+  // Footer button container - responsive layout
+  footerButtonContainer: {
+    flexDirection: 'column-reverse' as const,
+    gap: '$3',
+    width: '$full',
+    sx: {
+      '@md': {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+      },
+    },
+  },
+  // Change Pathway button - responsive
+  changePathwayButton: {
+    width: '$full',
+    sx: {
+      '@md': {
+        width: 'auto',
+      },
+    },
+  },
+  // Submit button - responsive
+  submitButton: {
+    width: '$full', 
+    sx: {
+      '@md': {
+        width: 'auto',
+      },
+    },
   },
 } as const;
 
 export const projectInfoCardStyles = {
   container: {
     bg: '$backgroundPrimary.light',
-    padding: '$6',
+    padding: '$1',
   },
   header: {
     justifyContent: 'space-between' as const,
@@ -56,7 +164,7 @@ export const projectInfoCardStyles = {
     // Simple text container
   },
   progressContainer: {
-    space: 'xs' as const,
+    space: 'lg' as const,
     marginLeft: '$4',
     width: 120,
   },
