@@ -16,6 +16,7 @@ import { USER_MANAGEMENT_MOCK_DATA, User } from '@constants/USER_MANAGEMENT_MOCK
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { applyFilters } from '@utils/helper';
 import { usePlatform } from '@utils/platform';
+import { styles } from './Styles';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -177,31 +178,26 @@ const UserManagementScreen = () => {
       />
       
       {/* Table Header with Title, Count, and Export Button */}
-      <Box
-        bg="$white"
-        padding="$4"
-        borderRadius="$lg"
-        borderWidth={1}
-        borderColor="$borderColor"
-      >
-        <HStack justifyContent="space-between" alignItems="center" marginBottom="$4">
+      <Box {...styles.tableContainer}>
+        <HStack {...styles.tableHeader}>
           <Text {...TYPOGRAPHY.h4} color="$textForeground" fontWeight="$normal">
             {t('admin.users.allUsers')}
           </Text>
-          <HStack space="md" alignItems="center">
-            <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
-              {t('admin.users.showing', {
-                count: filteredData.length,
-                total: USER_MANAGEMENT_MOCK_DATA.length,
-              })}
-            </Text>
+          <HStack {...styles.tableHeaderActions}>
+            {!isMobile && (
+              <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
+                {t('admin.users.showing', {
+                  count: filteredData.length,
+                  total: USER_MANAGEMENT_MOCK_DATA.length,
+                })}
+              </Text>
+            )}
             <Button
-              variant="outline"
-              size="sm"
-              onPress={() => {
-                // Handle export CSV
-              }}
-            >
+                {...titleHeaderStyles.outlineButton}
+                onPress={() => {
+                  // Handle bulk upload
+                }}
+              >
               <HStack space="xs" alignItems="center">
                 <LucideIcon
                   name="Download"

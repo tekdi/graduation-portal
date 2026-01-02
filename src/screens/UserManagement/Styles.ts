@@ -87,4 +87,27 @@ export const styles = {
     ...columnTextBase,
     color: '$textForeground' as const,
   },
+
+  // Table Container Styles
+  tableContainer: {
+    bg: '$white' as const,
+    padding: '$4' as const,
+    borderRadius: '$lg' as const,
+    borderWidth: 1,
+    borderColor: '$borderColor' as const,
+    mt: '$3' as const,
+  },
+
+  // Table Header Styles
+  tableHeader: {
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    marginBottom: '$4' as const,
+  },
+
+  // Table Header Actions Styles
+  tableHeaderActions: {
+    space: 'md' as const,
+    alignItems: 'center' as const,
+  },
 } as const;

@@ -210,8 +210,8 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
       </Text>
     ),
     mobileConfig: {
-      leftRank: 2,
-      showLabel: true,
+      fullWidthRank: 1,
+      showLabel: false,
     },
   },
   {
@@ -221,7 +221,7 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     render: (user) => <RoleBadge role={user.role} />,
     mobileConfig: {
       rightRank: 1,
-      showLabel: true,
+      showLabel: false,
     },
   },
   {
@@ -231,7 +231,7 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     render: (user) => <StatusBadge status={user.status} />,
     mobileConfig: {
       rightRank: 2,
-      showLabel: true,
+      showLabel: false,
     },
   },
   {
@@ -245,7 +245,7 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     ),
     mobileConfig: {
       leftRank: 3,
-      showLabel: true,
+      showLabel: false,
     },
   },
   {
@@ -260,8 +260,8 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
       </Pressable>
     ),
     mobileConfig: {
-      leftRank: 4,
-      showLabel: true,
+      rightRank: 3,
+      showLabel: false,
     },
   },
   {
@@ -275,7 +275,7 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     ),
     mobileConfig: {
       leftRank: 5,
-      showLabel: true,
+      showLabel: false,
     },
   },
   {
@@ -284,8 +284,8 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     flex: 1.5,
     render: (user) => <DetailsCell details={user.details} />,
     mobileConfig: {
-      fullWidthRank: 1,
-      showLabel: true,
+      leftRank: 4,
+      showLabel: false,
     },
   },
   {
