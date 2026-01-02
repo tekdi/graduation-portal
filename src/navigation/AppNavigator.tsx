@@ -14,7 +14,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { useAuth } from '@contexts/AuthContext';
 import { Spinner } from '@ui';
 import logger from '@utils/logger';
-import { usePlatform } from '@utils/platform';
+import { isWeb, usePlatform } from '@utils/platform';
 import AccessBaseNavigator from './navigators/AccessBaseNavigator';
 import HomeScreen from '../screens/Home';
 import UserManagementScreen from '../screens/UserManagement';
@@ -26,6 +26,7 @@ import ParticipantsList from '../screens/ParticipantsList/index';
 import ProjectPlayer from '../screens/ProjectPlayer';
 import LogVisit from '../screens/ParticipantDetail/LogVisit';
 import Observation from '../screens/Observation/Observation';
+import TemplateScreen from '../screens/Template';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -52,7 +53,7 @@ class NavigationErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        this.props.fallback || <Spinner size="large" color="$primary500" />
+        this.props.fallback || <Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />
       );
     }
     return this.props.children;
@@ -87,6 +88,7 @@ const getAccessPages = (
         { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
         { name: 'log-visit', path: '/participants/:id/log-visit', component: LogVisit },
         { name: 'observation', path: '/participants/:id/observation/:observationId', component: Observation },
+        { name: 'template', path: '/participants/:id/template', component: TemplateScreen },
         { name: 'participants', component: ParticipantsList },
         { name: 'project', path: '/project', component: ProjectPlayer },
       ];
@@ -118,8 +120,8 @@ const getLinkingConfig = (
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
         ? // Remove leading slash for react-navigation config consistency
-          page.path.startsWith('/')
-          ? page.path.substr(1)
+        page.path.startsWith('/')
+          ? page.path.slice(1)
           : page.path
         : page.name;
 
@@ -165,7 +167,7 @@ const RoleBasedNavigator: React.FC = () => {
   }
 
   return (
-    <Suspense fallback={<Spinner size="large" color="$primary500" />}>
+    <Suspense fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}>
       <AccessBaseNavigator accessPages={accessPages} />
     </Suspense>
   );
@@ -225,7 +227,7 @@ const AppNavigator: React.FC = () => {
   }, [isLoggedIn, user?.role, accessPages.length]);
 
   if (loading) {
-    return <Spinner size="large" color="$primary500" />;
+    return <Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />;
   }
 
   return (
@@ -233,7 +235,7 @@ const AppNavigator: React.FC = () => {
       <NavigationContainer
         key={navigationKey}
         linking={linking}
-        fallback={<Spinner size="large" color="$primary500" />}
+        fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}
         onReady={() => {
           if (isWeb) {
             logger.log('Navigation container ready');
@@ -250,10 +252,10 @@ const AppNavigator: React.FC = () => {
             headerShown: false,
             cardStyle: isWeb
               ? ({
-                  width: '100%',
-                  minHeight: '100vh',
-                  height: 'auto',
-                } as any)
+                width: '100%',
+                minHeight: '100vh',
+                height: 'auto',
+              } as any)
               : ({ width: '100%' } as any),
           }}
         >
@@ -281,5 +283,4 @@ const AppNavigator: React.FC = () => {
     </NavigationErrorBoundary>
   );
 };
-
 export default AppNavigator;
