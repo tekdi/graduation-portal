@@ -161,7 +161,8 @@
     "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
     "actions": {
       "bulkUploadCSV": "Bulk Upload (CSV)",
-      "createUser": "Create User"
+      "createUser": "Create User",
+      "exportCSV": "Export CSV"
     },
     "filters": {
       "role": "Role",
@@ -179,6 +180,7 @@
       "deactivated": "Deactivated"
     },
     "users": {
+      "allUsers": "All Users",
       "name": "Name",
       "email": "Email",
       "role": "Role",
@@ -190,6 +192,7 @@
       "actions": "Actions",
       "noUsersFound": "No users found",
       "loadingUsers": "Loading users...",
+      "showing": "Showing {{count}} of {{total}} users",
       "actionMenu": {
         "viewProfile": "View Profile",
         "edit": "Edit",
