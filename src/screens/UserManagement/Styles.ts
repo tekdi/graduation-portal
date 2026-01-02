@@ -1,32 +1,90 @@
-export const userManagementStyles = {
-  scrollView: {
-    flex: 1,
-    width: '100%',
-    p: '$4',
-    bg: '$backgroundLight0',
+/**
+ * Styles for UserManagement screen components
+ * Centralized style definitions for better maintainability
+ */
+
+// Base column text style - common properties shared by all column text styles
+const columnTextBase = {
+  fontWeight: '$normal' as const,
+  fontSize: '$sm' as const,
+};
+
+export const styles = {
+  // Role Badge Styles
+  roleBadge: {
+    paddingHorizontal: '$2' as const,
+    paddingVertical: '$0.5' as const,
+    borderRadius: '$md' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
   },
-  statsHStack: {
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+  roleBadgeText: {
+    color: '$white' as const,
+    fontWeight: '$medium' as const,
+    fontSize: '$xs' as const,
   },
-  sectionsContainer: {
-    flexWrap: 'wrap',
-    space: 'lg',
+  roleColors: {
+    Admin: '$error600' as const,
+    Supervisor: '$primary500' as const,
+    'Linkage Champion': '$textMutedForeground' as const,
+    Participant: '$textSecondary' as const,
   },
-  sectionBox: {
-    flex: 1,
-    w: '100%',
+
+  // Status Badge Styles
+  statusBadge: {
+    paddingHorizontal: '$2' as const,
+    paddingVertical: '$0.5' as const,
+    borderRadius: '$md' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
   },
-  sectionTitle: {
-    fontWeight: '$bold',
-    mb: '$2',
+  statusBadgeText: {
+    color: '$white' as const,
+    fontWeight: '$medium' as const,
+    fontSize: '$xs' as const,
   },
-  // Quick Actions Card
-  quickActionsCard: {
-    borderWidth: 1,
-    borderColor: '$borderLight300',
-    rounded: '$2xl',
-    p: '$4',
-    bg: '$backgroundLight0',
+  statusBadgeActive: {
+    bg: '$success600' as const,
+  },
+  statusBadgeInactive: {
+    bg: '$textMutedForeground' as const,
+  },
+
+  // Details Cell Styles
+  detailsAssignedText: {
+    color: '$primary500' as const,
+    fontWeight: '$medium' as const,
+  },
+  detailsProgressContainer: {
+    space: 'sm' as const,
+    alignItems: 'center' as const,
+    width: '$full' as const,
+    maxWidth: 200,
+  },
+  detailsProgressText: {
+    color: '$textMutedForeground' as const,
+    minWidth: 40,
+  },
+
+  // Column Text Styles - using base style with color overrides
+  nameText: {
+    ...columnTextBase,
+    color: '$textForeground' as const,
+  },
+  emailText: {
+    ...columnTextBase,
+    color: '$textForeground' as const,
+  },
+  provinceText: {
+    ...columnTextBase,
+    color: '$textForeground' as const,
+  },
+  districtText: {
+    ...columnTextBase,
+    color: '$textMutedForeground' as const,
+  },
+  lastLoginText: {
+    ...columnTextBase,
+    color: '$textForeground' as const,
   },
 } as const;

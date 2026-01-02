@@ -1,13 +1,32 @@
 import React from "react";
-import { VStack, HStack, Text, Image, Input, InputField, Button } from "@ui";
+import { VStack, HStack, Text, Image, Input, InputField, Pressable } from "@ui";
 import Select from "../ui/Inputs/Select";
 import { filterStyles } from "./Styles";
 import filterIcon from "../../assets/images/FilterIcon.png";
 import { useLanguage } from "@contexts/LanguageContext";
 
-export default function FilterButton({ data }: any) {
+interface FilterButtonProps {
+  data: any[];
+  filteredCount?: number;
+  totalCount?: number;
+  userLabel?: string; // e.g., "users", "participants"
+  onFilterChange?: (filters: Record<string, any>) => void;
+}
+
+export default function FilterButton({ 
+  data, 
+  filteredCount, 
+  totalCount,
+  userLabel = 'users',
+  onFilterChange
+}: FilterButtonProps) {
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
+
+  // Notify parent when filters change
+  React.useEffect(() => {
+    onFilterChange?.(value);
+  }, [value, onFilterChange]);
 
   // Get default display values for UI (not included in output)
   const getDefaultDisplayValue = (item: any) => {
@@ -35,16 +54,42 @@ export default function FilterButton({ data }: any) {
 
   return (
     <VStack {...filterStyles.container}>
-      {/* Title */}
+      {/* Title Row with User Count and Clear Button */}
       <HStack {...filterStyles.titleContainer}>
-        <Image 
-          source={filterIcon}
-          style={{ width: 20, height: 20 }}
-          alt="Filter icon"
-        />
-        <Text {...filterStyles.titleText}>
-          {t('common.filters')}
-        </Text>
+        {/* Left: Filter Icon + Title */}
+        <HStack alignItems="center">
+          <Image 
+            source={filterIcon}
+            style={{ width: 16, height: 16 }}
+            alt="Filter icon"
+          />
+          <Text {...filterStyles.titleText}>
+            {t('common.filters')}
+          </Text>
+        </HStack>
+
+        {/* Right: User Count + Clear Button */}
+        <HStack space="md" alignItems="center">
+          {filteredCount !== undefined && totalCount !== undefined && (
+            <Text 
+              fontSize="$sm"
+              color="$textMutedForeground"
+              fontWeight="$normal"
+            >
+              {filteredCount} of {totalCount} {userLabel}
+            </Text>
+          )}
+          <Pressable onPress={handleClearFilters}>
+            <Text 
+              fontSize="$xs"
+              color="$textMutedForeground"
+              fontWeight="$medium"
+              $web-cursor="pointer"
+            >
+              {t('common.clear')}
+            </Text>
+          </Pressable>
+        </HStack>
       </HStack>
 
       {/* Filters Row */}
@@ -56,9 +101,9 @@ export default function FilterButton({ data }: any) {
               ? filterStyles.searchContainer 
               : filterStyles.roleContainer)}
           >
-            <Text {...filterStyles.label}>
+            {/* <Text {...filterStyles.label}>
               {item.nameKey ? t(item.nameKey) : item.name}
-            </Text>
+            </Text> */}
             {item.type === 'search' ? (
               <Input {...filterStyles.input}>
                 <InputField
@@ -124,16 +169,6 @@ export default function FilterButton({ data }: any) {
             )}
           </VStack>
         ))}
-
-        {/* Clear Filters Button */}
-        <VStack {...filterStyles.clearButtonContainer}>
-          <Button 
-            onPress={handleClearFilters}
-            {...filterStyles.button}
-          >
-            <Text {...filterStyles.buttonText}>{t('common.clearFilters')}</Text>
-          </Button>
-        </VStack>
       </HStack>
 
     </VStack>

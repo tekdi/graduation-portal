@@ -91,6 +91,7 @@ export const theme = {
       // Task Card colors for nested project children
       taskCardBg: '#f8f9fa',
       taskCardBorder: '#e9ecef',
+      borderColor : '#e2e8f0',
     },
     sizes: {
       ...((gluestackConfig.tokens as any).sizes || {}),

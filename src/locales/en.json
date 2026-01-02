@@ -25,6 +25,7 @@
     "filter": "Filter",
     "filters": "Filters",
     "clearFilters": "Clear Filters",
+    "clear": "Clear",
     "submit": "Submit",
     "back": "Back",
     "next": "Next",
@@ -165,6 +166,8 @@
     "filters": {
       "role": "Role",
       "status": "Status",
+      "province": "Province",
+      "district": "District",
       "searchPlaceholder": "Search by name or email...",
       "allRoles": "All Roles",
       "admin": "Admin",
@@ -174,6 +177,27 @@
       "allStatus": "All Status",
       "active": "Active",
       "deactivated": "Deactivated"
+    },
+    "users": {
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "province": "Province",
+      "district": "District",
+      "lastLogin": "Last Login",
+      "details": "Details",
+      "actions": "Actions",
+      "noUsersFound": "No users found",
+      "loadingUsers": "Loading users...",
+      "actionMenu": {
+        "viewProfile": "View Profile",
+        "edit": "Edit",
+        "resetPassword": "Reset Password",
+        "deactivate": "Deactivate",
+        "confirmDeactivate": "Confirm Deactivation",
+        "deactivateMessage": "Are you sure you want to deactivate {{name}}? This will prevent them from accessing the system."
+      }
     },
     "stats": {
       "totalUsers": "Total Users",

@@ -3,6 +3,8 @@
  * Data-driven filter definitions for the User Management screen
  */
 
+import { PROVINCES } from './PARTICIPANTS_LIST';
+
 // Type definition for filter configuration
 type FilterConfig = {
   name?: string; // Fallback if nameKey is not provided
@@ -14,6 +16,22 @@ type FilterConfig = {
   placeholderKey?: string; // Translation key for the placeholder
 };
 
+/**
+ * South African Districts
+ * Mock data for district selection dropdown
+ * TODO: Replace with API call in future (may depend on selected province)
+ */
+const DISTRICTS = [
+  { label: 'Alfred Nzo', value: 'alfred-nzo' },
+  { label: 'Amathole', value: 'amathole' },
+  { label: 'Chris Hani', value: 'chris-hani' },
+  { label: 'Joe Gqabi', value: 'joe-gqabi' },
+  { label: 'OR Tambo', value: 'or-tambo' },
+  { label: 'Sarah Baartman', value: 'sarah-baartman' },
+  { label: 'Buffalo City', value: 'buffalo-city' },
+  { label: 'Nelson Mandela Bay', value: 'nelson-mandela-bay' },
+];
+
 // Search filter configuration
 export const SearchFilter: FilterConfig = {
   nameKey: 'common.search',
@@ -23,7 +41,7 @@ export const SearchFilter: FilterConfig = {
   placeholderKey: 'admin.filters.searchPlaceholder',
 };
 
-// Select filters (Role, Status, etc.)
+// Select filters (Role, Status, Province, District, etc.)
 export const FilterOptions: ReadonlyArray<FilterConfig> = [
   {
     nameKey: 'admin.filters.role',
@@ -45,6 +63,30 @@ export const FilterOptions: ReadonlyArray<FilterConfig> = [
       { labelKey: 'admin.filters.allStatus', value: 'all-status' },
       { labelKey: 'admin.filters.active', value: 'Active' },
       { labelKey: 'admin.filters.deactivated', value: 'Deactivated' },
+    ],
+  },
+  {
+    nameKey: 'admin.filters.province',
+    attr: 'province',
+    type: 'select',
+    data: [
+      { label: 'All Provinces', value: 'all-provinces' },
+      ...PROVINCES.map(province => ({
+        label: province.label,
+        value: province.value,
+      })),
+    ],
+  },
+  {
+    nameKey: 'admin.filters.district',
+    attr: 'district',
+    type: 'select',
+    data: [
+      { label: 'All Districts', value: 'all-districts' },
+      ...DISTRICTS.map(district => ({
+        label: district.label,
+        value: district.value,
+      })),
     ],
   },
 ];
