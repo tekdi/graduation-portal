@@ -12,6 +12,11 @@ interface FilterButtonProps {
   totalCount?: number;
   userLabel?: string; // e.g., "users", "participants"
   onFilterChange?: (filters: Record<string, any>) => void;
+  // Configuration for right section (User Count + Clear Button)
+  showCount?: boolean; // Show filtered count (default: true if filteredCount and totalCount are provided)
+  showClearButton?: boolean; // Show clear button (default: true)
+  rightContent?: React.ReactNode; // Custom right content (overrides default count + clear button)
+  countFormatter?: (filtered: number, total: number, label: string) => string; // Custom count format function
 }
 
 export default function FilterButton({ 
@@ -19,7 +24,11 @@ export default function FilterButton({
   filteredCount, 
   totalCount,
   userLabel = 'users',
-  onFilterChange
+  onFilterChange,
+  showCount,
+  showClearButton = true,
+  rightContent,
+  countFormatter
 }: FilterButtonProps) {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
@@ -52,6 +61,50 @@ export default function FilterButton({
 
   const handleClearFilters = () => {
     setValue({});
+  };
+
+  // Determine if count should be shown
+  const shouldShowCount = showCount !== undefined 
+    ? showCount 
+    : (filteredCount !== undefined && totalCount !== undefined);
+
+  // Format count text
+  const getCountText = () => {
+    if (!shouldShowCount || filteredCount === undefined || totalCount === undefined) {
+      return null;
+    }
+    if (countFormatter) {
+      return countFormatter(filteredCount, totalCount, userLabel);
+    }
+    return `${filteredCount} of ${totalCount} ${userLabel}`;
+  };
+
+  // Render right section content
+  const renderRightContent = () => {
+    // If custom right content is provided, use it
+    if (rightContent) {
+      return rightContent;
+    }
+
+    // Otherwise, render default count + clear button
+    const countText = getCountText();
+    
+    return (
+      <HStack space="md" alignItems="center">
+        {countText && (
+          <Text {...filterStyles.userCountText}>
+            {countText}
+          </Text>
+        )}
+        {showClearButton && (
+          <Pressable onPress={handleClearFilters}>
+            <Text {...filterStyles.clearLinkText} $web-cursor="pointer">
+              {t('common.clear')}
+            </Text>
+          </Pressable>
+        )}
+      </HStack>
+    );
   };
 
   // Render a single filter item
@@ -146,28 +199,8 @@ export default function FilterButton({
           </Text>
         </HStack>
 
-        {/* Right: User Count + Clear Button */}
-        <HStack space="md" alignItems="center">
-          {filteredCount !== undefined && totalCount !== undefined && (
-            <Text 
-              fontSize="$sm"
-              color="$textMutedForeground"
-              fontWeight="$normal"
-            >
-              {filteredCount} of {totalCount} {userLabel}
-            </Text>
-          )}
-          <Pressable onPress={handleClearFilters}>
-            <Text 
-              fontSize="$xs"
-              color="$textMutedForeground"
-              fontWeight="$medium"
-              $web-cursor="pointer"
-            >
-              {t('common.clear')}
-            </Text>
-          </Pressable>
-        </HStack>
+        {/* Right: Configurable content (User Count + Clear Button or custom) */}
+        {renderRightContent()}
       </HStack>
 
       {/* Filters Row */}
