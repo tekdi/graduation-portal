@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
-import { Box, VStack, Text, Button, ButtonText } from '@ui';
+import { Box, VStack, Text, Button, ButtonText, LucideIcon } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
-import { LucideIcon } from '@ui';
+import { usePlatform } from '@utils/platform';
 import { interventionPlanStyles } from './Styles';
 import ProjectPlayer, {
   ProjectPlayerData,
   ProjectPlayerConfig,
 } from '../../../project-player/index';
+import { Task } from '../../../project-player/types/project.types';
 import {
   COMPLEX_PROJECT_DATA,
   PROJECT_PLAYER_CONFIGS,
@@ -20,6 +21,24 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   const { t } = useLanguage();
   const [showPlayer, setShowPlayer] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
+  const [addedTasks, setAddedTasks] = useState<Set<string>>(new Set());
+
+  // Define required optional tasks IDs needed for submission
+  const REQUIRED_OPTIONAL_TASKS = ['subtask-sp-003', 'subtask-sp-004'];
+  const areAllOptionalTasksAdded = REQUIRED_OPTIONAL_TASKS.every(id => addedTasks.has(id));
+
+  // Handle task update callback from ProjectPlayer
+  const handleTaskUpdate = (task: Task) => {
+    if (task.metadata?.addedToPlan) {
+      setAddedTasks(prev => new Set(prev).add(task._id));
+    } else {
+      setAddedTasks(prev => {
+        const next = new Set(prev);
+        next.delete(task._id);
+        return next;
+      });
+    }
+  };
 
   // Memoize ProjectPlayer config based on status and edit mode
   const config: ProjectPlayerConfig = useMemo(() => {
@@ -43,6 +62,8 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
           ...baseConfig,
           showSubmitButton: true,
           onSubmitInterventionPlan: () => setIsEditMode(true),
+          isSubmitDisabled: !areAllOptionalTasksAdded,
+          submitWarningMessage: t('participantDetail.interventionPlan.socialProtectionWarning'),
         };
       }
 
@@ -57,7 +78,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     };
 
     return statusConfigMap[status] || PROJECT_PLAYER_CONFIGS.previewMode;
-  }, [participantStatus, isEditMode]);
+  }, [participantStatus, isEditMode, areAllOptionalTasksAdded, t]);
 
   // Memoize ProjectPlayer data - all statuses use COMPLEX_PROJECT_DATA
   const projectPlayerData: ProjectPlayerData = useMemo(
@@ -103,7 +124,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   // Single ProjectPlayer render point for all statuses
   return (
     <Box flex={1}>
-      <ProjectPlayer config={config} data={projectPlayerData} />
+      <ProjectPlayer config={config} data={projectPlayerData} onTaskUpdate={handleTaskUpdate} />
     </Box>
   );
 };

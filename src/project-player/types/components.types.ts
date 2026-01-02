@@ -1,8 +1,6 @@
 import { Task, ProjectData, Attachment, TaskStatus } from './project.types';
 
-// ============================================
 // TASK COMPONENT PROPS
-// ============================================
 
 export interface TaskCardProps {
   task: Task;
@@ -41,9 +39,7 @@ export interface ObservationPopupFormProps {
   formId: string;
 }
 
-// ============================================
 // PROJECT COMPONENT PROPS
-// ============================================
 
 export interface ProjectInfoCardProps {
   project: ProjectData;
@@ -68,17 +64,17 @@ export interface ProjectContextValue {
   deleteTask: (taskId: string) => void;
   saveLocal: () => void;
   syncToServer: () => Promise<void>;
+  onTaskUpdate?: (task: Task) => void;
 }
 
 export interface ProjectProviderProps {
   children: React.ReactNode;
   config: ProjectPlayerConfig;
   initialData: ProjectData | null;
+  onTaskUpdate?: (task: Task) => void;
 }
 
-// ============================================
 // MAIN COMPONENT PROPS
-// ============================================
 
 export interface ProjectPlayerConfig {
   mode: 'preview' | 'edit' | 'read-only';
@@ -121,11 +117,10 @@ export interface ProjectPlayerProps {
   config: ProjectPlayerConfig;
   data?: ProjectPlayerData;
   projectData?: any; // as per mock data json
+  onTaskUpdate?: (task: Task) => void;
 }
 
-// ============================================
 // API TYPES
-// ============================================
 
 export interface ApiResponse<T> {
   data: T;
