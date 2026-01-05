@@ -78,17 +78,12 @@ const Layout: React.FC<LayoutProps> = ({ title, children }) => {
       />
 
       {/* Main Content */}
-      <Box
-        {...stylesLayout.mainContent}
-        bg={isDark ? '$backgroundDark950' : '$backgroundLight0'}
-      >
-        <ScrollView 
-          flex={1}
-          contentContainerStyle={{ flexGrow: 1 }}
+        <ScrollView
+          {...stylesLayout.mainContent}
+          bg={isDark ? '$backgroundDark950' : '$accent100'}
         >
           {children}
         </ScrollView>
-      </Box>
     </SafeAreaView>
   );
 };

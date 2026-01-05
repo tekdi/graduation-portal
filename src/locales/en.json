@@ -116,6 +116,8 @@
     "imagePreviewPlaceholder": "Image preview would be displayed here",
     "noFilesUploaded": "No files uploaded yet",
     "uploadedBy": "Uploaded by {{name}}",
+    "cameraPermissionDenied": "Camera permission was denied",
+    "storagePermissionDenied": "Storage permission was denied",
     "file": "file",
     "files": "files",
     "graduationReadiness": "Graduation Readiness",
@@ -335,14 +337,6 @@
         "session9": {
           "name": "Organize & Schedule training on social empowerment sessions: Session 9 - Parent's involvement in schooling",
           "description": "Coordinate with service provider to schedule and organize Parent's involvement in schooling training session for participant."
-        },
-        "session10": {
-          "name": "Organize & Schedule training on social empowerment sessions: Session 10 - Decision Making",
-          "description": "Coordinate with service provider to schedule and organize Decision Making training session for participant."
-        },
-        "session11": {
-          "name": "Organize & Schedule training on social empowerment sessions: Session 11 - Problem Solving",
-          "description": "Coordinate with service provider to schedule and organize Problem Solving training session for participant."
         }
       },
       "livelihoods": {
