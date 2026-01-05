@@ -4,34 +4,22 @@ import Select from "../ui/Inputs/Select";
 import { filterStyles } from "./Styles";
 import filterIcon from "../../assets/images/FilterIcon.png";
 import { useLanguage } from "@contexts/LanguageContext";
-import { usePlatform } from "@utils/platform";
 
 interface FilterButtonProps {
   data: any[];
-  filteredCount?: number;
-  totalCount?: number;
-  userLabel?: string; // e.g., "users", "participants"
   onFilterChange?: (filters: Record<string, any>) => void;
-  // Configuration for right section (User Count + Clear Button)
-  showCount?: boolean; // Show filtered count (default: true if filteredCount and totalCount are provided)
+  // Configuration for right section (Clear Button)
   showClearButton?: boolean; // Show clear button (default: true)
-  rightContent?: React.ReactNode; // Custom right content (overrides default count + clear button)
-  countFormatter?: (filtered: number, total: number, label: string) => string; // Custom count format function
+  rightContent?: React.ReactNode; // Custom right content (overrides default clear button)
 }
 
 export default function FilterButton({ 
   data, 
-  filteredCount, 
-  totalCount,
-  userLabel = 'users',
   onFilterChange,
-  showCount,
   showClearButton = true,
-  rightContent,
-  countFormatter
+  rightContent
 }: FilterButtonProps) {
   const { t } = useLanguage();
-  const { isMobile } = usePlatform();
   const [value, setValue] = React.useState<any>({});
 
   // Notify parent when filters change
@@ -63,22 +51,6 @@ export default function FilterButton({
     setValue({});
   };
 
-  // Determine if count should be shown
-  const shouldShowCount = showCount !== undefined 
-    ? showCount 
-    : (filteredCount !== undefined && totalCount !== undefined);
-
-  // Format count text
-  const getCountText = () => {
-    if (!shouldShowCount || filteredCount === undefined || totalCount === undefined) {
-      return null;
-    }
-    if (countFormatter) {
-      return countFormatter(filteredCount, totalCount, userLabel);
-    }
-    return `${filteredCount} of ${totalCount} ${userLabel}`;
-  };
-
   // Render right section content
   const renderRightContent = () => {
     // If custom right content is provided, use it
@@ -86,34 +58,29 @@ export default function FilterButton({
       return rightContent;
     }
 
-    // Otherwise, render default count + clear button
-    const countText = getCountText();
-    
-    return (
-      <HStack space="md" alignItems="center">
-        {countText && (
-          <Text {...filterStyles.userCountText}>
-            {countText}
+    // Otherwise, render default clear button
+    if (showClearButton) {
+      return (
+        <Pressable onPress={handleClearFilters}>
+          <Text {...filterStyles.clearLinkText} $web-cursor="pointer">
+            {t('common.clear')}
           </Text>
-        )}
-        {showClearButton && (
-          <Pressable onPress={handleClearFilters}>
-            <Text {...filterStyles.clearLinkText} $web-cursor="pointer">
-              {t('common.clear')}
-            </Text>
-          </Pressable>
-        )}
-      </HStack>
-    );
+        </Pressable>
+      );
+    }
+
+    return null;
   };
 
   // Render a single filter item
-  const renderFilterItem = (item: any, containerStyle?: any) => (
+  const renderFilterItem = (item: any) => (
     <VStack 
       key={item.attr}
-      {...(containerStyle || (item.type === 'search' 
+      {...(item.type === 'search' 
         ? filterStyles.searchContainer 
-        : filterStyles.roleContainer))}
+        : filterStyles.roleContainer)}
+      width="$full"
+      $md-width="auto"
     >
       {/* <Text {...filterStyles.label}>
         {item.nameKey ? t(item.nameKey) : item.name}
@@ -204,15 +171,9 @@ export default function FilterButton({
       </HStack>
 
       {/* Filters Row */}
-      {isMobile ? (
-        <VStack space="md" width="$full">
-          {data.map((item: any) => renderFilterItem(item, { width: '$full' }))}
-        </VStack>
-      ) : (
-        <HStack {...filterStyles.filterFieldsContainer}>
-          {data.map((item: any) => renderFilterItem(item))}
-        </HStack>
-      )}
+      <HStack {...filterStyles.filterFieldsContainer}>
+        {data.map((item: any) => renderFilterItem(item))}
+      </HStack>
 
     </VStack>
   );

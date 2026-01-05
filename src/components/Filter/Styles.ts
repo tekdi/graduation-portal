@@ -22,18 +22,27 @@ export const filterStyles = {
   },
   filterFieldsContainer: {
     gap: '$2' as const,
-    alignItems: 'flex-end' as const,
+    //alignItems: 'flex-end' as const,
     flexWrap: 'wrap' as const,
-    flexDirection: 'row' as const,
+    flexDirection: 'column' as const,
+    $md: {
+      flexDirection: 'row' as const,
+    },
     justifyContent: 'space-between' as const,
   },
   searchContainer: {
     flex: 1,
-    minWidth: 485,
+    minWidth: '100%' as const,
+    $lg: {
+      minWidth: 485,
+    },
   },
   roleContainer: {
     flex: 1,
-    //minWidth: 200,
+    minWidth: '100%' as const,
+    $md: {
+      minWidth: 200,
+    },
   },
   statusContainer: {
     flex: 1,
