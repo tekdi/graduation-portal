@@ -5,7 +5,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { LucideIcon, Menu } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { theme } from '@config/theme';
-import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
+import { User } from '@app-types/user';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
 import { MenuItemData } from '@components/ui/Menu';
 import { styles } from './Styles';

@@ -1,6 +1,5 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { VStack, HStack, Button, Text, Image, Box } from '@ui';
-import { View } from 'react-native';
 import { LucideIcon } from '@ui/index';
 
 import UploadIcon from '../../assets/images/UploadIcon.png';
@@ -12,11 +11,11 @@ import TitleHeader from '@components/TitleHeader';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import DataTable from '@components/DataTable';
 import { getUsersColumns } from './UsersTableConfig';
-import { USER_MANAGEMENT_MOCK_DATA, User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
+import { User } from '@app-types/user';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
-import { applyFilters } from '@utils/helper';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
+import { getUsersList } from '../../services/userService';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -26,54 +25,120 @@ const UserManagementScreen = () => {
   const { isMobile } = usePlatform();
   const data = [SearchFilter, ...FilterOptions];
   const [filters, setFilters] = useState<Record<string, any>>({});
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   
   const columns = useMemo(() => getUsersColumns(), []);
 
-  // Filter users using applyFilters helper
-  const filteredData = useMemo(() => {
-    let result = [...USER_MANAGEMENT_MOCK_DATA];
+  // Fetch users from API
+  useEffect(() => {
+    const fetchUsers = async () => {
+      setIsLoading(true);
+      try {
+        // Build API parameters from filters
+        const apiParams: any = {
+          tenant_code: 'brac',
+          type: 'user,session_manager,org_admin',
+          page: currentPage,
+          limit: pageSize,
+        };
 
-    // Handle search filter separately (needs OR logic across name and email)
-    if (filters.search) {
-      const searchTerm = filters.search.toLowerCase();
-      result = result.filter(
-        (user) =>
-          user.name.toLowerCase().includes(searchTerm) ||
-          user.email.toLowerCase().includes(searchTerm)
-      );
-    }
+        // Add search parameter
+        if (filters.search) {
+          apiParams.search = filters.search;
+        }
 
-    // Build filters object for applyFilters
-    const filtersForHelper: Record<string, any> = {};
-    
-    if (filters.role && filters.role !== 'all-roles') {
-      filtersForHelper.role = filters.role;
-    }
-    if (filters.status && filters.status !== 'all-status') {
-      filtersForHelper.status = filters.status;
-    }
-    if (filters.province && filters.province !== 'all-provinces') {
-      const provinceFilter = FilterOptions.find((f) => f.attr === 'province');
-      const option = provinceFilter?.data.find((opt: any) => 
-        typeof opt === 'string' ? opt === filters.province : opt.value === filters.province
-      );
-      const provinceLabel = typeof option === 'object' && option?.label ? option.label : option;
-      if (provinceLabel) filtersForHelper.province = provinceLabel;
-    }
-    if (filters.district && filters.district !== 'all-districts') {
-      const districtFilter = FilterOptions.find((f) => f.attr === 'district');
-      const option = districtFilter?.data.find((opt: any) => 
-        typeof opt === 'string' ? opt === filters.district : opt.value === filters.district
-      );
-      const districtLabel = typeof option === 'object' && option?.label ? option.label : option;
-      if (districtLabel) filtersForHelper.district = districtLabel;
-    }
-    
-    return applyFilters(result, filtersForHelper);
-  }, [filters]);
+        // Add filter parameters (only if not "all" values)
+        if (filters.role && filters.role !== 'all-roles') {
+          apiParams.role = filters.role;
+        }
+        if (filters.status && filters.status !== 'all-status') {
+          apiParams.status = filters.status;
+        }
+        if (filters.province && filters.province !== 'all-provinces') {
+          const provinceFilter = FilterOptions.find((f) => f.attr === 'province');
+          const option = provinceFilter?.data.find((opt: any) => 
+            typeof opt === 'string' ? opt === filters.province : opt.value === filters.province
+          );
+          const provinceLabel = typeof option === 'object' && option?.label ? option.label : option;
+          if (provinceLabel) apiParams.province = provinceLabel;
+        }
+        if (filters.district && filters.district !== 'all-districts') {
+          const districtFilter = FilterOptions.find((f) => f.attr === 'district');
+          const option = districtFilter?.data.find((opt: any) => 
+            typeof opt === 'string' ? opt === filters.district : opt.value === filters.district
+          );
+          const districtLabel = typeof option === 'object' && option?.label ? option.label : option;
+          if (districtLabel) apiParams.district = districtLabel;
+        }
+
+        const response = await getUsersList(apiParams);
+        
+        // Map API response to User[] format
+        // Transform API response fields to match User interface
+        const usersData = (response.result?.data || []).map((user: any) => {
+          // Try to find role from various possible field names
+          let role = user.role || user.user_role || user.role_name || user.role_label || 
+                     user.user_type || user.type || user.roles?.[0]?.label || 
+                     user.roles?.[0]?.title || '-';
+          
+          // Normalize role values to match User interface
+          if (role && role !== '-') {
+            // Map common role variations to expected values
+            const roleMap: Record<string, string> = {
+              'admin': 'Admin',
+              'supervisor': 'Supervisor',
+              'linkage_champion': 'Linkage Champion',
+              'linkage champion': 'Linkage Champion',
+              'participant': 'Participant',
+              'session_manager': 'Supervisor', // or appropriate mapping
+              'org_admin': 'Admin',
+            };
+            role = roleMap[role.toLowerCase()] || role;
+          }
+          
+          // Map status
+          let status = user.status || user.user_status || 'Active';
+          if (typeof status === 'string') {
+            status = status === 'ACTIVE' || status === 'Active' ? 'Active' : 
+                     status === 'DEACTIVATED' || status === 'Deactivated' || status === 'INACTIVE' ? 'Deactivated' : 
+                     status;
+          }
+          
+          return {
+            id: String(user.id || user.user_id || user._id || ''),
+            name: user.name || user.full_name || user.username || user.display_name || '',
+            email: user.email || user.email_address || '',
+            role: role as User['role'],
+            status: status as User['status'],
+            province: user.province || user.province_name || user.address?.province || '-',
+            district: user.district || user.district_name || user.address?.district || '-',
+            lastLogin: user.lastLogin || user.last_login || user.lastLoginDate || user.last_login_date || '-',
+            details: user.details || null,
+          };
+        }) as User[];
+        
+        setUsers(usersData);
+        setTotalCount(response.result?.total || usersData.length);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+        setUsers([]);
+        setTotalCount(0);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchUsers();
+  }, [filters, currentPage, pageSize]);
 
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
+    // Reset to page 1 when filters change
+    setCurrentPage(1);
   }, []);
 
   const handleRowClick = useCallback((user: User) => {
@@ -171,9 +236,6 @@ const UserManagementScreen = () => {
       
       <FilterButton 
         data={data} 
-        filteredCount={filteredData.length}
-        totalCount={USER_MANAGEMENT_MOCK_DATA.length}
-        userLabel="users"
         onFilterChange={handleFilterChange}
       />
       
@@ -187,8 +249,8 @@ const UserManagementScreen = () => {
             {!isMobile && (
               <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
                 {t('admin.users.showing', {
-                  count: filteredData.length,
-                  total: USER_MANAGEMENT_MOCK_DATA.length,
+                  count: users.length,
+                  total: totalCount,
                 })}
               </Text>
             )}
@@ -213,15 +275,13 @@ const UserManagementScreen = () => {
 
         {/* DataTable */}
         <DataTable
-          data={filteredData}
+          data={users}
           columns={columns}
           onRowClick={handleRowClick}
           getRowKey={(user) => user.id}
+          isLoading={isLoading}
           pagination={{
-            enabled: true,
-            pageSize: 10,
-            pageSizeOptions: [10, 25, 50, 100],
-            maxPageNumbers: 5,
+            enabled: false, // Disable client-side pagination since we're using server-side pagination
           }}
           emptyMessage="admin.users.noUsersFound"
           loadingMessage="admin.users.loadingUsers"
