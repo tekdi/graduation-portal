@@ -206,7 +206,7 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
   {
     key: 'email',
     label: 'admin.users.email',
-    flex: 2,
+    flex: 2.5,
     render: (user) => (
       <Text {...TYPOGRAPHY.paragraph} {...styles.emailText}>
         {user.email}
