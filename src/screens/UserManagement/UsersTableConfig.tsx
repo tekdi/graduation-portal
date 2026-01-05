@@ -14,14 +14,17 @@ import { styles } from './Styles';
  * Role Badge Component
  */
 const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
+  const isParticipant = role === 'Participant';
+  
   return (
     <HStack
       bg={styles.roleColors[role as keyof typeof styles.roleColors] || '$textSecondary'}
-      {...styles.roleBadge}
+      {...(isParticipant ? styles.roleBadgeParticipant : styles.roleBadge)}
     >
       <Text
         {...TYPOGRAPHY.bodySmall}
-        {...styles.roleBadgeText}
+        {...(isParticipant ? styles.roleBadgeParticipantColor : styles.roleBadgeText)}
+      
       >
         {role}
       </Text>

@@ -18,16 +18,32 @@ export const styles = {
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
   },
+  roleBadgeParticipant: {
+    paddingHorizontal: '$2' as const,
+    paddingVertical: '$0.5' as const,
+    borderRadius: '$md' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    borderWidth: 1,
+    borderColor: '$borderLight200' as const,
+  },
   roleBadgeText: {
     color: '$white' as const,
     fontWeight: '$medium' as const,
     fontSize: '$xs' as const,
   },
+  roleBadgeParticipantColor: {
+    bg: '$white' as const,
+    color: '$textForeground' as const,
+    fontWeight: '$medium' as const,
+    fontSize: '$xs' as const,
+  
+  },
   roleColors: {
     Admin: '$error600' as const,
     Supervisor: '$primary500' as const,
     'Linkage Champion': '$textMutedForeground' as const,
-    Participant: '$textSecondary' as const,
+    Participant: '$white' as const,
   },
 
   // Status Badge Styles
