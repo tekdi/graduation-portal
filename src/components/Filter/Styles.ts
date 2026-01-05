@@ -22,7 +22,6 @@ export const filterStyles = {
   },
   filterFieldsContainer: {
     gap: '$2' as const,
-    //alignItems: 'flex-end' as const,
     flexWrap: 'wrap' as const,
     flexDirection: 'column' as const,
     $md: {
@@ -44,25 +43,6 @@ export const filterStyles = {
       minWidth: 200,
     },
   },
-  statusContainer: {
-    flex: 1,
-    minWidth: 200,
-  },
-  filterContainer: {
-    flex: 1,
-    //minWidth: 200,
-  },
-  clearButtonContainer: {
-    flex: 1,
-    minWidth: 150,
-    justifyContent: 'flex-end' as const,
-  },
-  label: {
-    fontSize: '$sm' as const,
-    mb: '$1' as const,
-    fontWeight: '$normal' as const,
-    color: '$textLight900' as const,
-  },
   input: {
     variant: 'outline' as const,
     size: 'md' as const,
@@ -70,23 +50,6 @@ export const filterStyles = {
     bg: '$backgroundLight50' as const,
     borderColor: '$borderLight300' as const,
     height: '$9' as const,
-  },
-  button: {
-    variant: 'outline' as const,
-    size: 'md' as const,
-    borderRadius: '$md' as const,
-    bg: 'transparent' as const,
-    borderColor: '$borderLight300' as const,
-  },
-  buttonText: {
-    color: '$textLight900' as const,
-    fontSize: '$sm' as const,
-    fontWeight: '$medium' as const,
-  },
-  userCountText: {
-    fontSize: '$sm' as const,
-    color: '$textMutedForeground' as const,
-    fontWeight: '$normal' as const,
   },
   clearLinkText: {
     fontSize: '$sm' as const,
