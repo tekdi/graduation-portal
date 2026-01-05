@@ -1,5 +1,5 @@
 import React from 'react';
-import { Linking, Platform } from 'react-native';
+import { Linking, Platform, Alert } from 'react-native';
 import {
     Box,
     VStack,
@@ -48,6 +48,9 @@ const EvidencePreviewModal: React.FC<EvidencePreviewModalProps> = ({
                 const canOpen = await Linking.canOpenURL(attachment.url);
                 if (canOpen) {
                     await Linking.openURL(attachment.url);
+                } else {
+                    Alert.alert('Cannot open file', 'Unable to open this file link.');
+                    console.warn('Cannot open URL:', attachment.url);
                 }
             }
         } catch (error) {

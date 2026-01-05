@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import {
     VStack,
     HStack,
@@ -122,7 +122,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 if (method === 'camera') {
                     const hasPermission = await requestCameraPermission();
                     if (!hasPermission) {
-                        console.log('Camera permission denied');
+                        Alert.alert(t('common.error'), t('projectPlayer.cameraPermissionDenied'));
                         return;
                     }
                     const result = await launchCamera(options);
@@ -133,7 +133,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 } else {
                     const hasPermission = await requestStoragePermission();
                     if (!hasPermission) {
-                        console.log('Storage permission denied');
+                        Alert.alert(t('common.error'), t('projectPlayer.storagePermissionDenied'));
                         return;
                     }
                     // For Android 13+ permissions we rely on requestStoragePermission update

@@ -328,7 +328,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
             color="$textPrimary"
             fontWeight="$medium"
           >
-            {t('projectPlayer.taskName')} <Text color="$textPrimary">*</Text>
+            {t('projectPlayer.taskName')} <Text color="$error500">*</Text>
           </Text>
           <Input {...addCustomTaskModalStyles.input}>
             <InputField

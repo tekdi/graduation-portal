@@ -59,7 +59,7 @@ const ProjectComponent: React.FC = () => {
       render: ({ id }) => (
         <Toast nativeID={id} action="success" variant="solid" {...projectComponentStyles.toast}>
           <HStack {...projectComponentStyles.toastContent}>
-            <LucideIcon name="CheckCircle" size={18} color={theme.tokens.colors.success500} />
+            <LucideIcon name="CheckCircle" size={18} color={theme.tokens.colors.success600} />
             <ToastTitle color="$textPrimary" {...TYPOGRAPHY.bodySmall} fontWeight="$medium">
               {t('projectPlayer.progressSaved')}
             </ToastTitle>
@@ -176,7 +176,7 @@ const ProjectComponent: React.FC = () => {
                             <LucideIcon
                               name="Plus"
                               size={18}
-                              color={isHovered ? '$primary700' : '$primary500'}
+                              color={isHovered ? theme.tokens.colors.primary700 : theme.tokens.colors.primary500}
                               strokeWidth={2.5}
                             />
                             <Text

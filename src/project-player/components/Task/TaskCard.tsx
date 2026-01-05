@@ -46,7 +46,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const isPreview = mode === 'preview';
   const isEdit = mode === 'edit';
   // Use mixed logic for completion: check status or use helper
-  const isCompleted = isTaskCompleted(task.status) || task.status === TASK_STATUS.COMPLETED;
+  const isCompleted = isTaskCompleted(task.status);
   const isAddedToPlan = task.metadata?.addedToPlan;
 
   const maxFileSize = config.maxFileSize || 10;
