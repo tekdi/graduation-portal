@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { HStack , VStack, Text, Button, Image, Box, Icon } from "@ui";
 import { useLanguage } from '@contexts/LanguageContext';
 import TitleHeader from '@components/TitleHeader';
@@ -6,9 +6,19 @@ import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
 import { templateManagementStyles } from './Styles';
+import DataTable from '@components/DataTable';
+import { getTemplatesColumns } from './TemplatesTableConfig';
+import { TEMPLATE_MANAGEMENT_MOCK_DATA } from '@constants/TEMPLATE_MANAGEMENT_MOCK_DATA';
 
 const TemplateManagementScreen = () => {
     const { t } = useLanguage();
+    const columns = useMemo(() => getTemplatesColumns(), []);
+
+    const handleRowClick = (template: typeof TEMPLATE_MANAGEMENT_MOCK_DATA[0]) => {
+        // Handle row click - navigate to template details
+        console.log('Template clicked:', template.id);
+    };
+
     return(
         <VStack>
            <TitleHeader
@@ -64,7 +74,7 @@ const TemplateManagementScreen = () => {
                             size={16}
                         />
                     {/* Content */}
-                    <VStack space="xs" flex={1}>
+                    <VStack space="sm" flex={1}>
                         <Text {...templateManagementStyles.infoBoxTitle}>
                                 {t('admin.templateManagement.infoBox.title')}
                         </Text>
@@ -75,6 +85,29 @@ const TemplateManagementScreen = () => {
                     </VStack>
                 </HStack>
             </Box>
+
+            {/* Table Section Header */}
+            <Box {...templateManagementStyles.tableHeaderContainer}>
+                <Text {...templateManagementStyles.tableHeaderTitle}>
+                    {t('admin.templates.tableTitle')}
+                </Text>
+            </Box>
+
+            {/* Templates Table */}
+            <DataTable
+                data={TEMPLATE_MANAGEMENT_MOCK_DATA}
+                columns={columns}
+                getRowKey={(template) => template.id}
+                onRowClick={handleRowClick}
+                isLoading={false}
+                emptyMessage={t('admin.templates.noTemplatesFound')}
+                loadingMessage={t('admin.templates.loadingTemplates')}
+                pagination={{
+                    enabled: true,
+                    pageSize: 10,
+                    maxPageNumbers: 5,
+                }}
+            />
         </VStack>
     );
 }
