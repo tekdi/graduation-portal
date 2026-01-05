@@ -1,3 +1,5 @@
+import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
+
 // Base column text style - common properties shared by all column text styles
 const columnTextBase = {
   fontWeight: '$normal' as const,
@@ -80,5 +82,63 @@ export const templateManagementStyles = {
     createdDateText: {
         ...columnTextBase,
         color: '$textForeground' as const,
+    },
+    // CSV Upload Guide Styles
+    csvGuideContainer: {
+        bg: '$white' as const,
+        borderWidth: 1,
+        borderColor: '$borderLight200' as const,
+        borderRadius: '$lg' as const,
+        padding: '$6' as const,
+        mt: '$6',
+    },
+    csvGuideTitle: {
+        color: '$textForeground' as const,
+        fontWeight: '$normal' as const,
+        fontSize: '$md' as const,
+    },
+    csvGuideSectionTitle: {
+        color: '$textForeground' as const,
+        fontWeight: '$normal' as const,
+        fontSize: '$md' as const,
+    },
+    csvGuideBullet: {
+        color: '$textForeground' as const,
+        fontSize: '$md' as const,
+        fontWeight: '$normal' as const,
+        mt: '$1',
+    },
+    csvGuideColumnName: {
+        fontSize: '$xs' as const,
+        color: '$textMutedForeground' as const,
+        fontWeight: '$normal' as const,
+        bg:'$bgSidebar',
+        borderRadius: '$sm' as const,
+        px: '$1',
+        py: '$0.5',
+    },
+    csvGuideColumnDescription: {
+        fontSize: '$xs' as const,
+        color: '$textMutedForeground' as const,
+        fontWeight: '$normal' as const,
+    },
+    csvGuideStepNumber: {
+        width: '$6',
+        height: '$6',
+        borderRadius: '$full' as const,
+        bg: '$primary500' as const,
+        alignItems: 'center' as const,
+        justifyContent: 'center' as const,
+        flexShrink: 0,
+    },
+    csvGuideStepNumberText: {
+        color: '$white' as const,
+        fontWeight: '$medium' as const,
+        fontSize: '$xs' as const,
+    },
+    csvGuideStepText: {
+        fontSize: '$xs' as const,
+        fontWeight: '$normal' as const,
+        color: '$textMutedForeground' as const,
     },
 } as const;

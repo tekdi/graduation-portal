@@ -9,6 +9,7 @@ import { templateManagementStyles } from './Styles';
 import DataTable from '@components/DataTable';
 import { getTemplatesColumns } from './TemplatesTableConfig';
 import { TEMPLATE_MANAGEMENT_MOCK_DATA } from '@constants/TEMPLATE_MANAGEMENT_MOCK_DATA';
+import CSVUploadGuide from './CSVUploadGuide';
 
 const TemplateManagementScreen = () => {
     const { t } = useLanguage();
@@ -105,6 +106,9 @@ const TemplateManagementScreen = () => {
                     }}
                 />
             </Box>
+
+            {/* CSV Upload Guide */}
+            <CSVUploadGuide />
         </VStack>
     );
 }

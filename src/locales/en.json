@@ -227,6 +227,25 @@
         "view": "View (Read-Only)",
         "deactivate": "Deactivate",
         "export": "Export as CSV"
+      },
+      "csvUploadGuide": {
+        "title": "CSV Upload Guide",
+        "requiredColumns": "Required CSV Columns",
+        "templateWorkflow": "Template Workflow",
+        "columns": {
+          "templateName": "Name of the IDP template",
+          "taskId": "Unique identifier for each task",
+          "taskName": "Name of the development task",
+          "taskDescription": "Detailed description",
+          "outputIndicator": "Output measurement criteria",
+          "outcomeIndicator": "Outcome measurement criteria"
+        },
+        "steps": {
+          "step1": "Download sample CSV template",
+          "step2": "Fill in template details and tasks",
+          "step3": "Upload completed CSV file",
+          "step4": "Review and activate template"
+        }
       }
     }
    
