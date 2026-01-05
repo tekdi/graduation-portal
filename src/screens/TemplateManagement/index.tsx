@@ -14,11 +14,6 @@ const TemplateManagementScreen = () => {
     const { t } = useLanguage();
     const columns = useMemo(() => getTemplatesColumns(), []);
 
-    const handleRowClick = (template: typeof TEMPLATE_MANAGEMENT_MOCK_DATA[0]) => {
-        // Handle row click - navigate to template details
-        console.log('Template clicked:', template.id);
-    };
-
     return(
         <VStack>
            <TitleHeader
@@ -86,28 +81,30 @@ const TemplateManagementScreen = () => {
                 </HStack>
             </Box>
 
-            {/* Table Section Header */}
-            <Box {...templateManagementStyles.tableHeaderContainer}>
-                <Text {...templateManagementStyles.tableHeaderTitle}>
-                    {t('admin.templates.tableTitle')}
-                </Text>
-            </Box>
+            {/* Table Section with Border */}
+            <Box {...templateManagementStyles.tableContainer}>
+                {/* Table Section Header */}
+                <Box {...templateManagementStyles.tableHeaderContainer}>
+                    <Text {...templateManagementStyles.tableHeaderTitle}>
+                        {t('admin.templates.tableTitle')}
+                    </Text>
+                </Box>
 
-            {/* Templates Table */}
-            <DataTable
-                data={TEMPLATE_MANAGEMENT_MOCK_DATA}
-                columns={columns}
-                getRowKey={(template) => template.id}
-                onRowClick={handleRowClick}
-                isLoading={false}
-                emptyMessage={t('admin.templates.noTemplatesFound')}
-                loadingMessage={t('admin.templates.loadingTemplates')}
-                pagination={{
-                    enabled: true,
-                    pageSize: 10,
-                    maxPageNumbers: 5,
-                }}
-            />
+                {/* Templates Table */}
+                <DataTable
+                    data={TEMPLATE_MANAGEMENT_MOCK_DATA}
+                    columns={columns}
+                    getRowKey={(template) => template.id}
+                    isLoading={false}
+                    emptyMessage={t('admin.templates.noTemplatesFound')}
+                    loadingMessage={t('admin.templates.loadingTemplates')}
+                    pagination={{
+                        enabled: true,
+                        pageSize: 10,
+                        maxPageNumbers: 5,
+                    }}
+                />
+            </Box>
         </VStack>
     );
 }

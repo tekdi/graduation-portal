@@ -8,7 +8,7 @@ import { theme } from '@config/theme';
 import { Template } from '@constants/TEMPLATE_MANAGEMENT_MOCK_DATA';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
 import { MenuItemData } from '@components/ui/Menu';
-import { styles } from './Styles';
+import { templateManagementStyles as styles } from './Styles';
 
 /**
  * Status Badge Component
@@ -53,25 +53,24 @@ const getTemplateMenuItems = (t: (key: string) => string): MenuItemData[] => [
     label: 'admin.templates.actionMenu.view',
     textValue: 'View (Read-Only)',
     iconName: 'Eye',
-    iconColor: theme.tokens.colors.textForeground,
-    iconSizeValue: 20,
+    iconColor: theme.tokens.colors.textMutedForeground,
+    iconSizeValue: 16,
   },
   {
     key: 'deactivate',
     label: 'admin.templates.actionMenu.deactivate',
     textValue: 'Deactivate',
     iconName: 'XCircle',
-    iconColor: theme.tokens.colors.error600,
-    iconSizeValue: 20,
-    color: theme.tokens.colors.error600,
+    iconColor: theme.tokens.colors.textMutedForeground,
+    iconSizeValue: 16,
   },
   {
     key: 'export',
     label: 'admin.templates.actionMenu.export',
     textValue: 'Export as CSV',
     iconName: 'Download',
-    iconColor: theme.tokens.colors.textForeground,
-    iconSizeValue: 20,
+    iconColor: theme.tokens.colors.textMutedForeground,
+    iconSizeValue: 16,
   },
 ];
 
