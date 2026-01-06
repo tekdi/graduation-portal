@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { Box, Container, VStack, HStack, Text, Pressable, Button, ButtonText } from '@ui';
 import { LucideIcon } from '@ui';
 import { AssessmentCard } from '@components/ObservationCards';
-import { LOG_VISIT_CARDS } from '@constants/LOG_VISIT_CARDS';
 import { getParticipantById } from '../../../services/participantService';
+import { getTargetedSolutions } from '../../../services/solutionService';
 import { useLanguage } from '@contexts/LanguageContext';
 import { theme } from '@config/theme';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { logVisitStyles } from './Style';
 import NotFound from '@components/NotFound';
 import { ParticipantData } from '@app-types/participant';
+import { AssessmentSurveyCardData } from '@app-types/participant';
+import logger from '@utils/logger';
 
 /**
  * Route parameters type definition for LogVisit screen
@@ -32,15 +34,39 @@ type LogVisitRouteProp = RouteProp<{
  */
 const LogVisit: React.FC = () => {
   const route = useRoute<LogVisitRouteProp>();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [solutions, setSolutions] = useState<AssessmentSurveyCardData[]>([]);
   const [participant, setParticipant] = useState<ParticipantData | undefined>(undefined);
   const navigation = useNavigation();
   const { t } = useLanguage();
 
+  /**
+   * Fetch targeted solutions from API
+   */
   useEffect(() => {
-    if (route.params?.id) {
-      const participantData = getParticipantById(route.params?.id);
-      setParticipant(participantData);
-    }
+    const fetchSolutions = async () => {
+      try {
+        setLoading(true);
+        const data = await getTargetedSolutions({
+          type: 'observation',
+          page: 1,
+          limit: 10,
+          search: '',
+        });
+        setSolutions(data);
+        if (route.params?.id) {
+          const participantData = getParticipantById(route.params?.id);
+          setParticipant(participantData);
+        }
+      } catch (error) {
+        logger.error('Error fetching solutions:', error);
+        setSolutions([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSolutions();
   }, [route.params?.id]);
 
   /**
@@ -113,9 +139,18 @@ const LogVisit: React.FC = () => {
 
         {/* Cards */}
         <VStack {...logVisitStyles.cardsContainer}>
-          {LOG_VISIT_CARDS.map(card => (
-            <AssessmentCard key={card.id} card={card} userId={participant?.id || ''} />
-          ))}
+        
+          {!loading && solutions.length > 0 ? (
+            solutions.map(card => (
+              <AssessmentCard key={card.id} card={card} userId={participant?.id || ''} />
+            ))
+          ) : (
+            !loading && (
+              <Text color="$textMutedForeground" textAlign="center" py="$4">
+                {t('logVisit.noSolutions')}
+              </Text>
+            )
+          )}
         </VStack>
         <VStack {...logVisitStyles.noteContainer}>
            <HStack {...logVisitStyles.noteBox}>
