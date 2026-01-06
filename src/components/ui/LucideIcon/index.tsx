@@ -1,5 +1,6 @@
 import React from 'react';
 import type { LucideProps } from 'lucide-react-native';
+import { Box } from '@ui';
 
 /**
  * Platform-agnostic Lucide Icon wrapper
@@ -45,12 +46,14 @@ const LucideIcon: React.FC<LucideIconProps> = ({
   }
 
   return (
-    <IconComponent
-      size={size}
-      color={color}
-      strokeWidth={strokeWidth}
-      {...props}
-    />
+    <Box style={{ color: color } as any}>
+      <IconComponent
+        size={size}
+        strokeWidth={strokeWidth}
+        color={color}
+        {...props}
+      />
+    </Box>
   );
 };
 
