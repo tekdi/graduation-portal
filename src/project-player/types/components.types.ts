@@ -1,6 +1,8 @@
 import { Task, ProjectData, Attachment, TaskStatus } from './project.types';
 
+// ============================================
 // TASK COMPONENT PROPS
+// ============================================
 
 export interface TaskCardProps {
   task: Task;
@@ -39,7 +41,9 @@ export interface ObservationPopupFormProps {
   formId: string;
 }
 
+// ============================================
 // PROJECT COMPONENT PROPS
+// ============================================
 
 export interface ProjectInfoCardProps {
   project: ProjectData;
@@ -74,7 +78,9 @@ export interface ProjectProviderProps {
   onTaskUpdate?: (task: Task) => void;
 }
 
+// ============================================
 // MAIN COMPONENT PROPS
+// ============================================
 
 export interface ProjectPlayerConfig {
   mode: 'preview' | 'edit' | 'read-only';
@@ -92,6 +98,8 @@ export interface ProjectPlayerConfig {
   showAddCustomTaskButton?: boolean; // Config to show/hide AddCustomTask button
   showSubmitButton?: boolean; // Config to show/hide Submit Intervention Plan button
   onSubmitInterventionPlan?: () => void; // Callback for Submit Intervention Plan button
+  isSubmitDisabled?: boolean; // Disable submit button until conditions are met
+  submitWarningMessage?: string; // Warning message to show when submit is disabled
   profileInfo?: {
     id: number | string;
     name: string;
@@ -120,7 +128,9 @@ export interface ProjectPlayerProps {
   onTaskUpdate?: (task: Task) => void;
 }
 
+// ============================================
 // API TYPES
+// ============================================
 
 export interface ApiResponse<T> {
   data: T;
@@ -139,4 +149,49 @@ export interface AddCustomTaskModalProps {
   templateId?: string;
   templateName?: string;
   mode?: 'add' | 'edit';
+}
+
+// ============================================
+// MODAL COMPONENT PROPS
+// ============================================
+
+// Attachment interface for evidence preview (extended from base Attachment)
+export interface EvidenceAttachment {
+  _id?: string;
+  name: string;
+  url?: string;
+  type?: string;
+  uploadedBy?: string;
+  uploadedAt?: string;
+  size?: number;
+}
+
+export interface EvidencePreviewModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  taskName: string;
+  attachments: EvidenceAttachment[];
+}
+
+export interface FileUploadModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onUpload: (method: 'camera' | 'device', files?: any[]) => void;
+  onConfirm?: (files?: any[]) => void;
+  taskName: string;
+  participantName?: string;
+  existingAttachments?: any[];
+  isConsent?: boolean;
+}
+
+export interface UploadMethodOptionProps {
+  method: 'camera' | 'device';
+  selectedMethod: 'camera' | 'device' | null;
+  hoveredOption: 'camera' | 'device' | null;
+  title: string;
+  subtitle: string;
+  icon: string;
+  onSelect: (method: 'camera' | 'device') => void;
+  onHoverIn: (method: 'camera' | 'device') => void;
+  onHoverOut: () => void;
 }

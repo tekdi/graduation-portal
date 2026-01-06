@@ -118,6 +118,8 @@
     "uploadedBy": "Uploaded by {{name}}",
     "cameraPermissionDenied": "Camera permission was denied",
     "storagePermissionDenied": "Storage permission was denied",
+    "cannotOpenFile": "Cannot open file",
+    "unableToOpenFile": "Unable to open this file link.",
     "file": "file",
     "files": "files",
     "graduationReadiness": "Graduation Readiness",
@@ -549,5 +551,21 @@
       "tasksLabel": "tasks"
     },
     "loadError": "Failed to load templates. Please try again."
+  },
+  "permissions": {
+    "camera": {
+      "title": "Camera Permission",
+      "message": "App needs access to your camera",
+      "buttonNeutral": "Ask Me Later",
+      "buttonNegative": "Cancel",
+      "buttonPositive": "OK"
+    },
+    "storage": {
+      "title": "Storage Permission",
+      "message": "App needs access to your storage",
+      "buttonNeutral": "Ask Me Later",
+      "buttonNegative": "Cancel",
+      "buttonPositive": "OK"
+    }
   }
 }

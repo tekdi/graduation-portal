@@ -40,7 +40,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
 
   const updateTask = useCallback((taskId: string, updates: Partial<Task>) => {
     let updatedTaskObj: Task | null = null;
-
     setProjectData(prev => {
       if (!prev) return null;
 

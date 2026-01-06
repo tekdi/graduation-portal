@@ -78,7 +78,9 @@ export const COMPLEX_PROJECT_DATA: ProjectData = {
         {
           _id: 'subtask-001',
           name: 'Organize & Schedule training on social empowerment sessions: Session 1 - Emotional Self Awareness',
-          description: 'Coordinate with service provider to schedule and organize Emotional Self Awareness training session for participant.',
+          description: 
+             
+            'Coordinate with service provider to schedule and organize Emotional Self Awareness training session for participant.',
           type: 'file',
           status: 'to-do',
           isRequired: true,
@@ -86,7 +88,9 @@ export const COMPLEX_PROJECT_DATA: ProjectData = {
         {
           _id: 'subtask-002',
           name: 'Organize & Schedule training on social empowerment sessions: Session 2 - Self Management',
-          description: 'Coordinate with service provider to schedule and organize Self Management training session for participant.',
+          description:
+            
+            'Coordinate with service provider to schedule and organize Self Management training session for participant.',
           type: 'file',
           status: 'to-do',
           isRequired: true,
@@ -180,7 +184,9 @@ export const COMPLEX_PROJECT_DATA: ProjectData = {
         {
           _id: 'subtask-liv-001',
           name: 'Organize and schedule business skills training: Session 1 - Business idea',
-          description: 'Coordinate with service provider to schedule and organize Business Idea training session for participant.',
+          description: 
+          
+            'Coordinate with service provider to schedule and organize Business Idea training session for participant.',
           type: 'file',
           status: 'to-do',
           isRequired: true,
@@ -188,7 +194,9 @@ export const COMPLEX_PROJECT_DATA: ProjectData = {
         {
           _id: 'subtask-liv-002',
           name: 'Organize and schedule business skills training: Session 2 - Business finances',
-          description: 'Coordinate with service provider to schedule and organize Business Finances training session for participant.',
+          description: 
+          
+            'Coordinate with service provider to schedule and organize Business Finances training session for participant.',
           type: 'file',
           status: 'to-do',
           isRequired: true,
