@@ -37,18 +37,18 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
   const getPillarIcon = (pillarName: string): { icon: string; color: string } => {
     const lowerName = pillarName.toLowerCase();
     if (lowerName.includes(PILLAR_NAMES.SOCIAL_EMPOWERMENT) || lowerName.includes(PILLAR_NAMES.EMPOWERMENT)) {
-      return { icon: 'Users', color: '$pillarSocialEmpowerment' };
+      return { icon: 'Users', color: theme.tokens.colors.pillarSocialEmpowerment };
     }
     if (lowerName.includes(PILLAR_NAMES.LIVELIHOOD)) {
-      return { icon: 'Briefcase', color: '$pillarLivelihoods' };
+      return { icon: 'Briefcase', color: theme.tokens.colors.pillarLivelihoods };
     }
     if (lowerName.includes(PILLAR_NAMES.FINANCIAL_INCLUSION) || lowerName.includes(PILLAR_NAMES.FINANCIAL)) {
-      return { icon: 'DollarSign', color:'$pillarFinancialInclusion' };
+      return { icon: 'DollarSign', color: theme.tokens.colors.pillarFinancialInclusion };
     }
     if (lowerName.includes(PILLAR_NAMES.SOCIAL_PROTECTION) || lowerName.includes(PILLAR_NAMES.PROTECTION)) {
-      return { icon: 'Shield', color: '$pillarSocialProtection' };
+      return { icon: 'Shield', color: theme.tokens.colors.pillarSocialProtection };
     }
-    return { icon: 'Folder', color: '$textSecondary' }; // Default
+    return { icon: 'Folder', color: theme.tokens.colors.textSecondary }; // Default
   };
 
   const pillarIconData = getPillarIcon(task.name);
