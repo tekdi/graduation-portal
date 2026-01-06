@@ -24,6 +24,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import Container from '@ui/Container';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
+import { TASK_TYPE, TASK_STATUS } from '@constants/app.constant';
 
 const ProjectComponent: React.FC = () => {
   const { projectData, mode, config } = useProjectContext();
@@ -35,7 +36,7 @@ const ProjectComponent: React.FC = () => {
   // Check if project has children (pillars) - used to distinguish Intervention Plan from Onboarding
   const hasChildren =
     projectData?.tasks?.some(
-      task => task.type === 'project' && task.children && task.children.length > 0,
+      task => task.type === TASK_TYPE.PROJECT && task.children && task.children.length > 0,
     ) || false;
 
   const isEditMode =
@@ -79,7 +80,7 @@ const ProjectComponent: React.FC = () => {
     projectData?.tasks?.forEach(pillar => {
       pillar.children?.forEach(task => {
         totalCount++;
-        if (task.status === 'completed') {
+        if (task.status === TASK_STATUS.COMPLETED) {
           completedCount++;
         }
       });

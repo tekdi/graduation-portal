@@ -3,7 +3,7 @@ import { Box, HStack, Card, Toast, ToastTitle, useToast, Checkbox, CheckboxIndic
 import { useProjectContext } from '../../context/ProjectContext';
 import { useTaskActions } from '../../hooks/useTaskActions';
 import { useLanguage } from '@contexts/LanguageContext';
-import { TASK_STATUS } from '../../../constants/app.constant';
+import { TASK_STATUS, TASK_TYPE, SPECIAL_TASK_NAMES } from '../../../constants/app.constant';
 import { TaskCardProps } from '../../types/components.types';
 import { Task } from '../../types/project.types';
 import { taskCardStyles } from './Styles';
@@ -61,9 +61,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
       showActionButton:
         task.metadata?.isOptional || // Always show for optional tasks (Add/Remove)
         (!isPreview &&
-          (task.type === 'file' ||
-            task.type === 'observation' ||
-            task.type === 'profile-update')),
+          (task.type === TASK_TYPE.FILE ||
+            task.type === TASK_TYPE.OBSERVATION ||
+            task.type === TASK_TYPE.PROFILE_UPDATE)),
       isInteractive: isEdit && !isUploading,
     }),
     [isChildOfProject, isPreview, isEdit, isUploading, task.type, task.metadata?.isOptional],
@@ -127,11 +127,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const handleTaskClick = () => {
     if (!isEdit) return;
 
-    if (task.type === 'observation') {
+    if (task.type === TASK_TYPE.OBSERVATION) {
       handleOpenForm(task._id);
-    } else if (task.type === 'file') {
+    } else if (task.type === TASK_TYPE.FILE) {
       setShowUploadModal(true); // Open modal instead of file picker
-    } else if (task.type === 'profile-update') {
+    } else if (task.type === TASK_TYPE.PROFILE_UPDATE) {
       const newStatus = isCompleted ? TASK_STATUS.TO_DO : TASK_STATUS.COMPLETED;
       handleStatusChange(task._id, newStatus);
     }
@@ -419,19 +419,19 @@ const TaskCard: React.FC<TaskCardProps> = ({
     // For file tasks, if completed:
     // - Onboarding: show Edit button (original behavior)
     // - Intervention Plan Edit mode: show Upload Evidence (new behavior)
-    if (task.type === 'file' && isCompleted && !isInterventionPlanEditMode) return t('common.edit') || 'Edit';
+    if (task.type === TASK_TYPE.FILE && isCompleted && !isInterventionPlanEditMode) return t('common.edit') || 'Edit';
 
-    if (task.name === 'Capture Consent') return t('projectPlayer.uploadConsent');
-    if (task.name === 'Upload SLA Form') return t('projectPlayer.uploadSLA');
-    if (task.name === 'Complete Household Profile') return t('projectPlayer.completeProfile');
+    if (task.name === SPECIAL_TASK_NAMES.CAPTURE_CONSENT) return t('projectPlayer.uploadConsent');
+    if (task.name === SPECIAL_TASK_NAMES.UPLOAD_SLA) return t('projectPlayer.uploadSLA');
+    if (task.name === SPECIAL_TASK_NAMES.HOUSEHOLD_PROFILE) return t('projectPlayer.completeProfile');
 
-    if (task.type === 'file') {
+    if (task.type === TASK_TYPE.FILE) {
       return isUploading
         ? t('projectPlayer.uploading')
         : t('projectPlayer.uploadEvidence');  // Edit mode uses Upload Evidence
     }
-    if (task.type === 'observation') return t('projectPlayer.completeForm');
-    if (task.type === 'profile-update') return t('projectPlayer.updateProfile');
+    if (task.type === TASK_TYPE.OBSERVATION) return t('projectPlayer.completeForm');
+    if (task.type === TASK_TYPE.PROFILE_UPDATE) return t('projectPlayer.updateProfile');
     return t('projectPlayer.viewTask');
   };
 
@@ -440,14 +440,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
     const iconColor = theme.tokens.colors.textSecondary;
     // Only for Intervention Plan Edit mode, always show Upload icon
     const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
-    if (task.type === 'file') {
+    if (task.type === TASK_TYPE.FILE) {
       // - Onboarding: show Pencil icon when completed (original behavior)
       // - Intervention Plan Edit mode: always show Upload icon (new behavior)
       if (isCompleted && !isInterventionPlanEditMode) return <LucideIcon name="Pencil" size={16} color={iconColor} />;
       return <LucideIcon name="Upload" size={16} color={iconColor} />;
     }
-    if (task.type === 'observation') return <LucideIcon name="FileText" size={16} color={iconColor} />;
-    if (task.type === 'profile-update') return <LucideIcon name="User" size={16} color={iconColor} />;
+    if (task.type === TASK_TYPE.OBSERVATION) return <LucideIcon name="FileText" size={16} color={iconColor} />;
+    if (task.type === TASK_TYPE.PROFILE_UPDATE) return <LucideIcon name="User" size={16} color={iconColor} />;
     return null;
   };
 
@@ -508,13 +508,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
     // For Intervention Plan Edit mode, always show Upload icon
     const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
     const getIconName = () => {
-      if (task.type === 'file') {
+      if (task.type === TASK_TYPE.FILE) {
         // Onboarding: show Pencil when completed
         // Intervention Plan Edit mode: always show Upload
         return (isCompleted && !isInterventionPlanEditMode) ? 'Pencil' : 'Upload';
       }
-      if (task.type === 'observation') return 'FileText';
-      if (task.type === 'profile-update') return 'User';
+      if (task.type === TASK_TYPE.OBSERVATION) return 'FileText';
+      if (task.type === TASK_TYPE.PROFILE_UPDATE) return 'User';
       return null;
     };
 
@@ -579,6 +579,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       taskName={task.name}
       participantName={config.profileInfo?.name}
       existingAttachments={task.attachments}
+      isConsent={task.name === SPECIAL_TASK_NAMES.CAPTURE_CONSENT}
       onUpload={(method) => {
         // console.log('Upload method selected:', method);
       }}
@@ -590,9 +591,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
         }
         setShowUploadModal(false);
         // Show success toast with task-specific message
-        const toastMessage = task.name === 'Capture Consent'
+        const toastMessage = task.name === SPECIAL_TASK_NAMES.CAPTURE_CONSENT
           ? t('projectPlayer.consentUploaded')
-          : task.name === 'Upload SLA Form'
+          : task.name === SPECIAL_TASK_NAMES.UPLOAD_SLA
             ? t('projectPlayer.slaUploaded')
             : t('projectPlayer.evidenceUploaded');
         showSuccessToast(toastMessage);
@@ -618,14 +619,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
         <Card
           {...taskCardStyles.childCard}
           bg={
-            (isEdit && !isPreview && task.type === 'observation')
+            (isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION)
               ? '$observationTaskBg'
               : isPreview && isAddedToPlan
                 ? '$addedToPlanBg'
                 : taskCardStyles.childCard?.bg
           }
           borderColor={
-            (isEdit && !isPreview && task.type === 'observation')
+            (isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION)
               ? '$observationTaskBorder'
               : isPreview && isAddedToPlan
                 ? '$addedToPlanBorder'

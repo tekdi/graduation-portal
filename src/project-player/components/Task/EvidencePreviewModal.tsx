@@ -49,7 +49,7 @@ const EvidencePreviewModal: React.FC<EvidencePreviewModalProps> = ({
                 if (canOpen) {
                     await Linking.openURL(attachment.url);
                 } else {
-                    Alert.alert('Cannot open file', 'Unable to open this file link.');
+                    Alert.alert(t('projectPlayer.cannotOpenFile'), t('projectPlayer.unableToOpenFile'));
                     console.warn('Cannot open URL:', attachment.url);
                 }
             }

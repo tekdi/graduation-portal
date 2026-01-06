@@ -13,6 +13,15 @@ export const TASK_STATUS = {
   COMPLETED: 'completed',
 } as const;
 
+// Task Type Constants
+export const TASK_TYPE = {
+  PROJECT: 'project',
+  FILE: 'file',
+  OBSERVATION: 'observation',
+  SIMPLE: 'simple',
+  PROFILE_UPDATE: 'profile-update',
+} as const;
+
 // Project Status Constants
 export const PROJECT_STATUS = {
   DRAFT: 'draft',
@@ -77,4 +86,14 @@ export const PILLAR_NAMES = {
  */
 export const PILLAR_CATEGORIES = {
   PROTECTION: 'protection',
+} as const;
+
+/**
+ * Special Task Name Constants
+ * Defines specific task names that require custom handling
+ */
+export const SPECIAL_TASK_NAMES = {
+  CAPTURE_CONSENT: 'Capture Consent',
+  UPLOAD_SLA: 'Upload SLA Form',
+  HOUSEHOLD_PROFILE: 'Complete Household Profile',
 } as const;

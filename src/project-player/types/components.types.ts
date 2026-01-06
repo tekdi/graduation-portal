@@ -181,6 +181,7 @@ export interface FileUploadModalProps {
   taskName: string;
   participantName?: string;
   existingAttachments?: any[];
+  isConsent?: boolean;
 }
 
 export interface UploadMethodOptionProps {

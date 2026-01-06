@@ -1,16 +1,16 @@
 import { Platform, PermissionsAndroid } from 'react-native';
 
-export const requestCameraPermission = async () => {
+export const requestCameraPermission = async (t: (key: string) => string) => {
     if (Platform.OS === 'android') {
         try {
             const granted = await PermissionsAndroid.request(
                 PermissionsAndroid.PERMISSIONS.CAMERA,
                 {
-                    title: 'Camera Permission',
-                    message: 'App needs access to your camera',
-                    buttonNeutral: 'Ask Me Later',
-                    buttonNegative: 'Cancel',
-                    buttonPositive: 'OK',
+                    title: t('permissions.camera.title'),
+                    message: t('permissions.camera.message'),
+                    buttonNeutral: t('permissions.camera.buttonNeutral'),
+                    buttonNegative: t('permissions.camera.buttonNegative'),
+                    buttonPositive: t('permissions.camera.buttonPositive'),
                 },
             );
             return granted === PermissionsAndroid.RESULTS.GRANTED;
@@ -22,7 +22,7 @@ export const requestCameraPermission = async () => {
     return true;
 };
 
-export const requestStoragePermission = async () => {
+export const requestStoragePermission = async (t: (key: string) => string) => {
     if (Platform.OS === 'android') {
         try {
             // Android 13+ (API 33) requires granular media permissions
@@ -30,11 +30,11 @@ export const requestStoragePermission = async () => {
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.READ_MEDIA_IMAGES,
                     {
-                        title: 'Storage Permission',
-                        message: 'App needs access to your photos',
-                        buttonNeutral: 'Ask Me Later',
-                        buttonNegative: 'Cancel',
-                        buttonPositive: 'OK',
+                        title: t('permissions.storage.title'),
+                        message: t('permissions.storage.message'),
+                        buttonNeutral: t('permissions.storage.buttonNeutral'),
+                        buttonNegative: t('permissions.storage.buttonNegative'),
+                        buttonPositive: t('permissions.storage.buttonPositive'),
                     },
                 );
                 return granted === PermissionsAndroid.RESULTS.GRANTED;
@@ -42,11 +42,11 @@ export const requestStoragePermission = async () => {
                 const granted = await PermissionsAndroid.request(
                     PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
                     {
-                        title: 'Storage Permission',
-                        message: 'App needs access to your storage',
-                        buttonNeutral: 'Ask Me Later',
-                        buttonNegative: 'Cancel',
-                        buttonPositive: 'OK',
+                        title: t('permissions.storage.title'),
+                        message: t('permissions.storage.message'),
+                        buttonNeutral: t('permissions.storage.buttonNeutral'),
+                        buttonNegative: t('permissions.storage.buttonNegative'),
+                        buttonPositive: t('permissions.storage.buttonPositive'),
                     },
                 );
                 return granted === PermissionsAndroid.RESULTS.GRANTED;

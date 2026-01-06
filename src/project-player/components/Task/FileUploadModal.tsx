@@ -88,6 +88,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     taskName,
     participantName,
     existingAttachments = [],
+    isConsent = false,
 }) => {
     const { t } = useLanguage();
     const [selectedMethod, setSelectedMethod] = useState<'camera' | 'device' | null>(null);
@@ -120,7 +121,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
 
             try {
                 if (method === 'camera') {
-                    const hasPermission = await requestCameraPermission();
+                    const hasPermission = await requestCameraPermission(t);
                     if (!hasPermission) {
                         Alert.alert(t('common.error'), t('projectPlayer.cameraPermissionDenied'));
                         return;
@@ -131,7 +132,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                         onUpload(method, result.assets);
                     }
                 } else {
-                    const hasPermission = await requestStoragePermission();
+                    const hasPermission = await requestStoragePermission(t);
                     if (!hasPermission) {
                         Alert.alert(t('common.error'), t('projectPlayer.storagePermissionDenied'));
                         return;
@@ -178,7 +179,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     };
 
     // If task is 'Capture Consent', show participant name, otherwise show task name
-    const isConsentTask = taskName === 'Capture Consent';
+    const isConsentTask = isConsent;
     const displayName = isConsentTask ? (participantName || taskName) : (taskName || participantName);
 
     const renderFileList = (files: any[], title: string, showDelete: boolean = false) => {
