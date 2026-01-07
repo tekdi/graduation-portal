@@ -1,11 +1,41 @@
 import { Participant } from '@app-types/screens';
 import type { ParticipantData, Province, Site } from '@app-types/participant';
 import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
+import api from './api';
+import { API_ENDPOINTS } from './apiEndpoints';
+import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
 
 /**
  * Participant Service
  * Handles participant data operations and transformations
  */
+
+/**
+ * User Search Parameters
+ * Parameters for searching/filtering users via API
+ */
+export interface UserSearchParams {
+  user_ids?: string[] | null;
+  tenant_code?: string;
+  type?: string; // 'user,session_manager,org_admin'
+  page?: number;
+  limit?: number;
+  search?: string;
+  role?: string;
+  status?: string;
+  province?: string;
+  district?: string;
+}
+
+/**
+ * User Search Response
+ * Response structure from the user search API
+ */
+export interface UserSearchResponse {
+  responseCode: string;
+  message: string;
+  result: any;
+}
 
 /**
  * Get participants list for table view
@@ -119,5 +149,72 @@ export const getSitesByProvince = (provinceValue: string): Site[] => {
   // TODO: Replace with API call that filters sites by province
   // For now, return all sites
   return SITES;
+};
+
+/**
+ * Get users list from API
+ * Handles search, filtering, and pagination
+ * Reuses same endpoint as participants, differentiated by type parameter
+ * 
+ * @param params - Query parameters for filtering and pagination
+ * @returns Promise resolving to UserSearchResponse
+ */
+export const getUsersList = async (
+  params: UserSearchParams
+): Promise<UserSearchResponse> => {
+  try {
+    const {
+      user_ids,
+      tenant_code = 'brac',
+      type = 'user,session_manager,org_admin',  // Different from participant
+      page = 1,
+      limit = 20,
+      search,
+      role,
+      status,
+      province,
+      district,
+    } = params;
+
+    // Build query string
+    const queryParams = new URLSearchParams({
+      tenant_code,
+      type,  // 'user,session_manager,org_admin' instead of 'participant'
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    // Add optional search parameter
+    if (search) {
+      queryParams.append('search', search);
+    }
+
+    // Add optional filter parameters
+    if (role) {
+      queryParams.append('role', role);
+    }
+    if (status) {
+      queryParams.append('status', status);
+    }
+    if (province) {
+      queryParams.append('province', province);
+    }
+    if (district) {
+      queryParams.append('district', district);
+    }
+
+    // Reuse PARTICIPANTS_LIST endpoint (same URL, different type param)
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
+
+    // Make POST request
+    const response = await api.post<UserSearchResponse>(endpoint, {
+      user_ids: user_ids || null,  // Different from participant_ids
+    });
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
 };
 
