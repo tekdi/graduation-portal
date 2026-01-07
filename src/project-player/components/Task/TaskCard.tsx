@@ -29,7 +29,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const { isWeb } = usePlatform();
   const { t } = useLanguage();
   const toast = useToast();
-  const [isUploading, setIsUploading] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
 
@@ -64,9 +63,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
           (task.type === TASK_TYPE.FILE ||
             task.type === TASK_TYPE.OBSERVATION ||
             task.type === TASK_TYPE.PROFILE_UPDATE)),
-      isInteractive: isEdit && !isUploading,
+      isInteractive: isEdit,
     }),
-    [isChildOfProject, isPreview, isEdit, isUploading, task.type, task.metadata?.isOptional],
+    [isChildOfProject, isPreview, isEdit, task.type, task.metadata?.isOptional],
   );
 
   // Toast helpers
@@ -426,29 +425,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (task.name === SPECIAL_TASK_NAMES.HOUSEHOLD_PROFILE) return t('projectPlayer.completeProfile');
 
     if (task.type === TASK_TYPE.FILE) {
-      return isUploading
-        ? t('projectPlayer.uploading')
-        : t('projectPlayer.uploadEvidence');  // Edit mode uses Upload Evidence
+      return t('projectPlayer.uploadEvidence');  // Edit mode uses Upload Evidence
     }
     if (task.type === TASK_TYPE.OBSERVATION) return t('projectPlayer.completeForm');
     if (task.type === TASK_TYPE.PROFILE_UPDATE) return t('projectPlayer.updateProfile');
     return t('projectPlayer.viewTask');
-  };
-
-  // Button icon helper
-  const getButtonIcon = () => {
-    const iconColor = theme.tokens.colors.textSecondary;
-    // Only for Intervention Plan Edit mode, always show Upload icon
-    const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
-    if (task.type === TASK_TYPE.FILE) {
-      // - Onboarding: show Pencil icon when completed (original behavior)
-      // - Intervention Plan Edit mode: always show Upload icon (new behavior)
-      if (isCompleted && !isInterventionPlanEditMode) return <LucideIcon name="Pencil" size={16} color={iconColor} />;
-      return <LucideIcon name="Upload" size={16} color={iconColor} />;
-    }
-    if (task.type === TASK_TYPE.OBSERVATION) return <LucideIcon name="FileText" size={16} color={iconColor} />;
-    if (task.type === TASK_TYPE.PROFILE_UPDATE) return <LucideIcon name="User" size={16} color={iconColor} />;
-    return null;
   };
 
   // Render action button (HEAD logic)
@@ -525,11 +506,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
         {...taskCardStyles.actionButton}
         onPress={handleTaskClick}
         ml="$0"
-        isDisabled={isReadOnly || isUploading}
+        isDisabled={isReadOnly}
         size={isWeb ? (uiConfig.showAsCard ? "sm" : "md") : "xs"}
         borderRadius="$lg"
         borderColor={buttonStyles.borderColor}
-        opacity={isReadOnly || isUploading ? 0.5 : 1}
+        opacity={isReadOnly ? 0.5 : 1}
         $hover-bg={isEdit ? buttonStyles.hoverBg : 'transparent'}
         $hover-borderColor="$primary500"
       >
