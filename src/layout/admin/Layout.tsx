@@ -2,12 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   HStack,
-  Icon,
-  MenuIcon,
   SafeAreaView,
   ScrollView,
   useColorMode,
-  Pressable,
 } from '@ui';
 import AdminHeader from '@components/Header';
 import AdminSidebar from '@components/Sidebar/Sidebar';
@@ -22,19 +19,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const mode = useColorMode();
   const isDark = mode === 'dark';
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [search, setSearch] = useState('');
   // Determine if we're on mobile/tablet (< 768px)
   const { isMobile, isWeb } = usePlatform();
 
   const handleCloseDrawer = () => {
     setIsDrawerOpen(false);
   };
-
-  const rightSideContent = (
-    <Pressable onPress={() => setIsDrawerOpen(!isDrawerOpen)}>
-      <Icon as={MenuIcon} />
-    </Pressable>
-  );
 
   useEffect(() => {
     setIsDrawerOpen(!isMobile);
@@ -66,8 +56,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
           {/* Header */}
           <Box {...layoutStyles.headerContent}>
             <AdminHeader
-              {...{ search, setSearch, showNotification: true }}
-              rightSideContent={rightSideContent}
+              showNotification={true}
             />
           </Box>
           {/* Main Content */}
