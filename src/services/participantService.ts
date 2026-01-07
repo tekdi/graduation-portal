@@ -3,7 +3,6 @@ import type { ParticipantData, Province, Site } from '@app-types/participant';
 import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
-import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
 
 /**
  * Participant Service
