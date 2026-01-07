@@ -203,6 +203,10 @@
       "otherSupervisors": "Other supervisors (admin only)"
     }
   },
+  "observation": {
+    "noParticipantFound": "No entity found observation solution attached to this participant",
+    "noParticipantFoundError": "Failed to update observation entities."
+  },
   "brand": {
     "primaryName": "brac",
     "secondaryName": "GBL Admin",

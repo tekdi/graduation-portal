@@ -85,3 +85,140 @@ export const getTargetedSolutions = async (
   }
 };
 
+
+
+/**
+ * Fetch entities for a given observation solution
+ *
+ * @param {Object} params
+ * @param {string} params.solutionId - The observation solution ID
+ * @param {Object} params.profileData - Profile data for the observation context
+ * @returns {Promise<any>} - List of entities (API response)
+ */
+export const getObservationEntities = async ({
+  solutionId,
+  profileData,
+}: {
+  solutionId: string;
+  profileData: {
+    state?: string;
+    district?: string;
+    block?: string;
+    cluster?: string;
+    school?: string;
+    professional_role?: string;
+    professional_subroles?: string;
+    organizations?: string;
+    [key: string]: any;
+  };
+}): Promise<any> => {
+  try {
+    // POST body
+    const data = { ...profileData };
+
+    const response = await api.post(
+      `${API_ENDPOINTS.OBSERVATION_ENTITIES}?solutionId=${solutionId}`,
+      data,
+    );
+
+    return response.data;
+  } catch (error) {
+    logger.error('Error fetching observation entities:', error);
+    throw error;
+  }
+};
+
+/**
+ * Update observation entities for a given observation
+ *
+ * @param {Object} params
+ * @param {string} params.entityId - The observation entity ID to update
+ * @param {string[]} params.data - Array of entity IDs to update
+ * @param {string} params.orgId - Organization ID (org-id header)
+ * @returns {Promise<any>} - Updated entities response
+ */
+export const updateObservationEntities = async ({
+  observationId,
+  data,
+}: {
+  observationId: string;
+  data: string[];
+}): Promise<any> => {
+  try {
+    const response = await api.post(
+      `${API_ENDPOINTS.UPDATE_OBSERVATION_ENTITIES}/${observationId}`,
+      { data },
+    );
+
+    logger.info('Observation entities updated successfully', {
+      observationId,
+      dataCount: data.length,
+    });
+
+    return response.data;
+  } catch (error) {
+    logger.error('Error updating observation entities:', error);
+    throw error;
+  }
+};
+
+/**
+ * Interface for search observation entities request parameters
+ */
+export interface SearchObservationEntitiesParams {
+  state?: string;
+  district?: string;
+  block?: string;
+  cluster?: string;
+  school?: string;
+  professional_role?: string;
+  professional_subroles?: string;
+  organizations?: string | string[] | object;
+  [key: string]: any;
+}
+
+/**
+ * Search observation entities for a given observation
+ *
+ * @param {Object} params
+ * @param {string} params.observationId - The observation ID
+ * @param {SearchObservationEntitiesParams} params.filters - Filter parameters for the search
+ * @returns {Promise<any>} - Search results response
+ */
+export const searchObservationEntities = async ({
+  observationId,
+  search = '',
+  filters = {},
+}: {
+  observationId: string;
+  search?: string;
+  filters?: SearchObservationEntitiesParams;
+}): Promise<any> => {
+  try {
+    // Prepare the request body
+    const requestBody: SearchObservationEntitiesParams = { ...filters };
+    
+    // Handle organizations field - ensure it's properly serialized
+    if (requestBody.organizations && typeof requestBody.organizations === 'object' && !Array.isArray(requestBody.organizations)) {
+      // If it's an object, convert to JSON string or handle appropriately
+      requestBody.organizations = JSON.stringify(requestBody.organizations);
+    }
+
+    const response = await api.post(
+      `${API_ENDPOINTS.SEARCH_OBSERVATION_ENTITIES}?observationId=${observationId}&search=${search}`,
+      requestBody,
+    );
+
+    logger.info('Observation entities searched successfully', {
+      observationId,
+      filtersCount: Object.keys(filters).length,
+    });
+
+    return response.data;
+  } catch (error) {
+    logger.error('Error searching observation entities:', error);
+    throw error;
+  }
+};
+
+

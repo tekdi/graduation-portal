@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
-import { Box, Container, VStack, HStack, Text, Pressable, Button, ButtonText } from '@ui';
+import { Box, Container, VStack, HStack, Text, Pressable, Button, ButtonText, Spinner } from '@ui';
 import { LucideIcon } from '@ui';
 import { AssessmentCard } from '@components/ObservationCards';
 import { getParticipantById } from '../../../services/participantService';
@@ -13,6 +13,7 @@ import NotFound from '@components/NotFound';
 import { ParticipantData } from '@app-types/participant';
 import { AssessmentSurveyCardData } from '@app-types/participant';
 import logger from '@utils/logger';
+import { isWeb } from '@utils/platform';
 
 /**
  * Route parameters type definition for LogVisit screen
@@ -46,7 +47,6 @@ const LogVisit: React.FC = () => {
   useEffect(() => {
     const fetchSolutions = async () => {
       try {
-        setLoading(true);
         const data = await getTargetedSolutions({
           type: 'observation',
           page: 1,
@@ -87,6 +87,10 @@ const LogVisit: React.FC = () => {
   // Error State: Missing participant ID or participant not found
   if (!participant) {
     return <NotFound message="participantDetail.notFound.title" />;
+  }
+
+  if(loading) {
+    return <Spinner height={isWeb ? '$calc(100vh - 68px)' : '$full'} size="large" color="$primary500" />;
   }
 
   return (

@@ -98,7 +98,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
                 onPress={() => {
                   if(navigationUrl && userId) {
                     // @ts-ignore
-                    navigation.navigate(navigationUrl as never, { id: userId || '',observationId:card?.id });
+                    navigation.navigate(navigationUrl as never, { id: userId || '',solutionId:card?.id });
                   } else {
                     logger.log('userId is required');
                   }
@@ -169,7 +169,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
           <Pressable
             onPress={() => {
               // @ts-ignore
-              navigation.navigate(navigationUrl as never, { id: userId || '',observationId:card?.solutionId || card?.id });
+              navigation.navigate(navigationUrl as never, { id: userId || '',solutionId:card?.solutionId || card?.id });
             }}
             $web-cursor="pointer"
           >
