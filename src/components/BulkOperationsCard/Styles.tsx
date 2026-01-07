@@ -2,7 +2,7 @@ export const bulkOperationStyles = {
   container: {
     bg: '$white',
     borderWidth: 1,
-    borderColor: '$borderColor',
+    borderColor: '$borderLight300',
     borderRadius: '$lg',
     p: '$6',
     width: '$full',

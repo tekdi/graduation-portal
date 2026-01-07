@@ -95,7 +95,7 @@ export const styles = {
   },
 
   cardContent: {
-    space: 'sm' as const, 
+    //space: 'sm' as const,
   },
 
   cardFullWidthRow: {
