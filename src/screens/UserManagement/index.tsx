@@ -1,12 +1,7 @@
-<<<<<<< Updated upstream
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { VStack, HStack, Button, Text, Image, Box } from '@ui';
-import { LucideIcon } from '@ui/index';
-=======
-import React, { useState, useRef } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { VStack, HStack, Button, Text, Image, Box, Pressable, Card, useToast, Toast, ToastTitle } from '@ui';
 import { View, Platform } from 'react-native';
->>>>>>> Stashed changes
+import { LucideIcon } from '@ui/index';
 
 import UploadIcon from '../../assets/images/UploadIcon.png';
 import ExportIcon from '../../assets/images/ExportIcon.png';
@@ -15,7 +10,6 @@ import { SearchFilter, FilterOptions } from '@constants/USER_MANAGEMENT_FILTERS'
 import FilterButton from '@components/Filter';
 import TitleHeader from '@components/TitleHeader';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
-<<<<<<< Updated upstream
 import DataTable from '@components/DataTable';
 import { getUsersColumns } from './UsersTableConfig';
 import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
@@ -23,15 +17,12 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
 import { getUsersList, UserSearchParams } from '../../services/participantService';
-=======
-import { Modal, LucideIcon } from '@ui';
+import { Modal } from '@ui';
 import { theme } from '@config/theme';
-import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
-import { userManagementStyles } from './Styles';
-
-// Type assertion to fix TypeScript inference issues
-const styles = userManagementStyles as typeof userManagementStyles;
->>>>>>> Stashed changes
+import BulkOperationsCard from '../../components/BulkOperationsCard';
+// TODO: Add USER_MANAGEMENT_STATS constant
+// import StatCard, { StatsRow } from '@components/StatCard';
+// import { USER_MANAGEMENT_STATS } from '@constants/USER_MANAGEMENT_STATS';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -40,7 +31,9 @@ const UserManagementScreen = () => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
   const data = [SearchFilter, ...FilterOptions];
-<<<<<<< Updated upstream
+  const toast = useToast();
+  
+  // API integration state
   const [filters, setFilters] = useState<Record<string, any>>({});
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +41,44 @@ const UserManagementScreen = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   
+  // File upload state
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const maxFileSize = 10; // 10MB max file size
+  
   const columns = useMemo(() => getUsersColumns(), []);
+
+  // Toast helpers
+  const showErrorToast = (message: string) => {
+    toast.show({
+      placement: 'top',
+      render: ({ id }) => (
+        <Toast nativeID={id} action="error" variant="solid">
+          <ToastTitle>{message}</ToastTitle>
+        </Toast>
+      ),
+    });
+  };
+
+  const showSuccessToast = (message: string) => {
+    toast.show({
+      placement: 'top',
+      render: ({ id }) => (
+        <Toast nativeID={id} action="success" variant="solid">
+          <ToastTitle>{message}</ToastTitle>
+        </Toast>
+      ),
+    });
+  };
+
+  // Validate file size
+  const validateFileSize = (file: File): boolean => {
+    const maxSizeBytes = maxFileSize * 1024 * 1024;
+    return file.size <= maxSizeBytes;
+  };
 
   // Fetch users from API when filters/pagination change
   useEffect(() => {
@@ -167,43 +197,6 @@ const UserManagementScreen = () => {
     // Handle row click - navigate to user details
     console.log('User clicked:', user);
   }, []);
-=======
-  const toast = useToast();
-  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const maxFileSize = 10; // 10MB max file size
-
-  // Toast helpers
-  const showErrorToast = (message: string) => {
-    toast.show({
-      placement: 'top',
-      render: ({ id }) => (
-        <Toast nativeID={id} action="error" variant="solid">
-          <ToastTitle>{message}</ToastTitle>
-        </Toast>
-      ),
-    });
-  };
-
-  const showSuccessToast = (message: string) => {
-    toast.show({
-      placement: 'top',
-      render: ({ id }) => (
-        <Toast nativeID={id} action="success" variant="solid">
-          <ToastTitle>{message}</ToastTitle>
-        </Toast>
-      ),
-    });
-  };
-
-  // Validate file size
-  const validateFileSize = (file: File): boolean => {
-    const maxSizeBytes = maxFileSize * 1024 * 1024;
-    return file.size <= maxSizeBytes;
-  };
 
   // Handle CSV upload: closes options modal and triggers native file picker
   const handleUploadCSV = () => {
@@ -265,7 +258,6 @@ const UserManagementScreen = () => {
     // TODO: Handle add user
     console.log('Add User clicked');
   };
->>>>>>> Stashed changes
 
   return (
     <VStack space="md" width="100%">
@@ -273,14 +265,11 @@ const UserManagementScreen = () => {
         title="admin.menu.userManagement"
         description="admin.userManagementDescription"
         right={
-<<<<<<< Updated upstream
           isMobile ? (
             <VStack space="sm" width="$full">
               <Button
                 {...titleHeaderStyles.outlineButton}
-                onPress={() => {
-                  // Handle bulk upload
-                }}
+                onPress={() => setIsUploadModalOpen(true)}
                 width="$full"
               >
                 <HStack space="sm" alignItems="center">
@@ -318,9 +307,7 @@ const UserManagementScreen = () => {
             <HStack space="md" alignItems="center">
               <Button
                 {...titleHeaderStyles.outlineButton}
-                onPress={() => {
-                  // Handle bulk upload
-                }}
+                onPress={() => setIsUploadModalOpen(true)}
               >
                 <HStack space="sm" alignItems="center">
                   <Image 
@@ -376,31 +363,12 @@ const UserManagementScreen = () => {
                 })}
               </Text>
             )}
-=======
-          <HStack space="md" alignItems="center">
             <Button
               {...titleHeaderStyles.outlineButton}
-              onPress={() => setIsUploadModalOpen(true)}
+              onPress={() => {
+                // Handle Export CSV
+              }}
             >
-              <HStack space="sm" alignItems="center">
-                <Image 
-                  source={UploadIcon}
-                  style={{ width: 16, height: 16 }}
-                  alt="Upload icon"
-                />
-                <Text {...titleHeaderStyles.outlineButtonText}>
-                  {t('admin.actions.bulkUploadCSV')}
-                </Text>
-              </HStack>
-            </Button>
-            
->>>>>>> Stashed changes
-            <Button
-                {...titleHeaderStyles.outlineButton}
-                onPress={() => {
-                  // Handle Export CSV
-                }}
-              >
               <HStack space="xs" alignItems="center">
                 <LucideIcon
                   name="Download"
@@ -412,7 +380,6 @@ const UserManagementScreen = () => {
               </HStack>
             </Button>
           </HStack>
-<<<<<<< Updated upstream
         </HStack>
 
         {/* DataTable */}
@@ -429,17 +396,14 @@ const UserManagementScreen = () => {
           loadingMessage="admin.users.loadingUsers"
         />
       </Box>
-=======
-        }
-      />
-      
-      <FilterButton data={data} />
-      
-      <BulkOperationsCard/>
+
+      {/* <BulkOperationsCard/> */}
+
       {/* Stats and Bulk Operations - Display after table */}
+      {/* TODO: Uncomment when USER_MANAGEMENT_STATS constant is available
       <View style={{ marginTop: 24, width: '100%' }}>
         <StatsRow>
-          {USER_MANAGEMENT_STATS.map((stat, index) => (
+          {USER_MANAGEMENT_STATS.map((stat: any, index: number) => (
             <StatCard
               key={index}
               title={stat.title}
@@ -450,6 +414,7 @@ const UserManagementScreen = () => {
           ))}
         </StatsRow>
       </View>
+      */}
       
       {/* Upload Users Modal */}
       <Modal
@@ -554,7 +519,6 @@ const UserManagementScreen = () => {
           style={{ display: 'none' }}
         />
       )}
->>>>>>> Stashed changes
     </VStack>
   );
 };
