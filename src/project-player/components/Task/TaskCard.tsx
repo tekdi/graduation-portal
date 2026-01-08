@@ -48,7 +48,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const isCompleted = isTaskCompleted(task.status);
   const isAddedToPlan = task.metadata?.addedToPlan;
 
-  const maxFileSize = config.maxFileSize || 10;
+  // Common Logic Variables
+  const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
   // Configuration (Merged from HEAD logic + helpers if needed)
   // We keep HEAD logic mainly because of the 'Add to Plan' button requirement which uiConfig drives
@@ -69,16 +70,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
   );
 
   // Toast helpers
-  const showErrorToast = (message: string) => {
-    toast.show({
-      placement: 'top',
-      render: ({ id }) => (
-        <Toast nativeID={id} action="error" variant="solid">
-          <ToastTitle>{message}</ToastTitle>
-        </Toast>
-      ),
-    });
-  };
 
   const showSuccessToast = (message: string) => {
     toast.show({
@@ -278,8 +269,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
     ) : null;
 
     // Status badge for Intervention Plan Edit mode only (not Onboarding)
-    // isEditModeOnly is true ONLY for Intervention Plan tasks that are children of pillars
-    const isEditModeOnly = isEdit && !isPreview && isChildOfProject;
+    // isInterventionPlanEditMode is true ONLY for Intervention Plan tasks that are children of pillars
+    const isEditModeOnly = isInterventionPlanEditMode;
     const statusBadge = (isEditModeOnly && uiConfig.showAsCard) ? (
       <Box
         bg={isCompleted ? '$textMuted' : '$primary500'}
@@ -413,7 +404,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const getButtonText = () => {
     // Intervention Plan Edit mode = isEdit && !isPreview && isChildOfProject
     // Only for Intervention Plan Edit mode, always show Upload Evidence for file tasks
-    const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
     // For file tasks, if completed:
     // - Onboarding: show Edit button (original behavior)
@@ -487,7 +477,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Get icon name based on task type
     // For Intervention Plan Edit mode, always show Upload icon
-    const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
     const getIconName = () => {
       if (task.type === TASK_TYPE.FILE) {
         // Onboarding: show Pencil when completed
@@ -593,132 +582,107 @@ const TaskCard: React.FC<TaskCardProps> = ({
   );
 
   // Main Render Logic
+  let mainContent;
 
   if (uiConfig.showAsCard) {
-    return (
-      <>
-        <Card
-          {...taskCardStyles.childCard}
-          bg={
-            (isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION)
-              ? '$observationTaskBg'
-              : isPreview && isAddedToPlan
-                ? '$addedToPlanBg'
-                : taskCardStyles.childCard?.bg
-          }
-          borderColor={
-            (isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION)
-              ? '$observationTaskBorder'
-              : isPreview && isAddedToPlan
-                ? '$addedToPlanBorder'
-                : taskCardStyles.childCard?.borderColor
-          }
-        >
-          <Box {...taskCardStyles.childCardContent}>
-            {isWeb ? (
-              // Web: All in one row
-              <HStack alignItems="flex-start" space="md">
+    mainContent = (
+      <Card
+        {...taskCardStyles.childCard}
+        bg={
+          (isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION)
+            ? '$observationTaskBg'
+            : isPreview && isAddedToPlan
+              ? '$addedToPlanBg'
+              : taskCardStyles.childCard?.bg
+        }
+        borderColor={
+          (isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION)
+            ? '$observationTaskBorder'
+            : isPreview && isAddedToPlan
+              ? '$addedToPlanBorder'
+              : taskCardStyles.childCard?.borderColor
+        }
+      >
+        <Box {...taskCardStyles.childCardContent}>
+          {isWeb ? (
+            // Web: All in one row
+            <HStack alignItems="flex-start" space="md">
+              <Box flexShrink={0} alignItems="center" justifyContent="center">
+                {renderStatusIndicator()}
+              </Box>
+              <Box flex={1} minWidth="$0">
+                {renderTaskInfo()}
+              </Box>
+              <Box flexShrink={0}>
+                <HStack space="xs" alignItems="center">
+                  {renderActionButton()}
+                  {renderCustomTaskActions({
+                    isCustomTask: task.isCustomTask || false,
+                    onEdit: openEditModal,
+                    onDelete: openDeleteModal,
+                  })}
+                </HStack>
+              </Box>
+            </HStack>
+          ) : (
+            // Mobile: Title/badge on top, button below
+            <VStack space="sm">
+              <HStack alignItems="flex-start" space="sm">
                 <Box flexShrink={0} alignItems="center" justifyContent="center">
                   {renderStatusIndicator()}
                 </Box>
-                <Box flex={1} minWidth="$0">
+                <Box flex={1}>
                   {renderTaskInfo()}
                 </Box>
-                <Box flexShrink={0}>
-                  <HStack space="xs" alignItems="center">
-                    {renderActionButton()}
-                    {renderCustomTaskActions({
-                      isCustomTask: task.isCustomTask || false,
-                      onEdit: openEditModal,
-                      onDelete: openDeleteModal,
-                    })}
-                  </HStack>
-                </Box>
               </HStack>
-            ) : (
-              // Mobile: Title/badge on top, button below
-              <VStack space="sm">
-                <HStack alignItems="flex-start" space="sm">
-                  <Box flexShrink={0} alignItems="center" justifyContent="center">
-                    {renderStatusIndicator()}
-                  </Box>
-                  <Box flex={1}>
-                    {renderTaskInfo()}
-                  </Box>
+              <Box alignItems="center" width="100%">
+                <HStack space="xs" alignItems="center">
+                  {renderActionButton()}
+                  {renderCustomTaskActions({
+                    isCustomTask: task.isCustomTask || false,
+                    onEdit: openEditModal,
+                    onDelete: openDeleteModal,
+                  })}
                 </HStack>
-                <Box alignItems="center" width="100%">
-                  <HStack space="xs" alignItems="center">
-                    {renderActionButton()}
-                    {renderCustomTaskActions({
-                      isCustomTask: task.isCustomTask || false,
-                      onEdit: openEditModal,
-                      onDelete: openDeleteModal,
-                    })}
-                  </HStack>
-                </Box>
-              </VStack>
-            )}
-          </Box>
-        </Card>
-        {renderUploadModal()}
-        {renderPreviewModal()}
-        {renderModals({
-          modalState,
-          onCloseModal: closeModal,
-          onConfirmDelete: handleConfirmDelete,
-          taskName: task.name,
-          t,
-        })}
-      </>
+              </Box>
+            </VStack>
+          )}
+        </Box>
+      </Card>
     );
-  }
-
-  // Inline style for preview mode with project children
-  if (isChildOfProject && isPreview) {
-    return (
-      <>
-        <HStack
-          {...taskCardStyles.previewInlineContainer}
-          padding={isWeb ? "$4" : "$0"}
-          bg={isAddedToPlan ? '$addedToPlanBg' : 'transparent'}
-          borderColor={isAddedToPlan ? '$addedToPlanBorder' : 'transparent'}
-          borderWidth={isAddedToPlan ? 1 : 0}
-          borderRadius="$lg"
-          marginBottom="$2"
-          alignItems="flex-start"
-          space={isWeb ? "md" : "xs"}
-        >
-          <Box flexShrink={0} mt="$1">
-            {renderStatusIndicator()}
-          </Box>
-          <Box flex={1} minWidth={isWeb ? "$0" : undefined}>
-            {renderTaskInfo()}
-          </Box>
-          <Box flexShrink={0}>
-            {renderActionButton()}
-            {renderCustomTaskActions({
-              isCustomTask: task.isCustomTask || false,
-              onEdit: openEditModal,
-              onDelete: openDeleteModal,
-            })}
-          </Box>
-        </HStack>
-        {renderDivider()}
-        {renderUploadModal()}
-        {renderModals({
-          modalState,
-          onCloseModal: closeModal,
-          onConfirmDelete: handleConfirmDelete,
-          taskName: task.name,
-          t,
-        })}
-      </>
+  } else if (isChildOfProject && isPreview) {
+    // Inline style for preview mode with project children
+    mainContent = (
+      <HStack
+        {...taskCardStyles.previewInlineContainer}
+        padding={isWeb ? "$4" : "$0"}
+        bg={isAddedToPlan ? '$addedToPlanBg' : 'transparent'}
+        borderColor={isAddedToPlan ? '$addedToPlanBorder' : 'transparent'}
+        borderWidth={isAddedToPlan ? 1 : 0}
+        borderRadius="$lg"
+        marginBottom="$2"
+        alignItems="flex-start"
+        space={isWeb ? "md" : "xs"}
+      >
+        <Box flexShrink={0} mt="$1">
+          {renderStatusIndicator()}
+        </Box>
+        <Box flex={1} minWidth={isWeb ? "$0" : undefined}>
+          {renderTaskInfo()}
+        </Box>
+        <Box flexShrink={0}>
+          {renderActionButton()}
+          {renderCustomTaskActions({
+            isCustomTask: task.isCustomTask || false,
+            onEdit: openEditModal,
+            onDelete: openDeleteModal,
+          })}
+        </Box>
+      </HStack>
     );
-  }
-
-  // Default inline style for regular tasks
-  return (
-    <>
+  } else {
+    // Default inline style for regular tasks
+    mainContent = (
       <Box {...taskCardStyles.regularTaskContainer} padding={isWeb ? "$5" : "$2"} marginLeft={level * (isWeb ? 16 : 8)}>
         <HStack alignItems="flex-start" space={isWeb ? "md" : "sm"}>
           <Box flexShrink={0} mt="$1">
@@ -737,8 +701,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
           </Box>
         </HStack>
       </Box>
-      {renderDivider()}
+    );
+  }
+
+  return (
+    <>
+      {mainContent}
+      {!uiConfig.showAsCard && renderDivider()}
       {renderUploadModal()}
+      {renderPreviewModal()}
       {renderModals({
         modalState,
         onCloseModal: closeModal,
