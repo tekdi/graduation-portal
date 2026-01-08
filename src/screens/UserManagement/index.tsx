@@ -19,7 +19,7 @@ import { styles } from './Styles';
 import { getUsersList, UserSearchParams } from '../../services/participantService';
 import { Modal } from '@ui';
 import { theme } from '@config/theme';
-import BulkOperationsCard from '../../components/BulkOperationsCard';
+//import BulkOperationsCard from '../../components/BulkOperationsCard';
 // TODO: Add USER_MANAGEMENT_STATS constant
 // import StatCard, { StatsRow } from '@components/StatCard';
 // import { USER_MANAGEMENT_STATS } from '@constants/USER_MANAGEMENT_STATS';
