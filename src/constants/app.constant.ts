@@ -88,12 +88,17 @@ export const PILLAR_CATEGORIES = {
   PROTECTION: 'protection',
 } as const;
 
-/**
- * Special Task Name Constants
- * Defines specific task names that require custom handling
- */
-export const SPECIAL_TASK_NAMES = {
-  CAPTURE_CONSENT: 'Capture Consent',
-  UPLOAD_SLA: 'Upload SLA Form',
-  HOUSEHOLD_PROFILE: 'Complete Household Profile',
+// Project Modes
+export const PROJECT_MODES = {
+  READ_ONLY: 'read-only',
+  PREVIEW: 'preview',
+  EDIT: 'edit',
 } as const;
+
+// Badge Types
+export const BADGE_TYPES = {
+  REQUIRED: 'required',
+  OPTIONAL: 'optional',
+} as const;
+
+

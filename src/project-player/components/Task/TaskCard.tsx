@@ -3,7 +3,7 @@ import { Box, HStack, Card, Toast, ToastTitle, useToast, Checkbox, CheckboxIndic
 import { useProjectContext } from '../../context/ProjectContext';
 import { useTaskActions } from '../../hooks/useTaskActions';
 import { useLanguage } from '@contexts/LanguageContext';
-import { TASK_STATUS, TASK_TYPE, SPECIAL_TASK_NAMES } from '../../../constants/app.constant';
+import { TASK_STATUS, TASK_TYPE, PROJECT_MODES, BADGE_TYPES } from '../../../constants/app.constant';
 import { TaskCardProps } from '../../types/components.types';
 import { Task } from '../../types/project.types';
 import { taskCardStyles } from './Styles';
@@ -41,9 +41,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
     type: null,
   });
 
-  const isReadOnly = mode === 'read-only';
-  const isPreview = mode === 'preview';
-  const isEdit = mode === 'edit';
+  const isReadOnly = mode === PROJECT_MODES.READ_ONLY;
+  const isPreview = mode === PROJECT_MODES.PREVIEW;
+  const isEdit = mode === PROJECT_MODES.EDIT;
   // Use mixed logic for completion: check status or use helper
   const isCompleted = isTaskCompleted(task.status);
   const isAddedToPlan = task.metadata?.addedToPlan;
@@ -236,14 +236,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
     // In Edit mode, hide Optional badges - only show 'required' type badges
     const isEditModeForBadge = isEdit && !isPreview;
     const shouldShowBadge = task.metadata?.badgeText &&
-      (!isEditModeForBadge || task.metadata?.badgeType === 'required');
+      (!isEditModeForBadge || task.metadata?.badgeType === BADGE_TYPES.REQUIRED);
 
     const taskBadge = shouldShowBadge ? (
       <Box
         bg={
-          task.metadata?.badgeType === 'required'
+          task.metadata?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
-            : task.metadata?.badgeType === 'optional'
+            : task.metadata?.badgeType === BADGE_TYPES.OPTIONAL
               ? '$optionalBadgeBg'
               : '$backgroundLight100'
         }
@@ -256,9 +256,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
           fontSize="$xs"
           fontWeight="$medium"
           color={
-            task.metadata?.badgeType === 'required'
+            task.metadata?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
-              : task.metadata?.badgeType === 'optional'
+              : task.metadata?.badgeType === BADGE_TYPES.OPTIONAL
                 ? '$optionalBadgeText'
                 : '$textMuted'
           }
@@ -304,11 +304,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               fontSize={((!isWeb && !uiConfig.showAsCard) ? "$sm" : (titleTypography as any).fontSize) as any}
               style={
                 isWeb
-                  ? ({
-                    wordBreak: 'normal',
-                    overflowWrap: 'break-word',
-                    whiteSpace: 'normal',
-                  } as any)
+                  ? (taskCardStyles.webTextWrap as any)
                   : undefined
               }
             >
@@ -326,11 +322,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
               fontSize={((!isWeb && !uiConfig.showAsCard) ? "$sm" : (titleTypography as any).fontSize) as any}
               style={
                 isWeb
-                  ? ({
-                    wordBreak: 'normal',
-                    overflowWrap: 'break-word',
-                    whiteSpace: 'normal',
-                  } as any)
+                  ? (taskCardStyles.webTextWrap as any)
                   : undefined
               }
             >
@@ -385,11 +377,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             {...textStyle}
             style={
               isWeb
-                ? ({
-                  wordBreak: 'normal',
-                  overflowWrap: 'break-word',
-                  whiteSpace: 'normal',
-                } as any)
+                ? (taskCardStyles.webTextWrap as any)
                 : undefined
             }
           >
@@ -400,24 +388,25 @@ const TaskCard: React.FC<TaskCardProps> = ({
     );
   };
 
-  // Button text helper (HEAD logic)
+  // Button text helper (Refactored logic)
   const getButtonText = () => {
     // Intervention Plan Edit mode = isEdit && !isPreview && isChildOfProject
-    // Only for Intervention Plan Edit mode, always show Upload Evidence for file tasks
 
     // For file tasks, if completed:
     // - Onboarding: show Edit button (original behavior)
-    // - Intervention Plan Edit mode: show Upload Evidence (new behavior)
-    if (task.type === TASK_TYPE.FILE && isCompleted && !isInterventionPlanEditMode) return t('common.edit') || 'Edit';
-
-    if (task.name === SPECIAL_TASK_NAMES.CAPTURE_CONSENT) return t('projectPlayer.uploadConsent');
-    if (task.name === SPECIAL_TASK_NAMES.UPLOAD_SLA) return t('projectPlayer.uploadSLA');
-    if (task.name === SPECIAL_TASK_NAMES.HOUSEHOLD_PROFILE) return t('projectPlayer.completeProfile');
+    // - Intervention Plan Edit mode: show Upload Evidence (new behavior) - but user asked for "Upload" everywhere?
+    // User Request: "same button label for all the File (instead of Upload Consent, Upload SLA, Upload Evidence) use only Upload"
+    // "only the comparision should be file , observation"
 
     if (task.type === TASK_TYPE.FILE) {
-      return t('projectPlayer.uploadEvidence');  // Edit mode uses Upload Evidence
+      if (isCompleted && !isInterventionPlanEditMode) return t('common.edit');
+      return t('projectPlayer.upload');
     }
-    if (task.type === TASK_TYPE.OBSERVATION) return t('projectPlayer.completeForm');
+
+    if (task.type === TASK_TYPE.OBSERVATION) {
+      return t('projectPlayer.completeForm');
+    }
+
     if (task.type === TASK_TYPE.PROFILE_UPDATE) return t('projectPlayer.updateProfile');
     return t('projectPlayer.viewTask');
   };
@@ -547,9 +536,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
       isOpen={showUploadModal}
       onClose={() => setShowUploadModal(false)}
       taskName={task.name}
-      participantName={config.profileInfo?.name}
+      participantName={!isChildOfProject ? config.profileInfo?.name : undefined}
       existingAttachments={task.attachments}
-      isConsent={task.name === SPECIAL_TASK_NAMES.CAPTURE_CONSENT}
+
       onUpload={(method) => {
         // console.log('Upload method selected:', method);
       }}
@@ -561,12 +550,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         }
         setShowUploadModal(false);
         // Show success toast with task-specific message
-        const toastMessage = task.name === SPECIAL_TASK_NAMES.CAPTURE_CONSENT
-          ? t('projectPlayer.consentUploaded')
-          : task.name === SPECIAL_TASK_NAMES.UPLOAD_SLA
-            ? t('projectPlayer.slaUploaded')
-            : t('projectPlayer.evidenceUploaded');
-        showSuccessToast(toastMessage);
+        showSuccessToast(t('projectPlayer.evidenceUploaded'));
       }}
     />
   );

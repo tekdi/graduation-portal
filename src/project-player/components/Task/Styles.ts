@@ -126,6 +126,12 @@ export const taskCardStyles = {
     fontSize: '$sm',
     fontWeight: '$medium',
   },
+  // Web text styles
+  webTextWrap: {
+    wordBreak: 'normal',
+    overflowWrap: 'break-word',
+    whiteSpace: 'normal',
+  } as const,
 } as const;
 
 export const taskAccordionStyles = {

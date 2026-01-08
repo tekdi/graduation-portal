@@ -88,7 +88,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
     taskName,
     participantName,
     existingAttachments = [],
-    isConsent = false,
+
 }) => {
     const { t } = useLanguage();
     const [selectedMethod, setSelectedMethod] = useState<'camera' | 'device' | null>(null);
@@ -178,9 +178,8 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
         onClose();
     };
 
-    // If task is 'Capture Consent', show participant name, otherwise show task name
-    const isConsentTask = isConsent;
-    const displayName = isConsentTask ? (participantName || taskName) : (taskName || participantName);
+    // If participant name is available, prioritize it (e.g. for "Upload for [Name]")
+    const displayName = participantName || taskName;
 
     const renderFileList = (files: any[], title: string, showDelete: boolean = false) => {
         if (!files || files.length === 0) return null;
@@ -259,7 +258,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 $hover-bg="$primary600"
             >
                 <ButtonText {...fileUploadModalStyles.submitButtonText}>
-                    {isConsentTask ? t('projectPlayer.uploadConsent') : t('projectPlayer.uploadEvidence')}
+                    {t('projectPlayer.upload')}
                 </ButtonText>
             </Button>
         </HStack>
