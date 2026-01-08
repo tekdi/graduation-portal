@@ -18,6 +18,8 @@
     "save": "Save",
     "saving": "Saving...",
     "cancel": "Cancel",
+    "upload": "Upload",
+    "uploading": "Uploading...",
     "delete": "Delete",
     "edit": "Edit",
     "close": "Close",
@@ -177,7 +179,16 @@
     "actions": {
       "bulkUploadCSV": "Bulk Upload (CSV)",
       "createUser": "Create User",
+<<<<<<< Updated upstream
       "exportCSV": "Export CSV"
+=======
+      "uploadUsers": "Upload Users",
+      "uploadUsersDescription": "Choose how you would like to add users to the system.",
+      "uploadCSV": "Upload CSV",
+      "uploadCSVDescription": "Import multiple users from a CSV file",
+      "addUser": "Add User",
+      "addUserDescription": "Manually add a single user"
+>>>>>>> Stashed changes
     },
     "filters": {
       "role": "Role",
