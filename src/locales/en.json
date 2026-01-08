@@ -38,7 +38,8 @@
     "actions": "Actions",
     "noDataFound": "No data found",
     "optional": "(Optional)",
-    "participant": "Participant"
+    "participant": "Participant",
+    "complete": "Complete"
   },
   "projectPlayer": {
     "status": "Status",

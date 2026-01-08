@@ -49,9 +49,6 @@ const LogVisit: React.FC = () => {
       try {
         const data = await getTargetedSolutions({
           type: 'observation',
-          page: 1,
-          limit: 10,
-          search: '',
         });
         setSolutions(data);
         if (route.params?.id) {

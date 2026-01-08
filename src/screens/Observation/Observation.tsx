@@ -1,7 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import WebComponentPlayer from '@components/WebComponent/WebComponentPlayer';
-import { Container, Spinner, useAlert } from '@ui';
-import { useRoute } from '@react-navigation/native';
+import {
+  Container,
+  Spinner,
+  useAlert,
+  HStack,
+  VStack,
+  Text,
+  Box,
+  Pressable,
+  Progress,
+  ProgressFilledTrack,
+  LucideIcon,
+} from '@ui';
+import { useRoute, useNavigation } from '@react-navigation/native';
 import { getToken } from '../../services/api';
 import {
   getObservationEntities,
@@ -18,13 +30,20 @@ interface ObservationData {
 
 const Observation = () => {
   const route = useRoute();
+  const navigation = useNavigation();
   const { t } = useLanguage();
-  const { id, solutionId } = route.params as {
+  const { id, solutionId, participantName } = route.params as {
     id: string;
     solutionId: string;
+    participantName?: string;
   };
   const [observation, setObservation] = useState<ObservationData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [participantInfo, setParticipantInfo] = useState<{
+    name: string;
+    date: string;
+  } | null>(null);
   const { showAlert } = useAlert();
 
   const [token, setToken] = useState<string | null>(null);
@@ -36,10 +55,10 @@ const Observation = () => {
         solutionId,
         profileData: {},
       });
-      const observationId = observationData.result._id;
+      const observationId = observationData?.result?._id;
       if (
         observationData.result?.entityType === 'participant' &&
-        observationData.result?.entities.length > 0
+        Array.isArray(observationData.result?.entities)
       ) {
         const newData = observationData.result.entities.find(
           (entity: any) => entity.externalId === id,
@@ -48,6 +67,11 @@ const Observation = () => {
           setObservation({
             entityId: newData._id,
             observationId: observationId,
+          });
+          // Set participant info
+          setParticipantInfo({
+            name: newData.name || participantName || 'Participant',
+            date: new Date().toISOString().split('T')[0],
           });
           setLoading(false);
         } else if (observationId) {
@@ -70,6 +94,12 @@ const Observation = () => {
                   entityId: entityData._id,
                   observationId: observationId,
                 });
+                // Set participant info
+                setParticipantInfo({
+                  name: entityData.name || participantName || 'Participant',
+                  date: new Date().toISOString().split('T')[0],
+                });
+                setLoading(false);
               }
             } catch (error) {
               showAlert(
@@ -91,10 +121,21 @@ const Observation = () => {
     if (solutionId && id) {
       fetchObservation();
     }
-  }, [solutionId, id]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [solutionId, id, participantName]);
 
-  const getProgress = (progress: number) => {
-    console.log('getProgress', progress);
+  const handleBackPress = () => {
+    if (navigation.canGoBack && navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      // Fallback: Navigate to participant detail if there's no previous screen
+      // @ts-ignore
+      navigation.navigate('participant-detail', { id: route.params?.id });
+    }
+  };
+
+  const handleProgressUpdate = (progressValue: number) => {
+    setProgress(Math.round(progressValue));
   };
 
   if (loading) {
@@ -108,34 +149,100 @@ const Observation = () => {
   }
 
   return (
+      <VStack flex={1} backgroundColor="$accent100">
+        {/* Header Section */}
+        <VStack space="md" padding="$4" backgroundColor="$white">
+          {/* Top Row: Back Button and Action Buttons */}
+          <HStack
+            justifyContent="space-between"
+            alignItems="flex-start"
+            width="$full"
+          >
+            {/* Back Button */}
+            <Pressable onPress={handleBackPress}>
+              <HStack alignItems="center" space="xs">
+                <LucideIcon
+                  name="ArrowLeft"
+                  size={20}
+                  color={theme.tokens.colors.textForeground}
+                />
+                {t('common.back')}
+              </HStack>
+            </Pressable>
+          </HStack>
+
+          {/* Title and Progress Badge Row */}
+          <HStack
+            justifyContent="space-between"
+            alignItems="center"
+            width="$full"
+            marginTop="$2"
+          >
+            <Text
+              fontSize="$xl"
+              fontWeight="$semibold"
+              color="$textPrimary"
+              flex={1}
+            >
+              {t('logVisit.individualEnterpriseVisit.title')}
+            </Text>
+
+            {/* Progress Badge */}
+            <Box
+              backgroundColor="$gray100"
+              paddingHorizontal="$3"
+              paddingVertical="$1"
+              borderRadius="$full"
+            >
+              <Text fontSize="$sm" color="$gray700" fontWeight="$medium">
+                {progress}% {t('common.complete') || 'Complete'}
+              </Text>
+            </Box>
+          </HStack>
+
+          {/* Progress Bar */}
+          <Box width="$full" marginTop="$2">
+            <Progress value={progress} width="$full" size="md">
+              <ProgressFilledTrack backgroundColor="$blue600" />
+            </Progress>
+          </Box>
+
+          {/* Participant Name and Date */}
+          {participantInfo && (
+            <Text
+              fontSize="$sm"
+              color="$textSecondary"
+              marginTop="$2"
+            >
+              {participantInfo.name} • {participantInfo.date}
+            </Text>
+          )}
+        </VStack>
     <Container>
-      <WebComponentPlayer
-        getProgress={getProgress}
-        playerConfig={{
-          baseURL: `${process.env.API_BASE_URL}/api`,
-          fileSizeLimit: 50,
-          userAuthToken: token,
-          solutionType: 'observation',
-          // profileData: {
-          //   state: '6852c86c7248c20014b38a4d',
-          //   district: '6852c8ae7248c20014b38a57',
-          //   block: '6852c8de7248c20014b38a9d',
-          //   cluster: '6852c9027248c20014b38c34',
-          //   school: '6852c9237248c20014b39fa0',
-          //   professional_role: '6825939a97b5680013e6a166',
-          //   professional_subroles: '68259c4397b5680013e6a1fb',
-          //   organizations: '[object Object]',
-          // },
-          observationId: observation?.observationId,
-          entityId: observation?.entityId,
-          evidenceCode: 'OB',
-          index: 0,
-          submissionNumber: 1,
-          solutionId: observation?.observationId,
-          // mockData: mockData,
-        }}
-      />
+
+        {/* Web Component Player */}
+        <Box flex={1} marginTop="$4">
+          <WebComponentPlayer
+            getProgress={handleProgressUpdate}
+            playerConfig={{
+              // @ts-ignore - process.env is injected by webpack DefinePlugin on web
+              baseURL: `${process.env.API_BASE_URL}/api`,
+              fileSizeLimit: 50,
+              userAuthToken: token,
+              solutionType: 'observation',
+              observationId: observation?.observationId,
+              entityId: observation?.entityId,
+              evidenceCode: 'OB',
+              index: 0,
+              submissionNumber: 1,
+              solutionId: observation?.observationId,
+              showSaveDraftButton: true,
+              onProgress: handleProgressUpdate,
+            }}
+          />
+        </Box>
     </Container>
+    </VStack>
   );
 };
 

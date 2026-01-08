@@ -32,33 +32,37 @@ export interface TargetedSolutionsResponse {
 
 /**
  * Get targeted solutions from API
- * 
+ *
  * @param params - Query parameters for the API call
  * @returns Promise resolving to array of AssessmentSurveyCardData
  */
 export const getTargetedSolutions = async (
-  params: TargetedSolutionsParams
+  params: TargetedSolutionsParams,
 ): Promise<AssessmentSurveyCardData[]> => {
   try {
-    const { type, page = 1, limit = 10, search = '' } = params;
-    
+    const { type, page, limit, search = '' } = params;
+
     // Build query string
     const queryParams = new URLSearchParams({
       type,
-      page: page.toString(),
-      limit: limit.toString(),
-      search: search || '',
+      ...(page ? { page: page.toString() } : {}),
+      ...(limit ? { limit: limit.toString() } : {}),
+      ...(search ? { search: search } : {}),
     });
 
     // Make API call with internal-access-token header
     const response = await api.post<TargetedSolutionsResponse>(
       `${API_ENDPOINTS.TARGETED_SOLUTIONS}?${queryParams.toString()}`,
-      {},
+      {
+        participant: 'ALL',
+        linkageChampion: 'ALL',
+        supervisor: 'ALL',
+      },
       {
         headers: {
           'internal-access-token': '9yG*tM*y(7)',
         },
-      }
+      },
     );
 
     // Extract data from response (handle different response structures)
@@ -66,7 +70,7 @@ export const getTargetedSolutions = async (
     const solutions = responseData?.result?.data || responseData?.data || [];
 
     // Map API response to AssessmentSurveyCardData format
-    const mappedSolutions: AssessmentSurveyCardData[] = solutions.map((item) => ({
+    const mappedSolutions: AssessmentSurveyCardData[] = solutions.map(item => ({
       ...item,
       icon: item.icon || 'FileText',
       iconColor: item.iconColor || '$primary500',
@@ -84,8 +88,6 @@ export const getTargetedSolutions = async (
     throw error;
   }
 };
-
-
 
 /**
  * Fetch entities for a given observation solution
@@ -197,9 +199,13 @@ export const searchObservationEntities = async ({
   try {
     // Prepare the request body
     const requestBody: SearchObservationEntitiesParams = { ...filters };
-    
+
     // Handle organizations field - ensure it's properly serialized
-    if (requestBody.organizations && typeof requestBody.organizations === 'object' && !Array.isArray(requestBody.organizations)) {
+    if (
+      requestBody.organizations &&
+      typeof requestBody.organizations === 'object' &&
+      !Array.isArray(requestBody.organizations)
+    ) {
       // If it's an object, convert to JSON string or handle appropriately
       requestBody.organizations = JSON.stringify(requestBody.organizations);
     }
@@ -220,5 +226,3 @@ export const searchObservationEntities = async ({
     throw error;
   }
 };
-
-

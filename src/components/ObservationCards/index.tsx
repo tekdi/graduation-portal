@@ -137,7 +137,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
         </HStack>
 
         {/* Status Badge - only show if status exists */}
-        {status && (
+        {status && !navigationUrl && (
           <Box {...getStatusBadgeStyle()}>
             <HStack alignItems="center" gap="$1">
               {(status === CARD_STATUS.GRADUATED || status === CARD_STATUS.COMPLETED) && (
