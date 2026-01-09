@@ -34,8 +34,8 @@ form.main {
   position: relative !important;
 }
 .mat-mdc-tab-body-wrapper {
-  max-height: calc(100vh - 180px) !important;
-  min-height: calc(100vh - 180px) !important;
+  max-height: calc(100vh - 357px) !important;
+  min-height: calc(100vh - 357px) !important;
 }
 .top-primary-border {
   border-top: none !important;

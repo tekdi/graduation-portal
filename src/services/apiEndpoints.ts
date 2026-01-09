@@ -7,4 +7,5 @@ export const API_ENDPOINTS = {
     OBSERVATION_ENTITIES: `${prefix}/survey/v1/observations/entities`,
     UPDATE_OBSERVATION_ENTITIES: `${prefix}/survey/v1/observations/updateEntities`,
     SEARCH_OBSERVATION_ENTITIES: `${prefix}/survey/v1/observations/searchEntities`,
+    OBSERVATION_SOLUTION: `${prefix}/survey/v1/observations/assessment`,
 }

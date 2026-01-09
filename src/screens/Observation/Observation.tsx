@@ -17,6 +17,7 @@ import { useRoute, useNavigation } from '@react-navigation/native';
 import { getToken } from '../../services/api';
 import {
   getObservationEntities,
+  getObservationSolution,
   searchObservationEntities,
   updateObservationEntities,
 } from '../../services/solutionService';
@@ -32,10 +33,9 @@ const Observation = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { t } = useLanguage();
-  const { id, solutionId, participantName } = route.params as {
+  const { id, solutionId } = route.params as {
     id: string;
     solutionId: string;
-    participantName?: string;
   };
   const [observation, setObservation] = useState<ObservationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -47,6 +47,32 @@ const Observation = () => {
   const { showAlert } = useAlert();
 
   const [token, setToken] = useState<string | null>(null);
+  const [mockData, setMockData] = useState<any>({});
+
+  const fetchObservationSolution = async ({entityId, observationId, submissionNumber, evidenceCode}: {entityId: string, observationId: string, submissionNumber: number, evidenceCode: string}) => {  
+    try {
+      const observationSolution = await getObservationSolution({
+        observationId,
+        entityId,
+        submissionNumber,
+        evidenceCode,
+      });
+      console.log('observationSolution', observationSolution);
+      setMockData(observationSolution?.result);
+      setObservation({
+        entityId: entityId,
+        observationId: observationId,
+      });
+    } catch (error) {
+      showAlert(
+        'error',
+        t('observation.noParticipantFoundError') + error,
+        {
+          duration: 10000,
+        },
+      );
+    }
+  }
   useEffect(() => {
     const fetchObservation = async () => {
       const tokenData = await getToken();
@@ -64,13 +90,15 @@ const Observation = () => {
           (entity: any) => entity.externalId === id,
         );
         if (newData) {
-          setObservation({
+          fetchObservationSolution({
             entityId: newData._id,
             observationId: observationId,
+            submissionNumber: 1,
+            evidenceCode: 'OB',
           });
           // Set participant info
           setParticipantInfo({
-            name: newData.name || participantName || 'Participant',
+            name: newData.name || 'Participant',
             date: new Date().toISOString().split('T')[0],
           });
           setLoading(false);
@@ -90,13 +118,15 @@ const Observation = () => {
               });
               console.log('data', data);
               if (data) {
-                setObservation({
+                fetchObservationSolution({
                   entityId: entityData._id,
                   observationId: observationId,
+                  submissionNumber: 1,
+                  evidenceCode: 'OB',
                 });
                 // Set participant info
                 setParticipantInfo({
-                  name: entityData.name || participantName || 'Participant',
+                  name: entityData.name || 'Participant',
                   date: new Date().toISOString().split('T')[0],
                 });
                 setLoading(false);
@@ -120,9 +150,10 @@ const Observation = () => {
     };
     if (solutionId && id) {
       fetchObservation();
+      // setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [solutionId, id, participantName]);
+  }, [solutionId, id]);
 
   const handleBackPress = () => {
     if (navigation.canGoBack && navigation.canGoBack()) {
@@ -136,6 +167,7 @@ const Observation = () => {
 
   const handleProgressUpdate = (progressValue: number) => {
     setProgress(Math.round(progressValue));
+    console.log('progressValue', progressValue);
   };
 
   if (loading) {
@@ -147,101 +179,95 @@ const Observation = () => {
       />
     );
   }
-
+  
   return (
-      <VStack flex={1} backgroundColor="$accent100">
-        {/* Header Section */}
-        <VStack space="md" padding="$4" backgroundColor="$white">
-          {/* Top Row: Back Button and Action Buttons */}
-          <HStack
-            justifyContent="space-between"
-            alignItems="flex-start"
-            width="$full"
-          >
-            {/* Back Button */}
-            <Pressable onPress={handleBackPress}>
-              <HStack alignItems="center" space="xs">
-                <LucideIcon
-                  name="ArrowLeft"
-                  size={20}
-                  color={theme.tokens.colors.textForeground}
-                />
-                {t('common.back')}
-              </HStack>
-            </Pressable>
-          </HStack>
+    <VStack flex={1} backgroundColor="$accent100">
+      {/* Header Section */}
+      <VStack space="md" padding="$4" backgroundColor="$white">
+        {/* Top Row: Back Button and Action Buttons */}
+        <HStack
+          justifyContent="space-between"
+          alignItems="flex-start"
+          width="$full"
+        >
+          {/* Back Button */}
+          <Pressable onPress={handleBackPress}>
+            <HStack alignItems="center" space="xs">
+              <LucideIcon name="ArrowLeft" size={20} color="$textPrimary" />
+              {t('common.back')}
+            </HStack>
+          </Pressable>
+        </HStack>
 
-          {/* Title and Progress Badge Row */}
-          <HStack
-            justifyContent="space-between"
-            alignItems="center"
-            width="$full"
-            marginTop="$2"
+        {/* Title and Progress Badge Row */}
+        <HStack
+          justifyContent="space-between"
+          alignItems="center"
+          width="$full"
+          marginTop="$2"
+        >
+          <Text
+            fontSize="$xl"
+            fontWeight="$semibold"
+            color="$textPrimary"
+            flex={1}
           >
-            <Text
-              fontSize="$xl"
-              fontWeight="$semibold"
-              color="$textPrimary"
-              flex={1}
-            >
-              {t('logVisit.individualEnterpriseVisit.title')}
+            {t('logVisit.individualEnterpriseVisit.title')}
+          </Text>
+
+          {/* Progress Badge */}
+          <Box
+            backgroundColor="$gray100"
+            paddingHorizontal="$3"
+            paddingVertical="$1"
+            borderRadius="$full"
+          >
+            <Text fontSize="$sm" color="$gray700" fontWeight="$medium">
+              {progress}% {t('common.complete') || 'Complete'}
             </Text>
-
-            {/* Progress Badge */}
-            <Box
-              backgroundColor="$gray100"
-              paddingHorizontal="$3"
-              paddingVertical="$1"
-              borderRadius="$full"
-            >
-              <Text fontSize="$sm" color="$gray700" fontWeight="$medium">
-                {progress}% {t('common.complete') || 'Complete'}
-              </Text>
-            </Box>
-          </HStack>
-
-          {/* Progress Bar */}
-          <Box width="$full" marginTop="$2">
-            <Progress value={progress} width="$full" size="md">
-              <ProgressFilledTrack backgroundColor="$blue600" />
-            </Progress>
           </Box>
+        </HStack>
 
-          {/* Participant Name and Date */}
-          {participantInfo && (
-            <Text
-              fontSize="$sm"
-              color="$textSecondary"
-              marginTop="$2"
-            >
-              {participantInfo.name} • {participantInfo.date}
-            </Text>
-          )}
-        </VStack>
-    <Container>
+        {/* Progress Bar */}
+        <Box width="$full" marginTop="$2">
+          <Progress value={progress} width="$full" size="md">
+            <ProgressFilledTrack backgroundColor="$blue600" />
+          </Progress>
+        </Box>
 
+        {/* Participant Name and Date */}
+        {participantInfo && (
+          <Text fontSize="$sm" color="$textSecondary" marginTop="$2">
+            {participantInfo.name} • {participantInfo.date}
+          </Text>
+        )}
+      </VStack>
+      <Container>
         {/* Web Component Player */}
         <Box flex={1} marginTop="$4">
-          <WebComponentPlayer
-            getProgress={handleProgressUpdate}
-            playerConfig={{
-              // @ts-ignore - process.env is injected by webpack DefinePlugin on web
-              baseURL: `${process.env.API_BASE_URL}/api`,
-              fileSizeLimit: 50,
-              userAuthToken: token,
-              solutionType: 'observation',
-              observationId: observation?.observationId,
-              entityId: observation?.entityId,
-              evidenceCode: 'OB',
-              index: 0,
-              submissionNumber: 1,
-              solutionId: observation?.observationId,
-              showSaveDraftButton: true,
-              onProgress: handleProgressUpdate,
-            }}
-          />
+          {mockData && (
+            <WebComponentPlayer
+              getProgress={handleProgressUpdate}
+              playerConfig={{
+                // @ts-ignore - process.env is injected by webpack DefinePlugin on web
+                baseURL: `${process.env.API_BASE_URL}/api`,
+                fileSizeLimit: 50,
+                userAuthToken: token,
+                solutionType: 'observation',
+                observationId: observation?.observationId,
+                entityId: observation?.entityId,
+                // evidenceCode: 'OB',
+                // index: 0,
+                submissionNumber: 1,
+                solutionId: observation?.observationId,
+                showSaveDraftButton: true,
+                onProgress: handleProgressUpdate,
+                mockData: mockData,
+              }}
+            />
+          )}
         </Box>
-    </Container>
+      </Container>
     </VStack>
   );
 };
