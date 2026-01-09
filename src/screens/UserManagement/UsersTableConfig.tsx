@@ -11,6 +11,16 @@ import { MenuItemData } from '@components/ui/Menu';
 import { styles } from './Styles';
 
 /**
+ * Helper function to extract role label from user object
+ * Extracts role label from nested user_organizations structure
+ */
+const useRole = (user: any): string => {
+  return user?.user_organizations?.[0]?.organization?.roles?.[0]?.role?.label || 
+         user?.role || 
+         '-';
+};
+
+/**
  * Role Badge Component
  */
 const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
@@ -36,7 +46,7 @@ const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
  * Status Badge Component
  */
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const isActive = status === 'Active';
+  const isActive = status?.toLowerCase() === 'active';
 
   return (
     <HStack
@@ -47,7 +57,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
         {...TYPOGRAPHY.bodySmall}
         {...styles.statusBadgeText}
       >
-        {status}
+        {status?.toLowerCase() === 'active' ? 'Active' : 'Deactivated'}
       </Text>
     </HStack>
   );
@@ -221,7 +231,11 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     key: 'role',
     label: 'admin.users.role',
     flex: 1.2,
-    render: (user) => <RoleBadge role={user.role} />,
+    render: (user: any) => {
+      const userRole =user.user_organizations?.[0]?.roles?.map((role: any) => role.role.label).join(', ');
+
+      return <RoleBadge role={userRole} />;
+    },
     mobileConfig: {
       rightRank: 1,
       showLabel: false,

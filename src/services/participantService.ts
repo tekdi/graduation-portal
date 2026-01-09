@@ -204,6 +204,10 @@ export const getUsersList = async (
 
     // Reuse PARTICIPANTS_LIST endpoint (same URL, different type param)
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
+    
+    // Log the complete API URL with query parameters
+    console.log('API URL:', endpoint);
+    console.log('Query Parameters:', Object.fromEntries(queryParams.entries()));
 
     // Make POST request
     const response = await api.post<UserSearchResponse>(endpoint, {

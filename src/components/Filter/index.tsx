@@ -5,7 +5,7 @@ import { filterStyles } from "./Styles";
 import filterIcon from "../../assets/images/FilterIcon.png";
 import { useLanguage } from "@contexts/LanguageContext";
 
-export default function FilterButton({ data }: any) {
+export default function FilterButton({ data, onFilterChange }: any) {
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
 
@@ -31,7 +31,17 @@ export default function FilterButton({ data }: any) {
 
   const handleClearFilters = () => {
     setValue({});
+    if (onFilterChange) {
+      onFilterChange({});
+    }
   };
+
+  // Call onFilterChange whenever value changes
+  React.useEffect(() => {
+    if (onFilterChange) {
+      onFilterChange(value);
+    }
+  }, [value, onFilterChange]);
 
   return (
     <VStack {...filterStyles.container}>

@@ -16,6 +16,7 @@ import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
+// API service for fetching users
 import { getUsersList, UserSearchParams } from '../../services/participantService';
 import { Modal } from '@ui';
 import { theme } from '@config/theme';
@@ -33,7 +34,7 @@ const UserManagementScreen = () => {
   const data = [SearchFilter, ...FilterOptions];
   const toast = useToast();
   
-  // API integration state
+  // API state management
   const [filters, setFilters] = useState<Record<string, any>>({});
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -80,27 +81,48 @@ const UserManagementScreen = () => {
     return file.size <= maxSizeBytes;
   };
 
+  // Map filter role labels to API role titles
+  const mapRoleLabelToTitle = (roleLabel: string): string => {
+    const roleMap: Record<string, string> = {
+      'Admin': 'org_admin',
+      'Supervisor': 'session_manager',
+      'Linkage Champion': 'lc',
+      'Participant': 'user',
+    };
+    const mappedRole = roleMap[roleLabel] || roleLabel;
+    console.log('Role mapping:', { roleLabel, mappedRole });
+    return mappedRole;
+  };
+
   // Fetch users from API when filters/pagination change
   useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
+        // Determine type parameter based on role filter
+        let apiType = 'user,session_manager,org_admin'; // Default: all types
+        if (filters.role && filters.role !== 'all-roles') {
+          // Map filter role label to API role title and use it as type
+          const mappedRole = mapRoleLabelToTitle(filters.role);
+          apiType = mappedRole;
+          console.log('Role filter applied - using type:', apiType);
+        }
+
         const apiParams: UserSearchParams = {
           tenant_code: 'brac',
-          type: 'user,session_manager,org_admin',
+          type: apiType,
           page: currentPage,
           limit: pageSize,
         };
 
-        // Add search parameter
         if (filters.search) {
           apiParams.search = filters.search;
         }
 
-        // Add filter parameters (only if not "all" values)
-        if (filters.role && filters.role !== 'all-roles') {
-          apiParams.role = filters.role;
-        }
+        console.log('Filters object:', filters);
+        console.log('Role filter value:', filters.role);
+        // Note: Role filter is handled via 'type' parameter above, not 'role' parameter
+        // We don't send 'role' parameter to avoid duplication
         if (filters.status && filters.status !== 'all-status') {
           apiParams.status = filters.status;
         }
@@ -132,50 +154,12 @@ const UserManagementScreen = () => {
         }
 
         const response = await getUsersList(apiParams);
+        console.log('API response:', response);
+        console.log('Users data:', response.result?.data);
         
-        // Transform API response to User[] format
-        const usersData = (response.result?.data || []).map((user: any) => {
-          // Normalize role values
-          let role = user.role || user.user_role || user.role_name || user.role_label || 
-                     user.user_type || user.type || user.roles?.[0]?.label || 
-                     user.roles?.[0]?.title || '-';
-          
-          if (role && role !== '-') {
-            const roleMap: Record<string, string> = {
-              'admin': 'Admin',
-              'supervisor': 'Supervisor',
-              'linkage_champion': 'Linkage Champion',
-              'linkage champion': 'Linkage Champion',
-              'participant': 'Participant',
-              'session_manager': 'Supervisor',
-              'org_admin': 'Admin',
-            };
-            role = roleMap[role.toLowerCase()] || role;
-          }
-          
-          // Normalize status
-          let status = user.status || user.user_status || 'Active';
-          if (typeof status === 'string') {
-            status = status === 'ACTIVE' || status === 'Active' ? 'Active' : 
-                     status === 'DEACTIVATED' || status === 'Deactivated' || status === 'INACTIVE' ? 'Deactivated' : 
-                     status;
-          }
-          
-          return {
-            id: String(user.id || user.user_id || user._id || ''),
-            name: user.name || user.full_name || user.username || user.display_name || '',
-            email: user.email || user.email_address || '',
-            role: role as User['role'],
-            status: status as User['status'],
-            province: user.province || user.province_name || user.address?.province || '-',
-            district: user.district || user.district_name || user.address?.district || '-',
-            lastLogin: user.lastLogin || user.last_login || user.lastLoginDate || user.last_login_date || '-',
-            details: user.details || null,
-          };
-        }) as User[];
-
-        setUsers(usersData);
-        setTotalCount(response.result?.total || usersData.length);
+        // Use raw API data directly
+        setUsers(response.result?.data || []);
+        setTotalCount(response.result?.total || (response.result?.data || []).length);
       } catch (error) {
         console.error('Error fetching users:', error);
         setUsers([]);
@@ -188,9 +172,10 @@ const UserManagementScreen = () => {
     fetchUsers();
   }, [filters, currentPage, pageSize]);
 
+  // Handle filter changes and reset pagination
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Reset to page 1 when filters change
+    setCurrentPage(1);
   }, []);
 
   const handleRowClick = useCallback((user: User) => {
@@ -344,7 +329,7 @@ const UserManagementScreen = () => {
       />
       
       <FilterButton 
-        data={data} 
+        data={data}
         onFilterChange={handleFilterChange}
       />
       
@@ -382,7 +367,7 @@ const UserManagementScreen = () => {
           </HStack>
         </HStack>
 
-        {/* DataTable */}
+        {/* DataTable with raw API data */}
         <DataTable
           data={users}
           columns={columns}
