@@ -7,7 +7,7 @@ const isMobile = width < 768;
 export const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 40,
+        padding: 7,
         backgroundColor: '#fff',
     },
     headerContainer: {

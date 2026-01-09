@@ -1,5 +1,4 @@
 import React from 'react';
-import { Platform } from 'react-native';
 import { Box, Text, VStack, HStack, Pressable } from '@ui';
 import { LucideIcon } from '@ui';
 import { styles } from './Styles';

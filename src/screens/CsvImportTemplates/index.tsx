@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { ScrollView, Platform } from 'react-native';
 import { styles } from './Styles';
 import { TemplateCard } from './TemplateCard';
@@ -57,32 +57,24 @@ const CsvImportTemplates = () => {
         t('admin.csvTemplatePage.guidelines.items.6'),
     ];
 
+    const CSV_TEMPLATES: Record<string, string> = {
+        user_import: "username,email,role,department,province,district\njohn.doe,john@example.com,Linkage Champion,Social Services,Gauteng,Johannesburg",
+        participant_assignment: "participant_email,lc_email,assignment_date\nparticipant@example.com,lc@example.com,2024-01-01",
+        lc_supervisor_mapping: "lc_email,supervisor_email\nlc@example.com,supervisor@example.com",
+        bulk_status_update: "user_email,new_status,reason\nuser@example.com,inactive,Resigned",
+        geographic_reassignment: "user_email,new_province,new_district\nuser@example.com,Western Cape,Cape Town"
+    };
+
     const handleDownload = (id: string) => {
         const template = TEMPLATE_DATA.find(item => item.id === id);
         if (!template) return;
 
-        const fileName = `${template.title}.csv`;
-
-        // Show Toast
-        toast.show({
-            placement: 'top right',
-            render: ({ id }) => {
-                return (
-                    <Toast nativeID={`toast-${id}`} action="success" variant="outline" bg="$white" hardShadow="5" style={{ borderColor: '#e5e7eb' }}>
-                        <HStack space="md" alignItems="center">
-                            <LucideIcon name="CheckCircle" size={20} color="#16a34a" />
-                            <ToastTitle color="$textPrimary" fontSize="$sm" fontWeight="$bold">
-                                Downloaded {template.title} template
-                            </ToastTitle>
-                        </HStack>
-                    </Toast>
-                )
-            }
-        });
+        const sanitizedTitle = template.title.replace(/[^a-zA-Z0-9-_]/g, '_');
+        const fileName = `${sanitizedTitle || id}.csv`;
 
         // Trigger Download
         if (Platform.OS === 'web') {
-            const csvContent = "header1,header2,header3\nvalue1,value2,value3";
+            const csvContent = CSV_TEMPLATES[id] || "header1,header2\nvalue1,value2";
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
             if (link.download !== undefined) {
@@ -93,7 +85,41 @@ const CsvImportTemplates = () => {
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
+
+                // Show Success Toast only on Web
+                toast.show({
+                    placement: 'top right',
+                    render: ({ id }) => {
+                        return (
+                            <Toast nativeID={`toast-${id}`} action="success" variant="outline" bg="$white" hardShadow="5" style={{ borderColor: '#e5e7eb' }}>
+                                <HStack space="md" alignItems="center">
+                                    <LucideIcon name="CheckCircle" size={20} color="#16a34a" />
+                                    <ToastTitle color="$textPrimary" fontSize="$sm" fontWeight="$bold">
+                                        {t('admin.csvTemplatePage.downloadSuccess', { title: template.title })}
+                                    </ToastTitle>
+                                </HStack>
+                            </Toast>
+                        )
+                    }
+                });
             }
+        } else {
+            // Show Info Toast for Mobile
+            toast.show({
+                placement: 'top',
+                render: ({ id }) => {
+                    return (
+                        <Toast nativeID={`toast-${id}`} action="info" variant="outline" bg="$white" hardShadow="5" style={{ borderColor: '#e5e7eb' }}>
+                            <HStack space="md" alignItems="center">
+                                <LucideIcon name="Info" size={20} color="#3b82f6" />
+                                <ToastTitle color="$textPrimary" fontSize="$sm" fontWeight="$bold">
+                                    {t('admin.csvTemplatePage.downloadMobileInfo')}
+                                </ToastTitle>
+                            </HStack>
+                        </Toast>
+                    )
+                }
+            });
         }
     };
 
