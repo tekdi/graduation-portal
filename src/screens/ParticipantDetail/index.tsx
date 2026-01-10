@@ -121,6 +121,10 @@ export default function ParticipantDetail() {
   const configData: ProjectPlayerConfig = {
     ...PROJECT_PLAYER_CONFIGS.editMode,
     showAddCustomTaskButton: false,
+    profileInfo: {
+      name: participantName,
+      id: id,
+    },
   };
 
   const ProjectPlayerConfigData: ProjectPlayerData = {
