@@ -16,8 +16,17 @@ import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
-// API service for fetching users and roles
-import { getUsersList, UserSearchParams, getRolesList, Role } from '../../services/participantService';
+// API service for fetching users, roles, and provinces
+import { 
+  getUsersList, 
+  UserSearchParams, 
+  getRolesList, 
+  Role,
+  getEntityTypesList,
+  getEntityTypesFromStorage,
+  getProvincesByEntityType,
+  ProvinceEntity
+} from '../../services/participantService';
 import { Modal } from '@ui';
 import { theme } from '@config/theme';
 //import BulkOperationsCard from '../../components/BulkOperationsCard';
@@ -45,6 +54,10 @@ const UserManagementScreen = () => {
   const [roles, setRoles] = useState<Role[]>([]);
   const [isLoadingRoles, setIsLoadingRoles] = useState(false);
   const [roleMap, setRoleMap] = useState<Record<string, string>>({}); // Maps label → title
+  
+  // Provinces state for dynamic filter
+  const [provinces, setProvinces] = useState<ProvinceEntity[]>([]);
+  const [isLoadingProvinces, setIsLoadingProvinces] = useState(false);
   
   // File upload state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -117,6 +130,45 @@ const UserManagementScreen = () => {
     fetchRoles();
   }, []);
 
+  // Fetch provinces from API on component mount
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      setIsLoadingProvinces(true);
+      try {
+        // First, check if entity types are in storage
+        let entityTypes = await getEntityTypesFromStorage();
+        
+        // If not in storage, fetch entity types from API
+        if (!entityTypes || !entityTypes['province']) {
+          await getEntityTypesList();
+          entityTypes = await getEntityTypesFromStorage();
+        }
+
+        // Get province entity type ID
+        const provinceEntityTypeId = entityTypes?.['province'];
+        
+        if (!provinceEntityTypeId) {
+          console.error('Province entity type ID not found');
+          setProvinces([]);
+          return;
+        }
+
+        // Fetch provinces using the entity type ID
+        const response = await getProvincesByEntityType(provinceEntityTypeId);
+        const provincesData = response.result || [];
+        setProvinces(provincesData);
+      } catch (error) {
+        console.error('Error fetching provinces:', error);
+        // Set empty array - filter will show only "All Provinces" option
+        setProvinces([]);
+      } finally {
+        setIsLoadingProvinces(false);
+      }
+    };
+
+    fetchProvinces();
+  }, []);
+
   // Map filter role labels to API role titles (using dynamic roleMap from API)
   const mapRoleLabelToTitle = useCallback((roleLabel: string): string => {
     const mappedRole = roleMap[roleLabel] || roleLabel;
@@ -124,9 +176,11 @@ const UserManagementScreen = () => {
     return mappedRole;
   }, [roleMap]);
 
-  // Build dynamic filter options with API roles only
+  // Build dynamic filter options with API roles and provinces
   const filterOptionsWithRoles = useMemo(() => {
-    const otherFilters = FilterOptions.filter(f => f.attr !== 'role');
+    // Get status and district filters from FilterOptions
+    const statusFilter = FilterOptions.find(f => f.attr === 'status');
+    const districtFilter = FilterOptions.find(f => f.attr === 'district');
     
     // Always build role filter from API roles (even if empty during loading)
     const roleFilterOptions = [
@@ -137,6 +191,15 @@ const UserManagementScreen = () => {
       })),
     ];
 
+    // Always build province filter from API provinces (even if empty during loading)
+    const provinceFilterOptions = [
+      { labelKey: 'admin.filters.allProvinces', value: 'all-provinces' },
+      ...provinces.map((province: ProvinceEntity) => ({
+        label: province.name,
+        value: province.name, // Use name as value (e.g., "Eastern Cape")
+      })),
+    ];
+
     return [
       {
         nameKey: 'admin.filters.role',
@@ -144,9 +207,16 @@ const UserManagementScreen = () => {
         type: 'select' as const,
         data: roleFilterOptions,
       },
-      ...otherFilters,
+      ...(statusFilter ? [statusFilter] : []),
+      {
+        nameKey: 'admin.filters.province',
+        attr: 'province',
+        type: 'select' as const,
+        data: provinceFilterOptions,
+      },
+      ...(districtFilter ? [districtFilter] : []),
     ];
-  }, [roles]);
+  }, [roles, provinces]);
 
   // Combine search filter with dynamic filter options
   const data = useMemo(() => [SearchFilter, ...filterOptionsWithRoles], [filterOptionsWithRoles]);
@@ -184,17 +254,9 @@ const UserManagementScreen = () => {
           apiParams.status = filters.status;
         }
         if (filters.province && filters.province !== 'all-provinces') {
-          const provinceFilter = FilterOptions.find((f) => f.attr === 'province');
-          const option = provinceFilter?.data.find((opt: any) => 
-            typeof opt === 'string' ? opt === filters.province : opt.value === filters.province
-          );
-          let provinceLabel: string | undefined;
-          if (typeof option === 'string') {
-            provinceLabel = option;
-          } else if (typeof option === 'object' && option) {
-            provinceLabel = option.label || (option.value ? String(option.value) : undefined);
-          }
-          if (provinceLabel) apiParams.province = provinceLabel;
+          // Since we're using province.name as both label and value, use it directly
+          // The API expects the province name (e.g., "Eastern Cape")
+          apiParams.province = filters.province;
         }
         if (filters.district && filters.district !== 'all-districts') {
           const districtFilter = FilterOptions.find((f) => f.attr === 'district');

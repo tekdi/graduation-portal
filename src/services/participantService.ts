@@ -3,6 +3,8 @@ import type { ParticipantData, Province, Site } from '@app-types/participant';
 import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 
 /**
  * Participant Service
@@ -48,19 +50,6 @@ export interface Role {
   status: string;
   organization_id: number;
   tenant_code: string;
-}
-
-/**
- * Roles List Response
- * Response structure from the roles list API
- */
-export interface RolesListResponse {
-  responseCode: string;
-  message: string;
-  result: {
-    data: Role[];
-    count: number;
-  };
 }
 
 /**
@@ -263,7 +252,14 @@ export interface RolesListParams {
 
 export const getRolesList = async (
   params?: RolesListParams
-): Promise<RolesListResponse> => {
+): Promise<{
+  responseCode: string;
+  message: string;
+  result: {
+    data: Role[];
+    count: number;
+  };
+}> => {
   try {
     const { page = 1, limit = 100 } = params || {};
     
@@ -275,7 +271,113 @@ export const getRolesList = async (
     const endpoint = `${API_ENDPOINTS.USER_ROLES_LIST}?${queryParams.toString()}`;
     
     // GET request to fetch roles
-    const response = await api.get<RolesListResponse>(endpoint);
+    const response = await api.get<{
+      responseCode: string;
+      message: string;
+      result: {
+        data: Role[];
+        count: number;
+      };
+    }>(endpoint);
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Entity Types List Response
+ * Response structure from the entity types API
+ */
+export interface EntityTypesListResponse {
+  message: string;
+  status: number;
+  result: Array<{
+    _id: string;
+    name: string;
+  }>;
+}
+
+/**
+ * Province data from API
+ */
+export interface ProvinceEntity {
+  _id: string;
+  externalId: string;
+  name: string;
+  locationId: string;
+}
+
+/**
+ * Get entity types list and store in local storage
+ * Stores entity type name-id pairs for later use
+ */
+export const getEntityTypesList = async (): Promise<EntityTypesListResponse> => {
+  try {
+    const endpoint = API_ENDPOINTS.ENTITY_TYPES_LIST;
+    
+    // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
+    const response = await api.get<EntityTypesListResponse>(endpoint);
+
+    // Store entity types in local storage (name -> _id mapping)
+    if (response.data?.result && Array.isArray(response.data.result)) {
+      const entityTypesMap: Record<string, string> = {};
+      response.data.result.forEach((entityType) => {
+        entityTypesMap[entityType.name] = entityType._id;
+      });
+      
+      await AsyncStorage.setItem(
+        STORAGE_KEYS.ENTITY_TYPES,
+        JSON.stringify(entityTypesMap)
+      );
+    }
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Get entity types from local storage
+ * Returns cached entity types if available
+ */
+export const getEntityTypesFromStorage = async (): Promise<Record<string, string> | null> => {
+  try {
+    const stored = await AsyncStorage.getItem(STORAGE_KEYS.ENTITY_TYPES);
+    if (stored) {
+      return JSON.parse(stored);
+    }
+    return null;
+  } catch (error) {
+    console.error('Error reading entity types from storage:', error);
+    return null;
+  }
+};
+
+/**
+ * Get provinces list by entity type ID
+ * Uses the province entity type ID to fetch all provinces
+ */
+export const getProvincesByEntityType = async (
+  provinceEntityTypeId: string
+): Promise<{
+  message: string;
+  status: number;
+  result: ProvinceEntity[];
+}> => {
+  try {
+    const endpoint = `${API_ENDPOINTS.ENTITIES_BY_TYPE}/${provinceEntityTypeId}`;
+    
+    // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
+    const response = await api.get<{
+      message: string;
+      status: number;
+      result: ProvinceEntity[];
+    }>(endpoint);
 
     return response.data;
   } catch (error: any) {
