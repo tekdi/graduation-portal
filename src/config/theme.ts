@@ -98,6 +98,7 @@ export const theme = {
       pillarLivelihoods: '#15803d',        
       pillarFinancialInclusion: '#1d4ed8',
       pillarSocialProtection: '#f97316',   
+      borderColor : '#e2e8f0',
     },
     sizes: {
       ...((gluestackConfig.tokens as any).sizes || {}),
