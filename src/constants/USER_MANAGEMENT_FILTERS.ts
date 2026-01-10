@@ -14,6 +14,7 @@ type FilterConfig = {
   data: Array<string | { label?: string; labelKey?: string; value: string | null }>;
   placeholder?: string; // Fallback if placeholderKey is not provided
   placeholderKey?: string; // Translation key for the placeholder
+  disabled?: boolean; // Disable the filter (e.g., district when no province selected)
 };
 
 /**

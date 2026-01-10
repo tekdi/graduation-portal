@@ -16,7 +16,7 @@ import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
-// API service for fetching users, roles, and provinces
+// API service for fetching users, roles, provinces, and districts
 import { 
   getUsersList, 
   UserSearchParams, 
@@ -25,7 +25,9 @@ import {
   getEntityTypesList,
   getEntityTypesFromStorage,
   getProvincesByEntityType,
-  ProvinceEntity
+  ProvinceEntity,
+  getDistrictsByProvinceEntity,
+  DistrictEntity
 } from '../../services/participantService';
 import { Modal } from '@ui';
 import { theme } from '@config/theme';
@@ -58,6 +60,10 @@ const UserManagementScreen = () => {
   // Provinces state for dynamic filter
   const [provinces, setProvinces] = useState<ProvinceEntity[]>([]);
   const [isLoadingProvinces, setIsLoadingProvinces] = useState(false);
+  
+  // Districts state for dynamic filter
+  const [districts, setDistricts] = useState<DistrictEntity[]>([]);
+  const [isLoadingDistricts, setIsLoadingDistricts] = useState(false);
   
   // File upload state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -169,6 +175,92 @@ const UserManagementScreen = () => {
     fetchProvinces();
   }, []);
 
+  // Fetch districts when province filter changes
+  useEffect(() => {
+    const fetchDistricts = async () => {
+      // If no province selected or "All Provinces" is selected, clear districts
+      if (!filters.province || filters.province === 'all-provinces') {
+        setDistricts([]);
+        // Clear district filter if province is cleared
+        setFilters((prev) => {
+          if (prev.district) {
+            const updated = { ...prev };
+            delete updated.district;
+            return updated;
+          }
+          return prev;
+        });
+        return;
+      }
+
+      // Only fetch if provinces are loaded
+      if (provinces.length === 0) {
+        return;
+      }
+
+      setIsLoadingDistricts(true);
+      try {
+        // Find the selected province from provinces array to get its _id
+        const selectedProvince = provinces.find(
+          (province: ProvinceEntity) => province.name === filters.province
+        );
+
+        if (!selectedProvince || !selectedProvince._id) {
+          console.error('Selected province not found or missing _id:', filters.province);
+          setDistricts([]);
+          return;
+        }
+
+        // Console log: Province selected
+        console.log('Province selected:', selectedProvince.name);
+
+        // Build API endpoint URL for districts (base URL is configured in axios instance)
+        const queryParams = new URLSearchParams({
+          type: 'district',
+          page: '1',
+          limit: '100',
+        });
+        const endpoint = `/api/entity-management/v1/entities/subEntityList/${selectedProvince._id}?${queryParams.toString()}`;
+
+        // Fetch districts using the province's entity ID (_id)
+        const response = await getDistrictsByProvinceEntity(selectedProvince._id, {
+          page: 1,
+          limit: 100,
+        });
+        
+        // Access districts from response.result.data (API returns { result: { count, data } })
+        const districtsData = Array.isArray(response.result?.data) ? response.result.data : [];
+        setDistricts(districtsData);
+
+        // Console log: List of districts (below province selection)
+        const districtNames = districtsData.length > 0 
+          ? districtsData.map((d: DistrictEntity) => d.name).join(', ')
+          : 'No districts found';
+        console.log('list of district of province:', districtNames);
+        
+        // Console log: API URL (endpoint path - base URL is configured in axios)
+        console.log('API url link getting send to District filter to fetch districts:', endpoint);
+
+        // Clear district filter when new districts are loaded (to avoid invalid selections)
+        setFilters((prev) => {
+          if (prev.district) {
+            const updated = { ...prev };
+            delete updated.district;
+            return updated;
+          }
+          return prev;
+        });
+      } catch (error) {
+        console.error('Error fetching districts:', error);
+        setDistricts([]);
+      } finally {
+        setIsLoadingDistricts(false);
+      }
+    };
+
+    fetchDistricts();
+  }, [filters.province, provinces]);
+
   // Map filter role labels to API role titles (using dynamic roleMap from API)
   const mapRoleLabelToTitle = useCallback((roleLabel: string): string => {
     const mappedRole = roleMap[roleLabel] || roleLabel;
@@ -176,11 +268,10 @@ const UserManagementScreen = () => {
     return mappedRole;
   }, [roleMap]);
 
-  // Build dynamic filter options with API roles and provinces
+  // Build dynamic filter options with API roles, provinces, and districts
   const filterOptionsWithRoles = useMemo(() => {
-    // Get status and district filters from FilterOptions
+    // Get status filter from FilterOptions
     const statusFilter = FilterOptions.find(f => f.attr === 'status');
-    const districtFilter = FilterOptions.find(f => f.attr === 'district');
     
     // Always build role filter from API roles (even if empty during loading)
     const roleFilterOptions = [
@@ -200,6 +291,17 @@ const UserManagementScreen = () => {
       })),
     ];
 
+    // Build district filter from API districts
+    // District filter is disabled if no province is selected or "All Provinces" is selected
+    const isProvinceSelected = filters.province && filters.province !== 'all-provinces' && filters.province !== '';
+    const districtFilterOptions = [
+      { labelKey: 'admin.filters.allDistricts', value: 'all-districts' },
+      ...districts.map((district: DistrictEntity) => ({
+        label: district.name,
+        value: district.name, // Use name as value
+      })),
+    ];
+
     return [
       {
         nameKey: 'admin.filters.role',
@@ -214,9 +316,15 @@ const UserManagementScreen = () => {
         type: 'select' as const,
         data: provinceFilterOptions,
       },
-      ...(districtFilter ? [districtFilter] : []),
+      {
+        nameKey: 'admin.filters.district',
+        attr: 'district',
+        type: 'select' as const,
+        data: districtFilterOptions,
+        disabled: !isProvinceSelected, // Disable when no province is selected
+      },
     ];
-  }, [roles, provinces]);
+  }, [roles, provinces, districts, filters.province]);
 
   // Combine search filter with dynamic filter options
   const data = useMemo(() => [SearchFilter, ...filterOptionsWithRoles], [filterOptionsWithRoles]);
@@ -259,17 +367,9 @@ const UserManagementScreen = () => {
           apiParams.province = filters.province;
         }
         if (filters.district && filters.district !== 'all-districts') {
-          const districtFilter = FilterOptions.find((f) => f.attr === 'district');
-          const option = districtFilter?.data.find((opt: any) => 
-            typeof opt === 'string' ? opt === filters.district : opt.value === filters.district
-          );
-          let districtLabel: string | undefined;
-          if (typeof option === 'string') {
-            districtLabel = option;
-          } else if (typeof option === 'object' && option) {
-            districtLabel = option.label || (option.value ? String(option.value) : undefined);
-          }
-          if (districtLabel) apiParams.district = districtLabel;
+          // Since we're using district.name as both label and value, use it directly
+          // The API expects the district name (e.g., "Alfred Nzo")
+          apiParams.district = filters.district;
         }
 
         const response = await getUsersList(apiParams);
@@ -294,7 +394,7 @@ const UserManagementScreen = () => {
   // Handle filter changes and reset pagination
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset to first page when filters change
   }, []);
 
   const handleRowClick = useCallback((user: User) => {

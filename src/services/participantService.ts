@@ -386,3 +386,56 @@ export const getProvincesByEntityType = async (
   }
 };
 
+/**
+ * District data from API
+ */
+export interface DistrictEntity {
+  _id: string;
+  externalId: string;
+  name: string;
+  locationId: string;
+}
+
+/**
+ * Get districts list by province entity ID
+ * Uses the province entity ID to fetch all districts for that province
+ */
+export const getDistrictsByProvinceEntity = async (
+  provinceEntityId: string,
+  params?: { page?: number; limit?: number }
+): Promise<{
+  message: string;
+  status: number;
+  result: {
+    count: number;
+    data: DistrictEntity[];
+  };
+}> => {
+  try {
+    const { page = 1, limit = 100 } = params || {};
+    
+    const queryParams = new URLSearchParams({
+      type: 'district',
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    const endpoint = `${API_ENDPOINTS.SUB_ENTITIES_BY_PARENT}/${provinceEntityId}?${queryParams.toString()}`;
+    
+    // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
+    const response = await api.get<{
+      message: string;
+      status: number;
+      result: {
+        count: number;
+        data: DistrictEntity[];
+      };
+    }>(endpoint);
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
