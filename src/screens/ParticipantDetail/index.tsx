@@ -223,7 +223,9 @@ export default function ParticipantDetail() {
                     {activeTab ===
                       PARTICIPANT_DETAILS_TABS.ASSESSMENTS_SURVEYS && (
                       <AssessmentSurveys
-                        participantStatus={status as ParticipantStatus}
+                        participant={
+                          currentParticipantProfile as ParticipantData
+                        }
                       />
                     )}
                   </Box>
@@ -278,7 +280,7 @@ export default function ParticipantDetail() {
             </Text>
           </VStack>
 
-          {/* ID Field */}
+          {/* ID Field (externalId) */}
           <VStack space="xs" {...profileStyles.fieldSection}>
             <Text {...profileStyles.fieldLabel}>
               {t('common.profileFields.id')}

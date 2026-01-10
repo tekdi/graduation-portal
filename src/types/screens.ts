@@ -15,20 +15,40 @@ export type StatusCount = {
 };
 
 export interface ParticipantsResponse {
-  result: {
-    data: {
-      count: number;
-      participants: Participant[];
+    result: {
+        data: {
+            count: number;
+            participants: Participant[];
+        };
     };
-  };
-  statusCount?: StatusCount;
+    statusCount?: StatusCount;
 }
 
 export interface ParticipantsQueryParams {
-  searchKey?: string;
-  status?: StatusType | '';
-  page?: number;
-  limit?: number;
+    searchKey?: string;
+    status?: StatusType | '';
+    page?: number;
+    limit?: number;
+}
+
+export interface TemplateData {
+    id: string;
+    title: string;
+    description: string;
+    tag: string;
+    pillarsCount: number;
+    tasksCount: number;
+    version: string;
+    includedPillars: {
+        name: string;
+        tasks: number;
+    }[];
+}
+
+export interface InterventionPlanProps {
+    participantStatus?: StatusType;
+    participantId?: string;
+    participantName?: string;
 }
 
 export interface InterventionPlanProps {
