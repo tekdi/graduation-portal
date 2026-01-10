@@ -1,13 +1,31 @@
 import React from "react";
-import { VStack, HStack, Text, Image, Input, InputField, Button } from "@ui";
+import { VStack, HStack, Text, Image, Input, InputField, Pressable } from "@ui";
 import Select from "../ui/Inputs/Select";
 import { filterStyles } from "./Styles";
 import filterIcon from "../../assets/images/FilterIcon.png";
 import { useLanguage } from "@contexts/LanguageContext";
 
-export default function FilterButton({ data, onFilterChange }: any) {
+interface FilterButtonProps {
+  data: any[];
+  onFilterChange?: (filters: Record<string, any>) => void;
+  // Configuration for right section (Clear Button)
+  showClearButton?: boolean; // Show clear button (default: true)
+  rightContent?: React.ReactNode; // Custom right content (overrides default clear button)
+}
+
+export default function FilterButton({ 
+  data, 
+  onFilterChange,
+  showClearButton = true,
+  rightContent
+}: FilterButtonProps) {
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
+
+  // Notify parent when filters change
+  React.useEffect(() => {
+    onFilterChange?.(value);
+  }, [value, onFilterChange]);
 
   // Get default display values for UI (not included in output)
   const getDefaultDisplayValue = (item: any) => {
@@ -31,122 +49,132 @@ export default function FilterButton({ data, onFilterChange }: any) {
 
   const handleClearFilters = () => {
     setValue({});
-    if (onFilterChange) {
-      onFilterChange({});
-    }
   };
 
-  // Call onFilterChange whenever value changes
-  React.useEffect(() => {
-    if (onFilterChange) {
-      onFilterChange(value);
+  // Render right section content
+  const renderRightContent = () => {
+    // If custom right content is provided, use it
+    if (rightContent) {
+      return rightContent;
     }
-  }, [value, onFilterChange]);
+
+    // Otherwise, render default clear button
+    if (showClearButton) {
+      return (
+        <Pressable onPress={handleClearFilters}>
+          <Text {...filterStyles.clearLinkText} $web-cursor="pointer">
+            {t('common.clear')}
+          </Text>
+        </Pressable>
+      );
+    }
+
+    return null;
+  };
+
+  // Render a single filter item
+  const renderFilterItem = (item: any) => (
+    <VStack 
+      key={item.attr}
+      {...(item.type === 'search' 
+        ? filterStyles.searchContainer 
+        : filterStyles.roleContainer)}
+      width="$full"
+      $md-width="auto"
+    >
+      {/* <Text {...filterStyles.label}>
+        {item.nameKey ? t(item.nameKey) : item.name}
+      </Text> */}
+      {item.type === 'search' ? (
+        <Input {...filterStyles.input}>
+          <InputField
+            placeholder={
+              item.placeholderKey 
+                ? t(item.placeholderKey) 
+                : item.placeholder || (item.nameKey ? `${t('common.search')} ${t(item.nameKey).toLowerCase()}...` : `Search ${item.name?.toLowerCase()}...`)
+            }
+            value={value?.[item.attr] || ""}
+            onChangeText={(text: string) => {
+              if (!text || text.trim() === "") {
+                setValue((prev: any) => {
+                  const updated = { ...prev };
+                  delete updated[item.attr];
+                  return updated;
+                });
+              } else {
+                setValue((prev: any) => ({ ...prev, [item.attr]: text }));
+              }
+            }}
+          />
+        </Input>
+      ) : (
+        <Select
+          value={value?.[item.attr] || getDefaultDisplayValue(item)}
+          onChange={(v) => {
+            // ❗ If actual null (marked), empty string, or undefined → remove from state
+            // Note: String "null" is kept in state, only actual null/empty removes the key
+            if (v == null || v === '__NULL_VALUE__' || v === '') {
+              setValue((prev: any) => {
+                const updated = { ...prev };
+                delete updated[item.attr];
+                return updated;
+              });
+            } else {
+              // Otherwise store the selected value (including string "null")
+              setValue((prev: any) => ({
+                ...prev,
+                [item.attr]: v,
+              }));
+            }
+          }}
+          options={
+            item?.data?.map((option: any) => {
+              // If it's a string, return as-is (backward compatibility)
+              if (typeof option === 'string') {
+                return option;
+              }
+              // If it's an object with labelKey, translate it
+              if (option.labelKey) {
+                return {
+                  ...option,
+                  label: t(option.labelKey),
+                };
+              }
+              // If it has label, return as-is
+              return option;
+            }) || []
+          }
+          {...filterStyles.input}
+        />
+      )}
+    </VStack>
+  );
 
   return (
     <VStack {...filterStyles.container}>
-      {/* Title */}
+      {/* Title Row with User Count and Clear Button */}
       <HStack {...filterStyles.titleContainer}>
-        <Image 
-          source={filterIcon}
-          style={{ width: 20, height: 20 }}
-          alt="Filter icon"
-        />
-        <Text {...filterStyles.titleText}>
-          {t('common.filters')}
-        </Text>
+        {/* Left: Filter Icon + Title */}
+        <HStack alignItems="center">
+          <Image 
+            source={filterIcon}
+            style={{ width: 16, height: 16 }}
+            alt="Filter icon"
+          />
+          <Text {...filterStyles.titleText}>
+            {t('common.filters')}
+          </Text>
+        </HStack>
+
+        {/* Right: Configurable content (User Count + Clear Button or custom) */}
+        {renderRightContent()}
       </HStack>
 
       {/* Filters Row */}
       <HStack {...filterStyles.filterFieldsContainer}>
-        {data.map((item: any) => (
-          <VStack 
-            key={item.attr}
-            {...(item.type === 'search' 
-              ? filterStyles.searchContainer 
-              : filterStyles.roleContainer)}
-          >
-            <Text {...filterStyles.label}>
-              {item.nameKey ? t(item.nameKey) : item.name}
-            </Text>
-            {item.type === 'search' ? (
-              <Input {...filterStyles.input}>
-                <InputField
-                  placeholder={
-                    item.placeholderKey 
-                      ? t(item.placeholderKey) 
-                      : item.placeholder || (item.nameKey ? `${t('common.search')} ${t(item.nameKey).toLowerCase()}...` : `Search ${item.name?.toLowerCase()}...`)
-                  }
-                  value={value?.[item.attr] || ""}
-                  onChangeText={(text: string) => {
-                    if (!text || text.trim() === "") {
-                      setValue((prev: any) => {
-                        const updated = { ...prev };
-                        delete updated[item.attr];
-                        return updated;
-                      });
-                    } else {
-                      setValue((prev: any) => ({ ...prev, [item.attr]: text }));
-                    }
-                  }}
-                />
-              </Input>
-            ) : (
-              <Select
-                value={value?.[item.attr] || getDefaultDisplayValue(item)}
-                onChange={(v) => {
-                  // ❗ If actual null (marked), empty string, or undefined → remove from state
-                  // Note: String "null" is kept in state, only actual null/empty removes the key
-                  if (v == null || v === '__NULL_VALUE__' || v === '') {
-                    setValue((prev: any) => {
-                      const updated = { ...prev };
-                      delete updated[item.attr];
-                      return updated;
-                    });
-                  } else {
-                    // Otherwise store the selected value (including string "null")
-                    setValue((prev: any) => ({
-                      ...prev,
-                      [item.attr]: v,
-                    }));
-                  }
-                }}
-                options={
-                  item?.data?.map((option: any) => {
-                    // If it's a string, return as-is (backward compatibility)
-                    if (typeof option === 'string') {
-                      return option;
-                    }
-                    // If it's an object with labelKey, translate it
-                    if (option.labelKey) {
-                      return {
-                        ...option,
-                        label: t(option.labelKey),
-                      };
-                    }
-                    // If it has label, return as-is
-                    return option;
-                  }) || []
-                }
-                {...filterStyles.input}
-              />
-
-            )}
-          </VStack>
-        ))}
-
-        {/* Clear Filters Button */}
-        <VStack {...filterStyles.clearButtonContainer}>
-          <Button 
-            onPress={handleClearFilters}
-            {...filterStyles.button}
-          >
-            <Text {...filterStyles.buttonText}>{t('common.clearFilters')}</Text>
-          </Button>
-        </VStack>
+        {data.map((item: any) => renderFilterItem(item))}
       </HStack>
 
     </VStack>
   );
 }
-
