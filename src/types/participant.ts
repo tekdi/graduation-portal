@@ -1,5 +1,3 @@
-import { Participant } from './screens';
-
 /**
  * Participant Status Types
  * Defines the possible enrollment statuses for a participant
@@ -19,24 +17,6 @@ export type ParticipantStatus =
  * These keys correspond to translation keys in locale files
  */
 export type PathwayType = 'employment' | 'entrepreneurship';
-
-/**
- * Participant Data Interface
- * Single source of truth for participant data matching the UI structure.
- * Uses display format status strings and contact field.
- */
-export interface ParticipantData {
-  id: string;                     // Matches exactly as shown in UI (1002, 1006A, P-024, etc.)
-  name: string;
-  contact: string;                // normalized (was phone)
-  status: string;                 // UI labels: Not Onboarded, Onboarded, In Progress...
-  progress?: number;              // only for In Progress, Completed, Graduated
-  pathway?: string | undefined;   // keep original
-  graduationProgress?: number;    // same % as progress OR undefined
-  graduationDate?: string;        // only for Completed/Graduated if available
-  email?: string;                 // kept from original dataset
-  address?: string;               // kept from original dataset
-}
 
 /**
  * Assessment Survey Card Data Interface
@@ -100,12 +80,12 @@ export interface Site {
  */
 
 export interface ParticipantSearchParams {
-  user_ids?: string[] | null;
   tenant_code?: string;
   type?: string;
   page?: number;
   limit?: number;
   search?: string;
+  entity_id?: string;
 }
 
 export interface ParticipantSearchResponse {

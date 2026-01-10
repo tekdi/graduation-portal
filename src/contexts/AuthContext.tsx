@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 import logger from '@utils/logger';
-import { login as loginService } from '../services/authenticationService';
+import { getEntityDetails, login as loginService } from '../services/authenticationService';
 import offlineStorage from '../services/offlineStorage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import { getToken, removeToken } from '../services/api';
@@ -26,7 +26,7 @@ export interface User {
 interface AuthContextType {
   isLoggedIn: boolean;
   user: User | null;
-  login: (email: string, password: string, isAdmin?: boolean) => Promise<boolean>;
+  login: (email: string, password: string, isAdmin?: boolean) => Promise<{ success: boolean; message: string }>;
   logout: () => Promise<void>;
   setIsLoggedIn: (value: boolean) => void;
   loading: boolean;
@@ -136,31 +136,40 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     loadUser();
   }, []);
 
-  const login = async (email: string, password: string, isAdmin: boolean = false): Promise<boolean> => {
+  const login = async (email: string, password: string, isAdmin: boolean = false): Promise<{ success: boolean; message: string }> => {
     try {
       if (!email || !password) {
-        logger.warn(`${isAdmin ? 'Admin ' : ''}Login attempted with empty credentials`);
-        return false;
+        const message = `${isAdmin ? 'Admin ' : ''}Login attempted with empty credentials`;
+        logger.warn(message);
+        return { success: false, message };
       }
 
       // Call the authentication service with the isAdmin flag
       const loginResponse = await loginService(email, password, isAdmin);
-
       // Check if login response has user data
       if (loginResponse.result?.user) {
         const userData = loginResponse.result.user;
+
+        const entityDetails = await getEntityDetails(userData.id);
+        if(!entityDetails?.[0]) {
+          const message = 'User entity not found: You are not authorized to access the system';
+          logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
+          return { success: false, message };
+        }
         // Determine user role (admin priority), throws if unauthorized
         let determinedRole: UserRole;
         try {
           determinedRole = determineUserRole(userData);
         } catch (roleError: any) {
-          logger.warn(`${isAdmin ? 'Admin ' : ''}User role not authorized:`, roleError.message);
-          throw new Error(roleError.message || 'Unauthorized: This role is not authorized to access the system');
+          const message = roleError.message || 'Unauthorized: This role is not authorized to access the system';
+          logger.warn(`${isAdmin ? 'Admin ' : ''}User role not authorized:`, message);
+          return { success: false, message };
         }
         
         // Map API user data to User interface
         const mappedUser: User = {
           role: determinedRole,
+          entityDetails: entityDetails?.[0] || null,
           ...userData, // Include any additional properties from API
         };
 
@@ -171,16 +180,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setUser(mappedUser);
         setIsLoggedIn(true);
         
-        logger.info(`${isAdmin ? 'Admin ' : ''}User logged in successfully:`, mappedUser.email || mappedUser.id);
-        return true;
+        const message = `${isAdmin ? 'Admin ' : ''}User logged in successfully`;
+        logger.info(message, mappedUser.email || mappedUser.id);
+        return { success: true, message };
       } else {
-        logger.warn(`${isAdmin ? 'Admin ' : ''}Login failed:`, loginResponse.message || 'No user data in response');
-        return false;
+        const message = loginResponse.message || 'No user data in response';
+        logger.warn(`${isAdmin ? 'Admin ' : ''}Login failed:`, message);
+        return { success: false, message };
       }
     } catch (error: any) {
-      // @ts-ignore - Allow throwing error (so UI can show the error message)
+      const message = error?.message || 'An error occurred during login';
       logger.error(`${isAdmin ? 'Admin ' : ''}Login error:`, error);
-      return false;
+      return { success: false, message };
     }
   };
 

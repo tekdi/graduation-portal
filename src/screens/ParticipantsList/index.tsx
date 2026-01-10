@@ -23,6 +23,7 @@ import { STATUS } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
 import { applyFilters } from '@utils/helper';
 import { styles } from './Styles';
+import { useAuth } from '@contexts/AuthContext';
 
 /**
  * ParticipantsList Screen
@@ -32,6 +33,7 @@ const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
+  const { user } = useAuth();
 
   // State management
   const [participants, setParticipants] = useState<Participant[]>([]);
@@ -125,12 +127,12 @@ const ParticipantsList: React.FC = () => {
         page: 1,
         limit: 20,
         search: searchKey,
+        entity_id: user?.entityDetails?._id,
       });
-      
       setParticipants(response.result.data || []);
     };
     fetchParticipants();
-  }, [searchKey]);
+  }, [searchKey, user]);
 
   // When Active/Inactive filter changes, set default status
   useEffect(() => {
@@ -141,19 +143,6 @@ const ParticipantsList: React.FC = () => {
       setActiveStatus(STATUS.NOT_ENROLLED);
     }
   }, [activeFilter]);
-
-  const filteredParticipants = useMemo(() => {
-    // Build filters object for applyFilters
-    const filters: Record<string, any> = {};
-    
-    // Apply status filter if active
-    if (activeStatus) {
-      filters.status = activeStatus;
-    }
-    
-    // Apply filters using helper function
-    return applyFilters(participants, filters);
-  }, [participants, activeStatus]);
 
   // Handlers
   const handleSearch = useCallback((text: string) => {

@@ -70,9 +70,19 @@ export const login = async (
 };
 
 
-export const getUserProfile = async (): Promise<any> => {
+export const getUserProfile = async (id?: string | null): Promise<any> => {
   try {
-    const response = await api.get(API_ENDPOINTS.USER_PROFILE);
+    const response = await api.get(API_ENDPOINTS.USER_PROFILE + (id ? '/' + id : ''));
+    return response.data.result || {};
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+export const getEntityDetails = async (userId: string): Promise<any> => {
+  try {
+    const response = await api.get(API_ENDPOINTS.ENTITY_DETAILS + '/' + userId);
     return response.data.result || {};
   } catch (error: any) {
     // Error is already handled by axios interceptor

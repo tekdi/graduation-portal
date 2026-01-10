@@ -2,6 +2,9 @@ import type { ParticipantData, ParticipantSearchParams, ParticipantSearchRespons
 import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
+import { ROLE_NAMES } from '@constants/ROLES';
+import { getUserProfile } from './authenticationService';
+import { User } from '@contexts/AuthContext';
 
 
 /**
@@ -14,13 +17,14 @@ import { API_ENDPOINTS } from './apiEndpoints';
 export const getParticipantsList = async (params: ParticipantSearchParams): Promise<ParticipantSearchResponse> => {
   try {
     const {
-      user_ids,
       tenant_code = 'brac',
       type = 'user',
       page = 1,
       limit = 20, 
       search,
+      entity_id,
     } = params;
+
 
     // Build query string
     const queryParams = new URLSearchParams({
@@ -32,9 +36,12 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
     });
 
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
+    const subEntityListEndpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${entity_id}?type=${ROLE_NAMES.PARTICIPANT.toLowerCase()}`;
+    const subEntityListResponse = await api.get<any>(subEntityListEndpoint);
+    const subEntityList = subEntityListResponse.data.result.data;
 
     const response = await api.post<ParticipantSearchResponse>(endpoint, {
-      user_ids,
+      user_ids: subEntityList.map((subEntity: any) => subEntity.externalId),
     });
 
     return response.data;
@@ -45,34 +52,19 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
 };
 
 /**
- * Get participant detail data by ID
- * Returns detailed participant data including status, pathway, and progress
- */
-export const getParticipantById = (id: string): ParticipantData | undefined => {
-  const participant = PARTICIPANTS_DATA.find(p => p.id === id);
-  if (!participant) return undefined;
-
-  return {
-    id: participant.id,
-    name: participant.name,
-    contact: participant.contact,
-    status: participant.status,
-    progress: participant.progress,
-    pathway: participant.pathway || undefined,
-    graduationProgress: participant.graduationProgress != null && !isNaN(Number(participant.graduationProgress)) ? participant.graduationProgress : undefined,
-    graduationDate: participant.graduationDate && participant.graduationDate !== '' ? participant.graduationDate : undefined,
-    email: participant.email,
-    address: participant.address,
-  };
-};
-
-/**
  * Get participant profile data by ID
  * Returns full participant data including contact info and address
  * Currently uses mock data, will be replaced with API call later
  */
-export const getParticipantProfile = (id: string): ParticipantData | undefined => {
-  return PARTICIPANTS_DATA.find(p => p.id === id);
+export const getParticipantProfile = async (id: string): Promise<User |undefined> => {
+  try {
+    const userProfile = await getUserProfile(id);
+
+    return userProfile;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
 };
 
 /**
