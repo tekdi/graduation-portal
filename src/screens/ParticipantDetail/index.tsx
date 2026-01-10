@@ -14,7 +14,6 @@ import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
 import {
   getParticipantProfile,
-  updateParticipantAddress,
   getSitesByProvince,
 } from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -25,6 +24,7 @@ import { PROVINCES } from '@constants/PARTICIPANTS_LIST';
 import InterventionPlan from './InterventionPlan';
 import AssessmentSurveys from './AssessmentSurveys';
 import type {
+  ParticipantData,
   ParticipantStatus,
   PathwayType,
 } from '@app-types/participant';
@@ -88,14 +88,14 @@ export default function ParticipantDetail() {
   // Update participant if participantId changes
   useEffect(() => {
     const fetchParticipantProfile = async () => {
-    if (participantId) {
+      if (participantId) {
         setParticipant(await getParticipantProfile(participantId));
       }
     };
     fetchParticipantProfile();
   }, [participantId]);
-  
-// Error State: Participant Not Found
+
+  // Error State: Participant Not Found
   if (!participant) {
     return <NotFound message="participantDetail.notFound.title" />;
   }
@@ -141,7 +141,7 @@ export default function ParticipantDetail() {
 
     try {
         setParticipant((prev: User | undefined) => ({
-          ...(prev || {}),
+          ...(prev as User),
           location: `${editedAddress.street}, ${editedAddress.province}, ${editedAddress.site}`,
         } as User));
         setIsEditingAddress(false);
@@ -223,9 +223,7 @@ export default function ParticipantDetail() {
                     {activeTab ===
                       PARTICIPANT_DETAILS_TABS.ASSESSMENTS_SURVEYS && (
                       <AssessmentSurveys
-                        participant={
-                          currentParticipantProfile as ParticipantData
-                        }
+                        participant={participant as ParticipantData}
                       />
                     )}
                   </Box>

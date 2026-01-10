@@ -21,9 +21,9 @@ import { getStatusItems } from '@constants/FILTERS';
 import { getParticipantsList } from '../../services/participantService';
 import { STATUS } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
-import { applyFilters } from '@utils/helper';
 import { styles } from './Styles';
 import { useAuth } from '@contexts/AuthContext';
+import logger from '@utils/logger';
 
 /**
  * ParticipantsList Screen
@@ -42,7 +42,7 @@ const ParticipantsList: React.FC = () => {
   );
   const [searchKey, setSearchKey] = useState('');
   const [activeFilter, setActiveFilter] = useState<'active' | 'inactive'>('active');
-  const [isLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Calculate status counts dynamically from participants data
   const statusCounts = useMemo<StatusCount>(() => {
@@ -120,16 +120,29 @@ const ParticipantsList: React.FC = () => {
 
   useEffect(() => {
     const fetchParticipants = async () => {
-    // Set mock participants data
-      const response = await getParticipantsList({
-        tenant_code: 'brac',
-        type: 'user',
-        page: 1,
-        limit: 20,
-        search: searchKey,
-        entity_id: user?.entityDetails?._id,
-      });
-      setParticipants(response.result.data || []);
+      // Early return if entity ID is not available
+      if (!user?.entityDetails?._id) {
+        return;
+      }
+
+      try {
+        const response = await getParticipantsList({
+          tenant_code: 'brac',
+          type: 'user',
+          page: 1,
+          limit: 20,
+          search: searchKey,
+          entity_id: user.entityDetails._id,
+        });
+        setParticipants(response.result.data || []);
+      } catch (err: any) {
+        const errorMessage = err?.response?.data?.message || err?.message || 'Failed to fetch participants';
+        logger.error('Error fetching participants:', errorMessage, err);
+        // Optionally set empty array on error to prevent stale data
+        setParticipants([]);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchParticipants();
   }, [searchKey, user]);

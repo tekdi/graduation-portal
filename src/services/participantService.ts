@@ -36,9 +36,15 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
     });
 
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
-    const subEntityListEndpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${entity_id}?type=${ROLE_NAMES.PARTICIPANT.toLowerCase()}`;
+    
+    // Validate entity_id before constructing endpoint
+    if (!entity_id || entity_id.trim() === '') {
+      throw new Error('entity_id is required and cannot be empty');
+    }
+    
+    const subEntityListEndpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${encodeURIComponent(entity_id)}?type=${ROLE_NAMES.PARTICIPANT.toLowerCase()}`;
     const subEntityListResponse = await api.get<any>(subEntityListEndpoint);
-    const subEntityList = subEntityListResponse.data.result.data;
+    const subEntityList = subEntityListResponse.data?.result?.data || [];
 
     const response = await api.post<ParticipantSearchResponse>(endpoint, {
       user_ids: subEntityList.map((subEntity: any) => subEntity.externalId),

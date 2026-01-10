@@ -1,3 +1,5 @@
+import { User } from "@contexts/AuthContext";
+
 /**
  * Participant Status Types
  * Defines the possible enrollment statuses for a participant
@@ -17,6 +19,24 @@ export type ParticipantStatus =
  * These keys correspond to translation keys in locale files
  */
 export type PathwayType = 'employment' | 'entrepreneurship';
+
+/**
+ * Participant Data Interface
+ * Defines the structure for participant data including profile and status information
+ */
+export interface ParticipantData extends User {
+  id: string;
+  name: string;
+  contact: string;
+  email: string;
+  address: string;
+  status: ParticipantStatus;
+  pathway?: PathwayType;
+  progress?: number;
+  graduationProgress?: number;
+  graduationDate?: string | Date;
+  [key: string]: any; // Allow additional properties for flexibility
+}
 
 /**
  * Assessment Survey Card Data Interface
