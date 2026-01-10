@@ -37,6 +37,33 @@ export interface UserSearchResponse {
 }
 
 /**
+ * Role data from API
+ */
+export interface Role {
+  id: number;
+  title: string;
+  user_type: number;
+  visibility: string;
+  label: string;
+  status: string;
+  organization_id: number;
+  tenant_code: string;
+}
+
+/**
+ * Roles List Response
+ * Response structure from the roles list API
+ */
+export interface RolesListResponse {
+  responseCode: string;
+  message: string;
+  result: {
+    data: Role[];
+    count: number;
+  };
+}
+
+/**
  * Get participants list for table view
  * Maps ParticipantData[] to Participant[] format by converting contact to phone
  */
@@ -207,12 +234,48 @@ export const getUsersList = async (
     
     // Log the complete API URL with query parameters
     console.log('API URL:', endpoint);
-    console.log('Query Parameters:', Object.fromEntries(queryParams.entries()));
+    const paramsObj: Record<string, string> = {};
+    queryParams.forEach((value, key) => {
+      paramsObj[key] = value;
+    });
+    console.log('Query Parameters:', paramsObj);
 
     // Make POST request
     const response = await api.post<UserSearchResponse>(endpoint, {
       user_ids: user_ids || null,  // Different from participant_ids
     });
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Get user roles list for filter dropdown
+ * Fetches available roles from the API with pagination support
+ */
+export interface RolesListParams {
+  page?: number;
+  limit?: number;
+}
+
+export const getRolesList = async (
+  params?: RolesListParams
+): Promise<RolesListResponse> => {
+  try {
+    const { page = 1, limit = 100 } = params || {};
+    
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    const endpoint = `${API_ENDPOINTS.USER_ROLES_LIST}?${queryParams.toString()}`;
+    
+    // GET request to fetch roles
+    const response = await api.get<RolesListResponse>(endpoint);
 
     return response.data;
   } catch (error: any) {

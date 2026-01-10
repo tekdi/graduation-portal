@@ -16,8 +16,8 @@ import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
-// API service for fetching users
-import { getUsersList, UserSearchParams } from '../../services/participantService';
+// API service for fetching users and roles
+import { getUsersList, UserSearchParams, getRolesList, Role } from '../../services/participantService';
 import { Modal } from '@ui';
 import { theme } from '@config/theme';
 //import BulkOperationsCard from '../../components/BulkOperationsCard';
@@ -31,7 +31,6 @@ import { theme } from '@config/theme';
 const UserManagementScreen = () => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
-  const data = [SearchFilter, ...FilterOptions];
   const toast = useToast();
   
   // API state management
@@ -41,6 +40,11 @@ const UserManagementScreen = () => {
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
+  
+  // Roles state for dynamic filter
+  const [roles, setRoles] = useState<Role[]>([]);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(false);
+  const [roleMap, setRoleMap] = useState<Record<string, string>>({}); // Maps label → title
   
   // File upload state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -81,18 +85,71 @@ const UserManagementScreen = () => {
     return file.size <= maxSizeBytes;
   };
 
-  // Map filter role labels to API role titles
-  const mapRoleLabelToTitle = (roleLabel: string): string => {
-    const roleMap: Record<string, string> = {
-      'Admin': 'org_admin',
-      'Supervisor': 'session_manager',
-      'Linkage Champion': 'lc',
-      'Participant': 'user',
+  // Fetch roles from API on component mount
+  useEffect(() => {
+    const fetchRoles = async () => {
+      setIsLoadingRoles(true);
+      try {
+        const response = await getRolesList({ page: 1, limit: 100 });
+        const allRoles = response.result?.data || [];
+        
+        // Filter only ACTIVE roles for the dropdown
+        const activeRoles = allRoles.filter((role: Role) => role.status === 'ACTIVE');
+        setRoles(activeRoles);
+
+        // Build roleMap: label → title (e.g., "Supervisor" → "org_admin")
+        const newRoleMap: Record<string, string> = {};
+        activeRoles.forEach((role: Role) => {
+          if (role.label && role.title) {
+            newRoleMap[role.label] = role.title;
+          }
+        });
+        setRoleMap(newRoleMap);
+      } catch (error) {
+        console.error('Error fetching roles:', error);
+        // Set empty array - filter will show only "All Roles" option
+        setRoles([]);
+      } finally {
+        setIsLoadingRoles(false);
+      }
     };
+
+    fetchRoles();
+  }, []);
+
+  // Map filter role labels to API role titles (using dynamic roleMap from API)
+  const mapRoleLabelToTitle = useCallback((roleLabel: string): string => {
     const mappedRole = roleMap[roleLabel] || roleLabel;
     console.log('Role mapping:', { roleLabel, mappedRole });
     return mappedRole;
-  };
+  }, [roleMap]);
+
+  // Build dynamic filter options with API roles only
+  const filterOptionsWithRoles = useMemo(() => {
+    const otherFilters = FilterOptions.filter(f => f.attr !== 'role');
+    
+    // Always build role filter from API roles (even if empty during loading)
+    const roleFilterOptions = [
+      { labelKey: 'admin.filters.allRoles', value: 'all-roles' },
+      ...roles.map((role: Role) => ({
+        label: role.label,
+        value: role.label, // Use label as value (e.g., "Supervisor")
+      })),
+    ];
+
+    return [
+      {
+        nameKey: 'admin.filters.role',
+        attr: 'role',
+        type: 'select' as const,
+        data: roleFilterOptions,
+      },
+      ...otherFilters,
+    ];
+  }, [roles]);
+
+  // Combine search filter with dynamic filter options
+  const data = useMemo(() => [SearchFilter, ...filterOptionsWithRoles], [filterOptionsWithRoles]);
 
   // Fetch users from API when filters/pagination change
   useEffect(() => {
