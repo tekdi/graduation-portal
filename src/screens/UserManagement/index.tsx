@@ -3,6 +3,7 @@ import { VStack, HStack, Button, Text, Image, Box, useToast, Toast, ToastTitle }
 import { Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
 
+import UploadIcon from '../../assets/images/UploadIcon.png';
 import ExportIcon from '../../assets/images/ExportIcon.png';
 import { useLanguage } from '@contexts/LanguageContext';
 import { SearchFilter, FilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
@@ -400,23 +401,43 @@ const UserManagementScreen = () => {
         title="admin.menu.userManagement"
         description="admin.userManagementDescription"
         right={
-          <Button
-            {...titleHeaderStyles.solidButton}
-            onPress={() => {
-              // Handle create user
-            }}
-          >
-            <HStack space="sm" alignItems="center">
-              <Image 
-                source={ExportIcon}
-                style={{ width: 16, height: 16 }}
-                alt="Export icon"
-              />
-              <Text {...titleHeaderStyles.solidButtonText}>
-                {t('admin.actions.createUser')}
-              </Text>
-            </HStack>
-          </Button>
+          <HStack space="md" alignItems="center">
+            <Button
+              {...titleHeaderStyles.outlineButton}
+              onPress={() => {
+                // Handle bulk upload
+              }}
+            >
+              <HStack space="sm" alignItems="center">
+                <Image 
+                  source={UploadIcon}
+                  style={{ width: 16, height: 16 }}
+                  alt="Upload icon"
+                />
+                <Text {...titleHeaderStyles.outlineButtonText}>
+                  {t('admin.actions.bulkUploadCSV')}
+                </Text>
+              </HStack>
+            </Button>
+            
+            <Button
+              {...titleHeaderStyles.solidButton}
+              onPress={() => {
+                // Handle create user
+              }}
+            >
+              <HStack space="sm" alignItems="center">
+                <Image 
+                  source={ExportIcon}
+                  style={{ width: 16, height: 16 }}
+                  alt="Export icon"
+                />
+                <Text {...titleHeaderStyles.solidButtonText}>
+                  {t('admin.actions.createUser')}
+                </Text>
+              </HStack>
+            </Button>
+          </HStack>
         }
       />
       
