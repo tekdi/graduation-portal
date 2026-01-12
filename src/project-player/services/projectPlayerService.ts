@@ -1,26 +1,17 @@
 import axios from 'axios';
-import { PROJECT_PLAYER_CONFIGS } from '../../constants/PROJECTDATA';
+import {
+  PROJECT_PLAYER_CONFIGS,
+  taskDetailsAPIMockResponse,
+  templateDetailsAPIMockResponse,
+} from '../../constants/PROJECTDATA';
 import { ApiResponse } from '../types/components.types';
 import { API_ENDPOINTS } from './apiEndpoints';
 import { isWeb } from '@utils/platform';
 import { navigate } from '../../navigation/navigationRef';
 
-// Ensure baseURL is always valid (not empty string)
-const getBaseURL = (): string => {
-  const url = PROJECT_PLAYER_CONFIGS.baseUrl;
-  // If baseUrl is empty or invalid, use a default fallback
-  if (!url || url.trim() === '') {
-    console.warn(
-      'API_BASE_URL is not set in environment, using default fallback',
-    );
-    return 'https://brac-dev.tekdinext.com/api/project/v1';
-  }
-  return url;
-};
-
 export const apiClient = axios.create({
   // Use baseUrl from PROJECT_PLAYER_CONFIGS (which gets from env, with fallback)
-  baseURL: getBaseURL(),
+  baseURL: PROJECT_PLAYER_CONFIGS.baseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -86,6 +77,77 @@ export const getProjectTemplatesList = async (): Promise<ApiResponse<any>> => {
     const response = await apiClient.get(API_ENDPOINTS.PROJECT_TEMPLATES_LIST);
 
     return { data: response.data.result };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const createProjectForEntity = async (
+  entityId: string,
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await apiClient.post(API_ENDPOINTS.CREATE_PROJECT, {
+      entityId,
+    });
+
+    return { data: response.data.result };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const getProjectDetails = async (
+  projectID: string,
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.PROJECT_DETAILS(projectID),
+    );
+
+    return { data: response.data.result };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const getCategoryList = async (
+  parentId: string,
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await apiClient.get(
+      API_ENDPOINTS.GET_CATEGORY_LIST(parentId),
+    );
+    const resData = templateDetailsAPIMockResponse;
+    return { data: resData.result };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const getTemplateDetails = async (
+  categoryId: string,
+): Promise<ApiResponse<any>> => {
+  try {
+    // const response = await apiClient.get(
+    //   API_ENDPOINTS.GET_TEMPLATE(categoryId),
+    // );
+    // console.log(response);
+    const resData = templateDetailsAPIMockResponse;
+    // return { data: response.data.result };
+    return { data: resData.result };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+export const getTaskDetails = async (
+  categoryIds: string,
+): Promise<ApiResponse<any>> => {
+  try {
+    // const response = await apiClient.get(
+    //   API_ENDPOINTS.GET_TASK_DETAILS(categoryIds),
+    // );
+    const response = taskDetailsAPIMockResponse;
+    return { data: response.result };
   } catch (error) {
     return handleApiError(error);
   }

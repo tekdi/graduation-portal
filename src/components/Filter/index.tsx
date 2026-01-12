@@ -1,11 +1,21 @@
-import React from "react";
-import { VStack, HStack, Text, Image, Input, InputField, Button } from "@ui";
-import Select from "../ui/Inputs/Select";
-import { filterStyles } from "./Styles";
-import filterIcon from "../../assets/images/FilterIcon.png";
-import { useLanguage } from "@contexts/LanguageContext";
+import React from 'react';
+import { VStack, HStack, Text, Image, Input, InputField, Button } from '@ui';
+import Select from '../ui/Inputs/Select';
+import { filterStyles } from './Styles';
+import filterIcon from '../../assets/images/FilterIcon.png';
+import { useLanguage } from '@contexts/LanguageContext';
 
-export default function FilterButton({ data }: any) {
+interface FilterButtonProps {
+  data: any[];
+  showClearFilterButton?: boolean;
+  onChange?: (values: Record<string, any>) => void;
+}
+
+export default function FilterButton({
+  data,
+  showClearFilterButton = false,
+  onChange,
+}: FilterButtonProps) {
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
 
@@ -26,34 +36,35 @@ export default function FilterButton({ data }: any) {
         }
       }
     }
-    return "";
+    return '';
   };
 
   const handleClearFilters = () => {
-    setValue({});
+    const clearedValue = {};
+    setValue(clearedValue);
+    // Notify parent component when filters are cleared
+    onChange?.(clearedValue);
   };
 
   return (
     <VStack {...filterStyles.container}>
       {/* Title */}
       <HStack {...filterStyles.titleContainer}>
-        <Image 
+        <Image
           source={filterIcon}
           style={{ width: 20, height: 20 }}
           alt="Filter icon"
         />
-        <Text {...filterStyles.titleText}>
-          {t('common.filters')}
-        </Text>
+        <Text {...filterStyles.titleText}>{t('common.filters')}</Text>
       </HStack>
 
       {/* Filters Row */}
       <HStack {...filterStyles.filterFieldsContainer}>
         {data.map((item: any) => (
-          <VStack 
+          <VStack
             key={item.attr}
-            {...(item.type === 'search' 
-              ? filterStyles.searchContainer 
+            {...(item.type === 'search'
+              ? filterStyles.searchContainer
               : filterStyles.roleContainer)}
           >
             <Text {...filterStyles.label}>
@@ -63,43 +74,47 @@ export default function FilterButton({ data }: any) {
               <Input {...filterStyles.input}>
                 <InputField
                   placeholder={
-                    item.placeholderKey 
-                      ? t(item.placeholderKey) 
-                      : item.placeholder || (item.nameKey ? `${t('common.search')} ${t(item.nameKey).toLowerCase()}...` : `Search ${item.name?.toLowerCase()}...`)
+                    item.placeholderKey
+                      ? t(item.placeholderKey)
+                      : item.placeholder ||
+                        (item.nameKey
+                          ? `${t('common.search')} ${t(
+                              item.nameKey,
+                            ).toLowerCase()}...`
+                          : `Search ${item.name?.toLowerCase()}...`)
                   }
-                  value={value?.[item.attr] || ""}
+                  value={value?.[item.attr] || ''}
                   onChangeText={(text: string) => {
-                    if (!text || text.trim() === "") {
-                      setValue((prev: any) => {
-                        const updated = { ...prev };
-                        delete updated[item.attr];
-                        return updated;
-                      });
+                    let updatedValue: any;
+                    if (!text || text.trim() === '') {
+                      updatedValue = { ...value };
+                      delete updatedValue[item.attr];
                     } else {
-                      setValue((prev: any) => ({ ...prev, [item.attr]: text }));
+                      updatedValue = { ...value, [item.attr]: text };
                     }
+                    setValue(updatedValue);
+                    // Notify parent component of changes
+                    onChange?.(updatedValue);
                   }}
                 />
               </Input>
             ) : (
               <Select
                 value={value?.[item.attr] || getDefaultDisplayValue(item)}
-                onChange={(v) => {
+                onChange={v => {
+                  let updatedValue: any;
                   // ❗ If actual null (marked), empty string, or undefined → remove from state
                   // Note: String "null" is kept in state, only actual null/empty removes the key
                   if (v == null || v === '__NULL_VALUE__' || v === '') {
-                    setValue((prev: any) => {
-                      const updated = { ...prev };
-                      delete updated[item.attr];
-                      return updated;
-                    });
+                    updatedValue = { ...value };
+                    delete updatedValue[item.attr];
                   } else {
                     // Otherwise store the selected value (including string "null")
-                    setValue((prev: any) => ({
-                      ...prev,
-                      [item.attr]: v,
-                    }));
+                    updatedValue = { ...value, [item.attr]: v };
                   }
+                  setValue(updatedValue);
+                  // Notify parent component of changes
+                  onChange?.(updatedValue);
                 }}
                 options={
                   item?.data?.map((option: any) => {
@@ -120,23 +135,21 @@ export default function FilterButton({ data }: any) {
                 }
                 {...filterStyles.input}
               />
-
             )}
           </VStack>
         ))}
 
         {/* Clear Filters Button */}
-        <VStack {...filterStyles.clearButtonContainer}>
-          <Button 
-            onPress={handleClearFilters}
-            {...filterStyles.button}
-          >
-            <Text {...filterStyles.buttonText}>{t('common.clearFilters')}</Text>
-          </Button>
-        </VStack>
+        {showClearFilterButton && (
+          <VStack {...filterStyles.clearButtonContainer}>
+            <Button onPress={handleClearFilters} {...filterStyles.button}>
+              <Text {...filterStyles.buttonText}>
+                {t('common.clearFilters')}
+              </Text>
+            </Button>
+          </VStack>
+        )}
       </HStack>
-
     </VStack>
   );
 }
-

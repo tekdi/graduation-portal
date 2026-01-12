@@ -19,6 +19,7 @@ import { navigationRef } from './navigationRef';
 import AccessBaseNavigator from './navigators/AccessBaseNavigator';
 import HomeScreen from '../screens/Home';
 import UserManagementScreen from '../screens/UserManagement';
+import AssignUsersScreen from '../screens/AssignUsers';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
@@ -54,7 +55,13 @@ class NavigationErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        this.props.fallback || <Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />
+        this.props.fallback || (
+          <Spinner
+            height={isWeb ? '$100vh' : '$full'}
+            size="large"
+            color="$primary500"
+          />
+        )
       );
     }
     return this.props.children;
@@ -78,6 +85,11 @@ const getAccessPages = (
           path: '/user-management',
           component: UserManagementScreen,
         },
+        {
+          name: 'assign-users',
+          path: '/assign-users',
+          component: AssignUsersScreen,
+        },
       ];
     case 'supervisor':
       return [{ name: 'home', path: '/home', component: HomeScreen }];
@@ -86,10 +98,26 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
-        { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
-        { name: 'log-visit', path: '/participants/:id/log-visit', component: LogVisit },
-        { name: 'observation', path: '/participants/:id/observation/:observationId', component: Observation },
-        { name: 'template', path: '/participants/:id/template', component: TemplateScreen },
+        {
+          name: 'participant-detail',
+          path: '/participants/:id',
+          component: ParticipantDetail,
+        },
+        {
+          name: 'log-visit',
+          path: '/participants/:id/log-visit',
+          component: LogVisit,
+        },
+        {
+          name: 'observation',
+          path: '/participants/:id/observation/:observationId',
+          component: Observation,
+        },
+        {
+          name: 'template',
+          path: '/participants/:id/template',
+          component: TemplateScreen,
+        },
         { name: 'participants', component: ParticipantsList },
         { name: 'project', path: '/project', component: ProjectPlayer },
       ];
@@ -121,7 +149,7 @@ const getLinkingConfig = (
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
         ? // Remove leading slash for react-navigation config consistency
-        page.path.startsWith('/')
+          page.path.startsWith('/')
           ? page.path.slice(1)
           : page.path
         : page.name;
@@ -168,7 +196,15 @@ const RoleBasedNavigator: React.FC = () => {
   }
 
   return (
-    <Suspense fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}>
+    <Suspense
+      fallback={
+        <Spinner
+          height={isWeb ? '$100vh' : '$full'}
+          size="large"
+          color="$primary500"
+        />
+      }
+    >
       <AccessBaseNavigator accessPages={accessPages} />
     </Suspense>
   );
@@ -228,7 +264,13 @@ const AppNavigator: React.FC = () => {
   }, [isLoggedIn, user?.role, accessPages.length]);
 
   if (loading) {
-    return <Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />;
+    return (
+      <Spinner
+        height={isWeb ? '$100vh' : '$full'}
+        size="large"
+        color="$primary500"
+      />
+    );
   }
 
   return (
@@ -237,7 +279,13 @@ const AppNavigator: React.FC = () => {
         ref={navigationRef}
         key={navigationKey}
         linking={linking}
-        fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}
+        fallback={
+          <Spinner
+            height={isWeb ? '$100vh' : '$full'}
+            size="large"
+            color="$primary500"
+          />
+        }
         onReady={() => {
           if (isWeb) {
             logger.log('Navigation container ready');
@@ -254,10 +302,10 @@ const AppNavigator: React.FC = () => {
             headerShown: false,
             cardStyle: isWeb
               ? ({
-                width: '100%',
-                minHeight: '100vh',
-                height: 'auto',
-              } as any)
+                  width: '100%',
+                  minHeight: '100vh',
+                  height: 'auto',
+                } as any)
               : ({ width: '100%' } as any),
           }}
         >

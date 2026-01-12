@@ -10,12 +10,14 @@ import ProjectPlayer, {
 import { COMPLEX_PROJECT_DATA, MODE } from '@constants/PROJECTDATA';
 import { STATUS } from '@constants/app.constant';
 import type { InterventionPlanProps } from '../../../types/screens';
+import { useNavigation } from '@react-navigation/native';
 
 const InterventionPlan: React.FC<InterventionPlanProps> = ({
   participantStatus,
+  participantId,
 }) => {
   const { t } = useLanguage();
-  const [showPlayer, setShowPlayer] = useState(false);
+  const navigation = useNavigation();
   const [isEditMode, setIsEditMode] = useState(false);
 
   // Memoize ProjectPlayer config based on status and edit mode
@@ -69,7 +71,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   );
 
   // Show empty state for ENROLLED status when player is not shown yet
-  if (participantStatus === STATUS.ENROLLED && !showPlayer) {
+  if (participantStatus === STATUS.ENROLLED) {
     return (
       <Box {...interventionPlanStyles.container}>
         <VStack {...interventionPlanStyles.content}>
@@ -88,7 +90,9 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
           </Text>
           <Button
             {...interventionPlanStyles.button}
-            onPress={() => setShowPlayer(true)}
+            onPress={() => {
+              navigation.navigate('template', { id: participantId });
+            }}
           >
             <ButtonText {...interventionPlanStyles.buttonText}>
               {t('participantDetail.interventionPlan.developPlan')}

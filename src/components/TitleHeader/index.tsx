@@ -7,37 +7,39 @@ export interface TitleHeaderProps {
   title: string; // Translation key for the header title
   description: string; // Translation key for the header description
   right?: React.ReactNode;
+  bottom?: React.ReactNode;
 }
 
-const TitleHeader: React.FC<TitleHeaderProps> = ({ title, description, right }) => {
+const TitleHeader: React.FC<TitleHeaderProps> = ({
+  title,
+  description,
+  right,
+  bottom,
+}) => {
   const { t } = useLanguage();
-  
+
   return (
-    <HStack 
-      justifyContent="space-between" 
-      alignItems="flex-start" 
+    <HStack
+      justifyContent="space-between"
+      alignItems="flex-start"
       width="100%"
       flexWrap="wrap"
     >
       <VStack {...titleHeaderStyles.textContainer} flex={1}>
         <Text {...titleHeaderStyles.titleText}>{t(title)}</Text>
         <Text {...titleHeaderStyles.descriptionText}>{t(description)}</Text>
+        {bottom && <VStack marginTop={'$3'}>{bottom}</VStack>}
       </VStack>
-      
+
       {/* 
         Conditionally render right-side content (action buttons, icons, etc.)
         - Only renders if 'right' prop is provided (not null/undefined)
         - Wraps in VStack with flex-end alignment to position content on the right
         - This allows screens to optionally include action buttons without breaking layout
       */}
-      {right && (
-        <VStack alignItems="flex-end">
-          {right}
-        </VStack>
-      )}
+      {right && <VStack alignItems="flex-end">{right}</VStack>}
     </HStack>
   );
 };
 
 export default TitleHeader;
-

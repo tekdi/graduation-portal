@@ -53,14 +53,17 @@ const LoginScreen: React.FC = () => {
       const success = await login(email, password, isAdminMode);
 
       if (!success) {
-        setError(isAdminMode ? t('login.adminLoginFailed') : t('login.invalidEmailOrPassword'));
+        setError(
+          isAdminMode
+            ? t('login.adminLoginFailed')
+            : t('login.invalidEmailOrPassword'),
+        );
       }
       // AuthContext already handles setting isLoggedIn and user state on success
     } catch (err: any) {
       // Handle error from API
       const errorMessage =
-        err?.message ||
-        t('login.anErrorOccurredDuringLogin');
+        err?.message || t('login.anErrorOccurredDuringLogin');
       setError(errorMessage);
       logger.error(`${isAdminMode ? 'Admin ' : ''}Login error:`, err);
     } finally {
@@ -114,7 +117,6 @@ const LoginScreen: React.FC = () => {
     });
   };
 
-
   return (
     <ScrollView {...loginStyles.scrollView}>
       <Box {...loginStyles.container}>
@@ -134,7 +136,7 @@ const LoginScreen: React.FC = () => {
               <VStack {...loginStyles.vstack2}>
                 <Text {...loginStyles.text2}>
                   {isAdminMode
-                    ? t('login.welcomeToYourAccountAdmin') 
+                    ? t('login.welcomeToYourAccountAdmin')
                     : t('login.welcomeToYourAccount')}
                 </Text>
                 <Text {...loginStyles.text3}>{t('login.logInToContinue')}</Text>

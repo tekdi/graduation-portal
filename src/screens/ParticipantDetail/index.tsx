@@ -17,6 +17,7 @@ import {
   getParticipantProfile,
   updateParticipantAddress,
   getSitesByProvince,
+  getEntityDetails,
 } from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
@@ -73,6 +74,8 @@ export default function ParticipantDetail() {
   const [activeTab, setActiveTab] = useState<string>('intervention-plan');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [entityId, setEntityId] = useState('');
+  const [projectId, setProjectId] = useState('');
   const [editedAddress, setEditedAddress] = useState<{
     street: string;
     province: string;
@@ -94,9 +97,21 @@ export default function ParticipantDetail() {
 
   // Update currentParticipantProfile if participantId changes
   useEffect(() => {
-    if (participantId) {
-      setCurrentParticipantProfile(getParticipantProfile(participantId));
-    }
+    const fetchEntityDetails = async () => {
+      if (participantId) {
+        setCurrentParticipantProfile(getParticipantProfile(participantId));
+
+        try {
+          const response = await getEntityDetails(participantId);
+          console.log(response.data[0]);
+          setEntityId(response.data[0]._id);
+          setProjectId(response.data[0].metaInformation?.onBoardingProjectId);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    fetchEntityDetails();
   }, [participantId]);
 
   // Error State: Participant Not Found
@@ -127,7 +142,9 @@ export default function ParticipantDetail() {
 
   const ProjectPlayerConfigData: ProjectPlayerData = {
     solutionId: config.data.solutionId,
-    projectId: config.data.projectId,
+    projectId: projectId,
+    entityId: entityId,
+    userStatus: STATUS.NOT_ENROLLED,
     // data: DUMMY_PROJECT_DATA,
   };
 
@@ -190,6 +207,7 @@ export default function ParticipantDetail() {
                       PARTICIPANT_DETAILS_TABS.INTERVENTION_PLAN && (
                       <InterventionPlan
                         participantStatus={status as ParticipantStatus}
+                        participantId={id}
                       />
                     )}
                     {activeTab ===

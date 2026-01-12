@@ -9,7 +9,9 @@ type FilterConfig = {
   nameKey?: string; // Translation key for the filter name
   attr: string;
   type: 'search' | 'select';
-  data: Array<string | { label?: string; labelKey?: string; value: string | null }>;
+  data: Array<
+    string | { label?: string; labelKey?: string; value: string | null }
+  >;
   placeholder?: string; // Fallback if placeholderKey is not provided
   placeholderKey?: string; // Translation key for the placeholder
 };
@@ -48,4 +50,96 @@ export const FilterOptions: ReadonlyArray<FilterConfig> = [
     ],
   },
 ];
+export const supervisorFilterOptions: ReadonlyArray<FilterConfig> = [
+  {
+    nameKey: 'admin.filters.filterByProvince',
+    attr: 'filterByProvince',
+    type: 'select',
+    data: [
+      { labelKey: 'admin.filters.allProvinces', value: 'all-Provinces' },
+      { labelKey: 'Gauteng', value: 'Gauteng' },
+      { labelKey: 'KwaZulu-nutal', value: 'KwaZulu-nutal' },
+    ],
+  },
+  {
+    nameKey: 'admin.filters.selectSupervisor',
+    attr: 'selectSupervisor',
+    type: 'select',
+    data: [
+      {
+        labelKey: 'Dr. Lerato Mokoena Johannesburg',
+        value: 'Dr. Lerato Mokoena Johannesburg ',
+      },
+      {
+        labelKey: 'Zanele Ndabae Thekwini',
+        value: 'Zanele Ndabae Thekwini',
+      },
+    ],
+  },
+];
 
+export const lcFilterOptions: ReadonlyArray<FilterConfig> = [
+  {
+    nameKey: 'admin.filters.filterByProvince',
+    attr: 'filterByProvince',
+    type: 'select',
+    data: [
+      { labelKey: 'admin.filters.allProvinces', value: 'all-Provinces' },
+      { labelKey: 'Gauteng', value: 'Gauteng' },
+      { labelKey: 'KwaZulu-nutal', value: 'KwaZulu-nutal' },
+    ],
+  },
+  {
+    nameKey: 'admin.filters.allDistrict',
+    attr: 'allDistrict',
+    type: 'select',
+    data: [
+      { labelKey: 'admin.filters.allDistrict', value: 'all-District' },
+      {
+        labelKey: 'Jonnesburg',
+        value: 'Jonnesburg',
+      },
+      {
+        labelKey: 'Tshwane',
+        value: 'Tshwane',
+      },
+      {
+        labelKey: 'Cape town',
+        value: 'Cape town',
+      },
+    ],
+  },
+];
+
+export const selectedLCList = [
+  {
+    labelKey: 'Busisiwe Ngcobo',
+    value: 'Busisiwe-Ngcobo',
+    location: 'eThekwini, KwaZulu-Natal',
+    status: 'unassigned',
+  },
+  {
+    labelKey: 'Andile Mkhize',
+    value: 'Andile-Mkhize',
+    location: 'Johannesburg, Gauteng',
+    status: 'unassigned',
+  },
+];
+
+export const participantLCFilterOptions = [
+  {
+    nameKey: 'admin.filters.selectSupervisor',
+    attr: 'selectSupervisor',
+    type: 'select',
+    data: [
+      {
+        labelKey: 'Dr. Lerato Mokoena Johannesburg',
+        value: 'Dr. Lerato Mokoena Johannesburg ',
+      },
+      {
+        labelKey: 'Zanele Ndabae Thekwini',
+        value: 'Zanele Ndabae Thekwini',
+      },
+    ],
+  },
+];

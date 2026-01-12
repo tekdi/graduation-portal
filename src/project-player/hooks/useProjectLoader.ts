@@ -4,7 +4,19 @@ import {
   ProjectPlayerConfig,
   ProjectPlayerData,
 } from '../types/components.types';
-import { getProjectTemplatesList } from '../services/projectPlayerService';
+import {
+  createProjectForEntity,
+  getProjectDetails,
+  getProjectTemplatesList,
+  getTaskDetails,
+  getTemplateDetails,
+} from '../services/projectPlayerService';
+import {
+  enrichChildrenWithProjects,
+  normalizeTaskResponse,
+} from '../utils/helper';
+import { STATUS } from '@constants/app.constant';
+import { updateEntityDetails } from '../../../src/services/participantService';
 
 export const useProjectLoader = (
   config: ProjectPlayerConfig,
@@ -19,36 +31,66 @@ export const useProjectLoader = (
       try {
         setIsLoading(true);
 
-        // If local data is provided, use it (for testing/offline mode)
-        if (data.data) {
-          setProjectData(data.data);
-          setIsLoading(false);
-          return;
-        }
+        // config.mode = "edit" and data contains  projectId.
+        if (config.mode === 'edit') {
+          const { entityId, projectId, userStatus } = data;
 
-        // config.mode = "edit" and data contains both solutionId and projectId.
-        if (config.mode === 'edit' && data.projectId) {
-          const { data: templates, error } = await getProjectTemplatesList();
+          if (!entityId || userStatus !== STATUS.NOT_ENROLLED) return;
 
-          if (error) {
-            console.error('Failed to load project templates:', error);
+          try {
+            let projectData;
+
+            if (projectId) {
+              const res = await getProjectDetails(projectId);
+              projectData = res.data;
+            } else {
+              const res = await createProjectForEntity(entityId);
+              projectData = res.data;
+
+              if (projectData?._id) {
+                await updateEntityDetails(entityId, {
+                  'metaInformation.onBoardingProjectId': projectData._id,
+                });
+              }
+            }
+            if (error) {
+              throw new Error(error);
+            }
+
+            setProjectData(projectData);
+          } catch (err) {
+            console.error('Failed to load project templates:', err);
             setProjectData(null);
-            setError(new Error(error));
-            return;
+            setError(err as Error);
           }
-
-          const selectTemplate = (templates: any[]) =>
-            templates.find(t => t.externalId === data.projectId);
-
-          const template = selectTemplate(templates);
-
-          setProjectData({
-            ...template,
-            tasks: template.tasks.map((task: any) => ({
-              ...task,
-              _id: task.id,
-            })),
-          });
+        } else if (config.mode === 'preview') {
+          // const categoryId = '693fb8fcda98e72cedd4a5fd';
+          // const templateDetails = await getTemplateDetails(categoryId);
+          // console.log('template details', templateDetails);
+          // const categoryIds = [
+          //   templateDetails?.data?._id,
+          //   ...(templateDetails?.data?.children || []).map(
+          //     (child: any) => child._id,
+          //   ),
+          // ].filter(Boolean);
+          // const categoryIdsString = categoryIds.join(',');
+          // const taskResponse = await getTaskDetails(categoryIdsString);
+          // console.log('taskResponse', taskResponse);
+          // const taskResult = taskResponse.data;
+          // const taskData = normalizeTaskResponse(taskResult);
+          // console.log('taskData', taskData);
+          // // ✅ ENRICH — not replace
+          // const enrichedChildren = enrichChildrenWithProjects(
+          //   templateDetails.data.children,
+          //   taskData,
+          // );
+          // // ✅ final combined response
+          // const finalProjectData = {
+          //   ...templateDetails.data,
+          //   children: enrichedChildren,
+          // };
+          // console.log('final template details', finalProjectData);
+          // setProjectData(finalProjectData);
         } else if (data.solutionId) {
           // Load template
           // TODO: Implement API call

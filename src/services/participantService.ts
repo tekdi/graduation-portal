@@ -1,6 +1,12 @@
 import { Participant } from '@app-types/screens';
 import type { ParticipantData, Province, Site } from '@app-types/participant';
-import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
+import {
+  PARTICIPANTS_DATA,
+  PROVINCES,
+  SITES,
+} from '@constants/PARTICIPANTS_LIST';
+import api from './api';
+import { API_ENDPOINTS } from './apiEndpoints';
 
 /**
  * Participant Service
@@ -12,7 +18,7 @@ import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIS
  * Maps ParticipantData[] to Participant[] format by converting contact to phone
  */
 export const getParticipantsList = (): Participant[] => {
-  return PARTICIPANTS_DATA.map((participant) => ({
+  return PARTICIPANTS_DATA.map(participant => ({
     id: participant.id,
     name: participant.name,
     phone: participant.contact, // Map contact to phone
@@ -38,8 +44,15 @@ export const getParticipantById = (id: string): ParticipantData | undefined => {
     status: participant.status,
     progress: participant.progress,
     pathway: participant.pathway || undefined,
-    graduationProgress: participant.graduationProgress != null && !isNaN(Number(participant.graduationProgress)) ? participant.graduationProgress : undefined,
-    graduationDate: participant.graduationDate && participant.graduationDate !== '' ? participant.graduationDate : undefined,
+    graduationProgress:
+      participant.graduationProgress != null &&
+      !isNaN(Number(participant.graduationProgress))
+        ? participant.graduationProgress
+        : undefined,
+    graduationDate:
+      participant.graduationDate && participant.graduationDate !== ''
+        ? participant.graduationDate
+        : undefined,
     email: participant.email,
     address: participant.address,
   };
@@ -50,14 +63,16 @@ export const getParticipantById = (id: string): ParticipantData | undefined => {
  * Returns full participant data including contact info and address
  * Currently uses mock data, will be replaced with API call later
  */
-export const getParticipantProfile = (id: string): ParticipantData | undefined => {
+export const getParticipantProfile = (
+  id: string,
+): ParticipantData | undefined => {
   return PARTICIPANTS_DATA.find(p => p.id === id);
 };
 
 /**
  * Update participant address
  * Currently uses mock data update, will be replaced with API call later
- * 
+ *
  * @param id - Participant ID
  * @param address - New address object with street, province, and site
  * @returns Updated participant or undefined if not found
@@ -68,13 +83,13 @@ export const updateParticipantAddress = async (
     street: string;
     province: string;
     site: string;
-  }
+  },
 ): Promise<ParticipantData | undefined> => {
   // TODO: Replace with actual API call
   // Example: return await api.put(`/participants/${id}/address`, address);
-  
+
   // Mock implementation - simulate API delay
-  return new Promise((resolve) => {
+  return new Promise(resolve => {
     setTimeout(() => {
       const participant = PARTICIPANTS_DATA.find(p => p.id === id);
       if (participant) {
@@ -121,3 +136,28 @@ export const getSitesByProvince = (provinceValue: string): Site[] => {
   return SITES;
 };
 
+export const getEntityDetails = async (userId: string): Promise<any> => {
+  try {
+    const response = await api.get(API_ENDPOINTS.GET_ENTITY_DETAILS(userId));
+
+    return { data: response.data.result };
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const updateEntityDetails = async (
+  entityId: string,
+  requestBody: any,
+): Promise<any> => {
+  try {
+    const response = await api.post(
+      API_ENDPOINTS.UPDATE_ENTITY_DETAILS(entityId),
+      requestBody,
+    );
+
+    return { data: response.data.result };
+  } catch (error) {
+    throw error;
+  }
+};

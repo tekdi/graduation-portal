@@ -40,11 +40,11 @@ const ProjectComponent: React.FC = () => {
             <VStack>
               <ProjectInfoCard project={projectData} />
 
-              {projectData.tasks?.map((task, index) => (
+              {projectData?.tasks?.map((task, index) => (
                 <TaskComponent
                   key={task._id}
                   task={task}
-                  isLastTask={index === projectData.tasks.length - 1}
+                  isLastTask={index === projectData?.tasks.length - 1}
                 />
               ))}
             </VStack>

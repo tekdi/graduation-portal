@@ -114,6 +114,8 @@ export interface ProjectPlayerConfig {
 export interface ProjectPlayerData {
   solutionId?: string;
   projectId?: string;
+  entityId?: string;
+  userStatus?: string;
   data?: ProjectData;
 }
 

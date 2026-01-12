@@ -78,15 +78,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
   // Configuration for rendering different UI styles
   const uiConfig = useMemo(
-    () =>
-      getTaskCardUIConfig(
-        isChildOfProject,
-        isPreview,
-        isEdit,
-        isUploading,
-        task.type,
-      ),
-    [isChildOfProject, isPreview, isEdit, isUploading, task.type],
+    () => getTaskCardUIConfig(isChildOfProject, isPreview, isEdit, isUploading),
+    [isChildOfProject, isPreview, isEdit, isUploading],
   );
 
   // File upload handler
@@ -171,7 +164,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       <>
         {renderFileInput({
           fileInputRef,
-          taskType: task.type,
+          taskType: task?.type,
           isWeb,
           handleFileSelect,
           isEdit,
@@ -194,7 +187,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
                   isCompleted,
                   showAsCard: uiConfig.showAsCard,
                   taskName: task.name,
-                  taskDescription: task.description,
+                  taskDescription: task?.description,
+                  taskType: task.type,
                 })}
               </HStack>
               <HStack space="xs" alignItems="center">
@@ -255,6 +249,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             showAsCard: uiConfig.showAsCard,
             taskName: task.name,
             taskDescription: task.description,
+            taskType: task.type,
           })}
           {renderCustomTaskActions({
             isCustomTask: task.isCustomTask || false,
@@ -306,14 +301,16 @@ const TaskCard: React.FC<TaskCardProps> = ({
               showCheckbox: uiConfig.showCheckbox,
               isCompleted,
               showAsCard: uiConfig.showAsCard,
-              taskName: task.name,
-              taskDescription: task.description,
+              taskName: task?.name,
+              taskDescription: task?.description,
+              taskType: task?.type,
             })}
           </HStack>
           {renderActionButton({
             showActionButton: uiConfig.showActionButton,
             showAsCard: uiConfig.showAsCard,
             taskType: task.type,
+            metaInfo: task?.metaInformation,
             isUploading,
             handleTaskClick,
             isReadOnly,
