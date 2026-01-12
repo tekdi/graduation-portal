@@ -21,6 +21,22 @@ const useRole = (user: any): string => {
 };
 
 /**
+ * Helper function to extract province from user object
+ * Extracts province from API response, returns "-" if not found
+ */
+const getProvince = (user: any): string => {
+  return user?.province || user?.province_name || user?.location?.province || '-';
+};
+
+/**
+ * Helper function to extract district from user object
+ * Extracts district from API response, returns "-" if not found
+ */
+const getDistrict = (user: any): string => {
+  return user?.district || user?.district_name || user?.location?.district || '-';
+};
+
+/**
  * Role Badge Component
  */
 const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
@@ -232,9 +248,26 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     label: 'admin.users.role',
     flex: 1.2,
     render: (user: any) => {
-      const userRole =user.user_organizations?.[0]?.roles?.map((role: any) => role.role.label).join(', ');
+      // Extract all roles from user_organizations
+      const roles = user?.user_organizations?.[0]?.roles?.map((role: any) => role.role.label) || [];
+      
+      // If no roles found, show "-"
+      if (roles.length === 0) {
+        return (
+          <Text {...TYPOGRAPHY.paragraph}>
+            -
+          </Text>
+        );
+      }
 
-      return <RoleBadge role={userRole} />;
+      // Render separate badges for each role
+      return (
+        <HStack space="xs" flexWrap="wrap">
+          {roles.map((roleLabel: string, index: number) => (
+            <RoleBadge key={`${roleLabel}-${index}`} role={roleLabel} />
+          ))}
+        </HStack>
+      );
     },
     mobileConfig: {
       rightRank: 1,
@@ -255,9 +288,9 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     key: 'province',
     label: 'admin.users.province',
     flex: 1.2,
-    render: (user) => (
+    render: (user: any) => (
       <Text {...TYPOGRAPHY.paragraph} {...styles.provinceText}>
-        {user.province}
+        {getProvince(user)}
       </Text>
     ),
     mobileConfig: {
@@ -269,10 +302,10 @@ export const getUsersColumns = (): ColumnDef<User>[] => [
     key: 'district',
     label: 'admin.users.district',
     flex: 1.2,
-    render: (user) => (
+    render: (user: any) => (
       <Pressable $web-cursor="pointer">
         <Text {...TYPOGRAPHY.paragraph} {...styles.districtText}>
-          {user.district}
+          {getDistrict(user)}
         </Text>
       </Pressable>
     ),

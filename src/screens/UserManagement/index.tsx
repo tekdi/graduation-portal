@@ -283,11 +283,12 @@ const UserManagementScreen = () => {
     const statusFilter = FilterOptions.find(f => f.attr === 'status');
     
     // Always build role filter from API roles (even if empty during loading)
+    // Use title as value to ensure unique identification (even if labels are duplicate)
     const roleFilterOptions = [
       { labelKey: 'admin.filters.allRoles', value: 'all-roles' },
       ...roles.map((role: Role) => ({
-        label: role.label,
-        value: role.label, // Use label as value (e.g., "Supervisor")
+        label: role.label, // Display label in dropdown
+        value: role.title, // Use title as value for filtering (unique identifier)
       })),
     ];
 
@@ -344,12 +345,23 @@ const UserManagementScreen = () => {
       setIsLoading(true);
       try {
         // Determine type parameter based on role filter
-        let apiType = 'user,session_manager,org_admin'; // Default: all types
+        // When "All Roles" is selected, use all role titles from API
+        let apiType: string;
         if (filters.role && filters.role !== 'all-roles') {
-          // Map filter role label to API role title and use it as type
-          const mappedRole = mapRoleLabelToTitle(filters.role);
-          apiType = mappedRole;
+          // Filter value is already the role title (not label), so use it directly
+          apiType = filters.role;
           console.log('Role filter applied - using type:', apiType);
+        } else {
+          // Build type parameter from all active roles fetched from API
+          // Extract unique role titles from roles array
+          const allRoleTitles = roles
+            .map((role: Role) => role.title)
+            .filter((title: string | undefined): title is string => !!title)
+            .filter((title: string, index: number, self: string[]) => self.indexOf(title) === index); // Remove duplicates
+          
+          // Use all role titles from API (no fallback)
+          apiType = allRoleTitles.join(',');
+          console.log('All Roles selected - using type:', apiType);
         }
 
         const apiParams: UserSearchParams = {
@@ -365,11 +377,16 @@ const UserManagementScreen = () => {
 
         console.log('Filters object:', filters);
         console.log('Role filter value:', filters.role);
+        console.log('Status filter value:', filters.status);
         // Note: Role filter is handled via 'type' parameter above, not 'role' parameter
         // We don't send 'role' parameter to avoid duplication
         if (filters.status && filters.status !== 'all-status') {
           // Map status filter value to API format (e.g., "Active" → "ACTIVE")
-          apiParams.status = mapStatusLabelToAPI(filters.status);
+          const mappedStatus = mapStatusLabelToAPI(filters.status);
+          apiParams.status = mappedStatus;
+          console.log('Status filter applied - mapped value:', mappedStatus);
+        } else {
+          console.log('Status filter not applied - value is:', filters.status);
         }
         if (filters.province && filters.province !== 'all-provinces') {
           // Since we're using province.name as both label and value, use it directly
@@ -386,9 +403,57 @@ const UserManagementScreen = () => {
         console.log('API response:', response);
         console.log('Users data:', response.result?.data);
         
-        // Use raw API data directly
-        setUsers(response.result?.data || []);
-        setTotalCount(response.result?.total || (response.result?.data || []).length);
+        // Get raw API data
+        let usersData = response.result?.data || [];
+        
+        // Apply client-side status filtering if status filter is set (fallback if API doesn't filter)
+        // This ensures status filter works even if API doesn't support status parameter
+        if (filters.status && filters.status !== 'all-status') {
+          const mappedStatus = mapStatusLabelToAPI(filters.status);
+          usersData = usersData.filter((user: any) => {
+            const userStatus = user.status?.toUpperCase();
+            return userStatus === mappedStatus;
+          });
+          console.log('Client-side status filter applied:', { 
+            filterStatus: mappedStatus, 
+            filteredCount: usersData.length 
+          });
+        }
+
+        // Apply client-side province filtering if province filter is set
+        // Filter out users that don't have province data matching the filter
+        if (filters.province && filters.province !== 'all-provinces') {
+          usersData = usersData.filter((user: any) => {
+            const userProvince = user.province || user.province_name || user.location?.province;
+            // If user has no province data, exclude them when province filter is applied
+            if (!userProvince) return false;
+            // Match province name (case-insensitive)
+            return userProvince.toLowerCase() === filters.province.toLowerCase();
+          });
+          console.log('Client-side province filter applied:', { 
+            filterProvince: filters.province, 
+            filteredCount: usersData.length 
+          });
+        }
+
+        // Apply client-side district filtering if district filter is set
+        // Filter out users that don't have district data matching the filter
+        if (filters.district && filters.district !== 'all-districts') {
+          usersData = usersData.filter((user: any) => {
+            const userDistrict = user.district || user.district_name || user.location?.district;
+            // If user has no district data, exclude them when district filter is applied
+            if (!userDistrict) return false;
+            // Match district name (case-insensitive)
+            return userDistrict.toLowerCase() === filters.district.toLowerCase();
+          });
+          console.log('Client-side district filter applied:', { 
+            filterDistrict: filters.district, 
+            filteredCount: usersData.length 
+          });
+        }
+        
+        setUsers(usersData);
+        setTotalCount(usersData.length);
       } catch (error) {
         console.error('Error fetching users:', error);
         setUsers([]);
