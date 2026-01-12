@@ -127,10 +127,6 @@ const ParticipantsList: React.FC = () => {
 
       try {
         const response = await getParticipantsList({
-          tenant_code: 'brac',
-          type: 'user',
-          page: 1,
-          limit: 20,
           search: searchKey,
           entity_id: user.entityDetails._id,
         });

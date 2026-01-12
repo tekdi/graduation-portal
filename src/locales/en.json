@@ -243,6 +243,16 @@
     "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
     "title": "Generating Better Livelihoods"
   },
+  "auth": {
+    "loginAttemptedEmptyCredentials": "Login attempted with empty credentials",
+    "loginAttemptedEmptyCredentialsAdmin": "Admin Login attempted with empty credentials",
+    "userEntityNotFound": "User entity not found: You are not authorized to access the system",
+    "roleNotAuthorized": "Unauthorized: This role is not authorized to access the system",
+    "userLoggedInSuccessfully": "User logged in successfully",
+    "userLoggedInSuccessfullyAdmin": "Admin User logged in successfully",
+    "noUserDataInResponse": "No user data in response",
+    "errorOccurredDuringLogin": "An error occurred during login"
+  },
   "welcome": {
     "welcomeBack": "Welcome back",
     "chooseOptionBelowToGetStarted": "Choose an option below to get started",

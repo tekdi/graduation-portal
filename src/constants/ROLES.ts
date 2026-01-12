@@ -12,5 +12,5 @@ export const ROLE_NAMES = {
   SESSION_MANAGER: 'Session Manager',
   ORG_ADMIN: 'Organization Admin',
   PARTICIPANT: 'Participant',
+  USER: 'user',
 }
-

@@ -17,8 +17,8 @@ import { User } from '@contexts/AuthContext';
 export const getParticipantsList = async (params: ParticipantSearchParams): Promise<ParticipantSearchResponse> => {
   try {
     const {
-      tenant_code = 'brac',
-      type = 'user',
+      tenant_code = process.env.TENANT_CODE,
+      type = ROLE_NAMES.USER,
       page = 1,
       limit = 20, 
       search,
@@ -38,7 +38,7 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
     
     // Validate entity_id before constructing endpoint
-    if (!entity_id || entity_id.trim() === '') {
+    if (!entity_id?.trim()) {
       throw new Error('entity_id is required and cannot be empty');
     }
     
