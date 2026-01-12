@@ -101,12 +101,17 @@ export interface Site {
  */
 
 export interface ParticipantSearchParams {
+  user_ids?: string[] | null;
   tenant_code?: string;
   type?: string;
   page?: number;
   limit?: number;
   search?: string;
   entity_id?: string;
+  role?: string;
+  status?: string;
+  province?: string;
+  district?: string;
 }
 
 export interface ParticipantSearchResponse {

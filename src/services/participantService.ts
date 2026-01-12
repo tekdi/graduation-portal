@@ -4,7 +4,7 @@ import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
-import { ROLE_NAMES } from '@constants/ROLES';
+import { ROLE_NAMES, ADMIN_ROLES, LC_ROLES } from '@constants/ROLES';
 import { getUserProfile } from './authenticationService';
 import { User } from '@contexts/AuthContext';
 
@@ -15,33 +15,6 @@ declare const process: {
   };
 } | undefined;
 
-
-/**
- * User Search Parameters
- * Parameters for searching/filtering users via API
- */
-export interface UserSearchParams {
-  user_ids?: string[] | null;
-  tenant_code?: string;
-  type?: string; // 'user,session_manager,org_admin'
-  page?: number;
-  limit?: number;
-  search?: string;
-  role?: string;
-  status?: string;
-  province?: string;
-  district?: string;
-}
-
-/**
- * User Search Response
- * Response structure from the user search API
- */
-export interface UserSearchResponse {
-  responseCode: string;
-  message: string;
-  result: any;
-}
 
 /**
  * Role data from API
@@ -58,23 +31,31 @@ export interface Role {
 }
 
 /**
- * Get participants list for table view
- * Searches users by user IDs and returns the search response
+ * Get participants/users list for table view
+ * Handles both participants (with entity_id) and users (with user_ids or filters)
+ * 
+ * For participants: Requires entity_id, fetches sub-entities, then searches by those IDs
+ * For users: Can use user_ids directly or search/filter without entity_id
  *
- * @param params - Search parameters including user_ids array and optional query params
+ * @param params - Search parameters including optional user_ids, entity_id, and filter params
  * @returns A promise resolving to the search response from the API
  */
 export const getParticipantsList = async (params: ParticipantSearchParams): Promise<ParticipantSearchResponse> => {
   try {
     const {
-      tenant_code = process?.env?.TENANT_CODE,
-      type = ROLE_NAMES.USER,
+      user_ids,
+      tenant_code = process?.env?.TENANT_CODE || 'brac',
+      // Default type: if entity_id is provided, use participant type; otherwise use all role types
+      type = params.entity_id ? ROLE_NAMES.USER : [...ADMIN_ROLES, ...LC_ROLES].join(','),
       page = 1,
       limit = 20, 
       search,
       entity_id,
+      role,
+      status,
+      province,
+      district,
     } = params;
-
 
     // Build query string
     const queryParams = new URLSearchParams({
@@ -82,22 +63,54 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       type,
       page: page.toString(),
       limit: limit.toString(),
-      search: search || '',
     });
+
+    // Add optional search parameter
+    if (search) {
+      queryParams.append('search', search);
+    }
+
+    // Add optional filter parameters
+    if (role) {
+      queryParams.append('role', role);
+    }
+    if (status) {
+      queryParams.append('status', status);
+    }
+    if (province) {
+      queryParams.append('province', province);
+    }
+    if (district) {
+      queryParams.append('district', district);
+    }
 
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
     
-    // Validate entity_id before constructing endpoint
-    if (!entity_id?.trim()) {
-      throw new Error('entity_id is required and cannot be empty');
-    }
+    // Log the complete API URL with query parameters (for debugging)
+    console.log('API URL:', endpoint);
+    const paramsObj: Record<string, string> = {};
+    queryParams.forEach((value, key) => {
+      paramsObj[key] = value;
+    });
+    console.log('Query Parameters:', paramsObj);
     
-    const subEntityListEndpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${encodeURIComponent(entity_id)}?type=${ROLE_NAMES.PARTICIPANT.toLowerCase()}`;
-    const subEntityListResponse = await api.get<any>(subEntityListEndpoint);
-    const subEntityList = subEntityListResponse.data?.result?.data || [];
+    // Determine user_ids to send in POST body
+    let finalUserIds: string[] | null = null;
+
+    if (user_ids !== undefined) {
+      // If user_ids is explicitly provided (can be null), use it directly
+      finalUserIds = user_ids;
+    } else if (entity_id?.trim()) {
+      // If entity_id is provided, fetch sub-entities first (participants flow)
+      const subEntityListEndpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${encodeURIComponent(entity_id)}?type=${ROLE_NAMES.PARTICIPANT.toLowerCase()}`;
+      const subEntityListResponse = await api.get<any>(subEntityListEndpoint);
+      const subEntityList = subEntityListResponse.data?.result?.data || [];
+      finalUserIds = subEntityList.map((subEntity: any) => subEntity.externalId);
+    }
+    // If neither user_ids nor entity_id is provided, finalUserIds remains null (users search flow)
 
     const response = await api.post<ParticipantSearchResponse>(endpoint, {
-      user_ids: subEntityList.map((subEntity: any) => subEntity.externalId),
+      user_ids: finalUserIds,
     });
 
     return response.data;
@@ -190,80 +203,6 @@ export const getSitesByProvince = (provinceValue: string): Site[] => {
   return SITES;
 };
 
-/**
- * Get users list from API
- * Handles search, filtering, and pagination
- * Reuses same endpoint as participants, differentiated by type parameter
- * 
- * @param params - Query parameters for filtering and pagination
- * @returns Promise resolving to UserSearchResponse
- */
-export const getUsersList = async (
-  params: UserSearchParams
-): Promise<UserSearchResponse> => {
-  try {
-    const {
-      user_ids,
-      tenant_code = 'brac',
-      type = 'user,session_manager,org_admin',  // Different from participant
-      page = 1,
-      limit = 20,
-      search,
-      role,
-      status,
-      province,
-      district,
-    } = params;
-
-    // Build query string
-    const queryParams = new URLSearchParams({
-      tenant_code,
-      type,  // 'user,session_manager,org_admin' instead of 'participant'
-      page: page.toString(),
-      limit: limit.toString(),
-    });
-
-    // Add optional search parameter
-    if (search) {
-      queryParams.append('search', search);
-    }
-
-    // Add optional filter parameters
-    if (role) {
-      queryParams.append('role', role);
-    }
-    if (status) {
-      queryParams.append('status', status);
-    }
-    if (province) {
-      queryParams.append('province', province);
-    }
-    if (district) {
-      queryParams.append('district', district);
-    }
-
-    // Reuse PARTICIPANTS_LIST endpoint (same URL, different type param)
-    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
-    
-    // Log the complete API URL with query parameters
-    console.log('API URL:', endpoint);
-    const paramsObj: Record<string, string> = {};
-    queryParams.forEach((value, key) => {
-      paramsObj[key] = value;
-    });
-    console.log('Query Parameters:', paramsObj);
-
-    // Make POST request
-    const response = await api.post<UserSearchResponse>(endpoint, {
-      user_ids: user_ids || null,  // Different from participant_ids
-    });
-
-    return response.data;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
-    throw error;
-  }
-};
 
 /**
  * Get user roles list for filter dropdown - Dynamic role filter from API
@@ -444,7 +383,7 @@ export const getDistrictsByProvinceEntity = async (
       limit: limit.toString(),
     });
 
-    const endpoint = `${API_ENDPOINTS.SUB_ENTITIES_BY_PARENT}/${provinceEntityId}?${queryParams.toString()}`;
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${provinceEntityId}?${queryParams.toString()}`;
     
     // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
     const response = await api.get<{

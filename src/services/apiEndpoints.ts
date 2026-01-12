@@ -7,7 +7,6 @@ export const API_ENDPOINTS = {
     USER_ROLES_LIST: `${prefix}/user/v1/user-role/list`,  // Fetch available user roles for dynamic filter
     ENTITY_TYPES_LIST: `${prefix}/entity-management/v1/entityTypes/list`,  // Fetch entity types (province, district, etc.)
     ENTITIES_BY_TYPE: `${prefix}/entity-management/v1/entities/listByEntityType`,  // Fetch entities by type (e.g., provinces)
-    SUB_ENTITIES_BY_PARENT: `${prefix}/entity-management/v1/entities/subEntityList`,  // Fetch sub-entities by parent entity ID (e.g., districts by province)
     PARTICIPANTS_SUB_ENTITY_LIST: `${prefix}/entity-management/v1/entities/subEntityList`,
     ENTITY_DETAILS: `${prefix}/entity-management/v1/entities/details`,
 }

@@ -18,8 +18,7 @@ import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
 // API service for fetching users, roles, provinces, and districts
 import { 
-  getUsersList, 
-  UserSearchParams, 
+  getParticipantsList, 
   getRolesList, 
   Role,
   getEntityTypesList,
@@ -29,6 +28,7 @@ import {
   getDistrictsByProvinceEntity,
   DistrictEntity
 } from '../../services/participantService';
+import type { ParticipantSearchParams } from '@app-types/participant';
 import { Modal } from '@ui';
 import { theme } from '@config/theme';
 
@@ -311,7 +311,7 @@ const UserManagementScreen = () => {
           console.log('All Roles selected - using type:', apiType);
         }
 
-        const apiParams: UserSearchParams = {
+        const apiParams: ParticipantSearchParams = {
           tenant_code: 'brac',
           type: apiType,
           page: currentPage,
@@ -346,7 +346,7 @@ const UserManagementScreen = () => {
           apiParams.district = filters.district;
         }
 
-        const response = await getUsersList(apiParams);
+        const response = await getParticipantsList(apiParams);
         console.log('API response:', response);
         console.log('Users data:', response.result?.data);
         
