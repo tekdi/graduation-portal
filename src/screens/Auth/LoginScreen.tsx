@@ -50,10 +50,10 @@ const LoginScreen: React.FC = () => {
 
     try {
       // Use the login function from AuthContext with isAdmin flag based on current mode
-      const success = await login(email, password, isAdminMode);
-
-      if (!success) {
-        setError(isAdminMode ? t('login.adminLoginFailed') : t('login.invalidEmailOrPassword'));
+      const result = await login(email, password, isAdminMode);
+      if (!result.success) {
+        // Use the message from the login function, or fallback to default messages
+        setError(result.message || (isAdminMode ? t('login.adminLoginFailed') : t('login.invalidEmailOrPassword')));
       }
       // AuthContext already handles setting isLoggedIn and user state on success
     } catch (err: any) {

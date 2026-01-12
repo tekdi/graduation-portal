@@ -29,7 +29,6 @@ export const theme = {
         light: '#dc2626',
         dark: '#f87171',
       },
-      // Modal & UI colors
       modalBorder: '#8B2842',
       modalBackground: '#FFFFFF',
       modalBackdrop: 'rgba(0, 0, 0, 0.5)',
@@ -57,7 +56,6 @@ export const theme = {
       error700: '#c10007',
       error900: '#82181a',
       bgDestructive: '#ef4444',
-      // Status badge colors
       gray50: '#f9fafb',
       gray100: '#f6f3f4',
       gray300: '#d1d5dc',
@@ -76,29 +74,38 @@ export const theme = {
       success100: '#dcfce7',
       success300: '#7bf1a8',
       success700: '#008236',
-      // Background colors
       bgSecondary: '#f0f2f5',
-      // Hover states
       hoverBorder: '#C593A0',
-      // Icon colors - Cyan/Teal variants
       iconBgCyan: '#e0f7fa',
       iconCyan: '#00bcd4',
-      // Badge colors
       badgeSuccessBg: '#e6ffe6',
       badgeSuccessText: '#00b300',
       badgeInfoBg: '#eaf3ff',
       badgeInfoText: '#0b67e6',
-
-      // Task Card colors for nested project children
       taskCardBg: '#f8f9fa',
       taskCardBorder: '#e9ecef',
+      observationTaskBg: '#FFFBEB',        
+      observationTaskBorder: '#F59E0B',   
+      addedToPlanBg: '#DCFCE7',            
+      addedToPlanBorder: '#BBF7D0',       
+      optionalBadgeBg: '#DBEAFE',          
+      optionalBadgeText: '#1e40af',        
+      socialProtectionBg: '#FFF5F5',       
+      hoverPink: '#fef2f2',               
+      warningIconColor: '#ca8a04',        
+      infoIconColor: '#0284c7',            
+      stylesCardBg: '#F6F7FB',            
+      pillarSocialEmpowerment: '#9333ea',  
+      pillarLivelihoods: '#15803d',        
+      pillarFinancialInclusion: '#1d4ed8',
+      pillarSocialProtection: '#f97316',   
       borderColor : '#e2e8f0',
     },
     sizes: {
       ...((gluestackConfig.tokens as any).sizes || {}),
       container: {
-        0: '100%',     // mobile
-        sm: '540px',   // bootstrap container sm
+        0: '100%',     
+        sm: '540px',
         md: '720px',
         lg: '960px',
         xl: '1280px',

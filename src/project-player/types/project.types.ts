@@ -2,6 +2,7 @@ import {
   TASK_STATUS,
   PROJECT_STATUS,
   UPLOAD_STATUS,
+  TASK_TYPE,
 } from '../../constants/app.constant';
 
 export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
@@ -23,7 +24,7 @@ export interface Task {
   _id: string;
   name: string;
   description?: string;
-  type: 'simple' | 'file' | 'observation' | 'project' | 'profile-update';
+  type: (typeof TASK_TYPE)[keyof typeof TASK_TYPE];
   status?: TaskStatus;
   isRequired?: boolean;
   isCustomTask?: boolean; // Flag to identify user-created custom tasks
@@ -85,7 +86,7 @@ export interface RenderActionButtonProps {
   handleTaskClick: () => void;
   isReadOnly: boolean;
   isEdit: boolean;
-  t: (key: string) => string;
+  t: (key: string, values?: Record<string, unknown>) => string;
 }
 
 export interface RenderDividerProps {
@@ -108,5 +109,5 @@ export interface RenderModalsProps {
   onCloseModal: () => void;
   onConfirmDelete: () => void;
   taskName: string;
-  t: (key: string) => string;
+  t: (key: string, values?: Record<string, unknown>) => string;
 }
