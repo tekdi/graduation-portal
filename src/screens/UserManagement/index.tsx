@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { VStack, HStack, Button, Text, Image, Box, Pressable, Card, useToast, Toast, ToastTitle } from '@ui';
-import { View, Platform } from 'react-native';
+import { Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
 
 import UploadIcon from '../../assets/images/UploadIcon.png';
@@ -31,10 +31,6 @@ import {
 } from '../../services/participantService';
 import { Modal } from '@ui';
 import { theme } from '@config/theme';
-//import BulkOperationsCard from '../../components/BulkOperationsCard';
-// TODO: Add USER_MANAGEMENT_STATS constant
-// import StatCard, { StatsRow } from '@components/StatCard';
-// import { USER_MANAGEMENT_STATS } from '@constants/USER_MANAGEMENT_STATS';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -54,16 +50,12 @@ const UserManagementScreen = () => {
   
   // Roles state for dynamic filter
   const [roles, setRoles] = useState<Role[]>([]);
-  const [isLoadingRoles, setIsLoadingRoles] = useState(false);
-  const [roleMap, setRoleMap] = useState<Record<string, string>>({}); // Maps label → title
   
   // Provinces state for dynamic filter
   const [provinces, setProvinces] = useState<ProvinceEntity[]>([]);
-  const [isLoadingProvinces, setIsLoadingProvinces] = useState(false);
   
   // Districts state for dynamic filter
   const [districts, setDistricts] = useState<DistrictEntity[]>([]);
-  const [isLoadingDistricts, setIsLoadingDistricts] = useState(false);
   
   // File upload state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -107,7 +99,6 @@ const UserManagementScreen = () => {
   // Fetch roles from API on component mount - Dynamic role filter from API
   useEffect(() => {
     const fetchRoles = async () => {
-      setIsLoadingRoles(true);
       try {
         const response = await getRolesList({ page: 1, limit: 100 });
         const allRoles = response.result?.data || [];
@@ -115,21 +106,10 @@ const UserManagementScreen = () => {
         // Filter only ACTIVE roles for the dropdown
         const activeRoles = allRoles.filter((role: Role) => role.status === 'ACTIVE');
         setRoles(activeRoles);
-
-        // Build roleMap: label → title (e.g., "Supervisor" → "org_admin")
-        const newRoleMap: Record<string, string> = {};
-        activeRoles.forEach((role: Role) => {
-          if (role.label && role.title) {
-            newRoleMap[role.label] = role.title;
-          }
-        });
-        setRoleMap(newRoleMap);
       } catch (error) {
         console.error('Error fetching roles:', error);
         // Set empty array - filter will show only "All Roles" option
         setRoles([]);
-      } finally {
-        setIsLoadingRoles(false);
       }
     };
 
@@ -139,7 +119,6 @@ const UserManagementScreen = () => {
   // Fetch provinces from API on component mount - Dynamic province filter from API
   useEffect(() => {
     const fetchProvinces = async () => {
-      setIsLoadingProvinces(true);
       try {
         // First, check if entity types are in storage
         let entityTypes = await getEntityTypesFromStorage();
@@ -167,8 +146,6 @@ const UserManagementScreen = () => {
         console.error('Error fetching provinces:', error);
         // Set empty array - filter will show only "All Provinces" option
         setProvinces([]);
-      } finally {
-        setIsLoadingProvinces(false);
       }
     };
 
@@ -198,7 +175,6 @@ const UserManagementScreen = () => {
         return;
       }
 
-      setIsLoadingDistricts(true);
       try {
         // Find the selected province from provinces array to get its _id
         const selectedProvince = provinces.find(
@@ -211,17 +187,6 @@ const UserManagementScreen = () => {
           return;
         }
 
-        // Console log: Province selected
-        console.log('Province selected:', selectedProvince.name);
-
-        // Build API endpoint URL for districts (base URL is configured in axios instance)
-        const queryParams = new URLSearchParams({
-          type: 'district',
-          page: '1',
-          limit: '100',
-        });
-        const endpoint = `/api/entity-management/v1/entities/subEntityList/${selectedProvince._id}?${queryParams.toString()}`;
-
         // Fetch districts using the province's entity ID (_id)
         const response = await getDistrictsByProvinceEntity(selectedProvince._id, {
           page: 1,
@@ -231,15 +196,6 @@ const UserManagementScreen = () => {
         // Access districts from response.result.data (API returns { result: { count, data } })
         const districtsData = Array.isArray(response.result?.data) ? response.result.data : [];
         setDistricts(districtsData);
-
-        // Console log: List of districts (below province selection)
-        const districtNames = districtsData.length > 0 
-          ? districtsData.map((d: DistrictEntity) => d.name).join(', ')
-          : 'No districts found';
-        console.log('list of district of province:', districtNames);
-        
-        // Console log: API URL (endpoint path - base URL is configured in axios)
-        console.log('API url link getting send to District filter to fetch districts:', endpoint);
 
         // Clear district filter when new districts are loaded (to avoid invalid selections)
         setFilters((prev) => {
@@ -253,20 +209,11 @@ const UserManagementScreen = () => {
       } catch (error) {
         console.error('Error fetching districts:', error);
         setDistricts([]);
-      } finally {
-        setIsLoadingDistricts(false);
       }
     };
 
     fetchDistricts();
   }, [filters.province, provinces]);
-
-  // Map filter role labels to API role titles (using dynamic roleMap from API) - Maps display labels to API titles (e.g., "Supervisor" → "org_admin")
-  const mapRoleLabelToTitle = useCallback((roleLabel: string): string => {
-    const mappedRole = roleMap[roleLabel] || roleLabel;
-    console.log('Role mapping:', { roleLabel, mappedRole });
-    return mappedRole;
-  }, [roleMap]);
 
   // Map filter status labels to API status format - Maps display labels to API format (e.g., "Active" → "ACTIVE")
   const mapStatusLabelToAPI = useCallback((statusLabel: string): string => {
@@ -464,7 +411,7 @@ const UserManagementScreen = () => {
     };
 
     fetchUsers();
-  }, [filters, currentPage, pageSize, mapRoleLabelToTitle, mapStatusLabelToAPI]);
+  }, [filters, currentPage, pageSize, mapStatusLabelToAPI, roles]);
 
   // Handle filter changes and reset pagination
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
@@ -532,11 +479,6 @@ const UserManagementScreen = () => {
     }
   };
 
-  const handleAddUser = () => {
-    setIsUploadModalOpen(false);
-    // TODO: Handle add user
-    console.log('Add User clicked');
-  };
 
   return (
     <VStack space="md" width="100%">
@@ -676,25 +618,6 @@ const UserManagementScreen = () => {
         />
       </Box>
 
-      {/* <BulkOperationsCard/> */}
-
-      {/* Stats and Bulk Operations - Display after table */}
-      {/* TODO: Uncomment when USER_MANAGEMENT_STATS constant is available
-      <View style={{ marginTop: 24, width: '100%' }}>
-        <StatsRow>
-          {USER_MANAGEMENT_STATS.map((stat: any, index: number) => (
-            <StatCard
-              key={index}
-              title={stat.title}
-              count={stat.count}
-              subLabel={stat.subLabel}
-              color={stat.color}
-            />
-          ))}
-        </StatsRow>
-      </View>
-      */}
-      
       {/* Upload Users Modal */}
       <Modal
         isOpen={isUploadModalOpen}
