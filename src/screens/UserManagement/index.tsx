@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { VStack, HStack, Button, Text, Image, Box, useToast, Toast, ToastTitle } from '@ui';
-import { Platform } from 'react-native';
+import { VStack, HStack, Button, Text, Image, Box } from '@ui';
 import { LucideIcon } from '@ui/index';
 
 import UploadIcon from '../../assets/images/UploadIcon.png';
@@ -29,7 +28,6 @@ import {
   DistrictEntity
 } from '../../services/participantService';
 import type { ParticipantSearchParams } from '@app-types/participant';
-import { theme } from '@config/theme';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -37,7 +35,6 @@ import { theme } from '@config/theme';
 const UserManagementScreen = () => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
-  const toast = useToast();
   
   // API state management
   const [filters, setFilters] = useState<Record<string, any>>({});
@@ -57,19 +54,6 @@ const UserManagementScreen = () => {
   const [districts, setDistricts] = useState<DistrictEntity[]>([]);
   
   const columns = useMemo(() => getUsersColumns(), []);
-
-  // Toast helpers
-  const showErrorToast = (message: string) => {
-    toast.show({
-      placement: 'top',
-      render: ({ id }) => (
-        <Toast nativeID={id} action="error" variant="solid">
-          <ToastTitle>{message}</ToastTitle>
-        </Toast>
-      ),
-    });
-  };
-
 
   // Fetch roles from API on component mount - Dynamic role filter from API
   useEffect(() => {
