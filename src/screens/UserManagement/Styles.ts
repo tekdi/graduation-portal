@@ -40,7 +40,7 @@ export const styles = {
   
   },
   roleColors: {
-    Admin: '$error600' as const,
+    'BRAC admin': '$error600' as const,
     Supervisor: '$primary500' as const,
     'Linkage Champion': '$textMutedForeground' as const,
     Participant: '$white' as const,
