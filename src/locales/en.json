@@ -166,6 +166,7 @@
     "recentActivity": "Recent Activity",
     "menu": {
       "userManagement": "User Management",
+      "assignUsers": "Assign Users",
       "templateManagement": "Template Management",
       "auditLog": "Audit Log",
       "uploadUsers": "Upload Users",
@@ -217,7 +218,23 @@
       "participantsAllLevels": "Participants (all levels)",
       "linkageChampions": "Linkage Champions (supervisors+)",
       "otherSupervisors": "Other supervisors (admin only)"
-    }
+    },
+    "assignUsers": {
+     "step1SelectSupervisor": "Step 1: Select Supervisor",
+     "filterByProvince": "Filter by province and choose a supervisor",
+     "step2AssignLinkageChampions": "Step 2: Assign Linkage Champions",
+     "filterByGeography": "Filter by geography and select LCs to assign",
+     "chooseSupervisor": "Choose a supervisor to view their assigned LCs",
+     "step2SelectLC": "Step2: Select Linkage Champion",
+     "chooseLcFrom": "Choose an LC from {{supervisor}}'s team"
+   },
+    "filterByProvince": "Filter by Province",
+     "selectSupervisor": "Select Supervisor",
+     "allProvinces": "All Provinces",
+     "allDistrict": "ALl District",
+     "assignUsersDescription": "Assign Linkage Champions to Supervisors and Participants to LCs"
+
+    
   },
   "brand": {
     "primaryName": "brac",
