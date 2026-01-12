@@ -43,6 +43,7 @@ export const SearchFilter: FilterConfig = {
 };
 
 // Select filters (Role, Status, Province, District, etc.)
+// Note: Role, Province, and District filters are now dynamically populated from API in UserManagement screen
 export const FilterOptions: ReadonlyArray<FilterConfig> = [
   {
     nameKey: 'admin.filters.role',

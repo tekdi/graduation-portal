@@ -11,6 +11,7 @@ interface FilterButtonProps {
   // Configuration for right section (Clear Button)
   showClearButton?: boolean; // Show clear button (default: true)
   rightContent?: React.ReactNode; // Custom right content (overrides default clear button)
+  disabled?: boolean; // Disable filter (e.g., district when no province selected)
 }
 
 export default function FilterButton({ 
@@ -18,6 +19,7 @@ export default function FilterButton({
   onFilterChange,
   showClearButton = true,
   rightContent
+  // disabled prop is passed via data items - Used for district filter when no province selected
 }: FilterButtonProps) {
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
@@ -148,7 +150,7 @@ export default function FilterButton({
               return option;
             }) || []
           }
-          disabled={item.disabled}
+          disabled={item.disabled} // Disable filter when dependent filter not selected (e.g., district)
           {...filterStyles.input}
         />
       )}

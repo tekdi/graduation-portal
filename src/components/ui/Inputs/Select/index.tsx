@@ -33,7 +33,7 @@ type SelectProps = {
   placeholder?: string;
   bg?: string;
   borderColor?: string;
-  disabled?: boolean;
+  disabled?: boolean; // Support for disabling select (used in district filter)
 };
 
 export default function Select({

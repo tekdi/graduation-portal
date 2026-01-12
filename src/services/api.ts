@@ -48,7 +48,7 @@ api.interceptors.request.use(
         config.headers['x-auth-token'] = token;
       }
 
-      // Add internal-access-token header if available
+      // Add internal-access-token header if available - Required for entity-management API endpoints
       const internalAccessToken = await AsyncStorage.getItem(INTERNAL_ACCESS_TOKEN_KEY);
       if (internalAccessToken && config.headers) {
         config.headers['internal-access-token'] = internalAccessToken;

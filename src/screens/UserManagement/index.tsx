@@ -104,7 +104,7 @@ const UserManagementScreen = () => {
     return file.size <= maxSizeBytes;
   };
 
-  // Fetch roles from API on component mount
+  // Fetch roles from API on component mount - Dynamic role filter from API
   useEffect(() => {
     const fetchRoles = async () => {
       setIsLoadingRoles(true);
@@ -136,7 +136,7 @@ const UserManagementScreen = () => {
     fetchRoles();
   }, []);
 
-  // Fetch provinces from API on component mount
+  // Fetch provinces from API on component mount - Dynamic province filter from API
   useEffect(() => {
     const fetchProvinces = async () => {
       setIsLoadingProvinces(true);
@@ -175,7 +175,7 @@ const UserManagementScreen = () => {
     fetchProvinces();
   }, []);
 
-  // Fetch districts when province filter changes
+  // Fetch districts when province filter changes - Dynamic district filter based on selected province
   useEffect(() => {
     const fetchDistricts = async () => {
       // If no province selected or "All Provinces" is selected, clear districts
@@ -261,14 +261,23 @@ const UserManagementScreen = () => {
     fetchDistricts();
   }, [filters.province, provinces]);
 
-  // Map filter role labels to API role titles (using dynamic roleMap from API)
+  // Map filter role labels to API role titles (using dynamic roleMap from API) - Maps display labels to API titles (e.g., "Supervisor" → "org_admin")
   const mapRoleLabelToTitle = useCallback((roleLabel: string): string => {
     const mappedRole = roleMap[roleLabel] || roleLabel;
     console.log('Role mapping:', { roleLabel, mappedRole });
     return mappedRole;
   }, [roleMap]);
 
-  // Build dynamic filter options with API roles, provinces, and districts
+  // Map filter status labels to API status format - Maps display labels to API format (e.g., "Active" → "ACTIVE")
+  const mapStatusLabelToAPI = useCallback((statusLabel: string): string => {
+    const statusMap: Record<string, string> = {
+      'Active': 'ACTIVE',
+      'Deactivated': 'DEACTIVATED',
+    };
+    return statusMap[statusLabel] || statusLabel;
+  }, []);
+
+  // Build dynamic filter options with API roles, provinces, and districts - Replace hardcoded filters with API data
   const filterOptionsWithRoles = useMemo(() => {
     // Get status filter from FilterOptions
     const statusFilter = FilterOptions.find(f => f.attr === 'status');
@@ -359,7 +368,8 @@ const UserManagementScreen = () => {
         // Note: Role filter is handled via 'type' parameter above, not 'role' parameter
         // We don't send 'role' parameter to avoid duplication
         if (filters.status && filters.status !== 'all-status') {
-          apiParams.status = filters.status;
+          // Map status filter value to API format (e.g., "Active" → "ACTIVE")
+          apiParams.status = mapStatusLabelToAPI(filters.status);
         }
         if (filters.province && filters.province !== 'all-provinces') {
           // Since we're using province.name as both label and value, use it directly
@@ -389,7 +399,7 @@ const UserManagementScreen = () => {
     };
 
     fetchUsers();
-  }, [filters, currentPage, pageSize]);
+  }, [filters, currentPage, pageSize, mapRoleLabelToTitle, mapStatusLabelToAPI]);
 
   // Handle filter changes and reset pagination
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {

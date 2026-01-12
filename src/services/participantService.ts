@@ -242,7 +242,7 @@ export const getUsersList = async (
 };
 
 /**
- * Get user roles list for filter dropdown
+ * Get user roles list for filter dropdown - Dynamic role filter from API
  * Fetches available roles from the API with pagination support
  */
 export interface RolesListParams {
@@ -311,7 +311,7 @@ export interface ProvinceEntity {
 }
 
 /**
- * Get entity types list and store in local storage
+ * Get entity types list and store in local storage - Cache entity types for province/district filters
  * Stores entity type name-id pairs for later use
  */
 export const getEntityTypesList = async (): Promise<EntityTypesListResponse> => {
@@ -359,7 +359,7 @@ export const getEntityTypesFromStorage = async (): Promise<Record<string, string
 };
 
 /**
- * Get provinces list by entity type ID
+ * Get provinces list by entity type ID - Dynamic province filter from API
  * Uses the province entity type ID to fetch all provinces
  */
 export const getProvincesByEntityType = async (
@@ -397,7 +397,7 @@ export interface DistrictEntity {
 }
 
 /**
- * Get districts list by province entity ID
+ * Get districts list by province entity ID - Dynamic district filter based on selected province
  * Uses the province entity ID to fetch all districts for that province
  */
 export const getDistrictsByProvinceEntity = async (
