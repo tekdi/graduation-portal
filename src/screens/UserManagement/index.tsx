@@ -12,7 +12,7 @@ import TitleHeader from '@components/TitleHeader';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import DataTable from '@components/DataTable';
 import { getUsersColumns } from './UsersTableConfig';
-import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
+import { AdminUserManagementData } from '@app-types/participant';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
@@ -42,7 +42,7 @@ const UserManagementScreen = () => {
   
   // API state management
   const [filters, setFilters] = useState<Record<string, any>>({});
-  const [users, setUsers] = useState<User[]>([]);
+  const [users, setUsers] = useState<AdminUserManagementData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
@@ -419,11 +419,6 @@ const UserManagementScreen = () => {
     setCurrentPage(1); // Reset to first page when filters change
   }, []);
 
-  const handleRowClick = useCallback((user: User) => {
-    // Handle row click - navigate to user details
-    console.log('User clicked:', user);
-  }, []);
-
   // Handle CSV upload: closes options modal and triggers native file picker
   const handleUploadCSV = () => {
     setIsUploadModalOpen(false);
@@ -607,7 +602,6 @@ const UserManagementScreen = () => {
         <DataTable
           data={users}
           columns={columns}
-          onRowClick={handleRowClick}
           getRowKey={(user) => user.id}
           isLoading={isLoading}
           pagination={{

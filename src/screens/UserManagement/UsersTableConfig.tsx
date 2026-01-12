@@ -5,7 +5,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { LucideIcon, Menu } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { theme } from '@config/theme';
-import { User } from '@constants/USER_MANAGEMENT_MOCK_DATA';
+import { AdminUserManagementData } from '@app-types/participant';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
 import { MenuItemData } from '@components/ui/Menu';
 import { styles } from './Styles';
@@ -83,7 +83,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
  * Details Component
  * Shows either assigned count or progress bar
  */
-const DetailsCell: React.FC<{ details: User['details'] }> = ({ details }) => {
+const DetailsCell: React.FC<{ details: AdminUserManagementData['details'] }> = ({ details }) => {
   if (!details) {
     return null;
   }
@@ -172,7 +172,7 @@ const getUserMenuItems = (t: (key: string) => string): MenuItemData[] => [
 /**
  * Actions Column Component
  */
-const ActionsColumn: React.FC<{ user: User }> = ({ user }) => {
+const ActionsColumn: React.FC<{ user: AdminUserManagementData }> = ({ user }) => {
   const { t } = useLanguage();
 
   const handleMenuSelect = (key: string) => {
@@ -214,7 +214,7 @@ const ActionsColumn: React.FC<{ user: User }> = ({ user }) => {
 /**
  * All possible columns for Users Table
  */
-export const getUsersColumns = (): ColumnDef<User>[] => [
+export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
   {
     key: 'name',
     label: 'admin.users.name',
