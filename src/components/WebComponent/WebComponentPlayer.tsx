@@ -16,7 +16,7 @@ interface PlayerConfigProps {
    * }
    */
   playerConfig: any;
-  getProgress: (progress: number) => void;
+  getProgress: (progress: number | { data: { percentage: number }; type: string }) => void;
 }
 
 const WebComponentPlayer = ({ playerConfig, getProgress }: PlayerConfigProps) => {

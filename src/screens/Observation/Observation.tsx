@@ -1,33 +1,47 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import WebComponentPlayer from '@components/WebComponent/WebComponentPlayer';
-import {
-  Container,
-  Spinner,
-  useAlert,
-  HStack,
-  VStack,
-  Text,
-  Box,
-  Pressable,
-  Progress,
-  ProgressFilledTrack,
-  LucideIcon,
-} from '@ui';
+import { Container, Spinner, useAlert, VStack, Box } from '@ui';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { getToken } from '../../services/api';
 import {
   getObservationEntities,
   getObservationSolution,
+  getObservationSubmissions,
   searchObservationEntities,
   updateObservationEntities,
 } from '../../services/solutionService';
-import { isWeb } from '@utils/platform';
 import { useLanguage } from '@contexts/LanguageContext';
+import Header from './Header';
+import offlineStorage from '../../services/offlineStorage';
 
 interface ObservationData {
   entityId: string;
   observationId: string;
 }
+
+// Memoize WebComponentPlayer with custom comparison to ignore getProgress prop changes
+const WebComponentPlayerMemoized = React.memo(WebComponentPlayer, (prevProps, nextProps) => {
+  // Only rerender if playerConfig actually changes (shallow comparison), ignore getProgress changes
+  const prevConfig = prevProps.playerConfig;
+  const nextConfig = nextProps.playerConfig;
+  
+  // Compare key properties of playerConfig
+  return (
+    prevConfig?.baseURL === nextConfig?.baseURL &&
+    prevConfig?.fileSizeLimit === nextConfig?.fileSizeLimit &&
+    prevConfig?.userAuthToken === nextConfig?.userAuthToken &&
+    prevConfig?.solutionType === nextConfig?.solutionType &&
+    prevConfig?.observationId === nextConfig?.observationId &&
+    prevConfig?.entityId === nextConfig?.entityId &&
+    prevConfig?.evidenceCode === nextConfig?.evidenceCode &&
+    prevConfig?.index === nextConfig?.index &&
+    prevConfig?.submissionNumber === nextConfig?.submissionNumber &&
+    prevConfig?.solutionId === nextConfig?.solutionId &&
+    prevConfig?.showSaveDraftButton === nextConfig?.showSaveDraftButton &&
+    prevConfig?.progressCalculationLevel === nextConfig?.progressCalculationLevel &&
+    prevConfig?.mockData === nextConfig?.mockData
+  );
+});
 
 const Observation = () => {
   const route = useRoute();
@@ -49,30 +63,48 @@ const Observation = () => {
   const [token, setToken] = useState<string | null>(null);
   const [mockData, setMockData] = useState<any>({});
 
-  const fetchObservationSolution = async ({entityId, observationId, submissionNumber, evidenceCode}: {entityId: string, observationId: string, submissionNumber: number, evidenceCode: string}) => {  
+  // Use ref to store progress callback to avoid prop changes causing rerenders
+  const progressCallbackRef = useRef<(progressValue: number | { data: { percentage: number }; type: string }) => void | undefined>(undefined);
+
+  const fetchObservationSolution = async ({entityId, observationId,submissionNumber,evidenceCode}: {entityId: string; observationId: string; submissionNumber: number; evidenceCode: string}) => {
     try {
-      const observationSolution = await getObservationSolution({
+      const observationSubmissions = await getObservationSubmissions({
         observationId,
         entityId,
-        submissionNumber,
-        evidenceCode,
       });
-      console.log('observationSolution', observationSolution);
-      setMockData(observationSolution?.result);
+      let observationSolution: any = null;
+      if (observationSubmissions.result.length > 0) {
+        const submissionId = observationSubmissions.result[0]._id;
+        observationSolution = await offlineStorage.read(submissionId, {
+          dbName: 'questionnairePlayer',
+          storeName: 'questionnaire',
+        });
+        // submissionNumber = observationSubmissions.result[0].submissionNumber;
+      } else {
+        // submissionNumber = 1;
+      }
+
+      if (!observationSolution) {
+        const response = await getObservationSolution({
+          observationId,
+          entityId,
+          submissionNumber,
+          evidenceCode,
+        });
+        observationSolution = response.result;
+      }
+      setMockData(observationSolution);
       setObservation({
         entityId: entityId,
         observationId: observationId,
       });
     } catch (error) {
-      showAlert(
-        'error',
-        t('observation.noParticipantFoundError') + error,
-        {
-          duration: 10000,
-        },
-      );
+      showAlert('error', t('observation.noParticipantFoundError') + error, {
+        duration: 10000,
+      });
     }
-  }
+  };
+  
   useEffect(() => {
     const fetchObservation = async () => {
       const tokenData = await getToken();
@@ -116,7 +148,6 @@ const Observation = () => {
                 observationId,
                 data: [entityData._id],
               });
-              console.log('data', data);
               if (data) {
                 fetchObservationSolution({
                   entityId: entityData._id,
@@ -155,115 +186,85 @@ const Observation = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionId, id]);
 
-  const handleBackPress = () => {
+  const handleBackPress = useCallback(() => {
     if (navigation.canGoBack && navigation.canGoBack()) {
       navigation.goBack();
     } else {
       // Fallback: Navigate to participant detail if there's no previous screen
       // @ts-ignore
-      navigation.navigate('participant-detail', { id: route.params?.id });
+      navigation.navigate('participant-detail', { id });
     }
-  };
+  }, [navigation, id]);
 
-  const handleProgressUpdate = (progressValue: number) => {
-    setProgress(Math.round(progressValue));
-    console.log('progressValue', progressValue);
-  };
+  // Update ref whenever callback changes
+  useEffect(() => {
+    progressCallbackRef.current = (
+      progressValue: number | { data: { percentage: number }; type: string },
+    ) => {
+      if (typeof progressValue === 'number') {
+        setProgress(Math.round(progressValue));
+      } else {
+        setProgress(Math.round(progressValue?.data?.percentage || 0));
+      }
+    };
+  }, []);
+
+  // Stable callback that uses ref - this won't change between renders
+  const handleProgressUpdate = useCallback(
+    (
+      progressValue: number | { data: { percentage: number }; type: string },
+    ) => {
+      progressCallbackRef.current?.(progressValue);
+    },
+    [],
+  );
+
+  // Memoize playerConfig to prevent WebComponentPlayer rerenders
+  const playerConfigMemoized = useMemo(
+    () => ({
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web
+      baseURL: `${process.env.API_BASE_URL}/api`,
+      fileSizeLimit: 50,
+      userAuthToken: token,
+      solutionType: 'observation' as const,
+      observationId: observation?.observationId,
+      entityId: observation?.entityId,
+      evidenceCode: 'OB',
+      index: 0,
+      submissionNumber: 1,
+      solutionId: observation?.observationId,
+      showSaveDraftButton: true,
+      progressCalculationLevel: 'input' as const,
+      mockData: mockData,
+    }),
+    [token, observation?.observationId, observation?.entityId, mockData],
+  );
 
   if (loading) {
     return (
-      <Spinner
-        height={isWeb ? '$calc(100vh - 68px)' : '$full'}
-        size="large"
-        color="$primary500"
-      />
+      <VStack flex={1} justifyContent="center" alignItems="center">
+        <Spinner size="large" color="$primary500" />
+      </VStack>
     );
   }
   
   return (
     <VStack flex={1} backgroundColor="$accent100">
       {/* Header Section */}
-      <VStack space="md" padding="$4" backgroundColor="$white">
-        {/* Top Row: Back Button and Action Buttons */}
-        <HStack
-          justifyContent="space-between"
-          alignItems="flex-start"
-          width="$full"
-        >
-          {/* Back Button */}
-          <Pressable onPress={handleBackPress}>
-            <HStack alignItems="center" space="xs">
-              <LucideIcon name="ArrowLeft" size={20} color="$textPrimary" />
-              {t('common.back')}
-            </HStack>
-          </Pressable>
-        </HStack>
+      <Header
+        title={mockData?.solution?.name || ''}
+        progress={progress}
+        participantInfo={participantInfo}
+        onBackPress={handleBackPress}
+      />
 
-        {/* Title and Progress Badge Row */}
-        <HStack
-          justifyContent="space-between"
-          alignItems="center"
-          width="$full"
-          marginTop="$2"
-        >
-          <Text
-            fontSize="$xl"
-            fontWeight="$semibold"
-            color="$textPrimary"
-            flex={1}
-          >
-            {t('logVisit.individualEnterpriseVisit.title')}
-          </Text>
-
-          {/* Progress Badge */}
-          <Box
-            backgroundColor="$gray100"
-            paddingHorizontal="$3"
-            paddingVertical="$1"
-            borderRadius="$full"
-          >
-            <Text fontSize="$sm" color="$gray700" fontWeight="$medium">
-              {progress}% {t('common.complete') || 'Complete'}
-            </Text>
-          </Box>
-        </HStack>
-
-        {/* Progress Bar */}
-        <Box width="$full" marginTop="$2">
-          <Progress value={progress} width="$full" size="md">
-            <ProgressFilledTrack backgroundColor="$blue600" />
-          </Progress>
-        </Box>
-
-        {/* Participant Name and Date */}
-        {participantInfo && (
-          <Text fontSize="$sm" color="$textSecondary" marginTop="$2">
-            {participantInfo.name} • {participantInfo.date}
-          </Text>
-        )}
-      </VStack>
       <Container>
         {/* Web Component Player */}
         <Box flex={1} marginTop="$4">
           {mockData && (
-            <WebComponentPlayer
+            <WebComponentPlayerMemoized
               getProgress={handleProgressUpdate}
-              playerConfig={{
-                // @ts-ignore - process.env is injected by webpack DefinePlugin on web
-                baseURL: `${process.env.API_BASE_URL}/api`,
-                fileSizeLimit: 50,
-                userAuthToken: token,
-                solutionType: 'observation',
-                observationId: observation?.observationId,
-                entityId: observation?.entityId,
-                // evidenceCode: 'OB',
-                // index: 0,
-                submissionNumber: 1,
-                solutionId: observation?.observationId,
-                showSaveDraftButton: true,
-                onProgress: handleProgressUpdate,
-                mockData: mockData,
-              }}
+              playerConfig={playerConfigMemoized}
             />
           )}
         </Box>
