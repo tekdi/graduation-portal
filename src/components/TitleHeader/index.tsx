@@ -2,6 +2,7 @@ import React from 'react';
 import { HStack, VStack, Text } from '@ui';
 import { titleHeaderStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
+import { usePlatform } from '@utils/platform';
 
 export interface TitleHeaderProps {
   title: string; // Translation key for the header title
@@ -9,29 +10,38 @@ export interface TitleHeaderProps {
   right?: React.ReactNode;
 }
 
-const TitleHeader: React.FC<TitleHeaderProps> = ({ title, description, right }) => {
+const TitleHeader: React.FC<TitleHeaderProps> = ({
+  title,
+  description,
+  right,
+}) => {
   const { t } = useLanguage();
-  
+  const { isMobile } = usePlatform();
+
   return (
-    <HStack 
-      justifyContent="space-between" 
-      alignItems="flex-start" 
-      width="100%"
+    <HStack
+      justifyContent={isMobile ? 'flex-start' : 'space-between'}
+      alignItems={isMobile ? 'flex-start' : 'center'}
       flexWrap="wrap"
+      width="100%"
     >
       <VStack {...titleHeaderStyles.textContainer} flex={1}>
         <Text {...titleHeaderStyles.titleText}>{t(title)}</Text>
         <Text {...titleHeaderStyles.descriptionText}>{t(description)}</Text>
       </VStack>
-      
+
       {/* 
         Conditionally render right-side content (action buttons, icons, etc.)
         - Only renders if 'right' prop is provided (not null/undefined)
-        - Wraps in VStack with flex-end alignment to position content on the right
+        - On mobile: wraps in VStack to stack buttons vertically
+        - On desktop: wraps in VStack with flex-end alignment to position content on the right
         - This allows screens to optionally include action buttons without breaking layout
       */}
       {right && (
-        <VStack alignItems="flex-end">
+        <VStack
+          alignItems={isMobile ? 'stretch' : 'flex-end'}
+          width={isMobile ? '$full' : undefined}
+        >
           {right}
         </VStack>
       )}
@@ -40,4 +50,3 @@ const TitleHeader: React.FC<TitleHeaderProps> = ({ title, description, right }) 
 };
 
 export default TitleHeader;
-

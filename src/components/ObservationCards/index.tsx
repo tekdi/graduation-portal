@@ -7,6 +7,7 @@ import { LucideIcon } from '@ui';
 import { assessmentSurveyCardStyles } from './Styles';
 import { theme } from '@config/theme';
 import { CARD_STATUS } from '@constants/app.constant';
+import logger from '@utils/logger';
 
 /**
  * AssessmentCard Component
@@ -14,6 +15,7 @@ import { CARD_STATUS } from '@constants/app.constant';
  */
 export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   card,
+  userId
 }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
@@ -71,10 +73,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
             {...assessmentSurveyCardStyles.iconContainer}
             bg={getIconBackgroundColor()}
           >
-            <LucideIcon
-              name={icon}
-              size={24}
-            />
+            <LucideIcon name={icon} size={24} />
           </Box>
           <VStack flex={1} space="md">
             <Text {...assessmentSurveyCardStyles.title}>{t(title)}</Text>
@@ -91,45 +90,51 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
               )}
             </VStack>
 
-      {/* Action Button */}
-      {actionButton && (
-        <Button
-          {...getButtonStyle()}
-          onPress={() => {
-            if (actionButton.onPress) {
-              actionButton.onPress();
-            } else {
-              // Default action - can be customized
-              console.log(`Action: ${actionButton.label}`);
-            }
-          }}
-        >
-          <HStack alignItems="center" gap="$2">
-            <LucideIcon
-              name={actionButton.icon}
-              size={16}
-              color={
-                actionButton.variant === 'primary'
-                  ? theme.tokens.colors.white
-                  : theme.tokens.colors.textForeground
-              }
-            />
-            <ButtonText
-              {...assessmentSurveyCardStyles.buttonText}
-              color={
-                actionButton.variant === 'primary'
-                  ? '$white'
-                  : '$textForeground'
-              }
-            >
-              {t(actionButton.label)}
-            </ButtonText>
-          </HStack>
-        </Button>
-      )}
+            {/* Action Button */}
+            {actionButton && (
+              <Button
+                {...getButtonStyle()}
+                onPress={() => {
+                  if(navigationUrl && userId) {
+                    // @ts-ignore
+                    navigation.navigate(navigationUrl as never, { id: userId || '',observationId:card?.id });
+                  } else {
+                    logger.log('userId is required');
+                  }
+                  if (actionButton.onPress) {
+                    actionButton.onPress();
+                  } else {
+                    // Default action - can be customized
+                    logger.log(`Action: ${actionButton.label}`);
+                  }
+                }}
+              >
+                <HStack alignItems="center" gap="$2">
+                  <LucideIcon
+                    name={actionButton.icon}
+                    size={16}
+                    color={
+                      actionButton.variant === 'primary'
+                        ? theme.tokens.colors.white
+                        : theme.tokens.colors.textForeground
+                    }
+                  />
+                  <ButtonText
+                    {...assessmentSurveyCardStyles.buttonText}
+                    color={
+                      actionButton.variant === 'primary'
+                        ? '$white'
+                        : '$textForeground'
+                    }
+                  >
+                    {t(actionButton.label)}
+                  </ButtonText>
+                </HStack>
+              </Button>
+            )}
           </VStack>
         </HStack>
-        
+
         {/* Status Badge - only show if status exists */}
         {status && (
           <Box {...getStatusBadgeStyle()}>
@@ -157,13 +162,13 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
             </HStack>
           </Box>
         )}
-        
+
         {/* Navigation Arrow - show if navigationUrl exists */}
         {navigationUrl && (
           <Pressable
             onPress={() => {
               // @ts-ignore
-              navigation.navigate(navigationUrl);
+              navigation.navigate(navigationUrl as never, { id: card?.id || '',observationId:123 });
             }}
             $web-cursor="pointer"
           >

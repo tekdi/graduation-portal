@@ -24,12 +24,7 @@ import {
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import { taskCardStyles } from './Styles';
-import {
-  getTaskButtonText,
-  getTaskButtonIconName,
-  getStatusCircleColor,
-  getCompletedTaskTextStyle,
-} from './helpers';
+import { getStatusCircleColor, getCompletedTaskTextStyle } from './helpers';
 import Modal from '@ui/Modal';
 import AddCustomTaskModal from './AddCustomTaskModal';
 
@@ -166,12 +161,11 @@ export const renderTaskInfo = ({
 export const renderActionButton = ({
   showActionButton,
   showAsCard,
-  taskType,
   isUploading,
   handleTaskClick,
   isReadOnly,
   isEdit,
-  t,
+  metaInfo,
 }: RenderActionButtonProps): React.ReactElement | null => {
   if (!showActionButton) return null;
 
@@ -179,7 +173,7 @@ export const renderActionButton = ({
     ? taskCardStyles.actionButtonCard
     : taskCardStyles.actionButtonInline;
 
-  const iconName = getTaskButtonIconName(taskType);
+  const iconName = metaInfo?.icon;
 
   return (
     <Button
@@ -214,7 +208,7 @@ export const renderActionButton = ({
             },
           }}
         >
-          {getTaskButtonText(taskType, isUploading, t)}
+          {metaInfo.buttonLabel}
         </ButtonText>
       </HStack>
     </Button>
@@ -317,13 +311,16 @@ export const renderModals = ({
       <Modal
         isOpen={modalState.type === 'delete'}
         onClose={onCloseModal}
-        variant="confirmation"
-        title="projectPlayer.deleteTask"
-        message={t('projectPlayer.confirmDeleteTask', { taskName })}
+        headerTitle={t('projectPlayer.deleteTask')}
+        confirmButtonText={t('common.delete')}
+        cancelButtonText={t('common.cancel')}
         onConfirm={onConfirmDelete}
-        confirmText="common.delete"
-        cancelText="common.cancel"
-      />
+        confirmButtonColor={theme.tokens.colors.primary500}
+      >
+        <Text {...TYPOGRAPHY.paragraph} color="$textSecondary">
+          {t('projectPlayer.confirmDeleteTask', { taskName })}
+        </Text>
+      </Modal>
     </>
   );
 };
