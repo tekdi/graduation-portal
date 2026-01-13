@@ -90,14 +90,12 @@ const DetailsCell: React.FC<{ details: AdminUserManagementData['details'] }> = (
 
   if (details.type === 'assigned') {
     return (
-      <Pressable $web-cursor="pointer">
         <Text
           {...TYPOGRAPHY.bodySmall}
           {...styles.districtText}
         >
           {details.value} assigned
         </Text>
-      </Pressable>
     );
   }
 
@@ -303,11 +301,9 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
     label: 'admin.users.district',
     flex: 1.2,
     render: (user: any) => (
-      <Pressable $web-cursor="pointer">
         <Text {...TYPOGRAPHY.paragraph} {...styles.districtText}>
           {getDistrict(user)}
         </Text>
-      </Pressable>
     ),
     mobileConfig: {
       rightRank: 3,
