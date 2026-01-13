@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import WebComponentPlayer from '@components/WebComponent/WebComponentPlayer';
 import { Container, Spinner, useAlert, VStack, Box } from '@ui';
 import { useRoute, useNavigation } from '@react-navigation/native';
@@ -13,35 +13,12 @@ import {
 import { useLanguage } from '@contexts/LanguageContext';
 import Header from './Header';
 import offlineStorage from '../../services/offlineStorage';
-
+import { ENTITY_TYPE } from '@constants/ROLES';
+import { observationStyles } from './Styles';
 interface ObservationData {
   entityId: string;
   observationId: string;
 }
-
-// Memoize WebComponentPlayer with custom comparison to ignore getProgress prop changes
-const WebComponentPlayerMemoized = React.memo(WebComponentPlayer, (prevProps, nextProps) => {
-  // Only rerender if playerConfig actually changes (shallow comparison), ignore getProgress changes
-  const prevConfig = prevProps.playerConfig;
-  const nextConfig = nextProps.playerConfig;
-  
-  // Compare key properties of playerConfig
-  return (
-    prevConfig?.baseURL === nextConfig?.baseURL &&
-    prevConfig?.fileSizeLimit === nextConfig?.fileSizeLimit &&
-    prevConfig?.userAuthToken === nextConfig?.userAuthToken &&
-    prevConfig?.solutionType === nextConfig?.solutionType &&
-    prevConfig?.observationId === nextConfig?.observationId &&
-    prevConfig?.entityId === nextConfig?.entityId &&
-    prevConfig?.evidenceCode === nextConfig?.evidenceCode &&
-    prevConfig?.index === nextConfig?.index &&
-    prevConfig?.submissionNumber === nextConfig?.submissionNumber &&
-    prevConfig?.solutionId === nextConfig?.solutionId &&
-    prevConfig?.showSaveDraftButton === nextConfig?.showSaveDraftButton &&
-    prevConfig?.progressCalculationLevel === nextConfig?.progressCalculationLevel &&
-    prevConfig?.mockData === nextConfig?.mockData
-  );
-});
 
 const Observation = () => {
   const route = useRoute();
@@ -64,9 +41,24 @@ const Observation = () => {
   const [mockData, setMockData] = useState<any>({});
 
   // Use ref to store progress callback to avoid prop changes causing rerenders
-  const progressCallbackRef = useRef<(progressValue: number | { data: { percentage: number }; type: string }) => void | undefined>(undefined);
+  const progressCallbackRef =
+    useRef<
+      (
+        progressValue: number | { data: { percentage: number }; type: string },
+      ) => void | undefined
+    >(undefined);
 
-  const fetchObservationSolution = async ({entityId, observationId,submissionNumber,evidenceCode}: {entityId: string; observationId: string; submissionNumber: number; evidenceCode: string}) => {
+  const fetchObservationSolution = async ({
+    entityId,
+    observationId,
+    submissionNumber,
+    evidenceCode,
+  }: {
+    entityId: string;
+    observationId: string;
+    submissionNumber: number;
+    evidenceCode: string;
+  }) => {
     try {
       const observationSubmissions = await getObservationSubmissions({
         observationId,
@@ -99,12 +91,22 @@ const Observation = () => {
         observationId: observationId,
       });
     } catch (error: any) {
-      showAlert('error', `${t('observation.noParticipantFoundError')} : ${error.message}`, {
-        duration: 10000,
-      });
+      showAlert(
+        'error',
+        `${t('observation.noParticipantFoundError')} : ${error.message}`,
+        {
+          duration: 10000,
+        },
+      );
     }
   };
-  
+
+  const setLoadingOff = () => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 500);
+  };
+
   useEffect(() => {
     const fetchObservation = async () => {
       const tokenData = await getToken();
@@ -115,7 +117,7 @@ const Observation = () => {
       });
       const observationId = observationData?.result?._id;
       if (
-        observationData.result?.entityType === 'participant' &&
+        observationData.result?.entityType === ENTITY_TYPE.PARTICIPANT &&
         Array.isArray(observationData.result?.entities)
       ) {
         const newData = observationData.result.entities.find(
@@ -130,10 +132,10 @@ const Observation = () => {
           });
           // Set participant info
           setParticipantInfo({
-            name: newData.name || 'Participant',
+            name: newData.name || '',
             date: new Date().toISOString().split('T')[0],
           });
-          setLoading(false);
+          setLoadingOff();
         } else if (observationId) {
           const entitiesData = await searchObservationEntities({
             observationId: observationId,
@@ -160,23 +162,26 @@ const Observation = () => {
                   name: entityData.name || 'Participant',
                   date: new Date().toISOString().split('T')[0],
                 });
-                setLoading(false);
+                setLoadingOff();
               }
             } catch (error: any) {
-              showAlert('error',
-                `${t('observation.noParticipantFoundError')} : ${error.message}`,
-                { duration: 10000 }
+              showAlert(
+                'error',
+                `${t('observation.noParticipantFoundError')} : ${
+                  error.message
+                }`,
+                { duration: 10000 },
               );
-              setLoading(false);
+              setLoadingOff();
             }
           }
         } else {
           showAlert('error', t('observation.noParticipantFound'));
-          setLoading(false);
+          setLoadingOff();
         }
       } else {
         showAlert('error', t('observation.noParticipantFound'));
-        setLoading(false);
+        setLoadingOff();
       }
     };
     if (solutionId && id) {
@@ -185,7 +190,7 @@ const Observation = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionId, id]);
 
-  const handleBackPress = useCallback(() => {    
+  const handleBackPress = useCallback(() => {
     if (navigation.canGoBack && navigation.canGoBack()) {
       navigation.goBack();
       return false;
@@ -201,11 +206,12 @@ const Observation = () => {
     progressCallbackRef.current = (
       progressValue: number | { data: { percentage: number }; type: string },
     ) => {
-      if (typeof progressValue === 'number') {
-        setProgress(Math.round(progressValue));
-      } else {
-        setProgress(Math.round(progressValue?.data?.percentage || 0));
-      }
+      setProgress(
+        Math.round(
+          (progressValue as { data: { percentage: number } }).data
+            ?.percentage || 0,
+        ),
+      );
     };
   }, []);
 
@@ -220,7 +226,7 @@ const Observation = () => {
   );
 
   // Memoize playerConfig to prevent WebComponentPlayer rerenders
-  const playerConfigMemoized = useMemo(
+  const playerConfigMemoized = React.useMemo(
     () => ({
       // @ts-ignore - process.env is injected by webpack DefinePlugin on web
       baseURL: `${process.env.API_BASE_URL}/api`,
@@ -236,38 +242,43 @@ const Observation = () => {
       showSaveDraftButton: true,
       progressCalculationLevel: 'input' as const,
       mockData: mockData,
+      usePageQuestionsGrid: true,
     }),
     [token, observation?.observationId, observation?.entityId, mockData],
   );
 
-  if (loading) {
-    return (
-      <VStack flex={1} justifyContent="center" alignItems="center">
+  return (
+    <>
+      <VStack
+        {...observationStyles.loadingContainer}
+        display={loading ? 'flex' : 'none'}
+      >
         <Spinner size="large" color="$primary500" />
       </VStack>
-    );
-  }
-  
-  return (
-    <VStack flex={1} backgroundColor="$accent100">
-      {/* Header Section */}
-      <Header
-        title={mockData?.solution?.name || ''}
-        progress={progress}
-        participantInfo={participantInfo}
-        onBackPress={handleBackPress}
-      />
 
-      <Container>
-        {/* Web Component Player */}
-        <Box flex={1} marginTop="$4">
-          <WebComponentPlayerMemoized
-            getProgress={handleProgressUpdate}
-            playerConfig={playerConfigMemoized}
-          />
-        </Box>
-      </Container>
-    </VStack>
+      <VStack
+        {...observationStyles.contentContainer}
+        display={loading ? 'none' : 'flex'}
+      >
+        {/* Header Section */}
+        <Header
+          title={mockData?.solution?.name || ''}
+          progress={progress}
+          participantInfo={participantInfo}
+          onBackPress={handleBackPress}
+        />
+
+        <Container>
+          {/* Web Component Player */}
+          <Box {...observationStyles.webComponentPlayerContainer}>
+            <WebComponentPlayer
+              getProgress={handleProgressUpdate}
+              playerConfig={playerConfigMemoized}
+            />
+          </Box>
+        </Container>
+      </VStack>
+    </>
   );
 };
 

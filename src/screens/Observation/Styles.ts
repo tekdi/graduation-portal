@@ -54,4 +54,23 @@ export const observationStyles = {
     color: '$textSecondary' as const,
     marginTop: '$2' as const,
   },
+  loadingContainer: {
+    position: 'absolute' as const,
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    backgroundColor: '$white' as const,
+    zIndex: 1,
+  },
+  contentContainer: {
+    flex: 1 as const,
+    backgroundColor: '$accent100' as const,
+  },
+  webComponentPlayerContainer: {
+    flex: 1 as const,
+    marginTop: '$4' as const,
+  },
 } as const;

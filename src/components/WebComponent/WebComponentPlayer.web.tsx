@@ -274,4 +274,4 @@ const WebComponentPlayer: React.FC<PlayerConfigProps> = ({ playerConfig, getProg
   );
 };
 
-export default WebComponentPlayer;
+export default React.memo(WebComponentPlayer);

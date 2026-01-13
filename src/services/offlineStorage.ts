@@ -21,7 +21,7 @@ export interface IndexedDBConfig {
  */
 const initIndexedDB = (dbName: string, storeName: string): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
-    if (typeof indexedDB === 'undefined') {
+    if (Platform.OS !== 'web') {
       return reject(new Error('IndexedDB not available in this environment'));
     }
     const request = indexedDB.open(dbName, 1);
@@ -104,7 +104,7 @@ export const read = async <T>(
         indexedDBConfig.storeName
       );
       
-      if (data === null) {
+      if (!data) {
         logger.info(`OfflineStorage: Key "${key}" not found in IndexedDB`);
         return null;
       }
@@ -114,7 +114,7 @@ export const read = async <T>(
 
     // Default to AsyncStorage
     const jsonData = await AsyncStorage.getItem(key);
-    if (jsonData === null) {
+    if (!jsonData) {
       logger.info(`OfflineStorage: Key "${key}" not found`);
       return null;
     }
