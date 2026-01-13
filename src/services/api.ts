@@ -9,6 +9,7 @@ import logger from '@utils/logger';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 // import { API_BASE_URL, ORIGIN } from '@config/env';
 import offlineStorage from './offlineStorage';
+import { isAndroid } from '@utils/platform';
 
 // Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
 declare const process:
@@ -35,7 +36,7 @@ const api: AxiosInstance = axios.create({
     Accept: 'application/json, text/plain, */*',
     'internal-access-token': '9yG*tM*y(7)',
     // @ts-ignore - process.env is injected by webpack DefinePlugin on web
-    origin: process.env.ORIGIN || '',
+    ...(!isAndroid ? {} : { origin: process.env.ORIGIN || '' }),
   },
 });
 

@@ -34,8 +34,8 @@ form.main {
   position: relative !important;
 }
 .mat-mdc-tab-body-wrapper {
-  max-height: calc(100vh - 180px) !important;
-  min-height: calc(100vh - 180px) !important;
+  max-height: calc(100vh - 357px) !important;
+  min-height: calc(100vh - 357px) !important;
 }
 .top-primary-border {
   border-top: none !important;
@@ -251,3 +251,40 @@ textarea::placeholder {
   background-color: transparent !important;
 }
 /* end range slider */
+
+.mdc-dialog__title::before {
+  content: none !important;
+}
+
+.mat-mdc-dialog-title > div.flex-gap-3 {
+  gap: 1rem !important;
+}
+
+.btn-draft, .btn-draft + .btn-primary {
+  background-color: white !important;
+  border: 1px solid #e2e8f0 !important;
+  color: var(--text-color) !important;
+  border-radius: 10px !important;
+  margin-left: 0 !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  width: 100% !important;  
+}
+
+.btn-draft + .btn-primary {
+  background-color: var(--primary-color) !important;
+  border: 1px solid #e2e8f0 !important;
+  color:  white !important;
+}
+
+.btn-draft:hover {
+  background-color: #fafbfc !important;
+}
+
+.btn-draft:focus {
+  background-color: #fafbfc !important;
+}
+
+.btn-draft:active {
+  background-color: #fafbfc !important;
+}

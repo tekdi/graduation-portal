@@ -96,10 +96,10 @@ export const PARTICIPANTS_DATA: ParticipantData[] = [
   // ONBOARDED
   // -----------------------------
   {
-    id: '1006A',
-    name: 'Zinhle Bhengu',
-    contact: '077 678 9013',
-    status: 'ONBOARDED',
+    id: "3090",
+    name: "Zinhle Bhengu",
+    contact: "077 678 9013",
+    status: "Onboarded",
     progress: undefined,
     graduationProgress: undefined,
     graduationDate: undefined,
@@ -108,10 +108,22 @@ export const PARTICIPANTS_DATA: ParticipantData[] = [
     pathway: undefined,
   },
   {
-    id: '1006B',
-    name: 'Thandiwe Ngubane',
-    contact: '077 678 9014',
-    status: 'ONBOARDED',
+    id: "3091",
+    name: "Thandiwe Ngubane",
+    contact: "077 678 9014",
+    status: "Onboarded",
+    progress: undefined,
+    graduationProgress: undefined,
+    graduationDate: undefined,
+    email: "thandiwe.ngubane@example.com",
+    address: "",
+    pathway: undefined
+  },
+  {
+    id: "3081",
+    name: "Thandiwe Ngubane",
+    contact: "077 678 9014",
+    status: "Onboarded",
     progress: undefined,
     graduationProgress: undefined,
     graduationDate: undefined,
