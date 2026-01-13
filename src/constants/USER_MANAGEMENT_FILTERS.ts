@@ -58,21 +58,27 @@ export const supervisorFilterOptions: ReadonlyArray<FilterConfig> = [
       { labelKey: 'admin.filters.allProvinces', value: 'all-Provinces' },
       { labelKey: 'Gauteng', value: 'Gauteng' },
       { labelKey: 'KwaZulu-nutal', value: 'KwaZulu-nutal' },
+      { labelKey: 'Western Cape', value: 'Western Cape' },
     ],
   },
   {
     nameKey: 'admin.filters.selectSupervisor',
     attr: 'selectSupervisor',
     type: 'select',
+    placeholderKey: 'admin.filters.chooseSupervisor',
     data: [
       {
-        labelKey: 'Dr. Lerato Mokoena Johannesburg',
-        value: 'Dr. Lerato Mokoena Johannesburg ',
+        labelKey: 'Dr. Lerato Mokoena',
+        value: 'Dr. Lerato Mokoena',
       },
       {
-        labelKey: 'Zanele Ndabae Thekwini',
-        value: 'Zanele Ndabae Thekwini',
+        labelKey: 'Zanele Ndabae',
+        value: 'Zanele Ndabae',
       },
+      {
+        labelKey: 'Mpho Sithole',
+        value: 'Mpho Sithole',
+      }
     ],
   },
  ];
@@ -133,6 +139,7 @@ export const supervisorFilterOptions: ReadonlyArray<FilterConfig> = [
     nameKey: 'admin.filters.selectSupervisor',
     attr: 'selectSupervisor',
     type: 'select',
+    placeholderKey: 'admin.filters.chooseSupervisor',
     data: [
       {
         labelKey: 'Dr. Lerato Mokoena Johannesburg',

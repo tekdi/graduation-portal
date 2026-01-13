@@ -33,6 +33,7 @@ type SelectProps = {
   placeholder?: string;
   bg?: string;
   borderColor?: string;
+  disabled?: boolean;
 };
 
 export default function Select({
@@ -42,6 +43,7 @@ export default function Select({
   placeholder,
   bg,
   borderColor,
+  disabled = false,
 }: SelectProps) {
   // Normalize options: handle strings, objects, or already normalized Option[]
   const normalizedOptions: Option[] = options.map((e: RawOption, index: number) => {
@@ -116,7 +118,10 @@ export default function Select({
       selectedValue={value}
       onValueChange={handleValueChange}
     >
-      <SelectTrigger {...(getSelectTriggerStyles(bg, borderColor) as any)}>
+      <SelectTrigger 
+        {...(getSelectTriggerStyles(bg, borderColor) as any)}
+        disabled={disabled}
+      >
         <SelectInput
           placeholder={localizedPlaceholder}
           value={displayValue}

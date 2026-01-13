@@ -24,6 +24,7 @@
     "search": "Search",
     "filter": "Filter",
     "filters": "Filters",
+    "clear": "Clear",
     "clearFilters": "Clear Filters",
     "submit": "Submit",
     "back": "Back",
@@ -177,7 +178,10 @@
     "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
     "actions": {
       "bulkUploadCSV": "Bulk Upload (CSV)",
-      "createUser": "Create User"
+      "createUser": "Create User",
+      "lctosupervisior": "LC to Supervisor",
+      "participanttolc": "Participant to LC",
+      "assignLCsToSupervisor": "Assign LCs to Supervisor"
     },
     "filters": {
       "role": "Role",
@@ -190,7 +194,12 @@
       "participant": "Participant",
       "allStatus": "All Status",
       "active": "Active",
-      "deactivated": "Deactivated"
+      "deactivated": "Deactivated",
+      "filterByProvince": "Filter by Province",
+      "allProvinces": "All Provinces",
+      "selectSupervisor": "Select Supervisor",
+      "chooseSupervisor": "Choose Supervisor",
+      "allDistrict": "All District"
     },
     "stats": {
       "totalUsers": "Total Users",
@@ -226,12 +235,19 @@
      "filterByGeography": "Filter by geography and select LCs to assign",
      "chooseSupervisor": "Choose a supervisor to view their assigned LCs",
      "step2SelectLC": "Step2: Select Linkage Champion",
-     "chooseLcFrom": "Choose an LC from {{supervisor}}'s team"
+     "chooseLcFrom": "Choose an LC from {{supervisor}}'s team",
+     "selectedLinkageChampions": "Selected Linkage Champions",
+     "listOfLcsMappedToSupervisor": "List of LCs Mapped to Supervisor",
+     "currentLcAssignmentsFor": "Current LC assignments for {{supervisor}}",
+     "linkageChampion": "Linkage Champion",
+     "email": "Email",
+     "location": "Location",
+     "site": "Site",
+     "status": {
+       "assigned": "Assigned",
+       "unassigned": "Unassigned"
+     }
    },
-    "filterByProvince": "Filter by Province",
-     "selectSupervisor": "Select Supervisor",
-     "allProvinces": "All Provinces",
-     "allDistrict": "ALl District",
      "assignUsersDescription": "Assign Linkage Champions to Supervisors and Participants to LCs"
 
     

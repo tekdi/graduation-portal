@@ -35,24 +35,26 @@ interface SelectionCardProps {
  showLcList?: boolean;
  showLcListforSupervisorTeam?: boolean;
  onLcSelect?: (lc: any) => void;
+ onAssign?: (selectedLCs: any[]) => void;
 }
 
 
 const SelectionCard = ({
- title,
- description,
- filterOptions,
- onChange,
- selectedValues = {},
- showSelectedCard = false,
- showLcList = true,
- showLcListforSupervisorTeam = false,
- onLcSelect,
+  title,
+  description,
+  filterOptions,
+  onChange,
+  selectedValues = {},
+  showSelectedCard = false,
+  showLcList = true,
+  showLcListforSupervisorTeam = false,
+  onLcSelect,
+  onAssign,
 }: SelectionCardProps) => {
- const { t } = useLanguage();
+  const { t } = useLanguage();
 
-
- const [selectedLc, setSelectedLc] = useState<any>(null);
+  const [selectedLc, setSelectedLc] = useState<any>(null);
+  const [selectedLCs, setSelectedLCs] = useState<Set<string>>(new Set());
  // Handler to receive filter changes from FilterButton and pass to parent
  const handleFilterChange = (values: Record<string, any>) => {
    // Call parent's onChange handler if provided
@@ -60,19 +62,23 @@ const SelectionCard = ({
  };
 
 
- return (
-   <Card size="md" variant="outline">
-     <Heading size="md">{t(title)}</Heading>
-     <Text size="sm">{t(description)}</Text>
+  return (
+    <Card size="md" variant="outline">
+      <Heading size="md">{t(title)}</Heading>
+      <Text size="sm">
+        {description.includes('{{supervisor}}') && selectedValues?.selectSupervisor
+          ? t(description).replace('{{supervisor}}', selectedValues.selectSupervisor)
+          : t(description)}
+      </Text>
 
 
-     {!showLcListforSupervisorTeam && (
-       <FilterButton
-         data={filterOptions}
-         showClearFilterButton={false}
-         onChange={handleFilterChange}
-       />
-     )}
+    {!showLcListforSupervisorTeam && (
+      <FilterButton
+        data={filterOptions}
+        showClearButton={false}
+        onFilterChange={handleFilterChange}
+      />
+    )}
      {/* Display selected values if showSelectedCard is true and values exist */}
      {showSelectedCard && selectedValues && (
        <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>
@@ -99,18 +105,31 @@ const SelectionCard = ({
      {showLcList && (
        <VStack marginTop={'$3'}>
          <Text {...(AssignUsersStyles.provinceName as TextProps)}>
-           {'Selected Linkage Champions'}
+           {t('admin.assignUsers.selectedLinkageChampions')}
          </Text>
          <Card variant="outline">
-           {selectedLCList?.map((lc: any) => (
-             <>
-               <Checkbox
-                 key={lc.value}
-                 isDisabled={false}
-                 isInvalid={false}
-                 size="md"
-                 value={lc.value}
-               >
+           {selectedLCList?.map((lc: any) => {
+             const isChecked = selectedLCs.has(lc.value);
+             return (
+               <React.Fragment key={lc.value}>
+                 <Checkbox
+                   isDisabled={false}
+                   isInvalid={false}
+                   size="md"
+                   value={lc.value}
+                   isChecked={isChecked}
+                   onChange={(checked: boolean) => {
+                     setSelectedLCs((prev) => {
+                       const newSet = new Set(prev);
+                       if (checked) {
+                         newSet.add(lc.value);
+                       } else {
+                         newSet.delete(lc.value);
+                       }
+                       return newSet;
+                     });
+                   }}
+                 >
                  <CheckboxIndicator>
                    <CheckboxIcon as={CheckIcon} color="$modalBackground" />
                  </CheckboxIndicator>
@@ -141,7 +160,7 @@ const SelectionCard = ({
                      >
                        <HStack>
                          <Text {...titleHeaderStyles.outlineButtonText}>
-                           {lc.status}
+                           {t(`admin.assignUsers.status.${lc.status}`) || lc.status}
                          </Text>
                        </HStack>
                      </Button>
@@ -149,24 +168,36 @@ const SelectionCard = ({
                  </CheckboxLabel>
                </Checkbox>
                <Divider />
-             </>
-           ))}
+             </React.Fragment>
+           );
+           })}
          </Card>
 
 
-         <Button
-           {...titleHeaderStyles.solidButton}
-           mt={'$3'}
-           onPress={() => {
-             // Handle create user
-           }}
-         >
-           <HStack space="sm" alignItems="center">
-             <Text {...titleHeaderStyles.solidButtonText}>
-               {'Assign LCs to Supervisor'}
-             </Text>
-           </HStack>
-         </Button>
+        <Button
+          {...titleHeaderStyles.solidButton}
+          mt={'$3'}
+          onPress={() => {
+            // Handle assign LCs to supervisor
+            const selectedLCValues = Array.from(selectedLCs);
+            const selectedLCObjects = selectedLCList.filter((lc: any) =>
+              selectedLCValues.includes(lc.value)
+            );
+            console.log('Assigning LCs:', selectedLCObjects);
+            // Call parent's onAssign callback if provided
+            onAssign?.(selectedLCObjects);
+            // Clear selection after assignment
+            setSelectedLCs(new Set());
+            // TODO: Implement API call to assign LCs
+          }}
+          isDisabled={selectedLCs.size === 0}
+        >
+          <HStack space="sm" alignItems="center">
+            <Text {...titleHeaderStyles.solidButtonText}>
+              {t('admin.actions.assignLCsToSupervisor')}
+            </Text>
+          </HStack>
+        </Button>
        </VStack>
      )}
 
