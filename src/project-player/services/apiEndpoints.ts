@@ -12,4 +12,5 @@ export const API_ENDPOINTS = {
     `${prefix}/project/v1/library/categories/details/${id}?getChildren=true`,
   GET_TASK_DETAILS: (ids: string) =>
     `${prefix}/project/v1/project/templates/list?categoryIds=${ids}&groupByCategory=true`,
+  UPDATE_TASK: (id: string) => `${prefix}/project/v1/userProjects/update/${id}`,
 } as const;

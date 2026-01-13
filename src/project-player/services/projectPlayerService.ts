@@ -110,6 +110,22 @@ export const getProjectDetails = async (
   }
 };
 
+export const updateTask = async (
+  projectId: string,
+  requestBody: any,
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.UPDATE_TASK(projectId),
+      requestBody,
+    );
+
+    return { data: response };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
 export const getCategoryList = async (
   parentId: string,
 ): Promise<ApiResponse<any>> => {
@@ -117,8 +133,8 @@ export const getCategoryList = async (
     const response = await apiClient.get(
       API_ENDPOINTS.GET_CATEGORY_LIST(parentId),
     );
-    const resData = templateDetailsAPIMockResponse;
-    return { data: resData.result };
+    // const resData = templateDetailsAPIMockResponse;
+    return { data: response.data.result };
   } catch (error) {
     return handleApiError(error);
   }

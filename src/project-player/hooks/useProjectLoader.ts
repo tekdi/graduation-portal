@@ -63,23 +63,14 @@ export const useProjectLoader = (
             setProjectData(null);
             setError(err as Error);
           }
-        } else if (config.mode === 'preview') {
-          // const categoryId = '693fb8fcda98e72cedd4a5fd';
-          // const templateDetails = await getTemplateDetails(categoryId);
-          // console.log('template details', templateDetails);
-          // const categoryIds = [
-          //   templateDetails?.data?._id,
-          //   ...(templateDetails?.data?.children || []).map(
-          //     (child: any) => child._id,
-          //   ),
-          // ].filter(Boolean);
-          // const categoryIdsString = categoryIds.join(',');
-          // const taskResponse = await getTaskDetails(categoryIdsString);
-          // console.log('taskResponse', taskResponse);
-          // const taskResult = taskResponse.data;
-          // const taskData = normalizeTaskResponse(taskResult);
-          // console.log('taskData', taskData);
-          // // ✅ ENRICH — not replace
+        } else if (config.mode === 'preview' && data?.categoryIds) {
+          const categoryIdsString = data?.categoryIds.join(',');
+          const taskResponse = await getTaskDetails(categoryIdsString);
+          console.log('taskResponse', taskResponse);
+          const taskResult = taskResponse.data;
+          const taskData = normalizeTaskResponse(taskResult);
+          console.log('taskData', taskData);
+          // ✅ ENRICH — not replace
           // const enrichedChildren = enrichChildrenWithProjects(
           //   templateDetails.data.children,
           //   taskData,
@@ -89,8 +80,8 @@ export const useProjectLoader = (
           //   ...templateDetails.data,
           //   children: enrichedChildren,
           // };
-          // console.log('final template details', finalProjectData);
-          // setProjectData(finalProjectData);
+          console.log('final template details', taskData);
+          setProjectData(taskResponse);
         } else if (data.solutionId) {
           // Load template
           // TODO: Implement API call

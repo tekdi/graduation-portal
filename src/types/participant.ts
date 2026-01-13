@@ -7,7 +7,7 @@ import { Participant } from './screens';
  */
 export type ParticipantStatus =
   | 'Not Onboarded'
-  | 'Onboarded'
+  | 'ONBOARDED'
   | 'In Progress'
   | 'Completed'
   | 'Graduated'
@@ -26,16 +26,16 @@ export type PathwayType = 'employment' | 'entrepreneurship';
  * Uses display format status strings and contact field.
  */
 export interface ParticipantData {
-  id: string;                     // Matches exactly as shown in UI (1002, 1006A, P-024, etc.)
+  id: string; // Matches exactly as shown in UI (1002, 1006A, P-024, etc.)
   name: string;
-  contact: string;                // normalized (was phone)
-  status: string;                 // UI labels: Not Onboarded, Onboarded, In Progress...
-  progress?: number;              // only for In Progress, Completed, Graduated
-  pathway?: string | undefined;   // keep original
-  graduationProgress?: number;    // same % as progress OR undefined
-  graduationDate?: string;        // only for Completed/Graduated if available
-  email?: string;                 // kept from original dataset
-  address?: string;               // kept from original dataset
+  contact: string; // normalized (was phone)
+  status: string; // UI labels: Not Onboarded, Onboarded, In Progress...
+  progress?: number; // only for In Progress, Completed, Graduated
+  pathway?: string | undefined; // keep original
+  graduationProgress?: number; // same % as progress OR undefined
+  graduationDate?: string; // only for Completed/Graduated if available
+  email?: string; // kept from original dataset
+  address?: string; // kept from original dataset
 }
 
 /**
@@ -94,4 +94,3 @@ export interface Site {
   label: string;
   type: 'Urban' | 'Rural' | 'Peri-urban';
 }
-

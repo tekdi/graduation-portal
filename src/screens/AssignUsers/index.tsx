@@ -1,60 +1,39 @@
 import TitleHeader from '@components/TitleHeader';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
-import { VStack, HStack, Button, Text } from '@ui';
-import React, { useEffect, useState } from 'react';
+import { VStack, HStack, Button, Text, Card, Heading } from '@ui';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@contexts/LanguageContext';
-import {
-  lcFilterOptions,
-  participantLCFilterOptions,
-  SearchFilter,
-  // selectedLCList,
-} from '@constants/USER_MANAGEMENT_FILTERS';
-import { supervisorFilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
-import SelectionCard from '@components/SelectionCard';
+import FilterButton from '@components/Filter';
+import { AssignLCFilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
 
 const AssignUsersScreen = () => {
   const { t } = useLanguage();
-  const AssignLCFilterOptions = [SearchFilter, ...lcFilterOptions];
-  type AssignTab = 'LC_TO_SUPERVISOR' | 'PARTICIPANT_TO_LC';
+  const data = [...AssignLCFilterOptions];
 
-  const [activeTab, setActiveTab] = useState<AssignTab>('LC_TO_SUPERVISOR');
-  const [selectedLc, setSelectedLc] = useState<any>(null);
-  // State to store filter values for each SelectionCard
-  const [supervisorFilterValues, setSupervisorFilterValues] = useState<
-    Record<string, any>
-  >({});
-  const [lcFilterValues, setLcFilterValues] = useState<Record<string, any>>({});
+  const [filterValues, setFilterValues] = useState<Record<string, any>>({});
 
-  // Handler for supervisor SelectionCard filter changes
-  const handleSupervisorFilterChange = (values: Record<string, any>) => {
-    setSupervisorFilterValues(values);
-    console.log('Supervisor filter values changed:', values);
-    // Add your logic here to handle supervisor filter changes
-    // Example: fetchFilteredSupervisors(values);
+  // Handler to receive filter changes from FilterButton
+  const handleFilterChange = (values: Record<string, any>) => {
+    setFilterValues(values);
+    console.log('Filter values changed:', values);
+    setSelectedSupervisor(values);
+    // You can add your logic here to handle filter changes
+    // For example: filter data, make API calls, etc.
+    // Example usage:
+    // - filterValues.province - selected province value
+    // - filterValues.district - selected district value
+    // - filterValues.search - search text value
   };
 
-  // Handler for LC SelectionCard filter changes
-  const handleLcFilterChange = (values: Record<string, any>) => {
-    setLcFilterValues(values);
-    console.log('LC filter values changed:', values);
-    // Add your logic here to handle LC filter changes
-    // Example: fetchFilteredLCs(values);
-  };
-
-  // Use filter values to perform actions when filters change
+  // Use filterValues to perform actions when filters change
   useEffect(() => {
-    if (Object.keys(supervisorFilterValues).length > 0) {
-      console.log('Current supervisor filter values:', supervisorFilterValues);
-      // Add your filtering/fetching logic here for supervisors
+    if (Object.keys(filterValues).length > 0) {
+      console.log('Current filter values:', filterValues);
+      // Add your filtering/fetching logic here
+      // Example: fetchFilteredUsers(filterValues);
     }
-  }, [supervisorFilterValues]);
+  }, [filterValues]);
 
-  useEffect(() => {
-    if (Object.keys(lcFilterValues).length > 0) {
-      console.log('Current LC filter values:', lcFilterValues);
-      // Add your filtering/fetching logic here for LCs
-    }
-  }, [lcFilterValues]);
   return (
     <VStack space="md" width="100%">
       <TitleHeader
@@ -63,98 +42,50 @@ const AssignUsersScreen = () => {
         bottom={
           <HStack space="md" alignItems="center">
             <Button
-              {...(activeTab === 'LC_TO_SUPERVISOR'
-                ? titleHeaderStyles.solidButton
-                : titleHeaderStyles.outlineButton)}
-              onPress={() => setActiveTab('LC_TO_SUPERVISOR')}
+              {...titleHeaderStyles.solidButton}
+              onPress={() => {
+                // Handle create user
+              }}
             >
-              <Text
-                {...(activeTab === 'LC_TO_SUPERVISOR'
-                  ? titleHeaderStyles.solidButtonText
-                  : titleHeaderStyles.outlineButtonText)}
-              >
-                {t('admin.actions.lctosupervisior')}
-              </Text>
+              <HStack space="sm" alignItems="center">
+                <Text {...titleHeaderStyles.solidButtonText}>
+                  {t('admin.actions.lctosupervisior')}
+                </Text>
+              </HStack>
             </Button>
 
             <Button
-              {...(activeTab === 'PARTICIPANT_TO_LC'
-                ? titleHeaderStyles.solidButton
-                : titleHeaderStyles.outlineButton)}
-              onPress={() => setActiveTab('PARTICIPANT_TO_LC')}
+              {...titleHeaderStyles.outlineButton}
+              onPress={() => {
+                // Handle bulk upload
+              }}
             >
-              <Text
-                {...(activeTab === 'PARTICIPANT_TO_LC'
-                  ? titleHeaderStyles.solidButtonText
-                  : titleHeaderStyles.outlineButtonText)}
-              >
-                {t('admin.actions.participanttolc')}
-              </Text>
+              <HStack space="sm" alignItems="center">
+                <Text {...titleHeaderStyles.outlineButtonText}>
+                  {t('admin.actions.participanttolc')}
+                </Text>
+              </HStack>
             </Button>
           </HStack>
         }
       />
 
-      {activeTab === 'LC_TO_SUPERVISOR' && (
-        <>
-          <SelectionCard
-            title="admin.assignUsers.step1SelectSupervisor"
-            description="admin.assignUsers.filterByProvince"
-            filterOptions={supervisorFilterOptions}
-            onChange={handleSupervisorFilterChange}
-            selectedValues={supervisorFilterValues}
-            showSelectedCard={!!supervisorFilterValues.selectSupervisor}
-            showLcList={false}
-          />
+      <Card size="md" variant="outline">
+        <Heading size="md">
+          {t('admin.assignUsers.step1SelectSupervisor')}
+        </Heading>
+        <Text size="sm">
+          {t('admin.assignUsers.filterbyprovinceandchoosesp')}
+        </Text>
 
-          {supervisorFilterValues.selectSupervisor && (
-            <SelectionCard
-              title="admin.assignUsers.step2AssignLinkageChampions"
-              description="admin.assignUsers.filterByGeography"
-              filterOptions={AssignLCFilterOptions}
-              onChange={handleLcFilterChange}
-              selectedValues={lcFilterValues}
-              showLcList={true}
-            />
-          )}
-        </>
-      )}
-
-      {activeTab === 'PARTICIPANT_TO_LC' && (
-        <>
-          <SelectionCard
-            title="admin.assignUsers.step1SelectSupervisor"
-            description="admin.assignUsers.chooseSupervisor"
-            filterOptions={participantLCFilterOptions}
-            onChange={handleSupervisorFilterChange}
-            selectedValues={supervisorFilterValues}
-            showSelectedCard={!!supervisorFilterValues.selectSupervisor}
-            showLcList={false}
-          />
-
-          {supervisorFilterValues.selectSupervisor && (
-            <SelectionCard
-              title="admin.assignUsers.step2SelectLC"
-              description="admin.assignUsers.chooseLcFrom"
-              showLcList={false}
-              showLcListforSupervisorTeam={true}
-              onLcSelect={lc => setSelectedLc(lc)}
-            />
-          )}
-
-          {selectedLc && (
-            <SelectionCard
-              title="admin.assignUsers.step2AssignLinkageChampions"
-              description="admin.assignUsers.filterByGeography"
-              filterOptions={AssignLCFilterOptions}
-              onChange={handleLcFilterChange}
-              selectedValues={lcFilterValues}
-              showLcList={true}
-            />
-          )}
-        </>
-      )}
+        <FilterButton
+          data={data}
+          showClearFilterButton={false}
+          onChange={handleFilterChange}
+        />
+      </Card>
     </VStack>
+    // <div>hi</div>
   );
 };
 

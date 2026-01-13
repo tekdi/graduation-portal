@@ -1,6 +1,6 @@
 export const STATUS = {
   NOT_ENROLLED: 'Not Onboarded',
-  ENROLLED: 'Onboarded',
+  ENROLLED: 'ONBOARDED',
   IN_PROGRESS: 'In Progress',
   COMPLETED: 'Completed',
   DROPOUT: 'Dropped out',
@@ -11,6 +11,15 @@ export const STATUS = {
 export const TASK_STATUS = {
   TO_DO: 'to-do',
   COMPLETED: 'completed',
+} as const;
+
+// Task Type Constants
+export const TASK_TYPE = {
+  PROJECT: 'project',
+  FILE: 'file',
+  OBSERVATION: 'observation',
+  SIMPLE: 'simple',
+  PROFILE_UPDATE: 'profile-update',
 } as const;
 
 // Project Status Constants
@@ -56,3 +65,38 @@ export const PARTICIPANT_DETAILS_TABS = {
   INTERVENTION_PLAN: 'intervention-plan',
   ASSESSMENTS_SURVEYS: 'assessment-surveys',
 };
+
+/**
+ * Pillar Names Constants
+ * Defines the pillar name identifiers used for matching and display
+ */
+export const PILLAR_NAMES = {
+  SOCIAL_EMPOWERMENT: 'social empowerment',
+  EMPOWERMENT: 'empowerment',
+  LIVELIHOOD: 'livelihood',
+  FINANCIAL_INCLUSION: 'financial inclusion',
+  FINANCIAL: 'financial',
+  SOCIAL_PROTECTION: 'social protection',
+  PROTECTION: 'protection',
+} as const;
+
+/**
+ * Pillar Categories Constants
+ * Defines the metadata category identifiers for pillars
+ */
+export const PILLAR_CATEGORIES = {
+  PROTECTION: 'protection',
+} as const;
+
+// Project Modes
+export const PROJECT_MODES = {
+  READ_ONLY: 'read-only',
+  PREVIEW: 'preview',
+  EDIT: 'edit',
+} as const;
+
+// Badge Types
+export const BADGE_TYPES = {
+  REQUIRED: 'required',
+  OPTIONAL: 'optional',
+} as const;

@@ -88,6 +88,7 @@ export default function ParticipantDetail() {
   const [currentParticipantProfile, setCurrentParticipantProfile] = useState<
     ParticipantData | undefined
   >();
+  const [areAllTasksCompleted, setAreAllTasksCompleted] = useState(false);
 
   // Fetch participant data from mock data by ID
   // Ensure participantId exists before calling getParticipantById
@@ -103,7 +104,6 @@ export default function ParticipantDetail() {
 
         try {
           const response = await getEntityDetails(participantId);
-          console.log(response.data[0]);
           setEntityId(response.data[0]._id);
           setProjectId(response.data[0].metaInformation?.onBoardingProjectId);
         } catch (error) {
@@ -138,6 +138,10 @@ export default function ParticipantDetail() {
     ...config,
     ...selectedMode,
     showAddCustomTaskButton: false,
+    profileInfo: {
+      name: participantName,
+      id: id,
+    },
   };
 
   const ProjectPlayerConfigData: ProjectPlayerData = {
@@ -165,13 +169,19 @@ export default function ParticipantDetail() {
               graduationProgress={graduationProgress}
               graduationDate={graduationDate}
               onViewProfile={() => setIsProfileModalOpen(true)}
+              areAllTasksCompleted={areAllTasksCompleted}
+              userEntityId={entityId}
             />
           </Container>
         </VStack>
         <Container>
           {status === STATUS.NOT_ENROLLED ? (
             // NOT_ENROLLED: Show ProjectPlayer directly with editMode
-            <ProjectPlayer config={configData} data={ProjectPlayerConfigData} />
+            <ProjectPlayer
+              config={configData}
+              data={ProjectPlayerConfigData}
+              onTaskCompletionChange={setAreAllTasksCompleted}
+            />
           ) : (
             // ENROLLED, IN_PROGRESS, DROPOUT: Show tabs with ProjectPlayer in InterventionPlan
             <>

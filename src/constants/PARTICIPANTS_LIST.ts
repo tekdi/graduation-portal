@@ -47,7 +47,7 @@ export const PARTICIPANTS_DATA: ParticipantData[] = [
     id: '3090',
     name: 'Khanyi Ndlovu',
     contact: '073 456 7890',
-    status: 'Not Onboarded',
+    status: 'ONBOARDED',
     progress: undefined,
     graduationProgress: undefined,
     graduationDate: undefined,
@@ -56,7 +56,7 @@ export const PARTICIPANTS_DATA: ParticipantData[] = [
     pathway: undefined,
   },
   {
-    id: '1006',
+    id: '3091',
     name: 'Lindiwe Radebe',
     contact: '077 678 9012',
     status: 'Not Onboarded',

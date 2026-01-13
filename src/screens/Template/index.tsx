@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   ScrollView,
   Box,
@@ -74,12 +74,10 @@ const DevelopInterventionPlan: React.FC = () => {
   >([]);
 
   const [pillarData, setPillarData] = useState<any[]>([]);
+  const [pillarIdsToGetIdp, setPillarIdsToGetIdp] = useState<any[]>([]);
   const [selectionByPillar, setSelectionByPillar] = useState<
     Record<string, PillarSelection>
   >({});
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
-  const [selectedSubCategoryId, setSelectedSubCategoryId] =
-    useState<string>('');
 
   const [participant, setParticipant] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,11 +94,13 @@ const DevelopInterventionPlan: React.FC = () => {
     pillarCategoryMap.find(p => p.pillarId === pillarId)?.categories || [];
 
   const getSubCategoriesForPillar = (pillarId: string) => {
-    const selectedCategoryId = selectionByPillar[pillarId]?.categoryId;
-    return (
-      getCategoriesForPillar(pillarId).find(c => c.id === selectedCategoryId)
-        ?.subcategories || []
-    );
+    const pillarCategoryId = selectionByPillar[pillarId]?.categoryId;
+    if (!pillarCategoryId) {
+      return [];
+    }
+    const categories = getCategoriesForPillar(pillarId);
+    const selectedCategory = categories.find(c => c.id === pillarCategoryId);
+    return selectedCategory?.subcategories || [];
   };
 
   // Determine ProjectPlayer config and data based on participant status
@@ -113,11 +113,25 @@ const DevelopInterventionPlan: React.FC = () => {
     showAddCustomTaskButton: false,
   };
 
-  const ProjectPlayerConfigData: ProjectPlayerData = {
-    // solutionId: config.data.solutionId,
-    projectId: config.data.projectId,
-    data: COMPLEX_PROJECT_DATA,
-  };
+  // Combine pillarIdsToGetIdp with selected subcategory IDs
+  const categoryIdsArray = useMemo(() => {
+    const selectedSubCategoryIds = Object.values(selectionByPillar)
+      .map(selection => selection.subCategoryId)
+      .filter((id): id is string => Boolean(id)); // Filter out empty strings/undefined
+
+    // Combine pillar IDs without categories + selected subcategory IDs
+    return [...pillarIdsToGetIdp, ...selectedSubCategoryIds];
+  }, [pillarIdsToGetIdp, selectionByPillar]);
+
+  const ProjectPlayerConfigData: ProjectPlayerData = useMemo(
+    () => ({
+      solutionId: config.data.solutionId,
+      projectId: config.data.projectId,
+      data: COMPLEX_PROJECT_DATA,
+      categoryIds: categoryIdsArray, // Array of pillar IDs without categories + selected subcategory IDs
+    }),
+    [categoryIdsArray, config.data.solutionId, config.data.projectId],
+  );
 
   /* -------------------- EFFECTS -------------------- */
 
@@ -166,10 +180,18 @@ const DevelopInterventionPlan: React.FC = () => {
   /* -------------------- HANDLERS -------------------- */
 
   const handleConfirm = () => {
-    if (selectedCategoryId && selectedSubCategoryId) {
+    // Check if all pillars with child categories have both category and subcategory selected
+    const allPillarsHaveSelections = pillarData
+      .filter((pillar: any) => pillar?.hasChildCategories)
+      .every(
+        (pillar: any) =>
+          selectionByPillar[pillar._id]?.categoryId &&
+          selectionByPillar[pillar._id]?.subCategoryId,
+      );
+
+    if (allPillarsHaveSelections) {
       console.log({
-        selectedCategoryId,
-        selectedSubCategoryId,
+        selectionByPillar,
         participantId,
       });
       setIsModalOpen(false);
@@ -179,16 +201,21 @@ const DevelopInterventionPlan: React.FC = () => {
 
   const handlePathwaySelection = async (id: string) => {
     try {
-      setShowProjectPlayerPreview(true);
+      // setShowProjectPlayerPreview(true);
       setIsModalOpen(true);
       const res = await getCategoryList(id);
       console.log('categoriesData', res?.data);
-      const pillars = res?.data?.children ?? [];
+      const pillars = res?.data ?? [];
       setPillarData(pillars);
 
       const pillarIdsWithCategories = pillars
         .filter((pillar: any) => pillar?.hasChildCategories)
         .map((pillar: any) => pillar._id);
+
+      const pillarIdsWithoutCategories = pillars
+        .filter((pillar: any) => pillar?.hasChildCategories === false)
+        .map((pillar: any) => pillar._id);
+      setPillarIdsToGetIdp(pillarIdsWithoutCategories);
 
       const pillarCategoryHierarchy: PillarCategoryMap[] = await Promise.all(
         pillarIdsWithCategories.map(async pillarId => {
@@ -198,13 +225,13 @@ const DevelopInterventionPlan: React.FC = () => {
 
           // 2️⃣ categories + subcategories
           const categories: Category[] = await Promise.all(
-            categoryList.map(async (category: any) => {
+            categoryList.data.map(async (category: any) => {
               let subcategories: SubCategory[] = [];
 
               if (category?.hasChildCategories) {
                 const subCategoryList = await getCategoryList(category._id);
                 // const subCategoryList = subCategoryDetailsMockData.result;
-                subcategories = subCategoryList.map((sc: any) => ({
+                subcategories = subCategoryList.data.map((sc: any) => ({
                   id: sc._id,
                   label: sc.name,
                 }));
@@ -474,7 +501,15 @@ const DevelopInterventionPlan: React.FC = () => {
                 },
               }}
               onPress={handleConfirm}
-              isDisabled={!selectedCategoryId || !selectedSubCategoryId}
+              isDisabled={
+                !pillarData
+                  .filter((pillar: any) => pillar?.hasChildCategories)
+                  .every(
+                    (pillar: any) =>
+                      selectionByPillar[pillar._id]?.categoryId &&
+                      selectionByPillar[pillar._id]?.subCategoryId,
+                  )
+              }
             >
               <ButtonText
                 color={theme.tokens.colors.modalBackground}
@@ -504,7 +539,7 @@ const DevelopInterventionPlan: React.FC = () => {
                       label: c.label,
                       value: c.id,
                     }))}
-                    value={selectionByPillar[pillar._id]?.categoryId}
+                    value={selectionByPillar[pillar._id]?.categoryId || ''}
                     onChange={value =>
                       setSelectionByPillar(prev => ({
                         ...prev,
@@ -528,17 +563,26 @@ const DevelopInterventionPlan: React.FC = () => {
                   </Text>
 
                   <Box
-                    opacity={!selectedCategoryId ? 0.5 : 1}
-                    pointerEvents={!selectedCategoryId ? 'none' : 'auto'}
+                    opacity={
+                      !selectionByPillar[pillar._id]?.categoryId ? 0.5 : 1
+                    }
+                    pointerEvents={
+                      !selectionByPillar[pillar._id]?.categoryId
+                        ? 'none'
+                        : 'auto'
+                    }
                   >
                     <Select
+                      key={`subcategory-${pillar._id}-${
+                        selectionByPillar[pillar._id]?.categoryId || 'none'
+                      }`}
                       options={getSubCategoriesForPillar(pillar._id).map(
                         sc => ({
                           label: sc.label,
                           value: sc.id,
                         }),
                       )}
-                      value={selectionByPillar[pillar._id]?.subCategoryId}
+                      value={selectionByPillar[pillar._id]?.subCategoryId || ''}
                       onChange={value =>
                         setSelectionByPillar(prev => ({
                           ...prev,
@@ -552,7 +596,6 @@ const DevelopInterventionPlan: React.FC = () => {
                         'template.categoryModal.subCategoryPlaceholder',
                       )}
                       borderColor="$inputBorder"
-                      isDisabled={!selectionByPillar[pillar._id]?.categoryId}
                     />
                   </Box>
                 </VStack>
@@ -560,7 +603,13 @@ const DevelopInterventionPlan: React.FC = () => {
             ) : null,
           )}
           {/* Selected summary - blue info box */}
-          {selectedCategoryId && selectedSubCategoryId && (
+          {pillarData
+            .filter((pillar: any) => pillar?.hasChildCategories)
+            .every(
+              (pillar: any) =>
+                selectionByPillar[pillar._id]?.categoryId &&
+                selectionByPillar[pillar._id]?.subCategoryId,
+            ) && (
             <Box {...(templateStyles.summaryBox as any)}>
               <Text
                 {...TYPOGRAPHY.bodySmall}
@@ -568,8 +617,8 @@ const DevelopInterventionPlan: React.FC = () => {
                 fontWeight="$semibold"
               >
                 {t('template.categoryModal.selectedLabel', {
-                  selectedCategoryId,
-                  selectedSubCategoryId,
+                  selectedCategoryId: 'All selections complete',
+                  selectedSubCategoryId: '',
                 })}
               </Text>
               <Text
