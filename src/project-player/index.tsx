@@ -59,7 +59,11 @@ const ProjectPlayer: React.FC<ProjectPlayerProps> = ({
   }
 
   return (
-    <ProjectProvider config={config} initialData={loadedProject} onTaskUpdate={onTaskUpdate}>
+    <ProjectProvider
+      config={config}
+      initialData={loadedProject}
+      onTaskUpdate={onTaskUpdate}
+    >
       <TaskCompletionTracker onTaskCompletionChange={onTaskCompletionChange} />
       <ProjectComponent />
     </ProjectProvider>

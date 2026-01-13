@@ -87,11 +87,11 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   // Memoize ProjectPlayer data - all statuses use COMPLEX_PROJECT_DATA
   const projectPlayerData: ProjectPlayerData = useMemo(
     () => ({
-      solutionId: config.solutionId,
-      projectId: config.projectId,
+      solutionId: config?.solutionId,
+      projectId: config?.projectId,
       data: COMPLEX_PROJECT_DATA,
     }),
-    [config.solutionId, config.projectId],
+    [config?.solutionId, config?.projectId],
   );
 
   // Show empty state for ENROLLED status when player is not shown yet

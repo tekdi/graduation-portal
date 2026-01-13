@@ -36,6 +36,7 @@ import EvidencePreviewModal from './EvidencePreviewModal';
 import { usePlatform } from '@utils/platform';
 import { isTaskCompleted } from './helpers';
 import { renderCustomTaskActions, renderModals } from './renderHelpers';
+import { useNavigation } from '@react-navigation/native';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
@@ -43,6 +44,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   isLastTask = false,
   isChildOfProject = false,
 }) => {
+  const navigation = useNavigation();
   // Retrieve updateTask from context
   const { mode, config, projectData, updateTask } = useProjectContext();
   const { deleteTask } = useProjectContext();
@@ -146,14 +148,24 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (!isEdit) return;
 
     if (task.type === TASK_TYPE.OBSERVATION) {
-      // For observation tasks, mark as completed directly without file upload
       updateTask(task._id, {
         status: TASK_STATUS.COMPLETED,
-        metaInformation: {
-          ...task.metaInformation,
-          formCompleted: true,
-        },
+        _id: task._id,
       });
+
+      const userId = localStorage.getItem('userId');
+      const solutionId = task?.solutionDetails?._id;
+
+      if (!userId || !solutionId) {
+        console.error('Missing userId or solutionId');
+        return;
+      }
+
+      navigation.navigate('observation', {
+        id: userId,
+        observationId: solutionId,
+      });
+
       // Show success toast
       showSuccessToast(t('projectPlayer.taskCompleted'));
     } else {

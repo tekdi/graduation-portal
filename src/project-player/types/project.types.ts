@@ -40,6 +40,7 @@ export interface Task {
     [key: string]: any;
     buttonLabel?: string;
   };
+  solutionDetails?: any;
 }
 
 export interface Attachment {
