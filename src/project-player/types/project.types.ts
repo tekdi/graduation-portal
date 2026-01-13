@@ -2,6 +2,7 @@ import {
   TASK_STATUS,
   PROJECT_STATUS,
   UPLOAD_STATUS,
+  TASK_TYPE,
 } from '../../constants/app.constant';
 
 export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
@@ -9,12 +10,13 @@ export type TaskStatus = (typeof TASK_STATUS)[keyof typeof TASK_STATUS];
 export interface ProjectData {
   _id: string;
   solutionId: string;
-  name: string;
+  title?: string;
+  name?: string;
   description: string;
   status: (typeof PROJECT_STATUS)[keyof typeof PROJECT_STATUS];
   progress: number;
-  tasks: Task[];
-  metaData?: Record<string, any>;
+  tasks?: Task[];
+  metaInformation?: any;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,7 +25,7 @@ export interface Task {
   _id: string;
   name: string;
   description?: string;
-  type: 'simple' | 'file' | 'observation' | 'project' | 'profile-update';
+  type: (typeof TASK_TYPE)[keyof typeof TASK_TYPE];
   status?: TaskStatus;
   isRequired?: boolean;
   isCustomTask?: boolean; // Flag to identify user-created custom tasks
@@ -31,12 +33,14 @@ export interface Task {
   children?: Task[]; // For nested project tasks
   attachments?: Attachment[];
   observationFormId?: string;
-  metadata?: {
+  metaInformation?: {
     minFiles?: number; // Minimum files required for file-type tasks
     maxFiles?: number; // Maximum files allowed for file-type tasks
     formCompleted?: boolean; // For observation tasks
     [key: string]: any;
+    buttonLabel?: string;
   };
+  solutionDetails?: any;
 }
 
 export interface Attachment {
@@ -75,6 +79,7 @@ export interface RenderTaskInfoProps {
   showAsCard: boolean;
   taskName: string;
   taskDescription?: string;
+  taskType?: string;
 }
 
 export interface RenderActionButtonProps {
@@ -86,6 +91,7 @@ export interface RenderActionButtonProps {
   isReadOnly: boolean;
   isEdit: boolean;
   t: (key: string) => string;
+  metaInfo?: any;
 }
 
 export interface RenderDividerProps {
@@ -108,5 +114,5 @@ export interface RenderModalsProps {
   onCloseModal: () => void;
   onConfirmDelete: () => void;
   taskName: string;
-  t: (key: string) => string;
+  t: (key: string, values?: Record<string, unknown>) => string;
 }
