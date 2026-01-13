@@ -218,7 +218,6 @@ const AppNavigator: React.FC = () => {
   }, [isWeb]);
 
   // Create a stable key for NavigationContainer to prevent state issues
-  // when linking config changes
   // MUST be called before any conditional returns (Rules of Hooks)
   const navigationKey = useMemo(() => {
     return isLoggedIn

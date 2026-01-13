@@ -9,7 +9,7 @@ import { User } from "@contexts/AuthContext";
  */
 export type ParticipantStatus =
   | 'Not Onboarded'
-  | 'Onboarded'
+  | 'ONBOARDED'
   | 'In Progress'
   | 'Completed'
   | 'Graduated'
