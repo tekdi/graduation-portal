@@ -69,7 +69,7 @@ const UserManagementScreen = () => {
         }
       />
 
-      <FilterButton data={data} showClearFilterButton={true} />
+      <FilterButton data={data} />
 
       <BulkOperationsCard />
       {/* Stats and Bulk Operations - Display after table */}

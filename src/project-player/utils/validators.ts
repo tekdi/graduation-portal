@@ -83,4 +83,3 @@ export const validateForm = (
 
   return errors;
 };
-

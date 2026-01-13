@@ -14,12 +14,6 @@ export const MAIN_MENU_ITEMS: SidebarItem[] = [
     route: 'user-management',
   },
   {
-    key: 'assign-users',
-    label: 'admin.menu.assignUsers',
-    icon: 'UserPlus', // Lucide icon name
-    route: 'assign-users',
-  },
-  {
     key: 'template-management',
     label: 'admin.menu.templateManagement',
     icon: 'FileText', // Lucide icon name

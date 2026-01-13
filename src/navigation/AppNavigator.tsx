@@ -15,11 +15,9 @@ import { useAuth } from '@contexts/AuthContext';
 import { Spinner } from '@ui';
 import logger from '@utils/logger';
 import { isWeb, usePlatform } from '@utils/platform';
-import { navigationRef } from './navigationRef';
 import AccessBaseNavigator from './navigators/AccessBaseNavigator';
 import HomeScreen from '../screens/Home';
 import UserManagementScreen from '../screens/UserManagement';
-import AssignUsersScreen from '../screens/AssignUsers';
 import LoginScreen from '../screens/Auth/LoginScreen';
 import SelectLanguageScreen from '../screens/Language/Index';
 import WelcomePage from '../screens/Welcome/index';
@@ -84,11 +82,6 @@ const getAccessPages = (
           name: 'user-management',
           path: '/user-management',
           component: UserManagementScreen,
-        },
-        {
-          name: 'assign-users',
-          path: '/assign-users',
-          component: AssignUsersScreen,
         },
       ];
     case 'supervisor':
@@ -276,7 +269,6 @@ const AppNavigator: React.FC = () => {
   return (
     <NavigationErrorBoundary>
       <NavigationContainer
-        ref={navigationRef}
         key={navigationKey}
         linking={linking}
         fallback={
