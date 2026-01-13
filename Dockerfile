@@ -3,7 +3,8 @@
 # ------------------------------------
 FROM node:22.21.1-alpine AS builder
 WORKDIR /app
-COPY package.json yarn.lock ./
+COPY package.json ./
+COPY yarn.lock ./
 RUN yarn install
 COPY . .
 RUN yarn build:web
