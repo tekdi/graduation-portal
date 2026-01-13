@@ -6,11 +6,12 @@ import React, {
   useEffect,
 } from 'react';
 import logger from '@utils/logger';
-import { login as loginService } from '../services/authenticationService';
+import { getEntityDetails, login as loginService } from '../services/authenticationService';
 import offlineStorage from '../services/offlineStorage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import { getToken, removeToken } from '../services/api';
 import { ADMIN_ROLES, LC_ROLES } from '@constants/ROLES';
+import { useLanguage } from './LanguageContext';
 
 export type UserRole = 'Admin' | 'Supervisor' | 'LC';
 
@@ -75,12 +76,14 @@ const determineUserRole = (userData: any): UserRole => {
   }
 
   // If no matching roles found in organizations, throw unauthorized error
+  // Note: Error message will be translated in the login function
   throw new Error('Unauthorized: This role is not authorized to access the system');
 };
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState<User | null>(null);
@@ -139,7 +142,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   const login = async (email: string, password: string, isAdmin: boolean = false): Promise<{ success: boolean; message: string }> => {
     try {
       if (!email || !password) {
-        const message = `${isAdmin ? 'Admin ' : ''}Login attempted with empty credentials`;
+        const message = isAdmin ? t('auth.loginAttemptedEmptyCredentialsAdmin') : t('auth.loginAttemptedEmptyCredentials');
         logger.warn(message);
         return { success: false, message };
       }
@@ -149,12 +152,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       // Check if login response has user data
       if (loginResponse.result?.user) {
         const userData = loginResponse.result.user;
+
+        const entityDetails = await getEntityDetails(userData.id);
+        if(!entityDetails?.[0]) {
+          const message = t('auth.userEntityNotFound');
+          logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
+          return { success: false, message };
+        }
         // Determine user role (admin priority), throws if unauthorized
         let determinedRole: UserRole;
         try {
           determinedRole = determineUserRole(userData);
         } catch (roleError: any) {
-          const message = roleError.message || 'Unauthorized: This role is not authorized to access the system';
+          // Check if error message matches our known unauthorized message
+          const isUnauthorizedError = roleError.message?.includes('Unauthorized') || roleError.message?.includes('not authorized');
+          const message = isUnauthorizedError ? t('auth.roleNotAuthorized') : (roleError.message || t('auth.roleNotAuthorized'));
           logger.warn(`${isAdmin ? 'Admin ' : ''}User role not authorized:`, message);
           return { success: false, message };
         }
@@ -162,6 +174,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // Map API user data to User interface
         const mappedUser: User = {
           role: determinedRole,
+          entityDetails: entityDetails?.[0] || null,
           ...userData, // Include any additional properties from API
         };
 
@@ -172,16 +185,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         setUser(mappedUser);
         setIsLoggedIn(true);
         
-        const message = `${isAdmin ? 'Admin ' : ''}User logged in successfully`;
+        const message = isAdmin ? t('auth.userLoggedInSuccessfullyAdmin') : t('auth.userLoggedInSuccessfully');
         logger.info(message, mappedUser.email || mappedUser.id);
         return { success: true, message };
       } else {
-        const message = loginResponse.message || 'No user data in response';
+        const message = loginResponse.message || t('auth.noUserDataInResponse');
         logger.warn(`${isAdmin ? 'Admin ' : ''}Login failed:`, message);
         return { success: false, message };
       }
     } catch (error: any) {
-      const message = error?.message || 'An error occurred during login';
+      const message = error?.message || t('auth.errorOccurredDuringLogin');
       logger.error(`${isAdmin ? 'Admin ' : ''}Login error:`, error);
       return { success: false, message };
     }

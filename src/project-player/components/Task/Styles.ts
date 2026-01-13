@@ -8,22 +8,23 @@ export const taskCardStyles = {
   childCard: {
     size: 'md' as const,
     variant: 'elevated' as const,
-    bg: '$taskCardBg',
-    borderRadius: '$lg',
-    marginBottom: '$3',
+    bg: '#F6F7FB',
+    borderRadius: '$md',
+    marginBottom: '$0.5',
     borderWidth: 1,
-    borderColor: '$taskCardBorder',
+    borderColor: '$borderLight300',
   },
   childCardContent: {
-    padding: '$4',
+    padding: '$0.5',
+    paddingVertical: '$0.5',
   },
 
   // Inline style for preview mode with project children
   previewInlineContainer: {
     alignItems: 'center' as const,
     space: 'md' as const,
-    paddingVertical: '$2',
-    paddingHorizontal: '$1',
+    paddingVertical: '$0.5',
+    paddingHorizontal: '$0.5',
   },
 
   // Default inline style for regular tasks
@@ -44,6 +45,7 @@ export const taskCardStyles = {
     borderWidth: 2,
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
+    padding: '$1',
   },
 
   // Divider
@@ -68,7 +70,7 @@ export const taskCardStyles = {
     hoverBg: '$primary100' as const,
   },
   actionButtonText: {
-    color: '$textSecondary',
+    color: '$textPrimary',
   },
   actionButtonTextHover: {
     color: '$primary500' as const,
@@ -89,6 +91,47 @@ export const taskCardStyles = {
     borderRadius: '$sm',
     hoverBg: '$error200' as const,
   },
+
+  // Success toast styles
+  successToast: {
+    bg: '$white',
+    borderRadius: '$lg',
+    marginBottom: '$4',
+    marginRight: '$4',
+    borderWidth: 1,
+    borderColor: '$borderLight200',
+    shadowColor: '$backgroundLight900',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  successToastContent: {
+    space: 'sm' as const,
+    alignItems: 'center' as const,
+    padding: '$3',
+    paddingHorizontal: '$4',
+  },
+  successToastIcon: {
+    width: 24,
+    height: 24,
+    borderRadius: '$full',
+    bg: '$primary500',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  successToastIconSize: 14,
+  successToastTitle: {
+    color: '$textPrimary',
+    fontSize: '$sm',
+    fontWeight: '$medium',
+  },
+  // Web text styles
+  webTextWrap: {
+    wordBreak: 'normal',
+    overflowWrap: 'break-word',
+    whiteSpace: 'normal',
+  } as const,
 } as const;
 
 export const taskAccordionStyles = {
@@ -159,6 +202,74 @@ export const taskAccordionStyles = {
     space: 'md' as const,
     paddingTop: '$3',
   },
+  // Progress percentage text
+  progressText: {
+    fontSize: '$sm',
+    fontWeight: '$medium',
+    color: '$textSecondary',
+  },
+  // Task badge text
+  taskBadgeText: {
+    fontSize: '$xs',
+    fontWeight: '$medium',
+    color: '$primary500',
+  },
+  // Pillar header row with title and tasks
+  pillarHeaderRow: {
+    alignItems: 'center' as const,
+    space: 'sm' as const,
+    flexWrap: 'wrap' as const,
+    flex: 1,
+  },
+  // Action required badge (Social Protection)
+  actionRequiredBadge: {
+    space: 'xs' as const,
+    alignItems: 'center' as const,
+    bg: '$warning100',
+    borderWidth: 1,
+    borderColor: '$warning300',
+    borderRadius: '$full',
+    paddingHorizontal: '$2',
+    paddingVertical: '$0.5',
+  },
+  actionRequiredText: {
+    fontSize: '$xs',
+    fontWeight: '$medium',
+    color: '$warning700',
+  },
+  // Description text
+  descriptionText: {
+    color: '$textSecondary',
+    lineHeight: '$lg',
+  },
+  // Info banner
+  infoBanner: {
+    bg: '$blue50',
+    borderWidth: 1,
+    borderColor: '$blue200',
+    borderRadius: '$md',
+    padding: '$3',
+    marginBottom: '$4',
+  },
+  infoBannerContent: {
+    space: 'sm' as const,
+    alignItems: 'flex-start' as const,
+  },
+  infoBannerTitle: {
+    fontSize: '$xs',
+    fontWeight: '$semibold',
+    color: '$info600',
+    marginBottom: '$0.5',
+  },
+  infoBannerMessage: {
+    fontSize: '$xs',
+    color: '$info700',
+    lineHeight: '$sm',
+  },
+  // Icon sizes
+  accordionIconSize: 20,
+  warningIconSize: 12,
+  infoIconSize: 16,
 } as const;
 
 export const addCustomTaskStyles = {
@@ -247,7 +358,7 @@ export const addCustomTaskModalStyles = {
     borderColor: '$inputBorder',
     bg: '$backgroundPrimary.light',
     paddingHorizontal: '$6',
-    paddingVertical: '$3',
+    paddingVertical: '$2',
     borderRadius: '$md',
     hoverBg: '$hoverBackground' as const,
     cursor: 'pointer' as const,
@@ -256,7 +367,7 @@ export const addCustomTaskModalStyles = {
     variant: 'solid' as const,
     bg: '$primary500',
     paddingHorizontal: '$6',
-    paddingVertical: '$3',
+    paddingVertical: '$2',
     borderRadius: '$md',
     hoverBg: '$primary500' as const,
     hoverOpacity: 0.9,
@@ -266,4 +377,262 @@ export const addCustomTaskModalStyles = {
     space: 'xs' as const,
     alignItems: 'center' as const,
   },
+  // Service provider selection section
+  serviceProviderSection: {
+    space: 'sm' as const,
+    padding: '$3',
+    borderRadius: '$md',
+    borderWidth: 1,
+    borderColor: '$borderLight300',
+    bg: '$taskCardBg',
+  },
+  serviceProviderHeader: {
+    alignItems: 'center' as const,
+    space: 'xs' as const,
+  },
+} as const;
+
+export const evidencePreviewModalStyles = {
+  // Modal body container
+  container: {
+    space: 'md' as const,
+    padding: '$4',
+  },
+  // Description text
+  descriptionText: {
+    fontSize: '$sm',
+    color: '$textSecondary',
+  },
+  // Scrollable file list
+  scrollView: {
+    maxHeight: 400,
+  },
+  fileListContainer: {
+    space: 'md' as const,
+  },
+  // Individual file card
+  fileCard: {
+    borderWidth: 1,
+    borderColor: '$borderLight200',
+    borderRadius: '$lg',
+    padding: '$4',
+    bg: '$white',
+  },
+  // File header row
+  fileHeader: {
+    justifyContent: 'space-between' as const,
+    alignItems: 'flex-start' as const,
+    marginBottom: '$3',
+  },
+  fileInfoContainer: {
+    flex: 1,
+    space: 'xs' as const,
+  },
+  fileNameRow: {
+    space: 'sm' as const,
+    alignItems: 'center' as const,
+  },
+  fileNameText: {
+    fontSize: '$sm',
+    fontWeight: '$semibold',
+    color: '$textPrimary',
+    numberOfLines: 2,
+    flex: 1,
+  },
+  uploadInfoText: {
+    fontSize: '$xs',
+    color: '$textMuted',
+  },
+  // Download button
+  downloadButton: {
+    padding: '$2',
+    borderRadius: '$md',
+  },
+  downloadButtonHover: {
+    bg: '$hoverPink',
+  },
+  // Image preview placeholder
+  imagePreviewPlaceholder: {
+    bg: '$backgroundLight100',
+    borderRadius: '$md',
+    padding: '$6',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  imagePreviewText: {
+    fontSize: '$sm',
+    color: '$textMuted',
+    marginTop: '$2',
+  },
+  imageTypeText: {
+    fontSize: '$xs',
+    color: '$primary500',
+    marginTop: '$1',
+  },
+  // Empty state
+  emptyStateContainer: {
+    padding: '$8',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  emptyStateText: {
+    fontSize: '$sm',
+    color: '$textMuted',
+    marginTop: '$2',
+  },
+  // Icon sizes
+  fileIconSize: 18,
+  downloadIconSize: 20,
+  previewIconSize: 40,
+  // Close button
+  closeButton: {
+    borderWidth: 1,
+    borderColor: '$borderLight300',
+    borderRadius: '$md',
+    paddingHorizontal: '$5',  // ← Adjust padding here
+    paddingVertical: '$2',
+    bg: '$white',
+  },
+  closeButtonText: {
+    color: '$textPrimary',
+    fontSize: '$sm',
+    fontWeight: '$medium',
+  },
+} as const;
+
+export const fileUploadModalStyles = {
+  // Modal container
+  container: {
+    space: 'md' as const,
+  },
+  // Upload method option box
+  optionBox: {
+    padding: '$4',
+    borderRadius: '$lg',
+    borderWidth: 1,
+  },
+  optionBoxDefault: {
+    borderColor: '$borderLight200',
+    bg: '$white',
+  },
+  optionBoxActive: {
+    borderColor: '$primary500',
+    bg: '$primary100',
+  },
+  optionContent: {
+    space: 'md' as const,
+    alignItems: 'center' as const,
+  },
+  // Icon container for upload method
+  optionIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: '$full',
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+  },
+  optionIconContainerDefault: {
+    bg: '$backgroundLight100',
+  },
+  optionIconContainerActive: {
+    bg: '$white',
+  },
+  optionTextContainer: {
+    flex: 1,
+  },
+  optionTitle: {
+    fontSize: '$sm',
+    fontWeight: '$medium',
+  },
+  optionSubtitle: {
+    fontSize: '$xs',
+    color: '$textSecondary',
+  },
+  // File list section
+  fileListContainer: {
+    space: 'sm' as const,
+  },
+  fileListTitle: {
+    fontSize: '$sm',
+    fontWeight: '$semibold',
+    color: '$textPrimary',
+  },
+  fileListScrollView: {
+    maxHeight: 150,
+  },
+  fileListStack: {
+    space: 'xs' as const,
+  },
+  // File item card
+  fileItemCard: {
+    padding: '$3',
+    borderRadius: '$md',
+    bg: '$badgeSuccessBg',
+    borderWidth: 1,
+    borderColor: '$badgeSuccessBg',
+  },
+  fileItemContent: {
+    space: 'md' as const,
+    alignItems: 'center' as const,
+  },
+  fileItemIconContainer: {
+    width: 24,
+    height: 24,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+  },
+  fileItemTextContainer: {
+    flex: 1,
+  },
+  fileItemName: {
+    color: '$textPrimary',
+    numberOfLines: 1,
+  },
+  fileItemSize: {
+    color: '$textSecondary',
+  },
+  // Footer buttons
+  footerContainer: {
+    space: 'md' as const,
+    width: '$full',
+    justifyContent: 'flex-end' as const,
+  },
+  cancelButton: {
+    variant: 'outline' as const,
+    borderWidth: 1,
+    borderColor: '$borderLight300',
+    borderRadius: '$md',
+    paddingHorizontal: '$5',
+    paddingVertical: '$2',
+  },
+  submitButton: {
+    bg: '$primary500',
+    borderRadius: '$md',
+    paddingHorizontal: '$5',
+    paddingVertical: '$2',
+  },
+  submitButtonText: {
+    color: '$white',
+    fontSize: '$sm',
+  },
+  // Note box
+  noteBox: {
+    bg: '$blue50',
+    borderColor: '$blue200',
+    borderWidth: 1,
+    padding: '$3',
+    borderRadius: '$md',
+    marginTop: '$2',
+  },
+  noteText: {
+    fontSize: '$sm',
+    color: '$blue800',
+  },
+  noteBoldText: {
+    fontWeight: '$bold',
+    color: '$blue800',
+  },
+  // Icon sizes
+  optionIconSize: 20,
+  fileIconSize: 20,
 } as const;

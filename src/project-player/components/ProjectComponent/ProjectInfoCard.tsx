@@ -4,8 +4,6 @@ import {
   VStack,
   Text,
   HStack,
-  Progress,
-  ProgressFilledTrack,
 } from '@gluestack-ui/themed';
 import { ProjectInfoCardProps } from '../../types/components.types';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
@@ -44,11 +42,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
     }, 0) || 0;
 
   const isPreview = mode === 'preview';
-  const isEditOrReadOnly = mode === 'edit' || mode === 'read-only';
 
-  // Calculate progress percentage
-  const progressPercentage =
-    totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   return (
     <Box {...projectInfoCardStyles.container}>
@@ -90,27 +84,6 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
               {totalTasks} {t('projectPlayer.tasks')}
             </Text>
           </Box>
-        )}
-
-        {hasChildren && isEditOrReadOnly && (
-          <VStack {...projectInfoCardStyles.progressContainer}>
-            <Text
-              {...TYPOGRAPHY.caption}
-              {...projectInfoCardStyles.progressPercentage}
-              color="$primary500"
-              fontWeight="$bold"
-            >
-              {progressPercentage}%
-            </Text>
-            <Progress
-              value={progressPercentage}
-              {...projectInfoCardStyles.progressBar}
-            >
-              <ProgressFilledTrack
-                {...projectInfoCardStyles.progressFilledTrack}
-              />
-            </Progress>
-          </VStack>
         )}
 
         {hasChildren && isPreview && (

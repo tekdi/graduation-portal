@@ -1,5 +1,6 @@
 import { CARD_STATUS } from '@constants/app.constant';
 import { ValueOf } from 'react-native-gesture-handler/lib/typescript/typeUtils';
+import { User } from "@contexts/AuthContext";
 
 /**
  * Participant Status Types
@@ -23,20 +24,20 @@ export type PathwayType = 'employment' | 'entrepreneurship';
 
 /**
  * Participant Data Interface
- * Single source of truth for participant data matching the UI structure.
- * Uses display format status strings and contact field.
+ * Defines the structure for participant data including profile and status information
  */
-export interface ParticipantData {
-  id: string;                     // Matches exactly as shown in UI (1002, 1006A, P-024, etc.)
+export interface ParticipantData extends User {
+  id: string;
   name: string;
-  contact: string;                // normalized (was phone)
-  status: string;                 // UI labels: Not Onboarded, Onboarded, In Progress...
-  progress?: number;              // only for In Progress, Completed, Graduated
-  pathway?: string | undefined;   // keep original
-  graduationProgress?: number;    // same % as progress OR undefined
-  graduationDate?: string;        // only for Completed/Graduated if available
-  email?: string;                 // kept from original dataset
-  address?: string;               // kept from original dataset
+  contact: string;
+  email: string;
+  address: string;
+  status: ParticipantStatus;
+  pathway?: PathwayType;
+  progress?: number;
+  graduationProgress?: number;
+  graduationDate?: string | Date;
+  [key: string]: any; // Allow additional properties for flexibility
 }
 
 /**
@@ -93,3 +94,22 @@ export interface Site {
   type: 'Urban' | 'Rural' | 'Peri-urban';
 }
 
+/**
+ * Participant Service
+ * Handles participant data operations and transformations
+ */
+
+export interface ParticipantSearchParams {
+  tenant_code?: string;
+  type?: string;
+  page?: number;
+  limit?: number;
+  search?: string;
+  entity_id?: string;
+}
+
+export interface ParticipantSearchResponse {
+  responseCode: string;
+  message: string;
+  result: any;
+}

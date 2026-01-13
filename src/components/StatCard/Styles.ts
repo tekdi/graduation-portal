@@ -16,7 +16,7 @@ export const StatCardContainer = styled(View, {
   borderRadius: '$xl',
   padding: '$6',
   borderWidth: 1,
-  borderColor: '#E2E8F0',
+  borderColor: '$borderColor',
   minWidth: 150,
   marginHorizontal: '$2',
   marginBottom: '$4',
