@@ -61,7 +61,7 @@ jobs:
             cd ${{ secrets.TARGET_DIR_DEV }}
 
             if [ -f .env ]; then
-              rm .env
+              mv .env .env-bkp
             fi
 
             echo '${{ secrets.DEV_ENV_BRAC }}' > .env
