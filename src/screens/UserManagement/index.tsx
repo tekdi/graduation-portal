@@ -66,7 +66,7 @@ const UserManagementScreen = () => {
         const activeRoles = allRoles.filter((role: Role) => role.status === 'ACTIVE');
         setRoles(activeRoles);
       } catch (error) {
-       // console.error('Error fetching roles:', error);
+        console.error('Error fetching roles:', error);
         // Set empty array - filter will show only "All Roles" option
         setRoles([]);
       }
@@ -102,7 +102,7 @@ const UserManagementScreen = () => {
         const provincesData = response.result || [];
         setProvinces(provincesData);
       } catch (error) {
-       // console.error('Error fetching provinces:', error);
+        console.error('Error fetching provinces:', error);
         // Set empty array - filter will show only "All Provinces" option
         setProvinces([]);
       }
@@ -141,7 +141,7 @@ const UserManagementScreen = () => {
         );
 
         if (!selectedProvince || !selectedProvince._id) {
-         // console.error('Selected province not found or missing _id:', filters.province);
+          console.error('Selected province not found or missing _id:', filters.province);
           setDistricts([]);
           return;
         }
@@ -166,7 +166,7 @@ const UserManagementScreen = () => {
           return prev;
         });
       } catch (error) {
-       // console.error('Error fetching districts:', error);
+        console.error('Error fetching districts:', error);
         setDistricts([]);
       }
     };
@@ -256,7 +256,7 @@ const UserManagementScreen = () => {
         if (filters.role && filters.role !== 'all-roles') {
           // Filter value is already the role title (not label), so use it directly
           apiType = filters.role;
-          //console.log('Role filter applied - using type:', apiType);
+          console.log('Role filter applied - using type:', apiType);
         } else {
           // Build type parameter from all active roles fetched from API
           // Extract unique role titles from roles array
@@ -267,7 +267,7 @@ const UserManagementScreen = () => {
           
           // Use all role titles from API (no fallback)
           apiType = allRoleTitles.join(',');
-         // console.log('All Roles selected - using type:', apiType);
+          console.log('All Roles selected - using type:', apiType);
         }
 
         const apiParams: ParticipantSearchParams = {
@@ -281,15 +281,18 @@ const UserManagementScreen = () => {
           apiParams.search = filters.search;
         }
 
-        //console.log('Filters object:', filters);
-        //console.log('Role filter value:', filters.role);
-        //console.log('Status filter value:', filters.status);
+        console.log('Filters object:', filters);
+        console.log('Role filter value:', filters.role);
+        console.log('Status filter value:', filters.status);
         // Note: Role filter is handled via 'type' parameter above, not 'role' parameter
         // We don't send 'role' parameter to avoid duplication
         if (filters.status && filters.status !== 'all-status') {
           // Map status filter value to API format (e.g., "Active" → "ACTIVE")
           const mappedStatus = mapStatusLabelToAPI(filters.status);
           apiParams.status = mappedStatus;
+          console.log('Status filter applied - mapped value:', mappedStatus);
+        } else {
+          console.log('Status filter not applied - value is:', filters.status);
         }
         if (filters.province && filters.province !== 'all-provinces') {
           // Since we're using province.name as both label and value, use it directly
@@ -303,16 +306,60 @@ const UserManagementScreen = () => {
         }
 
         const response = await getParticipantsList(apiParams);
+        console.log('API response:', response);
+        console.log('Users data:', response.result?.data);
         
-        // Get API data - server handles all filtering (status, province, district)
-        const usersData = response.result?.data || [];
+        // Get raw API data
+        let usersData = response.result?.data || [];
         
-        // Use server-provided count if available, otherwise fall back to data length
-        // The API should return the total count matching the filters for proper pagination
-        const serverCount = response.result?.count ?? response.result?.total ?? usersData.length;
+        // Apply client-side status filtering if status filter is set (fallback if API doesn't filter)
+        // This ensures status filter works even if API doesn't support status parameter
+        if (filters.status && filters.status !== 'all-status') {
+          const mappedStatus = mapStatusLabelToAPI(filters.status);
+          usersData = usersData.filter((user: any) => {
+            const userStatus = user.status?.toUpperCase();
+            return userStatus === mappedStatus;
+          });
+          console.log('Client-side status filter applied:', { 
+            filterStatus: mappedStatus, 
+            filteredCount: usersData.length 
+          });
+        }
+
+        // Apply client-side province filtering if province filter is set
+        // Filter out users that don't have province data matching the filter
+        if (filters.province && filters.province !== 'all-provinces') {
+          usersData = usersData.filter((user: any) => {
+            const userProvince = user.province || user.province_name || user.location?.province;
+            // If user has no province data, exclude them when province filter is applied
+            if (!userProvince) return false;
+            // Match province name (case-insensitive)
+            return userProvince.toLowerCase() === filters.province.toLowerCase();
+          });
+          console.log('Client-side province filter applied:', { 
+            filterProvince: filters.province, 
+            filteredCount: usersData.length 
+          });
+        }
+
+        // Apply client-side district filtering if district filter is set
+        // Filter out users that don't have district data matching the filter
+        if (filters.district && filters.district !== 'all-districts') {
+          usersData = usersData.filter((user: any) => {
+            const userDistrict = user.district || user.district_name || user.location?.district;
+            // If user has no district data, exclude them when district filter is applied
+            if (!userDistrict) return false;
+            // Match district name (case-insensitive)
+            return userDistrict.toLowerCase() === filters.district.toLowerCase();
+          });
+          console.log('Client-side district filter applied:', { 
+            filterDistrict: filters.district, 
+            filteredCount: usersData.length 
+          });
+        }
         
         setUsers(usersData);
-        setTotalCount(serverCount);
+        setTotalCount(usersData.length);
       } catch (error) {
         console.error('Error fetching users:', error);
         setUsers([]);

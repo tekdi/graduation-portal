@@ -128,7 +128,7 @@ export interface AdminUserManagementData {
   id: string;
   name: string;
   email: string;
-  role: 'BRAC admin' | 'Supervisor' | 'Linkage Champion' | 'Participant';
+  role: 'Admin' | 'Supervisor' | 'Linkage Champion' | 'Participant';
   status: 'Active' | 'Deactivated';
   province: string;
   district: string;
