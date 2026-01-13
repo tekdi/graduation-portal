@@ -7,14 +7,8 @@ import {
 import {
   createProjectForEntity,
   getProjectDetails,
-  getProjectTemplatesList,
   getTaskDetails,
-  getTemplateDetails,
 } from '../services/projectPlayerService';
-import {
-  enrichChildrenWithProjects,
-  normalizeTaskResponse,
-} from '../utils/helper';
 import { STATUS } from '@constants/app.constant';
 import { updateEntityDetails } from '../../../src/services/participantService';
 
@@ -66,10 +60,9 @@ export const useProjectLoader = (
         } else if (config.mode === 'preview' && data?.categoryIds) {
           const categoryIdsString = data?.categoryIds.join(',');
           const taskResponse = await getTaskDetails(categoryIdsString);
-          console.log('taskResponse', taskResponse);
           const taskResult = taskResponse.data;
-          const taskData = normalizeTaskResponse(taskResult);
-          console.log('taskData', taskData);
+          // const taskData = normalizeTaskResponse(taskResult);
+          // console.log('taskData', taskData);
           // ✅ ENRICH — not replace
           // const enrichedChildren = enrichChildrenWithProjects(
           //   templateDetails.data.children,
@@ -80,8 +73,7 @@ export const useProjectLoader = (
           //   ...templateDetails.data,
           //   children: enrichedChildren,
           // };
-          console.log('final template details', taskData);
-          setProjectData(taskResponse);
+          setProjectData(taskResult);
         } else if (data.solutionId) {
           // Load template
           // TODO: Implement API call

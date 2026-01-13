@@ -187,13 +187,16 @@ export default function ParticipantDetail() {
             <ParticipantHeader
               participantName={participantName}
               participantId={id}
-              status={status}
+              status={status as ParticipantStatus}
               pathway={'employment'}
               graduationProgress={20}
               graduationDate={''}
               onViewProfile={() => setIsProfileModalOpen(true)}
               areAllTasksCompleted={areAllTasksCompleted}
               userEntityId={entityId}
+              onStatusUpdate={newStatus => {
+                setStatus(newStatus);
+              }}
             />
           </Container>
         </VStack>

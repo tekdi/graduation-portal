@@ -32,6 +32,7 @@ interface ParticipantHeaderProps {
   onViewProfile?: () => void; // Callback to open profile modal
   areAllTasksCompleted?: boolean; // Whether all tasks in the project are completed
   userEntityId?: string;
+  onStatusUpdate?: (newStatus: string) => void; // Callback when status is updated
 }
 
 /**
@@ -48,6 +49,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   onViewProfile,
   areAllTasksCompleted = false, // Default to false if not provided
   userEntityId,
+  onStatusUpdate,
 }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
@@ -61,13 +63,17 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     navigation.navigate('participants');
   };
 
-  const handleEnrollParticipant = async (participantId?: string) => {
+  const handleEnrollParticipant = async () => {
     if (!userEntityId) return;
 
     try {
       await updateEntityDetails(userEntityId, {
         'metaInformation.status': STATUS.ENROLLED,
       });
+      // Notify parent component about status update
+      if (onStatusUpdate) {
+        onStatusUpdate(STATUS.ENROLLED);
+      }
     } catch (error) {
       console.error('Failed to enroll participant', error);
     }
@@ -124,7 +130,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
       return (
         <Button
           {...participantHeaderStyles.solidButtonPrimary}
-          onPress={() => handleEnrollParticipant(participantId)}
+          onPress={handleEnrollParticipant}
           isDisabled={!areAllTasksCompleted}
           $md-width="auto"
         >

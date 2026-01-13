@@ -1,13 +1,8 @@
 import axios from 'axios';
-import {
-  PROJECT_PLAYER_CONFIGS,
-  taskDetailsAPIMockResponse,
-  templateDetailsAPIMockResponse,
-} from '../../constants/PROJECTDATA';
+import { PROJECT_PLAYER_CONFIGS } from '../../constants/PROJECTDATA';
 import { ApiResponse } from '../types/components.types';
 import { API_ENDPOINTS } from './apiEndpoints';
 import { isWeb } from '@utils/platform';
-import { navigate } from '../../navigation/navigationRef';
 
 export const apiClient = axios.create({
   // Use baseUrl from PROJECT_PLAYER_CONFIGS (which gets from env, with fallback)
@@ -49,7 +44,6 @@ apiClient.interceptors.response.use(
         const routeName = redirectUrl.startsWith('/')
           ? redirectUrl.slice(1)
           : redirectUrl;
-        navigate(routeName);
       }
     }
     return Promise.reject(error);
@@ -133,7 +127,6 @@ export const getCategoryList = async (
     const response = await apiClient.get(
       API_ENDPOINTS.GET_CATEGORY_LIST(parentId),
     );
-    // const resData = templateDetailsAPIMockResponse;
     return { data: response.data.result };
   } catch (error) {
     return handleApiError(error);
@@ -144,13 +137,11 @@ export const getTemplateDetails = async (
   categoryId: string,
 ): Promise<ApiResponse<any>> => {
   try {
-    // const response = await apiClient.get(
-    //   API_ENDPOINTS.GET_TEMPLATE(categoryId),
-    // );
-    // console.log(response);
-    const resData = templateDetailsAPIMockResponse;
-    // return { data: response.data.result };
-    return { data: resData.result };
+    const response = await apiClient.get(
+      API_ENDPOINTS.GET_TEMPLATE(categoryId),
+    );
+    // const resData = templateDetailsAPIMockResponse;
+    return { data: response.data.result };
   } catch (error) {
     return handleApiError(error);
   }
@@ -159,11 +150,11 @@ export const getTaskDetails = async (
   categoryIds: string,
 ): Promise<ApiResponse<any>> => {
   try {
-    // const response = await apiClient.get(
-    //   API_ENDPOINTS.GET_TASK_DETAILS(categoryIds),
-    // );
-    const response = taskDetailsAPIMockResponse;
-    return { data: response.result };
+    const response = await apiClient.get(
+      API_ENDPOINTS.GET_TASK_DETAILS(categoryIds),
+    );
+    // const response = taskDetailsAPIMockResponse;
+    return { data: response.data.result };
   } catch (error) {
     return handleApiError(error);
   }
