@@ -57,12 +57,7 @@ export const getTargetedSolutions = async (
         participant: 'ALL',
         linkageChampion: 'ALL',
         supervisor: 'ALL',
-      },
-      {
-        headers: {
-          'internal-access-token': '9yG*tM*y(7)',
-        },
-      },
+      }
     );
 
     // Extract data from response (handle different response structures)
@@ -134,9 +129,8 @@ export const getObservationEntities = async ({
  * Update observation entities for a given observation
  *
  * @param {Object} params
- * @param {string} params.entityId - The observation entity ID to update
- * @param {string[]} params.data - Array of entity IDs to update
- * @param {string} params.orgId - Organization ID (org-id header)
+ * @param {string} params.observationId - The observation ID to update
+ * @param {string[]} params.data - Array of observation entity IDs to update
  * @returns {Promise<any>} - Updated entities response
  */
 export const updateObservationEntities = async ({

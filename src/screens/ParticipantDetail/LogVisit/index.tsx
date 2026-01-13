@@ -3,7 +3,7 @@ import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import { Box, Container, VStack, HStack, Text, Pressable, Button, ButtonText, Spinner } from '@ui';
 import { LucideIcon } from '@ui';
 import { AssessmentCard } from '@components/ObservationCards';
-import { getParticipantById } from '../../../services/participantService';
+import { getParticipantProfile } from '../../../services/participantService';
 import { getTargetedSolutions } from '../../../services/solutionService';
 import { useLanguage } from '@contexts/LanguageContext';
 import { theme } from '@config/theme';
@@ -14,6 +14,7 @@ import { ParticipantData } from '@app-types/participant';
 import { AssessmentSurveyCardData } from '@app-types/participant';
 import logger from '@utils/logger';
 import { isWeb } from '@utils/platform';
+import { User } from '@contexts/AuthContext';
 
 /**
  * Route parameters type definition for LogVisit screen
@@ -37,7 +38,7 @@ const LogVisit: React.FC = () => {
   const route = useRoute<LogVisitRouteProp>();
   const [loading, setLoading] = useState<boolean>(true);
   const [solutions, setSolutions] = useState<AssessmentSurveyCardData[]>([]);
-  const [participant, setParticipant] = useState<ParticipantData | undefined>(undefined);
+  const [participant, setParticipant] = useState<ParticipantData | User | undefined>(undefined);
   const navigation = useNavigation();
   const { t } = useLanguage();
 
@@ -52,7 +53,7 @@ const LogVisit: React.FC = () => {
         });
         setSolutions(data);
         if (route.params?.id) {
-          const participantData = getParticipantById(route.params?.id);
+          const participantData = await getParticipantProfile(route.params?.id);
           setParticipant(participantData);
         }
       } catch (error) {
@@ -94,53 +95,51 @@ const LogVisit: React.FC = () => {
     <Box flex={1} bg="$accent100">
        {/* Header */}
        <VStack {...logVisitStyles.headerContainer}>
-          <Container>
-            <HStack {...logVisitStyles.headerContent}>
-              <HStack alignItems="center" gap="$3" flex={1}>
-                <Pressable onPress={handleBackPress}>
-                  <Box>
-                    <LucideIcon
-                      name="ArrowLeft"
-                      size={20}
-                      color={theme.tokens.colors.textForeground}
-                    />
-                  </Box>
-                </Pressable>
-                <VStack flex={1}>
-                  <Text {...TYPOGRAPHY.h3} color="$textForeground" mb="$1">
-                    {t('actions.logVisit')}
-                  </Text>
-                  <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
-                    {t('logVisit.selectVisitType', { name: participant?.name || '' })}
-                  </Text>
-                </VStack>
-              </HStack>
-              
-              <Button
-                {...logVisitStyles.viewCheckInsButton}
-                onPress={() => {
-                  // Handle view check-ins navigation
-                }}
-              >
-                <HStack alignItems="center" gap="$2">
+        <Container>
+          <HStack {...logVisitStyles.headerContent}>
+            <HStack alignItems="center" gap="$3" flex={1}>
+              <Pressable onPress={handleBackPress}>
+                <Box>
                   <LucideIcon
-                    name="Clock"
-                    size={16}
+                    name="ArrowLeft"
+                    size={20}
                     color={theme.tokens.colors.textForeground}
                   />
-                  <ButtonText {...logVisitStyles.viewCheckInsButtonText}>
-                    {t('logVisit.viewCheckIns')}
-                  </ButtonText>
-                </HStack>
-              </Button>
+                </Box>
+              </Pressable>
+              <VStack flex={1}>
+                <Text {...TYPOGRAPHY.h3} color="$textForeground" mb="$1">
+                  {t('actions.logVisit')}
+                </Text>
+                <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
+                  {t('logVisit.selectVisitType', { name: participant?.name || '' })}
+                </Text>
+              </VStack>
             </HStack>
-            </Container>
-          </VStack>
-        <Container>
-
+            
+            <Button
+              {...logVisitStyles.viewCheckInsButton}
+              onPress={() => {
+                // Handle view check-ins navigation
+              }}
+            >
+              <HStack alignItems="center" gap="$2">
+                <LucideIcon
+                  name="Clock"
+                  size={16}
+                  color={theme.tokens.colors.textForeground}
+                />
+                <ButtonText {...logVisitStyles.viewCheckInsButtonText}>
+                  {t('logVisit.viewCheckIns')}
+                </ButtonText>
+              </HStack>
+            </Button>
+          </HStack>
+        </Container>
+      </VStack>
+      <Container>
         {/* Cards */}
         <VStack {...logVisitStyles.cardsContainer}>
-        
           {!loading && solutions.length > 0 ? (
             solutions.map(card => (
               <AssessmentCard key={card.id} card={card} userId={participant?.id || ''} />

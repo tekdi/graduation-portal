@@ -8,8 +8,12 @@ import {
   Progress,
   ProgressFilledTrack,
   LucideIcon,
+  Container,
 } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
+import { theme } from '@config/theme';
+import { observationStyles } from './Styles';
+import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 interface HeaderProps {
   title: string;
@@ -25,64 +29,53 @@ const Header: React.FC<HeaderProps> = ({ title, progress, participantInfo, onBac
   const { t } = useLanguage();
 
   return (
-    <VStack space="md" padding="$4" backgroundColor="$white">
-      {/* Top Row: Back Button and Action Buttons */}
-      <HStack
-        justifyContent="space-between"
-        alignItems="flex-start"
-        width="$full"
-      >
-        {/* Back Button */}
-        <Pressable onPress={onBackPress}>
-          <HStack alignItems="center" space="xs">
-            <LucideIcon name="ArrowLeft" size={20} color="$textPrimary" />
-            <Text>{t('common.back')}</Text>
-          </HStack>
-        </Pressable>
-      </HStack>
-
-      {/* Title and Progress Badge Row */}
-      <HStack
-        justifyContent="space-between"
-        alignItems="center"
-        width="$full"
-        marginTop="$2"
-      >
-        <Text
-          fontSize="$xl"
-          fontWeight="$semibold"
-          color="$textPrimary"
-          flex={1}
+    <VStack {...observationStyles.headerContainer}>
+      <Container>
+        {/* Top Row: Back Button and Action Buttons */}
+        <HStack
+          {...observationStyles.headerContent}
         >
-          {title || t('logVisit.individualEnterpriseVisit.title')}
-        </Text>
+          {/* Back Button */}
+          <Pressable onPress={onBackPress}>
+            <HStack {...observationStyles.backButton}>
+              <LucideIcon name="ArrowLeft" size={16} color={theme.tokens.colors.textForeground} />
+              <Text {...TYPOGRAPHY.bodySmall}>{t('common.back')}</Text>
+            </HStack>
+          </Pressable>
+        </HStack>
 
-        {/* Progress Badge */}
-        <Box
-          backgroundColor="$gray100"
-          paddingHorizontal="$3"
-          paddingVertical="$1"
-          borderRadius="$full"
+        {/* Title and Progress Badge Row */}
+        <HStack
+          {...observationStyles.titleAndProgressContainer}
         >
-          <Text fontSize="$sm" color="$gray700" fontWeight="$medium">
-            {progress}% {t('common.complete') || 'Complete'}
+          <Text {...TYPOGRAPHY.h4}>
+            {title || t('logVisit.individualEnterpriseVisit.title')}
           </Text>
+
+          {/* Progress Badge */}
+          <Box
+            {...observationStyles.progressBadge}
+          >
+            <Text {...observationStyles.progressBadgeText}>
+              {progress}% {t('common.complete') || 'Complete'}
+            </Text>
+          </Box>
+        </HStack>
+
+        {/* Progress Bar */}
+        <Box {...observationStyles.progressBarContainer}>
+          <Progress value={progress} {...observationStyles.progressBar}>
+            <ProgressFilledTrack {...observationStyles.progressBarFill} />
+          </Progress>
         </Box>
-      </HStack>
 
-      {/* Progress Bar */}
-      <Box width="$full" marginTop="$2">
-        <Progress value={progress} width="$full" size="md">
-          <ProgressFilledTrack backgroundColor="$blue600" />
-        </Progress>
-      </Box>
-
-      {/* Participant Name and Date */}
-      {participantInfo && (
-        <Text fontSize="$sm" color="$textSecondary" marginTop="$2">
-          {participantInfo.name} • {participantInfo.date}
-        </Text>
-      )}
+        {/* Participant Name and Date */}
+        {participantInfo && (
+          <Text {...observationStyles.participantInfoText}>
+            {participantInfo.name} • {participantInfo.date}
+          </Text>
+        )}
+      </Container>
     </VStack>
   );
 };

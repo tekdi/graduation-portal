@@ -1,0 +1,57 @@
+export const observationStyles = {
+  headerContainer: {
+    space: 'md' as const,
+    padding: '$4' as const,
+    backgroundColor: '$white' as const,
+    borderBottomWidth: '$1' as const,
+    borderBottomColor: '$borderLight300' as const,
+  },
+  headerContent: {
+    justifyContent: 'space-between' as const,
+    alignItems: 'flex-start' as const,
+    width: '$full' as const,
+  },
+  backButton: {
+    alignItems: 'center' as const,
+    space: 'xs' as const,
+  },
+  title: {
+    fontSize: '$xl' as const,
+    fontWeight: '$semibold' as const,
+    color: '$textPrimary' as const,
+    flex: 1 as const,
+  },
+  titleAndProgressContainer: {
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    width: '$full' as const,
+    marginTop: '$4' as const,
+  },
+  progressBadge: {
+    bg: '$gray100' as const,
+    paddingHorizontal: '$3' as const,
+    paddingVertical: '$1' as const,
+    borderRadius: '$full' as const,
+  },
+  progressBadgeText: {
+    fontSize: '$sm' as const,
+    color: '$gray700' as const,
+    fontWeight: '$medium' as const,
+  },
+  progressBarContainer: {
+    width: '$full' as const,
+    marginTop: '$2' as const,
+  },
+  progressBar: {
+    width: '$full' as const,
+    size: 'md' as const,
+  },
+  progressBarFill: {
+    bg: '$blue600' as const,
+  },
+  participantInfoText: {
+    fontSize: '$sm' as const,
+    color: '$textSecondary' as const,
+    marginTop: '$2' as const,
+  },
+} as const;

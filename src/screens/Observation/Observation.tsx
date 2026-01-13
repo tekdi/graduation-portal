@@ -98,8 +98,8 @@ const Observation = () => {
         entityId: entityId,
         observationId: observationId,
       });
-    } catch (error) {
-      showAlert('error', t('observation.noParticipantFoundError') + error, {
+    } catch (error: any) {
+      showAlert('error', `${t('observation.noParticipantFoundError')} : ${error.message}`, {
         duration: 10000,
       });
     }
@@ -162,33 +162,33 @@ const Observation = () => {
                 });
                 setLoading(false);
               }
-            } catch (error) {
-              showAlert(
-                'error',
-                t('observation.noParticipantFoundError') + error,
-                {
-                  duration: 10000,
-                },
+            } catch (error: any) {
+              showAlert('error',
+                `${t('observation.noParticipantFoundError')} : ${error.message}`,
+                { duration: 10000 }
               );
+              setLoading(false);
             }
           }
         } else {
           showAlert('error', t('observation.noParticipantFound'));
+          setLoading(false);
         }
       } else {
         showAlert('error', t('observation.noParticipantFound'));
+        setLoading(false);
       }
     };
     if (solutionId && id) {
       fetchObservation();
-      // setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionId, id]);
 
-  const handleBackPress = useCallback(() => {
+  const handleBackPress = useCallback(() => {    
     if (navigation.canGoBack && navigation.canGoBack()) {
       navigation.goBack();
+      return false;
     } else {
       // Fallback: Navigate to participant detail if there's no previous screen
       // @ts-ignore
@@ -261,12 +261,10 @@ const Observation = () => {
       <Container>
         {/* Web Component Player */}
         <Box flex={1} marginTop="$4">
-          {mockData && (
-            <WebComponentPlayerMemoized
-              getProgress={handleProgressUpdate}
-              playerConfig={playerConfigMemoized}
-            />
-          )}
+          <WebComponentPlayerMemoized
+            getProgress={handleProgressUpdate}
+            playerConfig={playerConfigMemoized}
+          />
         </Box>
       </Container>
     </VStack>
