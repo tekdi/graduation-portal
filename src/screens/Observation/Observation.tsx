@@ -38,8 +38,7 @@ const Observation = () => {
   const { showAlert } = useAlert();
 
   const [token, setToken] = useState<string | null>(null);
-  const [mockData, setMockData] = useState<any>({});
-
+  const [mockData, setMockData] = useState<any>();
   // Use ref to store progress callback to avoid prop changes causing rerenders
   const progressCallbackRef =
     useRef<
@@ -187,6 +186,14 @@ const Observation = () => {
     if (solutionId && id) {
       fetchObservation();
     }
+
+    return () => {
+      setMockData(null);
+      setObservation(null);
+      setParticipantInfo(null);
+      setProgress(0);
+      setLoading(true);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionId, id]);
 
@@ -222,7 +229,7 @@ const Observation = () => {
     ) => {
       progressCallbackRef.current?.(progressValue);
     },
-    [],
+    [mockData],
   );
 
   // Memoize playerConfig to prevent WebComponentPlayer rerenders
@@ -271,10 +278,12 @@ const Observation = () => {
         <Container>
           {/* Web Component Player */}
           <Box {...observationStyles.webComponentPlayerContainer}>
-            <WebComponentPlayer
-              getProgress={handleProgressUpdate}
-              playerConfig={playerConfigMemoized}
-            />
+            {mockData &&
+              <WebComponentPlayer
+                getProgress={handleProgressUpdate}
+                playerConfig={playerConfigMemoized}
+              />
+            }
           </Box>
         </Container>
       </VStack>
