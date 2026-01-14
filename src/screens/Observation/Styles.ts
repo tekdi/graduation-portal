@@ -1,7 +1,6 @@
 export const observationStyles = {
   headerContainer: {
     space: 'md' as const,
-    padding: '$4' as const,
     backgroundColor: '$white' as const,
     borderBottomWidth: '$1' as const,
     borderBottomColor: '$borderLight300' as const,
@@ -71,6 +70,8 @@ export const observationStyles = {
   },
   webComponentPlayerContainer: {
     flex: 1 as const,
-    marginTop: '$4' as const,
+    '$md-px': '$6' as const,
+    px: '$4' as const, // padding like container padding
+    py: '$6' as const,
   },
 } as const;

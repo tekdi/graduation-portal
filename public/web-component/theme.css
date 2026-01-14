@@ -33,10 +33,10 @@ form.main {
 .sticky-footer {
   position: relative !important;
 }
-.mat-mdc-tab-body-wrapper {
+/* lib-page-questions-grid .custom-font {
   max-height: calc(100vh - 357px) !important;
   min-height: calc(100vh - 357px) !important;
-}
+} */
 .top-primary-border {
   border-top: none !important;
   padding: 0.5rem 1rem !important;
@@ -218,6 +218,50 @@ textarea::placeholder {
 /* end checkbox */
 
 /* start radio */
+lib-radio-input, lib-checkbox-input {
+  max-height: 300px;
+  overflow-y: overlay;
+  border: 1px solid lightgray;
+  padding-block: 10px;
+  border-radius: 0.66rem !important;
+}
+
+lib-checkbox-input > div {
+  gap: .75rem;
+  display: flex;
+  flex-direction: column;
+  padding-left: 0.5rem !important;
+}
+
+lib-checkbox-input .mdc-checkbox {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+.mat-mdc-checkbox {
+  margin: 0 !important;
+}
+lib-checkbox-input .mdc-checkbox .mdc-checkbox__native-control,
+lib-checkbox-input .mat-mdc-checkbox-touch-target,
+lib-checkbox-input .mat-mdc-checkbox-ripple,
+lib-checkbox-input .mdc-checkbox__ripple,
+lib-checkbox-input .mdc-checkbox__background
+lib-checkbox-input .mdc-checkbox
+{
+  width: 1rem !important;
+  height: 1rem !important;
+}
+lib-checkbox-input .mdc-checkbox__background {
+  top: 0 !important;
+  left: 0 !important;
+  border-radius: 0.25rem !important;
+  border-color: #e2e8f0 !important;
+}
+
+lib-checkbox-input .mat-mdc-checkbox-checked .mdc-checkbox__background {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
 .mat-mdc-radio-group {
   gap: 1rem !important;
   display: flex !important;
