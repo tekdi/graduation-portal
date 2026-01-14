@@ -1,25 +1,30 @@
 export const AssignUsersStyles = {
+    coverCardStyles: {
+     padding: '$6',
+     borderRadius: '$2xl',
+     mt: '$6',
+     backgroundColor: '$white',
+    },
     cardStyles: {
       size: 'md',
       variant: 'outline',
-      backgroundColor: '$error100',
-      borderColor: '$primary500',
+      backgroundColor: '$bgPrimary/5',
+      borderColor: '$bgPrimaryBorder/5',
       mt: '$6',
       flexDirection: 'row',
       alignItems: 'center',
       gap: '$3',
     },
     supervisorName: {
-      fontSize: '$lg',
-      fontWeight: '$normal',
-      mb: '$3',
-      color: '$textLight900',
-    },
-    provinceName: {
       fontSize: '$md',
       fontWeight: '$normal',
-      mb: '$3',
-      color: '$textLight900',
+      mb: '$1',
+      color: '$textForeground',
+    },
+    provinceName: {
+      fontSize: '$sm',
+      fontWeight: '$normal',
+      color: '$textMutedForeground',
     },
     viewstyles: {
       flexDirection: 'row',
@@ -35,6 +40,27 @@ export const AssignUsersStyles = {
       flexDirection: 'row',
       alignItems: 'center',
       gap: '$3',
+    },
+    headingStyles: {
+      fontSize: 16,
+      fontWeight: '$medium',
+      color: '$textForeground',
+    },
+    descriptionTextStyles: {
+      fontSize: 16,
+      fontWeight: '$normal',
+      color: '$textMutedForeground',
+    },
+    avatarBgStyles: {
+      backgroundColor: '$bgPrimary/10',
+      width: '$10',
+      height: '$10',
+      // Avatar background style - customize as needed
+    },
+    avatarFallbackTextStyles: {
+      color: '$primary500',
+      fontWeight: '$normal',
+      // AvatarFallbackText style - customize as needed
     },
 };
    

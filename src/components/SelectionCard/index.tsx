@@ -23,6 +23,8 @@ import type { TextProps, ViewProps } from 'react-native';
 import { useLanguage } from '@contexts/LanguageContext';
 import { selectedLCList } from '@constants/USER_MANAGEMENT_FILTERS';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
+import { LucideIcon } from '@ui';
+import { theme } from '@config/theme';
 
 
 interface SelectionCardProps {
@@ -36,6 +38,8 @@ interface SelectionCardProps {
  showLcListforSupervisorTeam?: boolean;
  onLcSelect?: (lc: any) => void;
  onAssign?: (selectedLCs: any[]) => void;
+ lcList?: any[]; // Optional filtered LC list (if not provided, uses default selectedLCList)
+ isParticipantList?: boolean; // Flag to indicate if this is a participant list (different button text)
 }
 
 
@@ -50,11 +54,16 @@ const SelectionCard = ({
   showLcListforSupervisorTeam = false,
   onLcSelect,
   onAssign,
+  lcList,
+  isParticipantList = false,
 }: SelectionCardProps) => {
   const { t } = useLanguage();
 
   const [selectedLc, setSelectedLc] = useState<any>(null);
   const [selectedLCs, setSelectedLCs] = useState<Set<string>>(new Set());
+  
+  // Use provided lcList or fall back to default selectedLCList
+  const displayLCList = lcList || selectedLCList;
  // Handler to receive filter changes from FilterButton and pass to parent
  const handleFilterChange = (values: Record<string, any>) => {
    // Call parent's onChange handler if provided
@@ -63,27 +72,29 @@ const SelectionCard = ({
 
 
   return (
-    <Card size="md" variant="outline">
-      <Heading size="md">{t(title)}</Heading>
-      <Text size="sm">
+    <Card {...(AssignUsersStyles.coverCardStyles as ViewProps)}>
+      <Heading {...(AssignUsersStyles.headingStyles as any)}>{t(title)}</Heading>
+      <Text {...(AssignUsersStyles.descriptionTextStyles as TextProps)}>
         {description.includes('{{supervisor}}') && selectedValues?.selectSupervisor
           ? t(description).replace('{{supervisor}}', selectedValues.selectSupervisor)
+          : description.includes('{{lc}}') && selectedValues?.selectedLc?.labelKey
+          ? t(description).replace('{{lc}}', selectedValues.selectedLc.labelKey)
           : t(description)}
       </Text>
 
 
-    {!showLcListforSupervisorTeam && (
-      <FilterButton
-        data={filterOptions}
-        showClearButton={false}
-        onFilterChange={handleFilterChange}
-      />
-    )}
+      {!showLcListforSupervisorTeam && (
+        <FilterButton
+          data={filterOptions}
+          showClearButton={false}
+          onFilterChange={handleFilterChange}
+        />
+      )}
      {/* Display selected values if showSelectedCard is true and values exist */}
      {showSelectedCard && selectedValues && (
        <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>
-         <Avatar>
-           <AvatarFallbackText>
+         <Avatar {...(AssignUsersStyles.avatarBgStyles as any)}>
+           <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)}>
              {selectedValues.selectSupervisor ||
                selectedValues.selectedValue ||
                selectedValues.labelKey ||
@@ -97,25 +108,28 @@ const SelectionCard = ({
                ''}
            </Text>
            <Text {...(AssignUsersStyles.provinceName as TextProps)}>
-             {selectedValues.filterByProvince || selectedValues.province || ''}
+             {selectedValues.filterByProvince || selectedValues.province || 'eThekwini, KwaZulu-Natal'}
            </Text>
          </View>
        </Card>
      )}
      {showLcList && (
        <VStack marginTop={'$3'}>
-         <Text {...(AssignUsersStyles.provinceName as TextProps)}>
-           {t('admin.assignUsers.selectedLinkageChampions')}
+         <Text {...(AssignUsersStyles.provinceName as TextProps)} color="$textForeground">
+           {isParticipantList 
+             ? t('admin.assignUsers.selectParticipants', { count: selectedLCs.size })
+             : t('admin.assignUsers.selectedLinkageChampions')}
          </Text>
-         <Card variant="outline">
-           {selectedLCList?.map((lc: any) => {
+        <Card variant="outline" padding="$0" marginTop="$1">
+          {displayLCList?.map((lc: any) => {
              const isChecked = selectedLCs.has(lc.value);
              return (
                <React.Fragment key={lc.value}>
                  <Checkbox
                    isDisabled={false}
                    isInvalid={false}
-                   size="md"
+                   size="sm"
+                   padding="$3"
                    value={lc.value}
                    isChecked={isChecked}
                    onChange={(checked: boolean) => {
@@ -130,31 +144,38 @@ const SelectionCard = ({
                      });
                    }}
                  >
-                 <CheckboxIndicator>
+                 <CheckboxIndicator borderWidth={1} borderColor="$textForeground">
                    <CheckboxIcon as={CheckIcon} color="$modalBackground" />
                  </CheckboxIndicator>
 
 
                  <CheckboxLabel>
                    <View {...(AssignUsersStyles.viewstyles as ViewProps)}>
-                     <Avatar>
-                       <AvatarFallbackText>{lc.labelKey}</AvatarFallbackText>
+                     <Avatar {...(AssignUsersStyles.avatarBgStyles as any)} width="$8" height="$8">
+                       <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)} fontSize="$sm">{lc.labelKey}</AvatarFallbackText>
                      </Avatar>
 
 
                      <View>
                        <Text
-                         {...(AssignUsersStyles.supervisorName as TextProps)}
+                         {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm"
                        >
                          {lc.labelKey}
                        </Text>
-                       <Text
-                         {...(AssignUsersStyles.provinceName as TextProps)}
-                       >
-                         {lc.location}
-                       </Text>
+                       <HStack gap="$1">
+                         <LucideIcon
+                           name="MapPin"
+                           size={12}
+                           color={theme.tokens.colors.textMutedForeground}
+                         />
+                         <Text
+                           {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs"
+                         >
+                           {lc.location}
+                         </Text>
+                       </HStack>
                      </View>
-                     <Button
+                     {/* <Button
                        {...titleHeaderStyles.outlineButton}
                        marginLeft="auto"
                      >
@@ -163,7 +184,7 @@ const SelectionCard = ({
                            {t(`admin.assignUsers.status.${lc.status}`) || lc.status}
                          </Text>
                        </HStack>
-                     </Button>
+                     </Button> */}
                    </View>
                  </CheckboxLabel>
                </Checkbox>
@@ -180,7 +201,7 @@ const SelectionCard = ({
           onPress={() => {
             // Handle assign LCs to supervisor
             const selectedLCValues = Array.from(selectedLCs);
-            const selectedLCObjects = selectedLCList.filter((lc: any) =>
+            const selectedLCObjects = displayLCList.filter((lc: any) =>
               selectedLCValues.includes(lc.value)
             );
             console.log('Assigning LCs:', selectedLCObjects);
@@ -194,7 +215,9 @@ const SelectionCard = ({
         >
           <HStack space="sm" alignItems="center">
             <Text {...titleHeaderStyles.solidButtonText}>
-              {t('admin.actions.assignLCsToSupervisor')}
+              {isParticipantList
+                ? t('admin.assignUsers.assignParticipantsToLc').replace('{{count}}', String(selectedLCs.size))
+                : t('admin.actions.assignLCsToSupervisor')}
             </Text>
           </HStack>
         </Button>
@@ -203,7 +226,7 @@ const SelectionCard = ({
 
 
      {showLcListforSupervisorTeam &&
-       selectedLCList?.map((lc: any) => {
+       displayLCList?.map((lc: any) => {
          const isSelected = selectedLc?.value === lc.value;
 
 
@@ -220,8 +243,8 @@ const SelectionCard = ({
                  ? (AssignUsersStyles.cardStyles as ViewProps)
                  : (AssignUsersStyles.selectedCardStyles as ViewProps))}
              >
-               <Avatar>
-                 <AvatarFallbackText>{lc.labelKey || ''}</AvatarFallbackText>
+               <Avatar {...(AssignUsersStyles.avatarBgStyles as any)}>
+                 <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)}>{lc.labelKey || ''}</AvatarFallbackText>
                </Avatar>
 
 
