@@ -27,7 +27,7 @@ export const getParticipantsList = async (
 ): Promise<ParticipantSearchResponse> => {
   try {
     const {
-      tenant_code = process.env.TENANT_CODE,
+      tenant_code = process.env.TENANT_CODE_NAME || "brac",
       type = ROLE_NAMES.USER,
       page = 1,
       limit = 20,
