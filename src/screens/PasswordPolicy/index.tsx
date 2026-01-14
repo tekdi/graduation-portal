@@ -21,7 +21,7 @@ const PasswordPolicy = () => {
             id: 'admin',
             title: t('admin.passwordPolicyPage.cards.admin.title'),
             badgeText: t('admin.passwordPolicyPage.cards.admin.badge'),
-            badgeColor: theme.tokens.colors.red500,
+            badgeColor: theme.tokens.colors.error900,
             sections: [
                 {
                     type: 'success',
@@ -35,7 +35,7 @@ const PasswordPolicy = () => {
             id: 'supervisor',
             title: t('admin.passwordPolicyPage.cards.supervisor.title'),
             badgeText: t('admin.passwordPolicyPage.cards.supervisor.badge'),
-            badgeColor: theme.tokens.colors.red900, 
+            badgeColor: theme.tokens.colors.error600,
             sections: [
                 {
                     type: 'success',
