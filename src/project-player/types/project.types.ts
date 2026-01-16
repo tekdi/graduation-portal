@@ -19,6 +19,7 @@ export interface ProjectData {
   metaInformation?: any;
   createdAt: string;
   updatedAt: string;
+  children?: [];
 }
 
 export interface Task {
@@ -31,6 +32,7 @@ export interface Task {
   isCustomTask?: boolean; // Flag to identify user-created custom tasks
   serviceProvider?: string; // Service provider for custom tasks
   children?: Task[]; // For nested project tasks
+  tasks?: Task[]; // For nested project tasks
   attachments?: Attachment[];
   observationFormId?: string;
   metaInformation?: {

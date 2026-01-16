@@ -24,7 +24,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import Container from '@ui/Container';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
-import { TASK_TYPE, TASK_STATUS } from '@constants/app.constant';
+import { TASK_STATUS } from '@constants/app.constant';
 
 const ProjectComponent: React.FC = () => {
   const { projectData, mode, config } = useProjectContext();
@@ -33,14 +33,7 @@ const ProjectComponent: React.FC = () => {
   const [previousPercent, setPreviousPercent] = useState(0);
   const toast = useToast();
 
-  // Check if project has children (pillars) - used to distinguish Intervention Plan from Onboarding
-  const hasChildren =
-    projectData?.tasks?.some(
-      task =>
-        task.type === TASK_TYPE.PROJECT &&
-        task.children &&
-        task.children.length > 0,
-    ) || false;
+  const hasChildren = !!projectData?.children?.length;
 
   const isEditMode =
     mode === 'edit' && config.showAddCustomTaskButton !== false;
@@ -199,13 +192,21 @@ const ProjectComponent: React.FC = () => {
                 </Box>
               )}
 
-              {projectData.tasks?.map((task, index) => (
-                <TaskComponent
-                  key={task._id}
-                  task={task}
-                  isLastTask={index === projectData?.tasks.length - 1}
-                />
-              ))}
+              {hasChildren
+                ? projectData?.children?.map((task, index) => (
+                    <TaskComponent
+                      key={task._id}
+                      task={task}
+                      // isLastTask={index === projectData.children.length - 1}
+                    />
+                  ))
+                : projectData?.tasks?.map((task, index) => (
+                    <TaskComponent
+                      key={task._id}
+                      task={task}
+                      isLastTask={index === projectData.tasks.length - 1}
+                    />
+                  ))}
 
               {/* Pillar features only: +Add Custom Task button (for Intervention Plan, not Onboarding) */}
               {showPillarFeatures && (

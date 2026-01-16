@@ -1,10 +1,5 @@
 import React from 'react';
-import {
-  Box,
-  VStack,
-  Text,
-  HStack,
-} from '@gluestack-ui/themed';
+import { Box, VStack, Text, HStack } from '@gluestack-ui/themed';
 import { ProjectInfoCardProps } from '../../types/components.types';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useProjectContext } from '../../context/ProjectContext';
@@ -22,14 +17,10 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const totalTasks = project.tasks?.length || 0;
 
   // Check if any task is a project type (has children)
-  const hasChildren =
-    project?.children?.some(
-      task =>
-        task.type === 'project' && task.children && task.children.length > 0,
-    ) || false;
+  const hasChildren = !!project?.children?.length;
 
   // Count total pillars (project type tasks)
-  const totalPillars = project?.tasks.length || 0;
+  const totalPillars = project?.children?.length || 0;
 
   // Count total child tasks across all pillars
   const totalChildTasks =
@@ -41,7 +32,6 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
     }, 0) || 0;
 
   const isPreview = mode === 'preview';
-
 
   return (
     <Box {...projectInfoCardStyles.container}>
