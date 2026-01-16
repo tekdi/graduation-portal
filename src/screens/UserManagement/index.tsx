@@ -17,6 +17,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { userManagementStyles as styles } from './Styles';
 import { theme } from '@config/theme';
+import { getSignedUrl, uploadFileToSignedUrl, bulkUserCreate } from '../../services/bulkUploadService';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -81,7 +82,7 @@ const UserManagementScreen = () => {
     
     // Validate CSV file extension
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      showErrorToast('Please select a CSV file');
+      showErrorToast(t('admin.actions.csvValidationError') || 'Please select a CSV file');
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -90,7 +91,7 @@ const UserManagementScreen = () => {
 
     // Validate file size
     if (!validateFileSize(file)) {
-      showErrorToast(`File size exceeds maximum limit of ${maxFileSize}MB`);
+      showErrorToast(t('admin.actions.csvMaxSizeError') || `File size exceeds maximum limit of ${maxFileSize}MB`);
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -99,16 +100,51 @@ const UserManagementScreen = () => {
 
     setIsUploading(true);
     try {
-      // TODO: Implement actual CSV upload API call
       console.log('Uploading CSV file:', file.name);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Step 1: Get signed URL
+      const signedUrlResponse = await getSignedUrl(file.name);
+      if (!signedUrlResponse.result?.signedUrl) {
+        throw new Error('Failed to get signed URL');
+      }
       
-      showSuccessToast('CSV file uploaded successfully');
-    } catch (error) {
+      // Step 2: Upload file to signed URL
+      await uploadFileToSignedUrl(signedUrlResponse.result.signedUrl, file);
+      console.log('File uploaded successfully to signed URL');
+      
+      // Show toast for file upload success
+      showSuccessToast(t('admin.actions.uploadSuccess') || 'CSV file uploaded successfully!');
+      
+      // Step 3: Trigger bulk user creation
+      const filePath = signedUrlResponse.result.filePath || signedUrlResponse.result.destFilePath;
+      if (!filePath) {
+        throw new Error('File path not found in response');
+      }
+      
+      const bulkCreateResponse = await bulkUserCreate(filePath, ['name', 'email'], 'UPLOAD');
+      console.log('Bulk user creation triggered successfully:', bulkCreateResponse);
+      
+      // Show toast for user upload success
+      showSuccessToast(
+        t('admin.actions.uploadSuccessMessage') || 
+        'CSV uploaded successfully! You will receive an email with results once processing is complete.'
+      );
+      
+    } catch (error: any) {
       console.error('Upload failed:', error);
-      showErrorToast('Failed to upload CSV file. Please try again.');
+      
+      // Determine which step failed and show appropriate error message
+      let errorMessage = t('admin.actions.uploadError') || 'Failed to upload CSV file. Please try again.';
+      
+      if (error.message?.includes('signed URL') || error.message?.includes('Failed to get upload URL')) {
+        errorMessage = t('admin.actions.uploadErrorSignedUrl') || 'Failed to get upload URL. Please try again.';
+      } else if (error.message?.includes('File upload failed') || error.message?.includes('upload file')) {
+        errorMessage = t('admin.actions.uploadErrorFileUpload') || 'Failed to upload file. Please try again.';
+      } else if (error.message?.includes('bulk user') || error.message?.includes('process')) {
+        errorMessage = t('admin.actions.uploadErrorBulkCreate') || 'File uploaded but failed to process. Please contact support.';
+      }
+      
+      showErrorToast(errorMessage);
     } finally {
       setIsUploading(false);
       // Reset file input

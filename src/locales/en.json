@@ -176,7 +176,21 @@
     "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
     "actions": {
       "bulkUploadCSV": "Bulk Upload (CSV)",
-      "createUser": "Create User"
+      "createUser": "Create User",
+      "uploadUsers": "Upload Users",
+      "uploadUsersDescription": "Choose how you want to add users",
+      "uploadCSV": "Upload CSV",
+      "uploadCSVDescription": "Upload a CSV file to create multiple users at once",
+      "addUser": "Add User",
+      "addUserDescription": "Manually add a single user to the system",
+      "uploadSuccess": "CSV file uploaded successfully!",
+      "uploadSuccessMessage": "CSV uploaded successfully! You will receive an email with results once processing is complete.",
+      "uploadError": "Failed to upload CSV file. Please try again.",
+      "uploadErrorSignedUrl": "Failed to get upload URL. Please try again.",
+      "uploadErrorFileUpload": "Failed to upload file. Please try again.",
+      "uploadErrorBulkCreate": "File uploaded but failed to process. Please contact support.",
+      "csvValidationError": "Please select a valid CSV file",
+      "csvMaxSizeError": "File size exceeds maximum limit of 10MB"
     },
     "filters": {
       "role": "Role",
