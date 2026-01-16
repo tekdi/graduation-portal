@@ -1,112 +1,133 @@
-import { StyleSheet, Platform, Dimensions } from 'react-native';
-import { theme } from '@config/theme';
-
-const { width } = Dimensions.get('window');
-const isMobile = width < 768;
-
-export const styles = StyleSheet.create({
+export const csvImportStyles = {
     container: {
         flex: 1,
-        padding: 7,
-        backgroundColor: '#fff',
+        bg: '$white' as const,
     },
     headerContainer: {
-        marginBottom: 32,
-        maxWidth: 1200,
-        width: '100%',
-        alignSelf: 'center',
+        space: 'xl' as const,
+        mb: '$8' as const,
+        mt: '$4' as const,
     },
     pageTitle: {
-        marginBottom: 8,
+        size: 'xl' as const,
+        mb: '$2' as const,
     },
-    pageSubtitle: {},
-
-    // Section Styles
+    pageSubtitle: {
+        size: 'md' as const,
+        color: '$textSecondary' as const,
+    },
     sectionContainer: {
         borderWidth: 1,
-        borderColor: theme.tokens.colors.gray300,
-        borderRadius: 8,
-        padding: 24,
-        marginBottom: 32,
-        maxWidth: 1200,
-        width: '100%',
-        alignSelf: 'center',
+        borderColor: '$gray300' as const,
+        borderRadius: '$md' as const,
+        p: '$6' as const,
+        mb: '$8' as const,
     },
     sectionTitle: {
-        marginBottom: 4,
+        size: 'md' as const,
+        mb: '$1' as const,
     },
     sectionSubtitle: {
-        marginBottom: 24,
+        size: 'sm' as const,
+        color: '$textSecondary' as const,
+        mb: '$6' as const,
     },
-
-    // Grid
     gridContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 16,
-        paddingHorizontal: 0,
+        flexWrap: 'wrap' as const,
+        gap: '$4' as const,
+        justifyContent: 'center' as const,
+        '$md-justifyContent': 'flex-start' as const,
     },
-
-    // Card Styles
-    cardContainer: {
-        // Visual styles removed to use Gluestack props for hover support
-        // Responsive width logic
-        width: Platform.OS === 'web' ? '31%' : '100%',
-        marginRight: 0,
-        marginBottom: 12,
-        minWidth: 280,
-    },
-    cardHeader: {},
-    cardTitle: {
-        flex: 1,
-        marginRight: 8,
-    },
-    cardDescription: {
-        marginBottom: 16,
-    },
-    downloadButton: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
-        borderColor: theme.tokens.colors.gray300,
-        borderRadius: 6,
-        paddingVertical: 8,
-        paddingHorizontal: 12,
-        backgroundColor: '#fff',
-    },
-    downloadButtonText: {
-        marginLeft: 8,
-    },
-
-    // Guidelines Section
     guidelinesContainer: {
-        backgroundColor: '#f8fafc',
+        bg: '$gray50' as const,
         borderWidth: 1,
-        borderColor: '#e2e8f0',
-        borderRadius: 8,
-        padding: 24,
-        marginTop: 16,
+        borderColor: '$gray300' as const,
+        borderRadius: '$md' as const,
+        p: '$6' as const,
+        mt: '$4' as const,
     },
     guidelinesHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
+        space: 'sm' as const,
+        alignItems: 'center' as const,
+        mb: '$4' as const,
     },
     guidelinesTitle: {
-        marginLeft: 8,
+        size: 'sm' as const,
+    },
+    guidelinesList: {
+        space: 'sm' as const,
     },
     guidelineItem: {
-        marginBottom: 8,
+        space: 'sm' as const,
+        alignItems: 'flex-start' as const,
     },
     bulletPoint: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: theme.tokens.colors.textSecondary,
-        marginTop: 8,
+        w: '$1.5' as const,
+        h: '$1.5' as const,
+        borderRadius: '$full' as const,
+        bg: '$textSecondary' as const,
+        mt: '$2' as const,
     },
     guidelineText: {
+        size: 'sm' as const,
         flex: 1,
     },
-});
+} as const;
+
+export const templateCardStyles = {
+    container: {
+        w: '$full' as const,
+        '$md-w': '31%',
+        '$sm-minWidth': 280,
+        mb: '$3' as const,
+        bg: '$white' as const,
+        borderRadius: '$md' as const,
+        borderWidth: 1,
+        borderColor: '$gray300' as const,
+        p: '$3' as const,
+        '$hover': {
+            borderColor: '$primary500',
+        },
+    },
+    contentVStack: {
+        space: 'sm' as const,
+        height: '100%',
+    },
+    headerHStack: {
+        justifyContent: 'space-between' as const,
+        alignItems: 'flex-start' as const,
+    },
+    title: {
+        flex: 1,
+        mr: '$2' as const,
+        fontWeight: '$bold' as const,
+        color: '$textPrimary' as const,
+    },
+    description: {
+        mb: '$4' as const,
+        color: '$textSecondary' as const,
+    },
+    buttonContainer: {
+        mt: 'auto' as const,
+    },
+    downloadButton: {
+        flexDirection: 'row' as const,
+        alignItems: 'center' as const,
+        justifyContent: 'center' as const,
+        borderWidth: 1,
+        borderColor: '$gray300' as const,
+        borderRadius: '$sm' as const,
+        bg: '$white' as const,
+        py: '$2' as const,
+        px: '$3' as const,
+        '$hover': {
+            bg: '$gray100',
+        },
+    },
+    buttonText: {
+        ml: '$2' as const,
+        fontSize: '$sm' as const,
+        fontWeight: '$medium' as const,
+        color: '$textPrimary' as const,
+    },
+} as const;
