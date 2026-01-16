@@ -11,6 +11,7 @@ import {
 } from '../services/projectPlayerService';
 import { STATUS } from '@constants/app.constant';
 import { updateEntityDetails } from '../../../src/services/participantService';
+import { getProjectCategoryList } from '../../../src/services/projectService';
 
 export const useProjectLoader = (
   config: ProjectPlayerConfig,
@@ -58,22 +59,46 @@ export const useProjectLoader = (
             setError(err as Error);
           }
         } else if (config.mode === 'preview' && data?.categoryIds) {
+          const templatesData = await getProjectCategoryList();
+          const selectedPathway = data?.selectedPathway;
+          const pathwayData = templatesData?.find(
+            (template: any) => template._id === selectedPathway,
+          );
           const categoryIdsString = data?.categoryIds.join(',');
           const taskResponse = await getTaskDetails(categoryIdsString);
           const taskResult = taskResponse.data;
-          // const taskData = normalizeTaskResponse(taskResult);
-          // console.log('taskData', taskData);
-          // ✅ ENRICH — not replace
-          // const enrichedChildren = enrichChildrenWithProjects(
-          //   templateDetails.data.children,
-          //   taskData,
-          // );
-          // // ✅ final combined response
-          // const finalProjectData = {
-          //   ...templateDetails.data,
-          //   children: enrichedChildren,
-          // };
-          setProjectData(taskResult);
+
+          const updatedPathwayData = {
+            ...pathwayData,
+            children: pathwayData?.children?.map((child: any) => {
+              let taskEntry = taskResult?.[child._id];
+
+              if (!taskEntry) {
+                const relation = data?.pillarCategoryRelation?.find(
+                  (rel: any) => rel.pillarId === child._id,
+                );
+
+                const newChildId = relation?.selectedCategoryId;
+                if (newChildId) {
+                  taskEntry = taskResult?.[newChildId];
+                }
+              }
+
+              // 3️⃣ Normalize tasks safely
+              const tasks = Array.isArray(taskEntry)
+                ? taskEntry?.[0]?.tasks ?? []
+                : taskEntry?.tasks ?? [];
+
+              return {
+                ...child,
+                tasks,
+              };
+            }),
+          };
+
+          console.log(updatedPathwayData);
+
+          setProjectData(updatedPathwayData);
         } else if (data.solutionId) {
           // Load template
           // TODO: Implement API call

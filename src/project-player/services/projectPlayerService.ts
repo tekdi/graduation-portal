@@ -16,7 +16,6 @@ apiClient.interceptors.request.use(async config => {
   // Get token from PROJECT_PLAYER_CONFIGS.accessToken (which fetches from AsyncStorage)
   try {
     const token = await PROJECT_PLAYER_CONFIGS.accessToken();
-    console.log('token', token);
     if (token) {
       config.headers['X-auth-token'] = token;
     }

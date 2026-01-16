@@ -80,6 +80,7 @@ const DevelopInterventionPlan: React.FC = () => {
   >({});
 
   const [participant, setParticipant] = useState<any>(null);
+  const [selectedPathway, setSelectedPathway] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showProjectPlayerPreview, setShowProjectPlayerPreview] =
     useState(false);
@@ -102,6 +103,65 @@ const DevelopInterventionPlan: React.FC = () => {
     const selectedCategory = categories.find(c => c.id === pillarCategoryId);
     return selectedCategory?.subcategories || [];
   };
+
+  /**
+   * Get relationship between pillars with categories and their selected category/subcategory
+   * Returns an array of objects with pillarId and selectedCategoryId
+   * - If subcategory is selected, uses subCategoryId
+   * - If no subcategory but category is selected, uses categoryId
+   */
+  const getPillarCategoryRelationships = useMemo(() => {
+    // Get all pillars that have child categories from pillarData
+    const pillarsWithCategories = pillarData.filter(
+      (pillar: any) => pillar?.hasChildCategories,
+    );
+
+    return pillarsWithCategories
+      .map((pillar: any) => {
+        const pillarId = pillar._id;
+        const selection = selectionByPillar[pillarId];
+
+        if (!selection) {
+          return null; // No selection made for this pillar
+        }
+
+        // Check if subcategory is selected
+        if (selection.subCategoryId) {
+          return {
+            pillarId: pillarId,
+            pillarName: pillar.name,
+            selectedCategoryId: selection.subCategoryId,
+            type: 'subcategory' as const,
+          };
+        }
+
+        // If no subcategory but category is selected, check if category has subcategories
+        if (selection.categoryId) {
+          // Get categories for this pillar directly from pillarCategoryMap
+          const pillarCategoryData = pillarCategoryMap.find(
+            p => p.pillarId === pillarId,
+          );
+          const categories = pillarCategoryData?.categories || [];
+          const selectedCategory = categories.find(
+            c => c.id === selection.categoryId,
+          );
+
+          // If selected category has no subcategories, use categoryId
+          // Otherwise, return null (waiting for subcategory selection)
+          if (selectedCategory && !selectedCategory.hasChildren) {
+            return {
+              pillarId: pillarId,
+              pillarName: pillar.name,
+              selectedCategoryId: selection.categoryId,
+              type: 'category' as const,
+            };
+          }
+        }
+
+        return null; // Incomplete selection (category selected but subcategory pending)
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+  }, [pillarData, selectionByPillar, pillarCategoryMap]);
 
   // Determine ProjectPlayer config and data based on participant status
   const config = PROJECT_PLAYER_CONFIGS;
@@ -129,8 +189,16 @@ const DevelopInterventionPlan: React.FC = () => {
       projectId: config.data.projectId,
       data: COMPLEX_PROJECT_DATA,
       categoryIds: categoryIdsArray, // Array of pillar IDs without categories + selected subcategory IDs
+      selectedPathway: selectedPathway,
+      pillarCategoryRelation: getPillarCategoryRelationships,
     }),
-    [categoryIdsArray, config.data.solutionId, config.data.projectId],
+    [
+      categoryIdsArray,
+      config.data.solutionId,
+      config.data.projectId,
+      selectedPathway,
+      getPillarCategoryRelationships,
+    ],
   );
 
   /* -------------------- EFFECTS -------------------- */
@@ -190,10 +258,12 @@ const DevelopInterventionPlan: React.FC = () => {
       );
 
     if (allPillarsHaveSelections) {
-      console.log({
-        selectionByPillar,
-        participantId,
-      });
+      // Log the pillar-category relationships
+      console.log(
+        'Pillar-Category Relationships:',
+        getPillarCategoryRelationships,
+      );
+
       setIsModalOpen(false);
       setShowProjectPlayerPreview(true);
     }
@@ -203,6 +273,7 @@ const DevelopInterventionPlan: React.FC = () => {
     try {
       // setShowProjectPlayerPreview(true);
       setIsModalOpen(true);
+      setSelectedPathway(id);
       const res = await getCategoryList(id);
       console.log('categoriesData', res?.data);
       const pillars = res?.data ?? [];
