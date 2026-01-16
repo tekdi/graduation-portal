@@ -87,7 +87,7 @@ const getAccessPages = (
         { name: 'dashboard', component: HomeScreen },
         { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
         { name: 'log-visit', path: '/participants/:id/log-visit', component: LogVisit },
-        { name: 'observation', path: '/participants/:id/observation/:observationId', component: Observation },
+        { name: 'observation', path: '/participants/:id/observation/:solutionId', component: Observation },
         { name: 'template', path: '/participants/:id/template', component: TemplateScreen },
         { name: 'participants', component: ParticipantsList },
         { name: 'project', path: '/project', component: ProjectPlayer },
