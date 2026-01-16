@@ -13,5 +13,13 @@ export const STORAGE_KEYS = {
   AUTH_USER: '@auth_user',
   /** Authentication refresh token storage key */
   AUTH_REFRESH_TOKEN: '@auth_refresh_token',
+  /** Entity types storage key (name-id pairs) */
+  ENTITY_TYPES: '@entity_types',
+  /** Internal access token storage key */
+  INTERNAL_ACCESS_TOKEN: '@internal_access_token',
+  /** Organization code storage key */
+  ORGANIZATION_CODE: '@organization_code',
+  /** Tenant code storage key */
+  TENANT_CODE: '@tenant_code',
 } as const;
 

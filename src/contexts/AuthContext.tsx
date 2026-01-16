@@ -10,8 +10,16 @@ import { getEntityDetails, login as loginService } from '../services/authenticat
 import offlineStorage from '../services/offlineStorage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import { getToken, removeToken } from '../services/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ADMIN_ROLES, LC_ROLES } from '@constants/ROLES';
 import { useLanguage } from './LanguageContext';
+
+// Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
+declare const process: {
+  env: {
+    [key: string]: string | undefined;
+  };
+} | undefined;
 
 export type UserRole = 'Admin' | 'Supervisor' | 'LC';
 
@@ -153,12 +161,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (loginResponse.result?.user) {
         const userData = loginResponse.result.user;
 
-        const entityDetails = await getEntityDetails(userData.id);
-        if(!entityDetails?.[0]) {
-          const message = t('auth.userEntityNotFound');
-          logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
-          return { success: false, message };
-        }
+        // const entityDetails = await getEntityDetails(userData.id);
+        // if(!entityDetails?.[0]) {
+        //   const message = t('auth.userEntityNotFound');
+        //   logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
+        //   return { success: false, message };
+        // }
         // Determine user role (admin priority), throws if unauthorized
         let determinedRole: UserRole;
         try {
@@ -174,9 +182,20 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // Map API user data to User interface
         const mappedUser: User = {
           role: determinedRole,
-          entityDetails: entityDetails?.[0] || null,
           ...userData, // Include any additional properties from API
         };
+
+        // Extract and store organization and tenant codes
+        // Try to get from userData.organizations or use defaults
+        const orgCode = userData.organizations?.[0]?.code || 
+                       (process?.env?.ORG_CODE as string) || 
+                       'brac_gbl';
+        const tenantCode = userData.tenant_code || 
+                          (process?.env?.TENANT_CODE as string) || 
+                          'brac';
+        
+        await AsyncStorage.setItem(STORAGE_KEYS.ORGANIZATION_CODE, orgCode);
+        await AsyncStorage.setItem(STORAGE_KEYS.TENANT_CODE, tenantCode);
 
         // Save the mapped user data to storage in one line
         await offlineStorage.create(STORAGE_KEYS.AUTH_USER, mappedUser);
@@ -208,6 +227,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       // Remove user data from storage
       await offlineStorage.remove(STORAGE_KEYS.AUTH_USER);
       await offlineStorage.remove(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
+      
+      // Clear organization and tenant codes
+      await AsyncStorage.removeItem(STORAGE_KEYS.ORGANIZATION_CODE);
+      await AsyncStorage.removeItem(STORAGE_KEYS.TENANT_CODE);
       
       // Clear context state
       setUser(null);
