@@ -325,38 +325,6 @@ const UserManagementScreen = () => {
             filteredCount: usersData.length 
           });
         }
-
-        // Apply client-side province filtering if province filter is set
-        // Filter out users that don't have province data matching the filter
-        if (filters.province && filters.province !== 'all-provinces') {
-          usersData = usersData.filter((user: any) => {
-            const userProvince = user.province || user.province_name || user.location?.province;
-            // If user has no province data, exclude them when province filter is applied
-            if (!userProvince) return false;
-            // Match province name (case-insensitive)
-            return userProvince.toLowerCase() === filters.province.toLowerCase();
-          });
-          console.log('Client-side province filter applied:', { 
-            filterProvince: filters.province, 
-            filteredCount: usersData.length 
-          });
-        }
-
-        // Apply client-side district filtering if district filter is set
-        // Filter out users that don't have district data matching the filter
-        if (filters.district && filters.district !== 'all-districts') {
-          usersData = usersData.filter((user: any) => {
-            const userDistrict = user.district || user.district_name || user.location?.district;
-            // If user has no district data, exclude them when district filter is applied
-            if (!userDistrict) return false;
-            // Match district name (case-insensitive)
-            return userDistrict.toLowerCase() === filters.district.toLowerCase();
-          });
-          console.log('Client-side district filter applied:', { 
-            filterDistrict: filters.district, 
-            filteredCount: usersData.length 
-          });
-        }
         
         setUsers(usersData);
         setTotalCount(usersData.length);
