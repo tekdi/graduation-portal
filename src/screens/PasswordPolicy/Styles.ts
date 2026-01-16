@@ -1,133 +1,164 @@
-import { StyleSheet } from 'react-native';
-import { theme } from '@config/theme';
-
-export const styles = StyleSheet.create({
+export const passwordPolicyStyles = {
     container: {
         flex: 1,
-        padding: 0,
-        backgroundColor: theme.tokens.colors.white,
+        bg: '$white' as const,
     },
     headerContainer: {
-        marginBottom: 32,
-        maxWidth: 1200,
-        width: '100%',
-        alignSelf: 'center',
+        mb: '$8' as const,
+        w: '$full' as const,
+        '$web-maxWidth': '1200px',
+        alignSelf: 'center' as const,
+    },
+    headerRow: {
+        alignItems: 'center' as const,
+        space: 'sm' as const,
+        mb: '$2' as const,
     },
     pageTitle: {
-        marginBottom: 8,
+        size: 'xl' as const,
+        fontWeight: '$bold' as const,
+        color: '$textPrimary' as const,
     },
-
+    pageSubtitle: {
+        size: 'sm' as const,
+        color: '$textSecondary' as const,
+    },
     // Section Styles
     sectionContainer: {
         borderWidth: 1,
-        borderColor: theme.tokens.colors.gray300,
-        borderRadius: 8,
-        padding: 24,
-        marginBottom: 32,
-        maxWidth: 1200,
-        width: '100%',
-        alignSelf: 'center',
-        backgroundColor: theme.tokens.colors.white,
+        borderColor: '$gray300' as const,
+        borderRadius: '$md' as const,
+        p: '$4' as const,
+        '$md-p': '$6' as const,
+        mb: '$8' as const,
+        w: '$full' as const,
+        '$web-maxWidth': '1200px',
+        alignSelf: 'center' as const,
+        bg: '$white' as const,
     },
     innerSectionContainer: {
         borderWidth: 1,
-        borderColor: theme.tokens.colors.gray300,
-        borderRadius: 8,
-        padding: 24,
-        marginTop: 20,
-        width: '100%',
+        borderColor: '$gray300' as const,
+        borderRadius: '$md' as const,
+        p: '$4' as const,
+        '$md-p': '$6' as const,
+        mt: '$5' as const,
+        w: '$full' as const,
     },
     sectionHeader: {
-        marginBottom: 24,
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
+        mb: '$6' as const,
+        flexDirection: 'row' as const,
+        alignItems: 'center' as const,
+        gap: '$2' as const,
+    },
+    headerTextContainer: {
+        flex: 1,
     },
     sectionTitle: {
-        fontWeight: '600',
+        fontWeight: '$semibold' as const,
+        size: 'md' as const,
+        color: '$textPrimary' as const,
     },
     sectionSubtitle: {
-        marginTop: 4,
+        mt: '$1' as const,
+        size: 'sm' as const,
+        color: '$textSecondary' as const,
     },
 
     // Hierarchy Grid
     hierarchyGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 16,
-        width: '100%',
+        flexDirection: 'row' as const,
+        flexWrap: 'wrap' as const,
+        gap: '$4' as const,
+        w: '$full' as const,
     },
     hierarchyCard: {
         flex: 1,
-        minWidth: 260,
+        minWidth: 200,
     },
 
     // Card Specifics
     cardHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 16,
+        flexDirection: 'row' as const,
+        alignItems: 'center' as const,
+        gap: '$2' as const,
+        mb: '$4' as const,
     },
     badge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 4,
+        px: '$2' as const,
+        py: '$1' as const,
+        borderRadius: '$sm' as const,
     },
     badgeText: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: theme.tokens.colors.white,
+        fontSize: '$xs' as const,
+        fontWeight: '$bold' as const,
+        color: '$white' as const,
+    },
+    hierarchyRoleText: {
+        fontSize: '$sm' as const,
+        color: '$textSecondary' as const,
+        fontWeight: '$medium' as const,
     },
 
     // Permission Blocks
     permissionBlock: {
-        padding: 16,
-        borderRadius: 6,
-        marginBottom: 12,
+        p: '$4' as const,
+        borderRadius: '$md' as const,
+        mb: '$3' as const,
         borderWidth: 1,
     },
     permissionHeader: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-        marginBottom: 8,
+        flexDirection: 'row' as const,
+        alignItems: 'center' as const,
+        gap: '$2' as const,
+        mb: '$2' as const,
+    },
+    permissionTitle: {
+        fontWeight: '$bold' as const, 
+        color: '$textPrimary' as const,
+        fontSize: '$sm' as const,
     },
     listContainer: {
-        gap: 4,
-        paddingLeft: 4,
+        gap: '$1' as const,
+        pl: '$1' as const,
     },
     listItem: {
-        flexDirection: 'row',
-        alignItems: 'flex-start',
-        gap: 8,
+        flexDirection: 'row' as const,
+        alignItems: 'flex-start' as const,
+        gap: '$2' as const,
     },
     listItemText: {
         flex: 1,
-        fontSize: 13,
-        color: theme.tokens.colors.textSecondary,
+        fontSize: '$sm' as const,
+        color: '$textSecondary' as const,
     },
     bullet: {
-        width: 4,
-        height: 4,
-        borderRadius: 2,
-        backgroundColor: theme.tokens.colors.textSecondary,
-        marginTop: 6, // Align regarding line height
+        w: '$1' as const,
+        h: '$1' as const,
+        borderRadius: '$full' as const,
+        bg: '$textSecondary' as const,
+        mt: '$1.5' as const,
+    },
+    noteText: {
+        fontSize: '$xs' as const,
+        color: '$textSecondary' as const,
+        mt: '$2' as const,
     },
 
     // Section 2: Requirements
     requirementsGrid: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 32, // Reduced gap
-        marginTop: 16,
+        flexDirection: 'row' as const,
+        flexWrap: 'wrap' as const,
+        gap: '$8' as const,
+        mt: '$4' as const,
     },
     requirementColumn: {
         flex: 1,
-        minWidth: 260,
+        minWidth: 200,
     },
     columnTitle: {
-        marginBottom: 12,
-        fontWeight: '600',
+        mb: '$3' as const,
+        fontWeight: '$semibold' as const,
+        color: '$textPrimary' as const,
     },
-});
+} as const;
