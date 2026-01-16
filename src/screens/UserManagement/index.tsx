@@ -41,8 +41,8 @@ const UserManagementScreen = () => {
   const [users, setUsers] = useState<AdminUserManagementData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  // Note: currentPage and pageSize are managed by DataTable component for client-side pagination
+  // API pageSize is set to 100 to fetch all users at once
   
   // Roles state for dynamic filter
   const [roles, setRoles] = useState<Role[]>([]);
@@ -273,8 +273,8 @@ const UserManagementScreen = () => {
         const apiParams: ParticipantSearchParams = {
           tenant_code: 'brac',
           type: apiType,
-          page: currentPage,
-          limit: pageSize,
+          page: 1, // Always fetch from page 1, DataTable handles client-side pagination
+          limit: 100, // Fetch all users at once for client-side pagination
         };
 
         if (filters.search) {
@@ -308,9 +308,13 @@ const UserManagementScreen = () => {
         const response = await getParticipantsList(apiParams);
         console.log('API response:', response);
         console.log('Users data:', response.result?.data);
+        console.log('Total count from API:', response.result?.count);
         
         // Get raw API data
         let usersData = response.result?.data || [];
+        
+        // Get total count from API response (if available), otherwise use data length
+        const apiTotalCount = response.result?.count ?? usersData.length;
         
         // Apply client-side status filtering if status filter is set (fallback if API doesn't filter)
         // This ensures status filter works even if API doesn't support status parameter
@@ -327,7 +331,8 @@ const UserManagementScreen = () => {
         }
         
         setUsers(usersData);
-        setTotalCount(usersData.length);
+        // Use API total count, not the length of returned data
+        setTotalCount(apiTotalCount);
       } catch (error) {
         console.error('Error fetching users:', error);
         setUsers([]);
@@ -338,12 +343,12 @@ const UserManagementScreen = () => {
     };
 
     fetchUsers();
-  }, [filters, currentPage, pageSize, mapStatusLabelToAPI, roles]);
+  }, [filters, mapStatusLabelToAPI, roles]); // Removed currentPage and pageSize from dependencies
 
-  // Handle filter changes and reset pagination
+  // Handle filter changes
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
-    setCurrentPage(1); // Reset to first page when filters change
+    // DataTable will reset to page 1 automatically when data changes
   }, []);
 
 
@@ -409,7 +414,7 @@ const UserManagementScreen = () => {
               <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
                 {t('admin.users.showing', {
                   count: users.length,
-                  total: totalCount,
+                  total: totalCount || users.length,
                 })}
               </Text>
             )}
@@ -434,12 +439,21 @@ const UserManagementScreen = () => {
 
         {/* DataTable with raw API data */}
         <DataTable
+          key={`users-table-${JSON.stringify(filters)}`} // Force remount when filters change to reset pagination
           data={users}
           columns={columns}
           getRowKey={(user) => user.id}
           isLoading={isLoading}
           pagination={{
-            enabled: false,  // Disable client-side pagination since API handles it
+            enabled: true,
+            pageSize: 10, // Display 10 users per page
+            showPageSizeSelector: false,
+            pageSizeOptions: [10, 25, 50, 100],
+          }}
+          onPageChange={(newPage) => {
+            // Note: This is for client-side pagination only
+            // The DataTable handles pagination internally
+            console.log('Page changed to:', newPage);
           }}
           emptyMessage="admin.users.noUsersFound"
           loadingMessage="admin.users.loadingUsers"
