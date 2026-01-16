@@ -9,6 +9,11 @@ export interface FeatureCardData {
   navigationUrl?: string;
   isDisabled?: boolean;
   pressableActionText?: string;
+  rightIcon?: string; // Optional right side icon (Lucide icon name)
+  rightIconColor?: string; // Optional color for right icon (defaults to mutedForeground)
+  rightIconSize?: number; // Optional size for right icon (defaults to 20)
+  badgeText?: string; // Optional badge text (e.g., "7 Topics")
+  badgeTranslationKey?: string; // Optional translation key for badge text
 }
 
 export interface FeatureCardProps {
