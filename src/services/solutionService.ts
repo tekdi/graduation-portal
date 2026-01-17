@@ -40,7 +40,7 @@ export const getTargetedSolutions = async (
   params: TargetedSolutionsParams,
 ): Promise<AssessmentSurveyCardData[]> => {
   try {
-    const { type, page, limit, search = '' } = params;
+    const { type, page, limit, search = '', ...rest } = params;
 
     // Build query string
     const queryParams = new URLSearchParams({
@@ -48,6 +48,7 @@ export const getTargetedSolutions = async (
       ...(page ? { page: page.toString() } : {}),
       ...(limit ? { limit: limit.toString() } : {}),
       ...(search ? { search: search } : {}),
+      ...rest,
     });
 
     // Make API call with internal-access-token header
@@ -67,8 +68,6 @@ export const getTargetedSolutions = async (
     // Map API response to AssessmentSurveyCardData format
     const mappedSolutions: AssessmentSurveyCardData[] = solutions.map(item => ({
       ...item,
-      icon: item.icon || 'FileText',
-      iconColor: item.iconColor || '$primary500',
       navigationUrl: item.navigationUrl || 'observation',
       status: item.status,
     }));

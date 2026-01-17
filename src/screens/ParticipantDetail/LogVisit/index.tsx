@@ -15,6 +15,7 @@ import { AssessmentSurveyCardData } from '@app-types/participant';
 import logger from '@utils/logger';
 import { isWeb } from '@utils/platform';
 import { User } from '@contexts/AuthContext';
+import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
 
 /**
  * Route parameters type definition for LogVisit screen
@@ -50,6 +51,7 @@ const LogVisit: React.FC = () => {
       try {
         const data = await getTargetedSolutions({
           type: 'observation',
+          "filter[keywords]":FILTER_KEYWORDS.LOG_VISIT.join(',')
         });
         setSolutions(data);
         if (route.params?.id) {

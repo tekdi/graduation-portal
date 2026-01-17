@@ -30,23 +30,15 @@ const statusBadgeWithIconStyles = {
 };
 
 export const assessmentSurveyCardStyles = {
-  statusBadgeActive: {
-    ...statusBadgeBaseStyles,
-    bg: theme.tokens.colors.primary500,
-  },
-  statusBadgeInactive: {
-    ...statusBadgeBaseStyles,
-    bg: theme.tokens.colors.textMutedForeground,
-  },
   cardContainer: {
     bg: '$white',
     borderWidth: 1,
     borderColor: '$borderLight200',
     borderRadius: '$2xl',
-    p: '$6',
     width: '$full',
     space: '$4',
     elevation: 0, // Remove shadow on React Native
+    padding: '$5',
   },
   cardHeader: {
     width: '$full',
@@ -73,7 +65,7 @@ export const assessmentSurveyCardStyles = {
   },
   statusBadgeInProgress: {
     ...statusBadgeBaseStyles,
-    bg: theme.tokens.colors.textMutedForeground,
+    bg: theme.tokens.colors.warning500,
   },
   statusBadgeCompleted: {
     ...statusBadgeWithIconStyles,
@@ -118,7 +110,7 @@ export const assessmentSurveyCardStyles = {
     lineHeight: '$md',
   },
   additionalInfo: {
-    fontSize: '$sm',
+    fontSize: '$md',
     color: '$textMutedForeground',
     fontStyle: 'normal' as const,
     lineHeight: '$sm',

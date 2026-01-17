@@ -110,76 +110,81 @@ const Observation = () => {
     const fetchObservation = async () => {
       const tokenData = await getToken();
       setToken(tokenData);
-      const observationData = await getObservationEntities({
-        solutionId,
-        profileData: {},
-      });
-      const observationId = observationData?.result?._id;
-      if (
-        observationData.result?.entityType === ENTITY_TYPE.PARTICIPANT &&
-        Array.isArray(observationData.result?.entities)
-      ) {
-        const newData = observationData.result.entities.find(
-          (entity: any) => entity.externalId === id,
-        );
-        if (newData) {
-          fetchObservationSolution({
-            entityId: newData._id,
-            observationId: observationId,
-            submissionNumber: 1,
-            evidenceCode: 'OB',
-          });
-          // Set participant info
-          setParticipantInfo({
-            name: newData.name || '',
-            date: new Date().toISOString().split('T')[0],
-          });
-          setLoadingOff();
-        } else if (observationId) {
-          const entitiesData = await searchObservationEntities({
-            observationId: observationId,
-            // search: "sagar",
-          });
-          const entityData = entitiesData.result?.[0]?.data.find(
+      try {
+        const observationData = await getObservationEntities({
+          solutionId,
+          profileData: {},
+        });
+        const observationId = observationData?.result?._id;
+        if (
+          observationData.result?.entityType === ENTITY_TYPE.PARTICIPANT &&
+          Array.isArray(observationData.result?.entities)
+        ) {
+          const newData = observationData.result.entities.find(
             (entity: any) => entity.externalId === id,
           );
-          if (entityData) {
-            try {
-              const data = await updateObservationEntities({
-                observationId,
-                data: [entityData._id],
-              });
-              if (data) {
-                fetchObservationSolution({
-                  entityId: entityData._id,
-                  observationId: observationId,
-                  submissionNumber: 1,
-                  evidenceCode: 'OB',
+          if (newData) {
+            fetchObservationSolution({
+              entityId: newData._id,
+              observationId: observationId,
+              submissionNumber: 1,
+              evidenceCode: 'OB',
+            });
+            // Set participant info
+            setParticipantInfo({
+              name: newData.name || '',
+              date: new Date().toISOString().split('T')[0],
+            });
+            setLoadingOff();
+          } else if (observationId) {
+            const entitiesData = await searchObservationEntities({
+              observationId: observationId,
+              // search: "sagar",
+            });
+            const entityData = entitiesData.result?.[0]?.data.find(
+              (entity: any) => entity.externalId === id,
+            );
+            if (entityData) {
+              try {
+                const data = await updateObservationEntities({
+                  observationId,
+                  data: [entityData._id],
                 });
-                // Set participant info
-                setParticipantInfo({
-                  name: entityData.name || 'Participant',
-                  date: new Date().toISOString().split('T')[0],
-                });
+                if (data) {
+                  fetchObservationSolution({
+                    entityId: entityData._id,
+                    observationId: observationId,
+                    submissionNumber: 1,
+                    evidenceCode: 'OB',
+                  });
+                  // Set participant info
+                  setParticipantInfo({
+                    name: entityData.name || 'Participant',
+                    date: new Date().toISOString().split('T')[0],
+                  });
+                  setLoadingOff();
+                }
+              } catch (error: any) {
+                showAlert(
+                  'error',
+                  `${t('observation.noParticipantFoundError')} : ${
+                    error.message
+                  }`,
+                  { duration: 10000 },
+                );
                 setLoadingOff();
               }
-            } catch (error: any) {
-              showAlert(
-                'error',
-                `${t('observation.noParticipantFoundError')} : ${
-                  error.message
-                }`,
-                { duration: 10000 },
-              );
-              setLoadingOff();
             }
+          } else {
+            showAlert('error', t('observation.noParticipantFound'));
+            setLoadingOff();
           }
         } else {
           showAlert('error', t('observation.noParticipantFound'));
           setLoadingOff();
         }
-      } else {
-        showAlert('error', t('observation.noParticipantFound'));
+      } catch (error: any) {
+        showAlert('error', t('observation.noParticipantFoundError') + ' : ' + error.message);
         setLoadingOff();
       }
     };
