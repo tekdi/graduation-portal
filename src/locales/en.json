@@ -283,7 +283,9 @@
       "backToCaseload": "Back to Caseload",
       "viewProfile": "View Profile",
       "enrollParticipant": "Enroll Participant",
-      "logVisit": "Log Visit",
+      "logVisit": "Check-ins",
+      "checkInsHistory": "Check-ins History",
+      "checkInsHistoryDescription": "Past forms and surveys for {{name}}",
       "droppedOut": "Dropped Out",
       "graduationReadiness": "Graduation Readiness",
       "programStatus": "Program Status",
@@ -386,7 +388,7 @@
   },
   "actions": {
     "viewDetails": "View Details",
-    "logVisit": "Log Visit",
+    "logVisit": "Check-ins",
     "dropout": "Dropout",
     "confirmDropout": "Confirm Dropout",
     "dropoutMessage": "Mark {{name}} as dropout from the program",
@@ -396,6 +398,8 @@
   },
   "logVisit": {
     "noSolutions":"No solutions found",
+    "selectSolution": "Select Solution",
+    "selectSolutionPlaceholder": "Select a solution...",
     "selectVisitType": "Select visit type for {{name}}",
     "viewCheckIns": "View Check-Ins",
     "note": "Note:",

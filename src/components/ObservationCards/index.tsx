@@ -14,6 +14,7 @@ interface IconMeta {
   icon: string;
   color: string;
   iconColor: string;
+
 }
 
 /**
@@ -33,31 +34,14 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
     const iconMeta = ICONS[card.id as keyof typeof ICONS] || ICONS?.[card?.name?.toLowerCase() as keyof typeof ICONS];
     setIconMeta(iconMeta as IconMeta);
   }, [card]);
-
-
-  // Get status badge styling based on status type
-  const getStatusBadgeStyle = () => {
-    if (!entity?.status) return null;
-    switch (entity?.status) {
-      case CARD_STATUS.GRADUATED:
-        return assessmentSurveyCardStyles.statusBadgeGraduated;
-      case CARD_STATUS.COMPLETED:
-        return assessmentSurveyCardStyles.statusBadgeCompleted;
-      case CARD_STATUS.IN_PROGRESS:
-        return assessmentSurveyCardStyles.statusBadgeInProgress;
-      case CARD_STATUS.NOT_STARTED:
-      default:
-        return assessmentSurveyCardStyles.statusBadgeNotStarted;
-    }
-  };
-
+  
   // Get button styling based on variant
   const getButtonStyle = () => {
     return entity?.status === CARD_STATUS.COMPLETED
       ? assessmentSurveyCardStyles.buttonSecondary
       : assessmentSurveyCardStyles.buttonPrimary;
   };
-  
+
   return (
     <Card
       {...assessmentSurveyCardStyles.cardContainer}
@@ -80,32 +64,9 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
             </VStack>)}
           </VStack>
           {/* Status Badge - only show if status exists */}
-        {entity?.status && (
-          <Box {...getStatusBadgeStyle()}>
-            <HStack alignItems="center" gap="$1">
-              {(entity?.status === CARD_STATUS.GRADUATED || entity?.status === CARD_STATUS.COMPLETED) && (
-                <LucideIcon
-                  name="CheckCircle"
-                  size={12}
-                  color={
-                    entity?.status === CARD_STATUS.GRADUATED
-                      ? "$white"
-                      : "$success600"
-                  }
-                />
-              )}
-              <Text
-                {...(entity?.status === CARD_STATUS.GRADUATED
-                  ? assessmentSurveyCardStyles.statusBadgeTextGraduated
-                  : entity?.status === CARD_STATUS.COMPLETED
-                  ? assessmentSurveyCardStyles.statusBadgeTextCompleted
-                  : assessmentSurveyCardStyles.statusBadgeText)}
-              >
-                {entity?.status}
-              </Text>
-            </HStack>
-          </Box>
-        )}
+          {entity?.status && (
+            <StatusBadge status={entity?.status} />
+          )}
         </HStack>
 
         {/* Navigation Arrow - show if navigationUrl exists */}
@@ -174,3 +135,44 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   );
 };
 
+export const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  // Get status badge styling based on status type
+  const getStatusBadgeStyle = () => {
+    if (status) return null;
+    switch (status) {
+      case CARD_STATUS.GRADUATED:
+        return assessmentSurveyCardStyles.statusBadgeGraduated;
+      case CARD_STATUS.COMPLETED:
+        return assessmentSurveyCardStyles.statusBadgeCompleted;
+      case CARD_STATUS.IN_PROGRESS:
+        return assessmentSurveyCardStyles.statusBadgeInProgress;
+      case CARD_STATUS.NOT_STARTED:
+      default:
+        return assessmentSurveyCardStyles.statusBadgeNotStarted;
+    }
+  };
+
+  return (
+    <Box {...getStatusBadgeStyle()}>
+      <HStack alignItems="center" gap="$1">
+        {(status === CARD_STATUS.GRADUATED ||
+          status === CARD_STATUS.COMPLETED) && (
+          <LucideIcon
+            name="CheckCircle"
+            size={12}
+            color={status === CARD_STATUS.GRADUATED ? '$white' : '$success600'}
+          />
+        )}
+        <Text
+          {...(status === CARD_STATUS.GRADUATED
+            ? assessmentSurveyCardStyles.statusBadgeTextGraduated
+            : status === CARD_STATUS.COMPLETED
+            ? assessmentSurveyCardStyles.statusBadgeTextCompleted
+            : assessmentSurveyCardStyles.statusBadgeText)}
+        >
+          {status}
+        </Text>
+      </HStack>
+    </Box>
+  );
+};

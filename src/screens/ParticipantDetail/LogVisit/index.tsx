@@ -122,7 +122,8 @@ const LogVisit: React.FC = () => {
             <Button
               {...logVisitStyles.viewCheckInsButton}
               onPress={() => {
-                // Handle view check-ins navigation
+                // @ts-ignore
+                navigation.navigate('check-ins-list', { id: route.params?.id });
               }}
             >
               <HStack alignItems="center" gap="$2">
