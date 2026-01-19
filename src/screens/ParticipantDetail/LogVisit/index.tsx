@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
-import { Box, Container, VStack, HStack, Text, Pressable, Button, ButtonText, Spinner } from '@ui';
+import { Box, Container, VStack, HStack, Text, Pressable, Button, ButtonText, Spinner, ButtonIcon } from '@ui';
 import { LucideIcon } from '@ui';
 import { AssessmentCard } from '@components/ObservationCards';
 import { getParticipantProfile } from '../../../services/participantService';
@@ -119,23 +119,13 @@ const LogVisit: React.FC = () => {
               </VStack>
             </HStack>
             
-            <Button
-              {...logVisitStyles.viewCheckInsButton}
-              onPress={() => {
+             {/* @ts-ignore: Back Button */}
+              <Button variant="outlineghost" onPress={() => {
                 // @ts-ignore
                 navigation.navigate('check-ins-list', { id: route.params?.id });
-              }}
-            >
-              <HStack alignItems="center" gap="$2">
-                <LucideIcon
-                  name="Clock"
-                  size={16}
-                  color={theme.tokens.colors.textForeground}
-                />
-                <ButtonText {...logVisitStyles.viewCheckInsButtonText}>
-                  {t('logVisit.viewCheckIns')}
-                </ButtonText>
-              </HStack>
+              }}>
+              <ButtonIcon as={LucideIcon} name="Clock" size={16} />
+              <ButtonText {...TYPOGRAPHY.bodySmall}>{t('logVisit.viewCheckIns')}</ButtonText>
             </Button>
           </HStack>
         </Container>

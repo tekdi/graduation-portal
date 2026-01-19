@@ -4,14 +4,15 @@ import {
   VStack,
   Text,
   Box,
-  Pressable,
   Progress,
   ProgressFilledTrack,
   LucideIcon,
   Container,
+  Button,
+  ButtonText,
+  ButtonIcon
 } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
-import { theme } from '@config/theme';
 import { observationStyles } from './Styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { StatusBadge } from '@components/ObservationCards';
@@ -37,13 +38,11 @@ const Header: React.FC<HeaderProps> = ({ title, progress, participantInfo, onBac
         <HStack
           {...observationStyles.headerContent}
         >
-          {/* Back Button */}
-          <Pressable onPress={onBackPress}>
-            <HStack {...observationStyles.backButton}>
-              <LucideIcon name="ArrowLeft" size={16} color={theme.tokens.colors.textForeground} />
-              <Text {...TYPOGRAPHY.bodySmall}>{t('common.back')}</Text>
-            </HStack>
-          </Pressable>
+          {/* @ts-ignore: Back Button */}
+          <Button variant="ghost" onPress={onBackPress}>
+            <ButtonIcon as={LucideIcon} name="ArrowLeft" size={16} />
+            <ButtonText {...TYPOGRAPHY.bodySmall}>{t('common.back')}</ButtonText>
+          </Button>
         </HStack>
 
         {/* Title and Progress Badge Row */}

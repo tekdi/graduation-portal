@@ -47,7 +47,8 @@ export const observationStyles = {
   },
   progressBar: {
     width: '$full' as const,
-    size: 'md' as const,
+    size: 'sm' as const,
+    bg:"$blue100" as const,
   },
   progressBarFill: {
     bg: '$blue600' as const,
