@@ -99,7 +99,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
             onPress={() => {
               if(navigationUrl && userId) {
                 // @ts-ignore
-                navigation.navigate(navigationUrl as never, { id: userId || '',solutionId:card?.solutionId || card?.id });
+                navigation.navigate(navigationUrl as never, { id: userId || '',solutionId:card?.solutionId || card?.id, submissionNumber:entity?.submissionsCount });
               } else {
                 logger.log('userId is required');
               }

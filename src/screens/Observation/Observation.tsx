@@ -15,6 +15,7 @@ import Header from './Header';
 import offlineStorage from '../../services/offlineStorage';
 import { ENTITY_TYPE } from '@constants/ROLES';
 import { observationStyles } from './Styles';
+import { CARD_STATUS } from '@constants/app.constant';
 interface ObservationData {
   entityId: string;
   observationId: string;
@@ -24,9 +25,10 @@ const Observation = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { t } = useLanguage();
-  const { id, solutionId } = route.params as {
+  const { id, solutionId, submissionNumber } = route.params as {
     id: string;
     solutionId: string;
+    submissionNumber: string;
   };
   const [observation, setObservation] = useState<ObservationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -50,40 +52,44 @@ const Observation = () => {
   const fetchObservationSolution = async ({
     entityId,
     observationId,
-    submissionNumber,
-    evidenceCode,
+    submissionNumberInput
   }: {
     entityId: string;
     observationId: string;
-    submissionNumber: number;
-    evidenceCode: string;
+    submissionNumberInput: number | null;
   }) => {
     try {
       const observationSubmissions = await getObservationSubmissions({
         observationId,
         entityId,
       });
+      let observationSubmissionsLast;
       let observationSolution: any = null;
-      if (observationSubmissions.result.length > 0) {
-        const submissionId = observationSubmissions.result[0]._id;
+      if(submissionNumberInput) {
+        observationSubmissionsLast = observationSubmissions.result.find((submission: any) => submission.submissionNumber === submissionNumberInput);
+      } else {
+        observationSubmissionsLast = observationSubmissions.result.find((submission: any) => submission.status === CARD_STATUS.IN_PROGRESS || submission.status === CARD_STATUS.NOT_STARTED);
+        if (!observationSubmissionsLast) {
+          observationSubmissionsLast = observationSubmissions.result?.[observationSubmissions.result.length - 1] || null;
+        }
+      }
+      if (observationSubmissionsLast) {
+        const submissionId = observationSubmissionsLast._id;
         observationSolution = await offlineStorage.read(submissionId, {
           dbName: 'questionnairePlayer',
           storeName: 'questionnaire',
         });
-        // submissionNumber = observationSubmissions.result[0].submissionNumber;
-      } else {
-        // submissionNumber = 1;
       }
 
-      if (!observationSolution) {
-        const response = await getObservationSolution({
-          observationId,
-          entityId,
-          submissionNumber,
-          evidenceCode,
-        });
-        observationSolution = response.result;
-      }
+      // if (!observationSolution) {
+      //   const response = await getObservationSolution({
+      //     observationId,
+      //     entityId,
+      //     submissionNumber :submissionNumberInput ? submissionNumberInput : observationSubmissionsLast?.submissionNumber,
+      //     evidenceCode:observationSubmissionsLast?.evidenceCode,
+      //   });
+      //   observationSolution = response.result;
+      // }
       setMockData(observationSolution);
       setObservation({
         entityId: entityId,
@@ -127,8 +133,7 @@ const Observation = () => {
             fetchObservationSolution({
               entityId: newData._id,
               observationId: observationId,
-              submissionNumber: 1,
-              evidenceCode: 'OB',
+              submissionNumberInput: submissionNumber ? parseInt(submissionNumber) : null,
             });
             // Set participant info
             setParticipantInfo({
@@ -154,8 +159,7 @@ const Observation = () => {
                   fetchObservationSolution({
                     entityId: entityData._id,
                     observationId: observationId,
-                    submissionNumber: 1,
-                    evidenceCode: 'OB',
+                    submissionNumberInput: submissionNumber ? parseInt(submissionNumber) : null,
                   });
                   // Set participant info
                   setParticipantInfo({
@@ -234,9 +238,8 @@ const Observation = () => {
     ) => {
       progressCallbackRef.current?.(progressValue);
     },
-    [mockData],
+    [],
   );
-
   // Memoize playerConfig to prevent WebComponentPlayer rerenders
   const playerConfigMemoized = React.useMemo(
     () => ({
@@ -247,16 +250,16 @@ const Observation = () => {
       solutionType: 'observation' as const,
       observationId: observation?.observationId,
       entityId: observation?.entityId,
-      evidenceCode: 'OB',
+      evidenceCode: mockData?.assessment?.evidences[0]?.code,
       index: 0,
-      submissionNumber: 1,
+      submissionNumber: submissionNumber ? parseInt(submissionNumber) : 1,
       solutionId: observation?.observationId,
       showSaveDraftButton: true,
       progressCalculationLevel: 'input' as const,
       mockData: mockData,
       usePageQuestionsGrid: true,
     }),
-    [token, observation?.observationId, observation?.entityId, mockData],
+    [token, observation?.observationId, observation?.entityId, mockData, submissionNumber],
   );
 
   return (

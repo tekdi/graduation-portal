@@ -89,7 +89,7 @@ const getAccessPages = (
         { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
         { name: 'log-visit', path: '/participants/:id/log-visit', component: LogVisit },
         { name: 'check-ins-list', path: '/participants/:id/check-ins-list', component: CheckInsList },
-        { name: 'observation', path: '/participants/:id/observation/:solutionId', component: Observation },
+        { name: 'observation', path: '/participants/:id/observation/:solutionId/:submissionNumber?', component: Observation },
         { name: 'template', path: '/participants/:id/template', component: TemplateScreen },
         { name: 'participants', component: ParticipantsList },
         { name: 'project', path: '/project', component: ProjectPlayer },

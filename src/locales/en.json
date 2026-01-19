@@ -398,6 +398,7 @@
   },
   "logVisit": {
     "noSolutions":"No solutions found",
+    "viewForm": "View Form",
     "selectSolution": "Select Solution",
     "selectSolutionPlaceholder": "Select a solution...",
     "selectVisitType": "Select visit type for {{name}}",

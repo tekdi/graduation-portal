@@ -314,6 +314,7 @@ const LogVisit: React.FC = () => {
                               navigation.navigate("observation" as never, {
                                 id: participant?.id || '',
                                 solutionId: selectedSolution,
+                                submissionNumber: submission.submissionNumber,
                               });
                             }}
                           >
@@ -323,7 +324,7 @@ const LogVisit: React.FC = () => {
                                 {...assessmentSurveyCardStyles.buttonText}
                                 color="$textForeground"
                               >
-                                {t('View Form')}
+                                {t('logVisit.viewForm')}
                               </ButtonText>
                             </HStack>
                           </Button>
