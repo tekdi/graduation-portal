@@ -172,7 +172,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
 export const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
   // Get status badge styling based on status type
   const getStatusBadgeStyle = () => {
-    if (status) return null;
+    if (!status) return null;
     switch (status) {
       case CARD_STATUS.GRADUATED:
         return assessmentSurveyCardStyles.statusBadgeGraduated;
@@ -202,6 +202,8 @@ export const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
             ? assessmentSurveyCardStyles.statusBadgeTextGraduated
             : status === CARD_STATUS.COMPLETED
             ? assessmentSurveyCardStyles.statusBadgeTextCompleted
+            : status === CARD_STATUS.IN_PROGRESS
+            ? assessmentSurveyCardStyles.statusBadgeTextWarning
             : assessmentSurveyCardStyles.statusBadgeText)}
         >
           {status}

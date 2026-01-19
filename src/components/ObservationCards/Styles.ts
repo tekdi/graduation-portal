@@ -61,26 +61,40 @@ export const assessmentSurveyCardStyles = {
   },
   statusBadgeNotStarted: {
     ...statusBadgeWithIconStyles,
-    bg: theme.tokens.colors.textMutedForeground,
+    bg: "$gray100",
+    borderWidth: 1,
+    borderColor: "$gray300"
   },
   statusBadgeInProgress: {
     ...statusBadgeBaseStyles,
-    bg: theme.tokens.colors.warning500,
+    bg: '$warning50',
+    borderWidth: 1,
+    borderColor: "$warning600",
   },
   statusBadgeCompleted: {
     ...statusBadgeWithIconStyles,
-    bg: '$white',
+    bg: '$success50',
     borderWidth: 1,
-    borderColor: theme.tokens.colors.success600,
+    borderColor: "$success600",
   },
   statusBadgeGraduated: {
     ...statusBadgeWithIconStyles,
-    bg: theme.tokens.colors.success600,
+    bg: '$success50',
+    borderWidth: 1,
+    borderColor: "$success600",
   },
   statusBadgeText: {
     fontSize: '$xs',
     fontWeight: '$medium',
-    color: '$white',
+    color: '$gray700',
+    $web: {
+      whiteSpace: 'nowrap' as const,
+    },
+  },
+  statusBadgeTextWarning: {
+    fontSize: '$xs',
+    fontWeight: '$medium',
+    color: '$warning600',
     $web: {
       whiteSpace: 'nowrap' as const,
     },

@@ -41,6 +41,7 @@ const Observation = () => {
 
   const [token, setToken] = useState<string | null>(null);
   const [mockData, setMockData] = useState<any>();
+  const [submission, setSubmission] = useState<any>(null);
   // Use ref to store progress callback to avoid prop changes causing rerenders
   const progressCallbackRef =
     useRef<
@@ -96,6 +97,7 @@ const Observation = () => {
         });
         observationSolution = response.result;
       }
+      setSubmission(observationSubmissionsLast);
       setMockData(observationSolution);
       setObservation({
         entityId: entityId,
@@ -262,7 +264,7 @@ const Observation = () => {
       entityId: observation?.entityId,
       evidenceCode: mockData?.assessment?.evidences[0]?.code,
       index: 0,
-      submissionNumber: submissionNumber ? parseInt(submissionNumber) : 1,
+      submissionNumber: submissionNumber ? submissionNumber : 1,
       solutionId: observation?.observationId,
       showSaveDraftButton: true,
       progressCountOptionalFields:false,
@@ -272,7 +274,7 @@ const Observation = () => {
     }),
     [token, observation?.observationId, observation?.entityId, mockData, submissionNumber],
   );
-
+  
   return (
     <>
       <VStack
@@ -292,6 +294,7 @@ const Observation = () => {
           progress={progress}
           participantInfo={participantInfo}
           onBackPress={handleBackPress}
+          status={submission?.status || ''}
         />
 
         <Container>

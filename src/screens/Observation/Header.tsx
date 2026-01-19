@@ -14,6 +14,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { theme } from '@config/theme';
 import { observationStyles } from './Styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
+import { StatusBadge } from '@components/ObservationCards';
 
 interface HeaderProps {
   title: string;
@@ -23,9 +24,10 @@ interface HeaderProps {
     date: string;
   } | null;
   onBackPress: () => void;
+  status: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ title, progress, participantInfo, onBackPress }) => {
+const Header: React.FC<HeaderProps> = ({ title, progress, participantInfo, onBackPress, status }) => {
   const { t } = useLanguage();
 
   return (
@@ -57,8 +59,9 @@ const Header: React.FC<HeaderProps> = ({ title, progress, participantInfo, onBac
             {...observationStyles.progressBadge}
           >
             <Text {...observationStyles.progressBadgeText}>
-              {progress}% {t('common.complete') || 'Complete'}
+              {progress}% 
             </Text>
+            <StatusBadge status={status} />
           </Box>
         </HStack>
 
