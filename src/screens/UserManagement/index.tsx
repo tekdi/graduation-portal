@@ -82,7 +82,7 @@ const UserManagementScreen = () => {
     
     // Validate CSV file extension
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      showErrorToast(t('admin.actions.csvValidationError') || 'Please select a CSV file');
+      showErrorToast(t('admin.actions.csvValidationError'));
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -91,7 +91,7 @@ const UserManagementScreen = () => {
 
     // Validate file size
     if (!validateFileSize(file)) {
-      showErrorToast(t('admin.actions.csvMaxSizeError') || `File size exceeds maximum limit of ${maxFileSize}MB`);
+      showErrorToast(t('admin.actions.csvMaxSizeError'));
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -103,7 +103,7 @@ const UserManagementScreen = () => {
       // Step 1: Get signed URL
       const signedUrlResponse = await getSignedUrl(file.name);
       if (!signedUrlResponse.result?.signedUrl) {
-        throw new Error('Failed to get signed URL');
+          throw new Error(t('admin.actions.uploadErrorSignedUrl'));
       }
       
       // Step 2: Upload file to signed URL
@@ -112,7 +112,7 @@ const UserManagementScreen = () => {
       // Step 3: Trigger bulk user creation
       const filePath = signedUrlResponse.result.filePath || signedUrlResponse.result.destFilePath;
       if (!filePath) {
-        throw new Error('File path not found in response');
+        throw new Error(t('admin.actions.uploadErrorFilePathNotFound'));
       }
       
       const bulkCreateResponse = await bulkUserCreate(filePath, ['name', 'email'], 'UPLOAD');

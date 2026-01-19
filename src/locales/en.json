@@ -184,13 +184,12 @@
       "addUser": "Add User",
       "addUserDescription": "Manually add a single user to the system",
       "uploadSuccess": "CSV file uploaded successfully!",
-      "uploadSuccessMessage": "User uploaded successfully.",
       "uploadError": "Failed to upload CSV file. Please try again.",
       "uploadErrorSignedUrl": "Failed to get upload URL. Please try again.",
       "uploadErrorFileUpload": "Failed to upload file. Please try again.",
       "uploadErrorBulkCreate": "File uploaded but failed to process. Please contact support.",
       "csvValidationError": "Please select a valid CSV file",
-      "csvMaxSizeError": "File size exceeds maximum limit of 10MB"
+      "csvMaxSizeError": "File size exceeds maximum limit of {{maxSize}}MB"
     },
     "filters": {
       "role": "Role",
