@@ -189,7 +189,7 @@
       "uploadErrorFileUpload": "Failed to upload file. Please try again.",
       "uploadErrorBulkCreate": "File uploaded but failed to process. Please contact support.",
       "csvValidationError": "Please select a valid CSV file",
-      "csvMaxSizeError": "File size exceeds maximum limit of {{maxSize}}MB"
+      "uploadErrorFilePathNotFound": "File path not found in upload response. Please try again."
     },
     "filters": {
       "role": "Role",

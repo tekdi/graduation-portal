@@ -80,7 +80,6 @@ export const uploadFileToSignedUrl = async (
       throw new Error(`File upload failed: ${uploadResponse.status} ${uploadResponse.statusText} - ${errorText}`);
     }
   } catch (error: any) {
-    const errorMessage = error.response?.data || error.message || 'File upload failed';
     logger.error('Error uploading file to signed URL:', error);
     throw error;
   }

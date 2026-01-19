@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { VStack, HStack, Spinner, Button, Text, Image, Box, Pressable, Card, useToast, Toast, ToastTitle, Modal } from '@ui';
+import React, { useState, useRef } from 'react';
+import { VStack, HStack, Button, Text, Image, Box, Pressable, Card, useToast, Toast, ToastTitle, Modal } from '@ui';
 import { View, Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
 
@@ -33,7 +33,6 @@ const UserManagementScreen = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const maxFileSize = 10; // 10MB max file size
 
   // Toast helpers
   const showErrorToast = (message: string) => {
@@ -58,12 +57,6 @@ const UserManagementScreen = () => {
     });
   };
 
-  // Validate file size
-  const validateFileSize = (file: File): boolean => {
-    const maxSizeBytes = maxFileSize * 1024 * 1024;
-    return file.size <= maxSizeBytes;
-  };
-
   // Handle CSV upload: closes options modal and triggers native file picker
   const handleUploadCSV = () => {
     setIsUploadModalOpen(false);
@@ -83,15 +76,6 @@ const UserManagementScreen = () => {
     // Validate CSV file extension
     if (!file.name.toLowerCase().endsWith('.csv')) {
       showErrorToast(t('admin.actions.csvValidationError'));
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      return;
-    }
-
-    // Validate file size
-    if (!validateFileSize(file)) {
-      showErrorToast(t('admin.actions.csvMaxSizeError'));
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }

@@ -14,13 +14,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ADMIN_ROLES, LC_ROLES } from '@constants/ROLES';
 import { useLanguage } from './LanguageContext';
 
-// Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
-declare const process: {
-  env: {
-    [key: string]: string | undefined;
-  };
-} | undefined;
-
 export type UserRole = 'Admin' | 'Supervisor' | 'LC';
 
 export interface User {
@@ -185,15 +178,10 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           ...userData, // Include any additional properties from API
         };
 
-        // [BULK UPLOAD FEATURE] Extract and store organization and tenant codes during login
+        // [BULK UPLOAD FEATURE] Store organization and tenant codes during login
         // These codes are required for bulk user upload API calls (used in api.ts interceptor)
-        // Try to get from userData.organizations or use environment variables/defaults
-        const orgCode = userData.organizations?.[0]?.code || 
-                       (process?.env?.ORG_CODE as string) || 
-                       'brac_gbl';
-        const tenantCode = userData.tenant_code || 
-                          (process?.env?.TENANT_CODE as string) || 
-                          'brac';
+        const orgCode = 'brac_gbl';
+        const tenantCode = 'brac';
         
         await AsyncStorage.setItem(STORAGE_KEYS.ORGANIZATION_CODE, orgCode);
         await AsyncStorage.setItem(STORAGE_KEYS.TENANT_CODE, tenantCode);
