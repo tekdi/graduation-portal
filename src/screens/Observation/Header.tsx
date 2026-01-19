@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ title, progress, participantInfo, onBac
 
   return (
     <VStack {...observationStyles.headerContainer}>
-      <Container $md-px='$6' px='$4' py='$6'>
+      <Container $md-px='$6' px='$4' py='$4'>
         {/* Top Row: Back Button and Action Buttons */}
         <HStack
           {...observationStyles.headerContent}

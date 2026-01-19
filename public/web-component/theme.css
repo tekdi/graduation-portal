@@ -352,3 +352,14 @@ mat-select {
   padding: 2px !important;
 }
 /* end mat-select styles */
+
+/* submited field styles */
+.submitted lib-date-input, .submitted .attachment-btn, .submitted lib-radio-input, .submitted lib-checkbox-input,
+.submitted mat-select, .submitted lib-text-input, .submitted lib-number-input, .submitted lib-text-area,
+.submitted lib-dropdown, .submitted lib-single-select, .submitted lib-multi-select, .submitted lib-date-range-input,
+.submitted lib-time-input, .submitted lib-time-range-input, .submitted lib-date-time-input, .submitted lib-date-time-range-input,
+.submitted lib-date-time-input-range, .submitted lib-date-time-range-input-range, .submitted lib-date-time-input-range-range,
+.submitted lib-date-time-range-input-range-range{
+  opacity: 0.5 !important;
+}
+/* end submited field styles */
