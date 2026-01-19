@@ -62,5 +62,23 @@ export const logVisitStyles = {
     borderColor: '$borderLight300' as const,
     gap: '$2' as const,
   },
+  selectSolutionContainer: {
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
+    w: '100%' as const,
+    py: '$8' as const,
+  },
+  selectSolutionCard: {
+    maxWidth: 500 as const,
+    width: '100%' as const,
+    px: 40 as const,
+    py: 40 as const,
+    alignSelf: 'center' as const,
+  },
+  selectSolutionText: {
+    color: '$textMutedForeground' as const,
+    textAlign: 'center' as const,
+    py: '$4' as const,
+  },
 } as const;
 

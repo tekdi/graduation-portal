@@ -28,7 +28,7 @@ const Observation = () => {
   const { id, solutionId, submissionNumber } = route.params as {
     id: string;
     solutionId: string;
-    submissionNumber: string;
+    submissionNumber: number;
   };
   const [observation, setObservation] = useState<ObservationData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -66,7 +66,13 @@ const Observation = () => {
       let observationSubmissionsLast;
       let observationSolution: any = null;
       if(submissionNumberInput) {
-        observationSubmissionsLast = observationSubmissions.result.find((submission: any) => submission.submissionNumber === submissionNumberInput);
+        observationSubmissionsLast = observationSubmissions.result.find((submission: any) => submission.submissionNumber == submissionNumberInput);
+        if(!observationSubmissionsLast) {
+          showAlert( 'error', `${t('logVisit.thisFormNotFound')} ${submissionNumberInput}`,
+            {duration: 10000},
+          );
+          return;
+        }
       } else {
         observationSubmissionsLast = observationSubmissions.result.find((submission: any) => submission.status === CARD_STATUS.IN_PROGRESS || submission.status === CARD_STATUS.NOT_STARTED);
         if (!observationSubmissionsLast) {
@@ -81,15 +87,15 @@ const Observation = () => {
         });
       }
 
-      // if (!observationSolution) {
-      //   const response = await getObservationSolution({
-      //     observationId,
-      //     entityId,
-      //     submissionNumber :submissionNumberInput ? submissionNumberInput : observationSubmissionsLast?.submissionNumber,
-      //     evidenceCode:observationSubmissionsLast?.evidenceCode,
-      //   });
-      //   observationSolution = response.result;
-      // }
+      if (!observationSolution) {
+        const response = await getObservationSolution({
+          observationId,
+          entityId,
+          submissionNumber :submissionNumberInput ? submissionNumberInput : observationSubmissionsLast?.submissionNumber,
+          evidenceCode:observationSubmissionsLast?.evidenceCode,
+        });
+        observationSolution = response.result;
+      }
       setMockData(observationSolution);
       setObservation({
         entityId: entityId,
@@ -121,6 +127,10 @@ const Observation = () => {
           solutionId,
           profileData: {},
         });
+        if(!observationData.result?.allowMultipleAssessemts && submissionNumber > 1){
+          showAlert('error', t('logVisit.multipleAssessemtsNotAllowed'));
+          return;
+        }
         const observationId = observationData?.result?._id;
         if (
           observationData.result?.entityType === ENTITY_TYPE.PARTICIPANT &&
@@ -133,7 +143,7 @@ const Observation = () => {
             fetchObservationSolution({
               entityId: newData._id,
               observationId: observationId,
-              submissionNumberInput: submissionNumber ? parseInt(submissionNumber) : null,
+              submissionNumberInput: submissionNumber ? submissionNumber : null,
             });
             // Set participant info
             setParticipantInfo({
@@ -159,7 +169,7 @@ const Observation = () => {
                   fetchObservationSolution({
                     entityId: entityData._id,
                     observationId: observationId,
-                    submissionNumberInput: submissionNumber ? parseInt(submissionNumber) : null,
+                    submissionNumberInput: submissionNumber ? submissionNumber : null,
                   });
                   // Set participant info
                   setParticipantInfo({
@@ -255,6 +265,7 @@ const Observation = () => {
       submissionNumber: submissionNumber ? parseInt(submissionNumber) : 1,
       solutionId: observation?.observationId,
       showSaveDraftButton: true,
+      progressCountOptionalFields:false,
       progressCalculationLevel: 'input' as const,
       mockData: mockData,
       usePageQuestionsGrid: true,

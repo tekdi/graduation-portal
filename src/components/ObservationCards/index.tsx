@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { Card, Box, VStack, HStack, Text, Button, ButtonText, Pressable } from '@ui';
+import {
+  Card,
+  Box,
+  VStack,
+  HStack,
+  Text,
+  Button,
+  ButtonText,
+  Pressable,
+} from '@ui';
 import { AssessmentSurveyCardProps } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
@@ -14,7 +23,6 @@ interface IconMeta {
   icon: string;
   color: string;
   iconColor: string;
-
 }
 
 /**
@@ -23,18 +31,20 @@ interface IconMeta {
  */
 export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   card,
-  userId
+  userId,
 }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
   const { name, description, navigationUrl, entity } = card;
-  const [iconMeta,setIconMeta] = useState<IconMeta | null>(null);
+  const [iconMeta, setIconMeta] = useState<IconMeta | null>(null);
 
   useEffect(() => {
-    const iconMeta = ICONS[card.id as keyof typeof ICONS] || ICONS?.[card?.name?.toLowerCase() as keyof typeof ICONS];
+    const iconMeta =
+      ICONS[card.id as keyof typeof ICONS] ||
+      ICONS?.[card?.name?.toLowerCase() as keyof typeof ICONS];
     setIconMeta(iconMeta as IconMeta);
   }, [card]);
-  
+
   // Get button styling based on variant
   const getButtonStyle = () => {
     return entity?.status === CARD_STATUS.COMPLETED
@@ -46,90 +56,114 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
     <Card
       {...assessmentSurveyCardStyles.cardContainer}
       $web-boxShadow="none" // Remove shadow on web
-    ><VStack space="lg">
-      {/* Card Header with Icon, name, Description, Action Button and Status Badge */}
-      <HStack {...assessmentSurveyCardStyles.cardHeader}>
-        <HStack alignItems="flex-start" space={entity?.status ? "sm" : "lg"} flex={1}>
-          <Box  {...(!entity?.status && {...assessmentSurveyCardStyles.iconContainer,bg:iconMeta?.color || '$primary500'})}>
-            <LucideIcon name={iconMeta?.icon || 'info'} size={!entity?.status ? 24 : 20} color={iconMeta?.iconColor || '$white'} />
-          </Box>
-          <VStack flex={1} space="md">
-            <Text {...assessmentSurveyCardStyles.title}>{t(name)}</Text>
-            {/* Card Description */}
-            {!entity?.status && (
-            <VStack space="sm">
-              <Text {...assessmentSurveyCardStyles.description}>
-                {t(description)}
-              </Text>
-            </VStack>)}
-          </VStack>
-          {/* Status Badge - only show if status exists */}
-          {entity?.status && (
-            <StatusBadge status={entity?.status} />
+    >
+      <VStack space="lg">
+        {/* Card Header with Icon, name, Description, Action Button and Status Badge */}
+        <HStack {...assessmentSurveyCardStyles.cardHeader}>
+          <HStack
+            alignItems="flex-start"
+            space={entity?.status ? 'sm' : 'lg'}
+            flex={1}
+          >
+            <Box
+              {...(!entity?.status && {
+                ...assessmentSurveyCardStyles.iconContainer,
+                bg: iconMeta?.color || '$primary500',
+              })}
+            >
+              <LucideIcon
+                name={iconMeta?.icon || 'info'}
+                size={!entity?.status ? 24 : 20}
+                color={iconMeta?.iconColor || '$white'}
+              />
+            </Box>
+            <VStack flex={1} space="md">
+              <Text {...assessmentSurveyCardStyles.title}>{t(name)}</Text>
+              {/* Card Description */}
+              {!entity?.status && (
+                <VStack space="sm">
+                  <Text {...assessmentSurveyCardStyles.description}>
+                    {t(description)}
+                  </Text>
+                </VStack>
+              )}
+            </VStack>
+            {/* Status Badge - only show if status exists */}
+            {entity?.status && <StatusBadge status={entity?.status} />}
+          </HStack>
+
+          {/* Navigation Arrow - show if navigationUrl exists */}
+          {!entity?.status && navigationUrl && (
+            <Pressable
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate(navigationUrl as never, {
+                  id: userId || '',
+                  solutionId: card?.solutionId || card?.id,
+                });
+              }}
+              $web-cursor="pointer"
+            >
+              <LucideIcon
+                name="ArrowRight"
+                size={20}
+                color={theme.tokens.colors.textMutedForeground}
+              />
+            </Pressable>
           )}
         </HStack>
-
-        {/* Navigation Arrow - show if navigationUrl exists */}
-        {!entity?.status && navigationUrl && (
-          <Pressable
-            onPress={() => {
-              // @ts-ignore
-              navigation.navigate(navigationUrl as never, { id: userId || '',solutionId:card?.solutionId || card?.id });
-            }}
-            $web-cursor="pointer"
-          >
-            <LucideIcon
-              name="ArrowRight"
-              size={20}
-              color={theme.tokens.colors.textMutedForeground}
-            />
-          </Pressable>
-        )}
-      </HStack>
-      {entity?.status && (
-        <VStack space="lg">
-          <Text {...assessmentSurveyCardStyles.additionalInfo}>
-            {t(description)}
-          </Text>
-
-        {/* Action Button */}
         {entity?.status && (
-          <Button
-            {...getButtonStyle()}
-            onPress={() => {
-              if(navigationUrl && userId) {
-                // @ts-ignore
-                navigation.navigate(navigationUrl as never, { id: userId || '',solutionId:card?.solutionId || card?.id, submissionNumber:entity?.submissionsCount });
-              } else {
-                logger.log('userId is required');
-              }
-            }}
-          >
-            <HStack alignItems="center" gap="$2">
-              <LucideIcon
-                name={"FileText"}
-                size={16}
-                color={
-                  entity?.status === CARD_STATUS.COMPLETED
-                  ? '$textForeground'
-                  : '$white'
-                }
-              />
-              <ButtonText
-                {...assessmentSurveyCardStyles.buttonText}
-                color={
-                  entity?.status === CARD_STATUS.COMPLETED
-                  ? '$textForeground'
-                  : '$white'
-                }
+          <VStack space="lg">
+            <Text {...assessmentSurveyCardStyles.additionalInfo}>
+              {t(description)}
+            </Text>
+
+            {/* Action Button */}
+            {entity?.status && (
+              <Button
+                {...getButtonStyle()}
+                onPress={() => {
+                  if (navigationUrl && userId) {
+                    // @ts-ignore
+                    navigation.navigate(navigationUrl as never, {
+                      id: userId || '',
+                      solutionId: card?.solutionId || card?.id,
+                      submissionNumber: entity?.submissionsCount,
+                    });
+                  } else {
+                    logger.log('userId is required');
+                  }
+                }}
               >
-                {t(entity?.status === CARD_STATUS.COMPLETED ? `View ${card?.name}` : `Fill ${card?.name}`)}
-              </ButtonText>
-            </HStack>
-          </Button>
+                <HStack alignItems="center" gap="$2">
+                  <LucideIcon
+                    name={'FileText'}
+                    size={16}
+                    color={
+                      entity?.status === CARD_STATUS.COMPLETED
+                        ? '$textForeground'
+                        : '$white'
+                    }
+                  />
+                  <ButtonText
+                    {...assessmentSurveyCardStyles.buttonText}
+                    color={
+                      entity?.status === CARD_STATUS.COMPLETED
+                        ? '$textForeground'
+                        : '$white'
+                    }
+                  >
+                    {t(
+                      entity?.status === CARD_STATUS.COMPLETED
+                        ? `View ${card?.name}`
+                        : `Fill ${card?.name}`,
+                    )}
+                  </ButtonText>
+                </HStack>
+              </Button>
+            )}
+          </VStack>
         )}
-        </VStack>
-      )}
       </VStack>
     </Card>
   );

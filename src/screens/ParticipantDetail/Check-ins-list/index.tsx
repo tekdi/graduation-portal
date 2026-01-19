@@ -31,7 +31,6 @@ import logger from '@utils/logger';
 import { isWeb } from '@utils/platform';
 import { User } from '@contexts/AuthContext';
 import { ENTITY_TYPE } from '@constants/ROLES';
-import { CARD_STATUS } from '@constants/app.constant';
 import { StatusBadge } from '@components/ObservationCards';
 
 /**
@@ -240,7 +239,7 @@ const LogVisit: React.FC = () => {
       </VStack>
       <Container>
         {/* Submissions List */}
-        {selectedSolution && (
+        {selectedSolution ? (
           <VStack {...logVisitStyles.cardsContainer}>
             {submissionsLoading ? (
               <Spinner size="large" color="$primary500" />
@@ -342,6 +341,26 @@ const LogVisit: React.FC = () => {
               )
             )}
           </VStack>
+        ):(
+          <Box {...logVisitStyles.selectSolutionContainer}>
+            <Card
+              {...assessmentSurveyCardStyles.cardContainer}
+              {...logVisitStyles.selectSolutionCard}
+              $web-boxShadow="none"
+            >
+              <Text {...logVisitStyles.selectSolutionText}>
+                {t('logVisit.selectSolution')}
+              </Text>
+              <Select
+                options={solutions.map(solution => ({
+                  label: solution.name || solution.id,
+                  value: solution.solutionId || solution.id,
+                }))}
+                value={selectedSolution}
+                onChange={setSelectedSolution}
+              />
+            </Card>
+          </Box>
         )}
       </Container>
     </Box>
