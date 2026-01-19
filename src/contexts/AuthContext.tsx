@@ -161,12 +161,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (loginResponse.result?.user) {
         const userData = loginResponse.result.user;
 
-        // const entityDetails = await getEntityDetails(userData.id);
-        // if(!entityDetails?.[0]) {
-        //   const message = t('auth.userEntityNotFound');
-        //   logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
-        //   return { success: false, message };
-        // }
+        const entityDetails = await getEntityDetails(userData.id);
+         if(!entityDetails?.[0]) {
+          const message = t('auth.userEntityNotFound');
+          logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
+          return { success: false, message };
+        }
         // Determine user role (admin priority), throws if unauthorized
         let determinedRole: UserRole;
         try {
@@ -185,8 +185,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           ...userData, // Include any additional properties from API
         };
 
-        // Extract and store organization and tenant codes
-        // Try to get from userData.organizations or use defaults
+        // [BULK UPLOAD FEATURE] Extract and store organization and tenant codes during login
+        // These codes are required for bulk user upload API calls (used in api.ts interceptor)
+        // Try to get from userData.organizations or use environment variables/defaults
         const orgCode = userData.organizations?.[0]?.code || 
                        (process?.env?.ORG_CODE as string) || 
                        'brac_gbl';
@@ -228,7 +229,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       await offlineStorage.remove(STORAGE_KEYS.AUTH_USER);
       await offlineStorage.remove(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
       
-      // Clear organization and tenant codes
+      // [BULK UPLOAD FEATURE] Clear organization and tenant codes on logout
+      // These codes are only needed when user is logged in for API authentication
       await AsyncStorage.removeItem(STORAGE_KEYS.ORGANIZATION_CODE);
       await AsyncStorage.removeItem(STORAGE_KEYS.TENANT_CODE);
       
