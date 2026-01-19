@@ -38,7 +38,8 @@
     "actions": "Actions",
     "noDataFound": "No data found",
     "optional": "(Optional)",
-    "participant": "Participant"
+    "participant": "Participant",
+    "complete": "Complete"
   },
   "projectPlayer": {
     "status": "Status",
@@ -232,6 +233,10 @@
       "otherSupervisors": "Other supervisors (admin only)"
     }
   },
+  "observation": {
+    "noParticipantFound": "No entity found observation solution attached to this participant",
+    "noParticipantFoundError": "Failed to update observation entities."
+  },
   "brand": {
     "primaryName": "brac",
     "secondaryName": "GBL Admin",
@@ -403,6 +408,7 @@
     "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
   },
   "logVisit": {
+    "noSolutions":"No solutions found",
     "selectVisitType": "Select visit type for {{name}}",
     "viewCheckIns": "View Check-Ins",
     "note": "Note:",
