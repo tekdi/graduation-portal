@@ -100,8 +100,6 @@ const UserManagementScreen = () => {
 
     setIsUploading(true);
     try {
-      console.log('Uploading CSV file:', file.name);
-      
       // Step 1: Get signed URL
       const signedUrlResponse = await getSignedUrl(file.name);
       if (!signedUrlResponse.result?.signedUrl) {
@@ -110,10 +108,6 @@ const UserManagementScreen = () => {
       
       // Step 2: Upload file to signed URL
       await uploadFileToSignedUrl(signedUrlResponse.result.signedUrl, file);
-      console.log('File uploaded successfully to signed URL');
-      
-      // Show toast for file upload success
-      showSuccessToast(t('admin.actions.uploadSuccess') || 'CSV file uploaded successfully!');
       
       // Step 3: Trigger bulk user creation
       const filePath = signedUrlResponse.result.filePath || signedUrlResponse.result.destFilePath;
@@ -122,26 +116,22 @@ const UserManagementScreen = () => {
       }
       
       const bulkCreateResponse = await bulkUserCreate(filePath, ['name', 'email'], 'UPLOAD');
-      console.log('Bulk user creation triggered successfully:', bulkCreateResponse);
       
-      // Show toast for user upload success
+      // Show success toast
       showSuccessToast(
-        t('admin.actions.uploadSuccessMessage') || 
-        'CSV uploaded successfully! You will receive an email with results once processing is complete.'
+        t('admin.actions.uploadSuccess')
       );
       
     } catch (error: any) {
-      console.error('Upload failed:', error);
-      
       // Determine which step failed and show appropriate error message
-      let errorMessage = t('admin.actions.uploadError') || 'Failed to upload CSV file. Please try again.';
+      let errorMessage = t('admin.actions.uploadError');
       
       if (error.message?.includes('signed URL') || error.message?.includes('Failed to get upload URL')) {
-        errorMessage = t('admin.actions.uploadErrorSignedUrl') || 'Failed to get upload URL. Please try again.';
+        errorMessage = t('admin.actions.uploadErrorSignedUrl');
       } else if (error.message?.includes('File upload failed') || error.message?.includes('upload file')) {
-        errorMessage = t('admin.actions.uploadErrorFileUpload') || 'Failed to upload file. Please try again.';
+        errorMessage = t('admin.actions.uploadErrorFileUpload');
       } else if (error.message?.includes('bulk user') || error.message?.includes('process')) {
-        errorMessage = t('admin.actions.uploadErrorBulkCreate') || 'File uploaded but failed to process. Please contact support.';
+        errorMessage = t('admin.actions.uploadErrorBulkCreate');
       }
       
       showErrorToast(errorMessage);

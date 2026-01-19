@@ -1,6 +1,8 @@
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
 import logger from '@utils/logger';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 
 /**
  * Interface for signed URL response
@@ -38,26 +40,18 @@ export interface BulkUserCreateResponse {
 
 /**
  * Step 1: Get signed URL for file upload
+ * Requests a pre-signed S3 URL from the backend to upload the CSV file directly to S3
  * @param fileName - Name of the CSV file
  * @returns Promise with signed URL response
  */
 export const getSignedUrl = async (fileName: string): Promise<SignedUrlResponse> => {
   try {
-    console.log('Step 1 - Requesting signed URL:', { fileName });
-    
     const response = await api.get<SignedUrlResponse>(API_ENDPOINTS.GET_SIGNED_URL, {
       params: { fileName },
     });
     
-    console.log('Step 1 - Signed URL Response:', response.data);
-    
     return response.data;
   } catch (error: any) {
-    console.error('Step 1 - Error:', error);
-    console.error('Step 1 - Error Details:', {
-      message: error.message,
-      response: error.response?.data,
-    });
     logger.error('Error getting signed URL:', error);
     throw error;
   }
@@ -65,6 +59,7 @@ export const getSignedUrl = async (fileName: string): Promise<SignedUrlResponse>
 
 /**
  * Step 2: Upload file to signed URL
+ * Uploads the CSV file directly to S3 using the pre-signed URL (no headers needed for S3)
  * @param signedUrl - The signed URL from Step 1
  * @param file - The CSV file to upload
  * @returns Promise that resolves when upload is complete
@@ -74,24 +69,10 @@ export const uploadFileToSignedUrl = async (
   file: File
 ): Promise<void> => {
   try {
-    console.log('Step 2 - Uploading file:', {
-      fileName: file.name,
-      fileSize: file.size,
-      signedUrl,
-    });
-    
+    // Use fetch for direct S3 upload - S3 signed URLs don't accept extra headers
     const uploadResponse = await fetch(signedUrl, {
       method: 'PUT',
       body: file,
-      headers: {
-        'Content-Type': 'text/csv',
-      },
-    });
-    
-    console.log('Step 2 - File Upload Response:', {
-      status: uploadResponse.status,
-      statusText: uploadResponse.statusText,
-      ok: uploadResponse.ok,
     });
     
     if (!uploadResponse.ok) {
@@ -99,10 +80,7 @@ export const uploadFileToSignedUrl = async (
       throw new Error(`File upload failed: ${uploadResponse.status} ${uploadResponse.statusText} - ${errorText}`);
     }
   } catch (error: any) {
-    console.error('Step 2 - Error:', error);
-    console.error('Step 2 - Error Details:', {
-      message: error.message,
-    });
+    const errorMessage = error.response?.data || error.message || 'File upload failed';
     logger.error('Error uploading file to signed URL:', error);
     throw error;
   }
@@ -110,6 +88,8 @@ export const uploadFileToSignedUrl = async (
 
 /**
  * Step 3: Trigger bulk user creation
+ * Triggers the backend to process the uploaded CSV file and create users in bulk
+ * Uses Postman-compatible headers (x-tenant-code, orgId) instead of default interceptor headers
  * @param filePath - The file path from Step 1 response
  * @param editableFields - Fields that can be edited (default: ["name", "email"])
  * @param uploadType - Type of upload: "CREATE", "UPLOAD", or "INVITE"
@@ -121,30 +101,57 @@ export const bulkUserCreate = async (
   uploadType: 'CREATE' | 'UPLOAD' | 'INVITE' = 'UPLOAD'
 ): Promise<BulkUserCreateResponse> => {
   try {
-    console.log('Step 3 - Triggering bulk user create:', {
-      filePath,
-      editableFields,
-      uploadType,
-    });
+    const requestBody = {
+      file_path: filePath,
+      editable_fields: editableFields,
+      upload_type: uploadType,
+    };
     
-    const response = await api.post<BulkUserCreateResponse>(
-      API_ENDPOINTS.BULK_USER_CREATE,
-      {
-        file_path: filePath,
-        editable_fields: editableFields,
-        upload_type: uploadType,
+    // Get organization and tenant codes from storage for headers
+    const orgCode = await AsyncStorage.getItem(STORAGE_KEYS.ORGANIZATION_CODE);
+    const tenantCode = await AsyncStorage.getItem(STORAGE_KEYS.TENANT_CODE);
+    
+    // Set headers to match Postman format (x-tenant-code, orgId)
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (tenantCode) {
+      headers['x-tenant-code'] = tenantCode;
+    }
+    
+    if (orgCode) {
+      headers['orgId'] = orgCode;
+    }
+    
+    // Remove interceptor's default headers (tenant, organization) and use API-specific headers (x-tenant-code, orgId)
+    // This is necessary because the bulkUserCreate API endpoint expects specific header names that differ from
+    // the default interceptor headers, and having both sets of headers can cause conflicts or validation errors
+    const interceptorId = api.interceptors.request.use(
+      (config) => {
+        if (config.headers) {
+          delete config.headers['tenant'];
+          delete config.headers['organization'];
+        }
+        api.interceptors.request.eject(interceptorId);
+        return config;
+      },
+      (error) => {
+        api.interceptors.request.eject(interceptorId);
+        return Promise.reject(error);
       }
     );
     
-    console.log('Step 3 - Bulk User Create Response:', response.data);
+    const response = await api.post<BulkUserCreateResponse>(
+      API_ENDPOINTS.BULK_USER_CREATE,
+      requestBody,
+      {
+        headers,
+      }
+    );
     
     return response.data;
   } catch (error: any) {
-    console.error('Step 3 - Error:', error);
-    console.error('Step 3 - Error Details:', {
-      message: error.message,
-      response: error.response?.data,
-    });
     logger.error('Error triggering bulk user create:', error);
     throw error;
   }

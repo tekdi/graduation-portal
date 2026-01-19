@@ -184,7 +184,7 @@
       "addUser": "Add User",
       "addUserDescription": "Manually add a single user to the system",
       "uploadSuccess": "CSV file uploaded successfully!",
-      "uploadSuccessMessage": "CSV uploaded successfully! You will receive an email with results once processing is complete.",
+      "uploadSuccessMessage": "User uploaded successfully.",
       "uploadError": "Failed to upload CSV file. Please try again.",
       "uploadErrorSignedUrl": "Failed to get upload URL. Please try again.",
       "uploadErrorFileUpload": "Failed to upload file. Please try again.",
