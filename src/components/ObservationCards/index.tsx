@@ -155,8 +155,8 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
                   >
                     {t(
                       entity?.status === CARD_STATUS.COMPLETED
-                        ? `View ${card?.name}`
-                        : `Fill ${card?.name}`,
+                        ? `${t('actions.view')} ${card?.name}`
+                        : `${t('actions.fill')} ${card?.name}`,
                     )}
                   </ButtonText>
                 </HStack>

@@ -7,7 +7,7 @@ import type {
   AssessmentSurveyCardData,
   ParticipantData,
 } from '@app-types/participant';
-import { getObservationEntities, getObservationSubmissions, getTargetedSolutions } from '../../../services/solutionService';
+import { getObservationEntities, getTargetedSolutions } from '../../../services/solutionService';
 import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
 import logger from '@utils/logger';
 import { isWeb } from '@utils/platform';
@@ -47,7 +47,7 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
     };
 
     fetchSolutions();
-  }, []);
+  }, [participant?.id]);
 
   const getdetails = async ({solutionId,id}:{solutionId:string,id:string}) => {
     const observationData = await getObservationEntities({

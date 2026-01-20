@@ -143,5 +143,14 @@ export const assessmentSurveyCardStyles = {
     fontSize: '$sm',
     fontWeight: '$medium',
   },
+  emptyCard:{
+    alignItems: "center",
+    width:"$100%",
+  },
+  emptyCardTitale: {
+    color:"$textMutedForeground",
+    textAlign:"center",
+    py:"$4"
+  }
 } as const;
 
