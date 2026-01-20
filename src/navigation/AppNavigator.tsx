@@ -103,7 +103,7 @@ const getAccessPages = (
         },
         {
           name: 'observation',
-          path: '/participants/:id/observation/:observationId',
+          path: '/participants/:id/observation/:solutionId',
           component: Observation,
         },
         {
