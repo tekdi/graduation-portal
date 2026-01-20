@@ -175,7 +175,8 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
         color="$textMutedForeground"
         fontSize="$sm" 
         $md-fontSize="$md"
-        marginTop="$3" $md-marginTop="$0"
+        $web-overflow="break-word"
+        width="$full"
       >
         {participant.phone}
       </Text>

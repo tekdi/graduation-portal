@@ -100,12 +100,11 @@ export interface Site {
  */
 
 export interface ParticipantSearchParams {
-  tenant_code?: string;
+  userId: string;
   type?: string;
   page?: number;
   limit?: number;
   search?: string;
-  entity_id?: string;
 }
 
 export interface ParticipantSearchResponse {
