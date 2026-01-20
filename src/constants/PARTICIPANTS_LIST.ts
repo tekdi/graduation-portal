@@ -97,7 +97,7 @@ export const PARTICIPANTS_DATA: ParticipantData[] = [
   // -----------------------------
   {
     id: "3090",
-    name: "Zinhle Bhengu",
+    name: "Zinhle Bhengue",
     contact: "077 678 9013",
     status: "Onboarded",
     progress: undefined,

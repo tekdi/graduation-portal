@@ -93,7 +93,7 @@ const getAccessPages = (
         { name: 'project', path: '/project', component: ProjectPlayer },
       ];
     default:
-      return []; // Always return an array, even if empty
+      return []; // Always return an array even if empty
   }
 };
 
