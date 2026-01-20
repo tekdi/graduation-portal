@@ -121,14 +121,10 @@ const ParticipantsList: React.FC = () => {
   useEffect(() => {
     const fetchParticipants = async () => {
       // Early return if entity ID is not available
-      if (!user?.entityDetails?._id) {
-        return;
-      }
-
       try {
         const response = await getParticipantsList({
+          userId: user?.id as string,
           search: searchKey,
-          entity_id: user.entityDetails._id,
         });
         setParticipants(response.result.data || []);
       } catch (err: any) {

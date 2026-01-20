@@ -27,21 +27,22 @@ export const getParticipantsList = async (
 ): Promise<ParticipantSearchResponse> => {
   try {
     const {
-      tenant_code = process.env.TENANT_CODE_NAME || "brac",
+      userId,
       type = ROLE_NAMES.USER,
       page = 1,
       limit = 20,
       search,
-      entity_id,
+      // entity_id,
     } = params;
 
     // Build query string
     const queryParams = new URLSearchParams({
-      tenant_code,
+      userId,
       type,
       page: page.toString(),
       limit: limit.toString(),
       search: search || '',
+      programId: process.env.GLOBAL_LC_PROGRAM_ID as string,
     });
 
     const endpoint = `${
@@ -49,22 +50,15 @@ export const getParticipantsList = async (
     }?${queryParams.toString()}`;
 
     // Validate entity_id before constructing endpoint
-    if (!entity_id?.trim()) {
-      throw new Error('entity_id is required and cannot be empty');
-    }
+    // if (!entity_id?.trim()) {
+    //   throw new Error('entity_id is required and cannot be empty');
+    // }
+    
+    // const subEntityListEndpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${encodeURIComponent(entity_id)}?type=${ROLE_NAMES.PARTICIPANT.toLowerCase()}`;
+    // const subEntityListResponse = await api.get<any>(subEntityListEndpoint);
+    // const subEntityList = subEntityListResponse.data?.result?.data || [];
 
-    const subEntityListEndpoint = `${
-      API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST
-    }/${encodeURIComponent(
-      entity_id,
-    )}?type=${ROLE_NAMES.PARTICIPANT.toLowerCase()}`;
-    const subEntityListResponse = await api.get<any>(subEntityListEndpoint);
-    const subEntityList = subEntityListResponse.data?.result?.data || [];
-
-    const response = await api.post<ParticipantSearchResponse>(endpoint, {
-      user_ids: subEntityList.map((subEntity: any) => subEntity.externalId),
-    });
-
+    const response = await api.get<ParticipantSearchResponse>(endpoint);
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor
