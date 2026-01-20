@@ -1,6 +1,6 @@
 import { CARD_STATUS } from '@constants/app.constant';
 import { ValueOf } from 'react-native-gesture-handler/lib/typescript/typeUtils';
-import { User } from "@contexts/AuthContext";
+import { User } from '@contexts/AuthContext';
 
 /**
  * Participant Status Types
@@ -65,6 +65,7 @@ export interface AssessmentSurveyCardData {
     showForStatuses?: Array<ParticipantStatus>;
     hideForStatuses?: Array<ParticipantStatus>;
   };
+  entity:any;
 }
 
 /**
