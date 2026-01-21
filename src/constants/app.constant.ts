@@ -1,6 +1,6 @@
 export const STATUS = {
-  NOT_ENROLLED: 'Not Onboarded',
-  ENROLLED: 'Onboarded',
+  NOT_ONBOARDED: 'Not Onboarded',
+  ONBOARDED: 'Onboarded',
   IN_PROGRESS: 'In Progress',
   COMPLETED: 'Completed',
   DROPOUT: 'Dropped out',
