@@ -32,6 +32,7 @@ export const getParticipantsList = async (
       page = 1,
       limit = 20,
       search,
+      status,
       // entity_id,
     } = params;
 
@@ -45,10 +46,13 @@ export const getParticipantsList = async (
       programId: process.env.GLOBAL_LC_PROGRAM_ID as string,
     });
 
-    const endpoint = `${
-      API_ENDPOINTS.PARTICIPANTS_LIST
-    }?${queryParams.toString()}`;
+    // Add status to query params if provided
+    if (status) {
+      queryParams.append('status', status);
+    }
 
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
+    
     // Validate entity_id before constructing endpoint
     // if (!entity_id?.trim()) {
     //   throw new Error('entity_id is required and cannot be empty');
