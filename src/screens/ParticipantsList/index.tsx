@@ -21,8 +21,9 @@ import { getStatusItems } from '@constants/FILTERS';
 import { getParticipantsList } from '../../services/participantService';
 import { STATUS } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
-import { applyFilters } from '@utils/helper';
 import { styles } from './Styles';
+import { useAuth } from '@contexts/AuthContext';
+import logger from '@utils/logger';
 
 /**
  * ParticipantsList Screen
@@ -32,16 +33,16 @@ const ParticipantsList: React.FC = () => {
   const navigation = useNavigation();
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
+  const { user } = useAuth();
 
   // State management
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [activeStatus, setActiveStatus] = useState<StatusType | ''>(
     STATUS.NOT_ENROLLED,
   );
-  const [_searchKey, setSearchKey] = useState('');
+  const [searchKey, setSearchKey] = useState('');
   const [activeFilter, setActiveFilter] = useState<'active' | 'inactive'>('active');
-  const [isLoading] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(true);
 
   // Calculate status counts dynamically from participants data
   const statusCounts = useMemo<StatusCount>(() => {
@@ -118,10 +119,29 @@ const ParticipantsList: React.FC = () => {
   }, [statusItems, t]);
 
   useEffect(() => {
-    // Set mock participants data
-    const participants = getParticipantsList();
-    setParticipants(participants);
-  }, []);
+    const fetchParticipants = async () => {
+      // Early return if entity ID is not available
+      if (!user?.entityDetails?._id) {
+        return;
+      }
+
+      try {
+        const response = await getParticipantsList({
+          search: searchKey,
+          entity_id: user.entityDetails._id,
+        });
+        setParticipants(response.result.data || []);
+      } catch (err: any) {
+        const errorMessage = err?.response?.data?.message || err?.message || 'Failed to fetch participants';
+        logger.error('Error fetching participants:', errorMessage, err);
+        // Optionally set empty array on error to prevent stale data
+        setParticipants([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchParticipants();
+  }, [searchKey, user]);
 
   // When Active/Inactive filter changes, set default status
   useEffect(() => {
@@ -133,22 +153,10 @@ const ParticipantsList: React.FC = () => {
     }
   }, [activeFilter]);
 
-  const filteredParticipants = useMemo(() => {
-    // Build filters object for applyFilters
-    const filters: Record<string, any> = {};
-    
-    // Apply status filter if active
-    if (activeStatus) {
-      filters.status = activeStatus;
-    }
-    
-    // Apply filters using helper function
-    return applyFilters(participants, filters);
-  }, [participants, activeStatus]);
-
   // Handlers
   const handleSearch = useCallback((text: string) => {
     // Search functionality can be implemented here when needed
+    setSearchKey(text);
   }, []);
 
   const handleStatusChange = useCallback((status: StatusType | '') => {
@@ -164,8 +172,6 @@ const ParticipantsList: React.FC = () => {
     },
     [navigation],
   );
-
-
 
   return (
     <Box {...styles.mainContainer}>
@@ -187,6 +193,7 @@ const ParticipantsList: React.FC = () => {
                   placeholder={t('participants.searchByNameOrId')}
                   onSearch={handleSearch}
                   debounceMs={500}
+                  defaultValue={searchKey}
                 />
               </Box>
               <Box {...styles.selectContainer}>
@@ -254,7 +261,7 @@ const ParticipantsList: React.FC = () => {
 
             {/* Participants Table */}
             <DataTable
-              data={filteredParticipants}
+              data={participants}
               columns={getParticipantsColumns(activeStatus)}
               getRowKey={participant => participant.id}
               onRowClick={handleRowClick}

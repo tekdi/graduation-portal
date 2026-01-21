@@ -9,8 +9,6 @@ import {
   InputField,
   Textarea,
   TextareaInput,
-  ModalBody,
-  ModalFooter,
 } from '@gluestack-ui/themed';
 import { LucideIcon, Modal } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -22,6 +20,7 @@ import { TASK_STATUS } from '../../../constants/app.constant';
 import { addCustomTaskModalStyles } from './Styles';
 import { AddCustomTaskModalProps } from 'src/project-player/types';
 import { theme } from '@config/theme';
+import { usePlatform } from '@utils/platform';
 
 export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
   isOpen,
@@ -38,6 +37,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
     updateTask,
     mode: playerMode,
   } = useProjectContext();
+  const { isWeb } = usePlatform();
 
   // Form state - merged into single object
   const [formData, setFormData] = useState({
@@ -196,168 +196,203 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
           : 'projectPlayer.addCustomTaskSubtitle'
       }
       maxWidth={550}
+      footerContent={
+        isWeb ? (
+          <HStack {...addCustomTaskModalStyles.footerButtons}>
+            {/* Cancel Button */}
+            <Button
+              {...addCustomTaskModalStyles.cancelButton}
+              onPress={handleCloseModal}
+            >
+              <ButtonText color="$textPrimary" {...TYPOGRAPHY.button}>
+                {t('common.cancel')}
+              </ButtonText>
+            </Button>
+
+            {/* Submit Button */}
+            <Button
+              {...addCustomTaskModalStyles.submitButton}
+              onPress={handleSubmit}
+              isDisabled={!isFormValid}
+              opacity={!isFormValid ? 0.5 : 1}
+            >
+              <HStack {...addCustomTaskModalStyles.submitButtonContent}>
+                <LucideIcon
+                  name={isEditMode ? 'Check' : 'Plus'}
+                  size={16}
+                  color={theme.tokens.colors.backgroundPrimary.light}
+                />
+                <ButtonText
+                  color="$backgroundPrimary.light"
+                  {...TYPOGRAPHY.button}
+                >
+                  {isEditMode
+                    ? t('projectPlayer.updateTask')
+                    : t('projectPlayer.addCustomTask')}
+                </ButtonText>
+              </HStack>
+            </Button>
+          </HStack>
+        ) : (
+          <VStack space="md" width="$full">
+            {/* Submit Button first on mobile */}
+            <Button
+              {...addCustomTaskModalStyles.submitButton}
+              width="$full"
+              onPress={handleSubmit}
+              isDisabled={!isFormValid}
+              opacity={!isFormValid ? 0.5 : 1}
+            >
+              <HStack {...addCustomTaskModalStyles.submitButtonContent}>
+                <LucideIcon
+                  name={isEditMode ? 'Check' : 'Plus'}
+                  size={16}
+                  color={theme.tokens.colors.backgroundPrimary.light}
+                />
+                <ButtonText
+                  color="$backgroundPrimary.light"
+                  {...TYPOGRAPHY.button}
+                >
+                  {isEditMode
+                    ? t('projectPlayer.updateTask')
+                    : t('projectPlayer.addCustomTask')}
+                </ButtonText>
+              </HStack>
+            </Button>
+
+            {/* Cancel Button */}
+            <Button
+              {...addCustomTaskModalStyles.cancelButton}
+              width="$full"
+              onPress={handleCloseModal}
+            >
+              <ButtonText color="$textPrimary" {...TYPOGRAPHY.button}>
+                {t('common.cancel')}
+              </ButtonText>
+            </Button>
+          </VStack>
+        )
+      }
     >
       {/* Modal Body - Form Fields */}
-      <ModalBody {...addCustomTaskModalStyles.modalBody}>
-        <VStack {...addCustomTaskModalStyles.formStack}>
-          {/* Select Pillar */}
-          <VStack {...addCustomTaskModalStyles.fieldStack}>
-            {/* Label */}
-            <Text
-              {...TYPOGRAPHY.label}
-              color="$textPrimary"
-              fontWeight="$medium"
-            >
-              {!isPreviewMode && (
-                <>
-                  {t('projectPlayer.selectPillar')}
-                  <Text color="$error500">*</Text>
-                </>
-              )}
-            </Text>
-
-            {/* Preview Mode → show Pillar: Pillar Name in one line */}
-            {isPreviewMode ? (
-              <HStack space="xs">
-                <Text
-                  {...TYPOGRAPHY.paragraph}
-                  color="$textPrimary"
-                  fontWeight="$medium"
-                >
-                  {t('projectPlayer.pillar')}:
-                </Text>
-                <Text {...TYPOGRAPHY.paragraph} color="$textPrimary">
-                  {parentPillarName || propPillarName}
-                </Text>
-              </HStack>
-            ) : propPillarId || isEditMode ? (
-              <Text {...TYPOGRAPHY.paragraph} color="$textPrimary">
-                {parentPillarName || propPillarName}
-              </Text>
-            ) : (
-              <Select
-                options={pillars}
-                value={formData.selectedPillar}
-                onChange={value => updateFormField('selectedPillar', value)}
-                placeholder={t('projectPlayer.selectPillarPlaceholder')}
-                {...addCustomTaskModalStyles.select}
-              />
+      <VStack {...addCustomTaskModalStyles.formStack}>
+        {/* Select Pillar */}
+        <VStack {...addCustomTaskModalStyles.fieldStack}>
+          {/* Label */}
+          <Text
+            {...TYPOGRAPHY.label}
+            color="$textPrimary"
+            fontWeight="$medium"
+          >
+            {!isPreviewMode && (
+              <>
+                {t('projectPlayer.selectPillar')}
+                <Text color="$error500">*</Text>
+              </>
             )}
-          </VStack>
+          </Text>
 
-          {/* Task Name */}
-          <VStack {...addCustomTaskModalStyles.fieldStack}>
-            <Text
-              {...TYPOGRAPHY.label}
-              color="$textPrimary"
-              fontWeight="$medium"
-            >
-              {t('projectPlayer.taskName')} <Text color="$error500">*</Text>
-            </Text>
-            <Input {...addCustomTaskModalStyles.input}>
-              <InputField
-                placeholder={t('projectPlayer.taskNamePlaceholder')}
-                value={formData.taskName}
-                onChangeText={value => updateFormField('taskName', value)}
-                placeholderTextColor="$textMuted"
-              />
-            </Input>
-          </VStack>
-
-          {/* Instructions */}
-          <VStack {...addCustomTaskModalStyles.fieldStack}>
-            <Text
-              {...TYPOGRAPHY.label}
-              color="$textPrimary"
-              fontWeight="$medium"
-            >
-              {t('projectPlayer.instructions')}
-            </Text>
-            <Textarea {...addCustomTaskModalStyles.textarea}>
-              <TextareaInput
-                placeholder={t('projectPlayer.instructionsPlaceholder')}
-                value={formData.instructions}
-                onChangeText={value => updateFormField('instructions', value)}
-                placeholderTextColor="$textMuted"
-              />
-            </Textarea>
-          </VStack>
-
-          {/* Service Provider Selection (Optional) */}
-          <VStack space="xs">
-            <HStack alignItems="center" space="xs">
-              <LucideIcon
-                name="Building2"
-                size={16}
-                color={theme.tokens.colors.primary500}
-              />
+          {/* Preview Mode → show Pillar: Pillar Name in one line */}
+          {isPreviewMode ? (
+            <HStack space="xs">
               <Text
-                {...TYPOGRAPHY.label}
+                {...TYPOGRAPHY.paragraph}
                 color="$textPrimary"
                 fontWeight="$medium"
               >
-                {t('projectPlayer.serviceProviderSelection')}
+                {t('projectPlayer.pillar')}:
               </Text>
-              <Text {...TYPOGRAPHY.bodySmall} color="$textMuted">
-                ({t('common.optional')})
+              <Text {...TYPOGRAPHY.paragraph} color="$textPrimary">
+                {parentPillarName || propPillarName}
               </Text>
             </HStack>
-            <Text {...TYPOGRAPHY.bodySmall} color="$textSecondary">
-              {t('projectPlayer.serviceProvider')}
+          ) : propPillarId || isEditMode ? (
+            <Text {...TYPOGRAPHY.paragraph} color="$textPrimary">
+              {parentPillarName || propPillarName}
             </Text>
+          ) : (
             <Select
-              options={[
-                { label: 'Service Provider 1', value: 'provider1' },
-                { label: 'Service Provider 2', value: 'provider2' },
-                { label: 'Service Provider 3', value: 'provider3' },
-              ]}
-              value={formData.serviceProvider}
-              onChange={value => updateFormField('serviceProvider', value)}
-              placeholder={t('projectPlayer.selectServiceProvider')}
+              options={pillars}
+              value={formData.selectedPillar}
+              onChange={value => updateFormField('selectedPillar', value)}
+              placeholder={t('projectPlayer.selectPillarPlaceholder')}
               {...addCustomTaskModalStyles.select}
             />
-          </VStack>
+          )}
         </VStack>
-      </ModalBody>
 
-      {/* Modal Footer - Action Buttons */}
-      <ModalFooter {...addCustomTaskModalStyles.modalFooter}>
-        <HStack {...addCustomTaskModalStyles.footerButtons}>
-          {/* Cancel Button */}
-          <Button
-            {...addCustomTaskModalStyles.cancelButton}
-            onPress={handleCloseModal}
+        {/* Task Name */}
+        <VStack {...addCustomTaskModalStyles.fieldStack}>
+          <Text
+            {...TYPOGRAPHY.label}
+            color="$textPrimary"
+            fontWeight="$medium"
           >
-            <ButtonText color="$textPrimary" {...TYPOGRAPHY.button}>
-              {t('common.cancel')}
-            </ButtonText>
-          </Button>
+            {t('projectPlayer.taskName')} <Text color="$error500">*</Text>
+          </Text>
+          <Input {...addCustomTaskModalStyles.input}>
+            <InputField
+              placeholder={t('projectPlayer.taskNamePlaceholder')}
+              value={formData.taskName}
+              onChangeText={value => updateFormField('taskName', value)}
+              placeholderTextColor="$textMuted"
+            />
+          </Input>
+        </VStack>
 
-          {/* Submit Button */}
-          <Button
-            {...addCustomTaskModalStyles.submitButton}
-            onPress={handleSubmit}
-            isDisabled={!isFormValid}
-            opacity={!isFormValid ? 0.5 : 1}
+        {/* Instructions */}
+        <VStack {...addCustomTaskModalStyles.fieldStack}>
+          <Text
+            {...TYPOGRAPHY.label}
+            color="$textPrimary"
+            fontWeight="$medium"
           >
-            <HStack {...addCustomTaskModalStyles.submitButtonContent}>
-              <LucideIcon
-                name={isEditMode ? 'Check' : 'Plus'}
-                size={16}
-                color={theme.tokens.colors.backgroundPrimary.light}
-              />
-              <ButtonText
-                color="$backgroundPrimary.light"
-                {...TYPOGRAPHY.button}
-              >
-                {isEditMode
-                  ? t('projectPlayer.updateTask')
-                  : t('projectPlayer.addCustomTask')}
-              </ButtonText>
-            </HStack>
-          </Button>
-        </HStack>
-      </ModalFooter>
+            {t('projectPlayer.instructions')}
+          </Text>
+          <Textarea {...addCustomTaskModalStyles.textarea}>
+            <TextareaInput
+              placeholder={t('projectPlayer.instructionsPlaceholder')}
+              value={formData.instructions}
+              onChangeText={value => updateFormField('instructions', value)}
+              placeholderTextColor="$textMuted"
+            />
+          </Textarea>
+        </VStack>
+
+        {/* Service Provider Selection (Optional) */}
+        <VStack
+          {...addCustomTaskModalStyles.serviceProviderSection}
+        >
+          <HStack {...addCustomTaskModalStyles.serviceProviderHeader}>
+            <LucideIcon
+              name="Building2"
+              size={16}
+              color={theme.tokens.colors.primary500}
+            />
+            <Text
+              {...TYPOGRAPHY.label}
+              color="$textPrimary"
+              fontWeight="$medium"
+            >
+              {t('projectPlayer.serviceProviderSelection')}
+            </Text>
+          </HStack>
+          <Text {...TYPOGRAPHY.bodySmall} color="$textSecondary">
+            {t('projectPlayer.serviceProvider')}
+          </Text>
+          <Select
+            options={[
+              { label: 'Service Provider 1', value: 'provider1' },
+              { label: 'Service Provider 2', value: 'provider2' },
+              { label: 'Service Provider 3', value: 'provider3' },
+            ]}
+            value={formData.serviceProvider}
+            onChange={value => updateFormField('serviceProvider', value)}
+            placeholder={t('projectPlayer.selectServiceProvider')}
+            {...addCustomTaskModalStyles.select}
+          />
+        </VStack>
+      </VStack>
     </Modal>
   );
 };
