@@ -1,11 +1,21 @@
 export const adminDashboardStyles = {
-  mainVStack: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+  container: {
+    space: 'md' as const,
+    width: '100%' as const,
   },
-  titleText: {
-    fontSize: '$2xl',
-    fontWeight: 'bold',
+  infoCard: {
+    size: 'md' as const,
+    variant: 'ghost' as const,
+    px: '$0' as const,
+  },
+  infoHeading: {
+    size: 'md' as const,
+    fontSize: '$md' as const,
+    fontWeight: '$normal' as const,
+    color: '$textForeground' as const,
+  },
+  infoText: {
+    size: 'sm' as const,
+    color: '$textMutedForeground' as const,
   },
 };

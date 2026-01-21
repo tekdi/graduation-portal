@@ -1,6 +1,5 @@
 import React from 'react';
 import { VStack, Card, Heading, Text } from '@ui';
-import { theme } from '@config/theme';
 
 import { adminDashboardStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -19,17 +18,22 @@ const AdminDashboard = () => {
   };
 
   return (
-    <VStack space="md" width="100%">
+    <VStack {...adminDashboardStyles.container}>
+      {/* Title Header */}
       <TitleHeader title="admin.dashboard" description="admin.dashboardDescription" />
+
+      {/* Filter Button */}
       <FilterButton 
         data={AdminDashboardFilterOptions as any[]} 
         onFilterChange={handleFilterChange}
       />
-      <Card size="md" variant="ghost" px="$0">
-        <Heading size="md" fontSize="$md" fontWeight="$normal" color="$textForeground">
+
+      {/* Info Card */}
+      <Card {...adminDashboardStyles.infoCard}>
+        <Heading {...adminDashboardStyles.infoHeading}>
           {t('admin.selectIndicatorType')}
         </Heading>
-        <Text size="sm" color="$textMutedForeground">{t('admin.indicatorTypeDescription')}</Text>
+        <Text {...adminDashboardStyles.infoText}>{t('admin.indicatorTypeDescription')}</Text>
       </Card>
 
       {/* Indicator Cards */}
