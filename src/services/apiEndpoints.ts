@@ -9,12 +9,11 @@ export const API_ENDPOINTS = {
   SEARCH_OBSERVATION_ENTITIES: `${prefix}/survey/v1/observations/searchEntities`,
   OBSERVATION_SOLUTION: `${prefix}/survey/v1/observations/assessment`,
   OBSERVATION_SUBMISSIONS: `${prefix}/survey/v1/observationSubmissions/list`,
-  PARTICIPANTS_LIST: `${prefix}/user/v1/account/search`,
+  PARTICIPANTS_LIST: `${prefix}/project/v1/programUsers/getEntities`,
   PARTICIPANTS_SUB_ENTITY_LIST: `${prefix}/entity-management/v1/entities/subEntityList`,
   ENTITY_DETAILS: `${prefix}/entity-management/v1/entities/details`,
   PROJECT_CATEGORIES_LIST: `/project/v1/library/categories/list?parentId=null&keywords=idp&getChildren=true`,
   GET_ENTITY_DETAILS: (id: string) =>
     `${prefix}/entity-management/v1/entities/details/${id}`,
-  UPDATE_ENTITY_DETAILS: (id: string) =>
-    `${prefix}/entity-management/v1/entities/update/${id}`,
+  UPDATE_ENTITY_DETAILS: `${prefix}/project/v1/programUsers/createOrUpdate`,
 };

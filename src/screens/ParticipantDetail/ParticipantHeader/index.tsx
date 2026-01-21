@@ -17,6 +17,7 @@ import ParticipantProgressCard from './ParticipantProgressCard';
 import { STATUS } from '@constants/app.constant';
 import { theme } from '@config/theme';
 import { updateEntityDetails } from '../../../services/participantService';
+import { useAuth } from '@contexts/AuthContext';
 
 /**
  * ParticipantHeader Props
@@ -53,7 +54,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
 }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
-
+const {user} = useAuth()
   /**
    * Handle Back Navigation
    * Navigates to the participants list page
@@ -67,9 +68,15 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     if (!userEntityId) return;
 
     try {
-      await updateEntityDetails(userEntityId, {
-        'metaInformation.status': STATUS.ENROLLED,
-      });
+
+       await updateEntityDetails({
+         userId: `${user?.id}`,
+         programId: process.env.GLOBAL_LC_PROGRAM_ID,
+         entityId: userEntityId,
+         entityUpdates: {
+           status: STATUS.ENROLLED,
+         },
+       });
       // Notify parent component about status update
       if (onStatusUpdate) {
         onStatusUpdate(STATUS.ENROLLED);

@@ -18,25 +18,20 @@ import Select from '@components/ui/Inputs/Select';
 import templateStyles from './styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
-import { getParticipantById } from '../../services/participantService';
+import { getParticipantById, getParticipantsList } from '../../services/participantService';
 import {
-  getProjectCategories,
   getProjectCategoryList,
-  getProjectTemplates,
-  // getProjectTemplates,
 } from '../../services/projectService';
 import { usePlatform } from '@utils/platform';
 import { useLanguage } from '@contexts/LanguageContext';
 import ProjectPlayer from '../ProjectPlayer/index';
 import {
-  categoryDetailsMockData,
-  COMPLEX_PROJECT_DATA,
   MODE,
   PROJECT_PLAYER_CONFIGS,
-  subCategoryDetailsMockData,
 } from '@constants/PROJECTDATA';
 import { ProjectPlayerData } from 'src/project-player/types/components.types';
 import { getCategoryList } from '../../project-player/services/projectPlayerService';
+import { useAuth } from '@contexts/AuthContext';
 
 type SubCategory = {
   id: string;
@@ -57,6 +52,8 @@ type PillarCategoryMap = {
 type PillarSelection = {
   categoryId?: string;
   subCategoryId?: string;
+  categoryName?:string;
+  subCategoryName?:string;
 };
 
 const DevelopInterventionPlan: React.FC = () => {
@@ -64,6 +61,7 @@ const DevelopInterventionPlan: React.FC = () => {
   const route = useRoute();
   const { t } = useLanguage();
   const { isWeb } = usePlatform();
+  const { user } = useAuth();
 
   const participantId = (route.params as { id?: string })?.id || '';
 
@@ -90,6 +88,22 @@ const DevelopInterventionPlan: React.FC = () => {
 
   /* -------------------- DERIVED -------------------- */
   const participantName = participant?.name || '-';
+
+    useEffect(() => {
+      const fetchEntityDetails = async () => {
+        if (participantId && user?.id) {
+          try {
+            const response = await getParticipantsList({entityId:participantId,userId:user?.id})
+            const {userDetails,...rest} = response?.result?.data?.[0]
+            const participantData = {...(userDetails || {}),...rest}
+            setParticipant(participantData);
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      };
+      fetchEntityDetails();
+    }, [participantId,user?.id]);
 
   const getCategoriesForPillar = (pillarId: string) =>
     pillarCategoryMap.find(p => p.pillarId === pillarId)?.categories || [];
@@ -167,10 +181,13 @@ const DevelopInterventionPlan: React.FC = () => {
   const config = PROJECT_PLAYER_CONFIGS;
   const selectedMode = MODE.previewMode;
 
+  
   const configData = {
     ...config,
     ...selectedMode,
-    showAddCustomTaskButton: false,
+    profileInfo: participant,
+    showAddCustomTaskButton: true,
+    showSubmitButton: true,
   };
 
   // Combine pillarIdsToGetIdp with selected subcategory IDs
@@ -187,7 +204,6 @@ const DevelopInterventionPlan: React.FC = () => {
     () => ({
       solutionId: config.data.solutionId,
       projectId: config.data.projectId,
-      data: COMPLEX_PROJECT_DATA,
       categoryIds: categoryIdsArray, // Array of pillar IDs without categories + selected subcategory IDs
       selectedPathway: selectedPathway,
       pillarCategoryRelation: getPillarCategoryRelationships,
@@ -275,7 +291,6 @@ const DevelopInterventionPlan: React.FC = () => {
       setIsModalOpen(true);
       setSelectedPathway(id);
       const res = await getCategoryList(id);
-      console.log('categoriesData', res?.data);
       const pillars = res?.data ?? [];
       setPillarData(pillars);
 
@@ -283,7 +298,7 @@ const DevelopInterventionPlan: React.FC = () => {
         .filter((pillar: any) => pillar?.hasChildCategories)
         .map((pillar: any) => pillar._id);
 
-      const pillarIdsWithoutCategories = pillars
+             const pillarIdsWithoutCategories = pillars
         .filter((pillar: any) => pillar?.hasChildCategories === false)
         .map((pillar: any) => pillar._id);
       setPillarIdsToGetIdp(pillarIdsWithoutCategories);
@@ -464,20 +479,6 @@ const DevelopInterventionPlan: React.FC = () => {
                       {pathway?.children.length}{' '}
                       {t('template.pathwayCard.pillars')}
                     </Text>
-                    {/* <Text
-                      {...TYPOGRAPHY.caption}
-                      color="$textMutedForeground"
-                      mr="$2"
-                    >
-                      •
-                    </Text>
-                    <Text
-                      {...TYPOGRAPHY.caption}
-                      color="$textMutedForeground"
-                      mr="$2"
-                    >
-                      {pathway.tasksCount} {t('template.pathwayCard.tasks')}
-                    </Text> */}
                     <Text
                       {...TYPOGRAPHY.caption}
                       color="$textMutedForeground"
@@ -611,15 +612,20 @@ const DevelopInterventionPlan: React.FC = () => {
                       value: c.id,
                     }))}
                     value={selectionByPillar[pillar._id]?.categoryId || ''}
-                    onChange={value =>
+                    onChange={value => {
+                      const selectedCategory = getCategoriesForPillar(
+                        pillar._id,
+                      ).find(c => c.id === value);
                       setSelectionByPillar(prev => ({
                         ...prev,
                         [pillar._id]: {
                           categoryId: value,
+                          categoryName: selectedCategory?.label || '',
                           subCategoryId: '', // reset
+                          subCategoryName: '', // reset
                         },
-                      }))
-                    }
+                      }));
+                    }}
                     placeholder={t(
                       'template.categoryModal.categoryPlaceholder',
                     )}
@@ -654,15 +660,19 @@ const DevelopInterventionPlan: React.FC = () => {
                         }),
                       )}
                       value={selectionByPillar[pillar._id]?.subCategoryId || ''}
-                      onChange={value =>
+                      onChange={value => {
+                        const selectedSubCategory = getSubCategoriesForPillar(
+                          pillar._id,
+                        ).find(sc => sc.id === value);
                         setSelectionByPillar(prev => ({
                           ...prev,
                           [pillar._id]: {
                             ...prev[pillar._id],
                             subCategoryId: value,
+                            subCategoryName: selectedSubCategory?.label || '',
                           },
-                        }))
-                      }
+                        }));
+                      }}
                       placeholder={t(
                         'template.categoryModal.subCategoryPlaceholder',
                       )}
@@ -682,23 +692,39 @@ const DevelopInterventionPlan: React.FC = () => {
                 selectionByPillar[pillar._id]?.subCategoryId,
             ) && (
             <Box {...(templateStyles.summaryBox as any)}>
-              <Text
-                {...TYPOGRAPHY.bodySmall}
-                color="$progressBarFillColor"
-                fontWeight="$semibold"
-              >
-                {t('template.categoryModal.selectedLabel', {
-                  selectedCategoryId: 'All selections complete',
-                  selectedSubCategoryId: '',
+              {pillarData
+                .filter((pillar: any) => pillar?.hasChildCategories)
+                .map((pillar: any) => {
+                  const selection = selectionByPillar[pillar._id];
+
+                  if (!selection?.categoryId || !selection?.subCategoryId) {
+                    return null;
+                  }
+
+                  return (
+                    <>
+                      <Text
+                        key={pillar._id}
+                        {...TYPOGRAPHY.bodySmall}
+                        color="$progressBarFillColor"
+                        fontWeight="$semibold"
+                        mb="$2"
+                      >
+                        {t('template.categoryModal.selectedLabel', {
+                          category: selection.categoryName,
+                          subcategory: selection.subCategoryName,
+                        })}
+                      </Text>
+                      <Text
+                        {...TYPOGRAPHY.caption}
+                        color="$progressBarFillColor"
+                        mt="$1"
+                      >
+                        {t('template.categoryModal.selectedDescription')}
+                      </Text>
+                    </>
+                  );
                 })}
-              </Text>
-              <Text
-                {...TYPOGRAPHY.caption}
-                color="$progressBarFillColor"
-                mt="$1"
-              >
-                {t('template.categoryModal.selectedDescription')}
-              </Text>
             </Box>
           )}
         </VStack>
