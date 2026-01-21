@@ -173,7 +173,6 @@
       "createUser": "Create User",
       "main": "Main Navigation",
       "quickActions": "Quick Actions",
-      "assignUsers": "Assign Users",
       "moreInformation": "More Information",
       "csvImportTemplates": "CSV Import Templates",
       "passwordManagementPolicy": "Password Management Policy",
@@ -231,14 +230,6 @@
       "linkageChampions": "Linkage Champions (supervisors+)",
       "otherSupervisors": "Other supervisors (admin only)"
     },
-    "assignUsers": {
-      "step1SelectSupervisor": "Step 1: Select Supervisor",
-      "filterByProvince": "Filter by province and choose a supervisor",
-      "step2AssignLinkageChampions": "Step 2: Assign Linkage Champions",
-      "filterByGeography": "Filter by geography and select LCs to assign",
-      "chooseSupervisor": "Choose a supervisor to view their assigned LCs",
-      "step2SelectLC": "Step2: Select Linkage Champion",
-      "chooseLcFrom": "Choose an LC from {{supervisor}}'s team",
     "csvTemplatePage": {
       "downloadSuccess": "Downloaded {{title}} template",
       "downloadMobileInfo": "Download available on Desktop/Web"
@@ -584,6 +575,5 @@
       "buttonNegative": "Cancel",
       "buttonPositive": "OK"
     }
-  }
   }
 }
