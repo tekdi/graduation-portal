@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { HStack, Box, Card, VStack, Text, Pressable, Badge, BadgeText } from '@ui';
 import { LucideIcon } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { useNavigation } from '@react-navigation/native';
-import { theme } from '@config/theme';
-import { AssessmentSurveyCardData } from '@app-types/participant';
+import { dashboardCardsStyles } from './DashboardStyle';
+import { DashboardCard } from '@constants/ADMIN_DASHBOARD_CARDS';
 
 interface DashboardCardsProps {
-  cards: AssessmentSurveyCardData[];
+  cards: DashboardCard[];
   userId?: string;
 }
 
@@ -21,8 +21,9 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
 }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
+  const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
 
-  const handleCardPress = (card: AssessmentSurveyCardData) => {
+  const handleCardPress = (card: DashboardCard) => {
     if (card.navigationUrl) {
       // @ts-ignore - Navigation type inference
       navigation.navigate(card.navigationUrl as never);
@@ -30,58 +31,46 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
   };
 
   return (
-    <HStack space="md" mt="$4" flexWrap="wrap">
+    <HStack {...dashboardCardsStyles.cardsContainer}>
       {cards.map(card => (
         <Pressable
           key={card.id}
-          flex={1}
-          minWidth="$64"
+          {...dashboardCardsStyles.pressable}
           onPress={() => handleCardPress(card)}
-          $web-cursor="pointer"
         >
-          <Card
-            size="md"
-            variant="outline"
-            borderWidth={1}
-            borderColor="$borderLight200"
-            borderRadius="$lg"
-            p="$4"
-            $web-hover={{
-              borderColor: '$primary500',
-              shadowColor: '$foreground',
+          <Card 
+            {...dashboardCardsStyles.card}
+            borderColor={hoveredCardId === card.id ? '$primary500' : '$borderColor'}
+            // @ts-ignore - Web-specific mouse events
+            onMouseEnter={() => setHoveredCardId(card.id)}
+            onMouseLeave={() => setHoveredCardId(null)}
+            style={hoveredCardId === card.id ? {
+              shadowColor: '#000',
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
               shadowRadius: 8,
               elevation: 3,
-            }}
+            } : undefined}
           >
-            <VStack space="md" flex={1}>
+            <VStack {...dashboardCardsStyles.cardContent}>
               {/* Icon and Title Row */}
-              <HStack space="md" alignItems="flex-start" justifyContent="space-between">
-                <HStack space="md" alignItems="flex-start" flex={1}>
+              <HStack {...dashboardCardsStyles.iconTitleRow}>
+                <HStack {...dashboardCardsStyles.iconTitleContainer}>
                   {/* Icon Container */}
                   <Box
-                    bg={card.iconColor || theme.tokens.colors.error100}
-                    borderRadius="$md"
-                    width={40}
-                    height={40}
-                    alignItems="center"
-                    justifyContent="center"
+                    {...dashboardCardsStyles.iconBox}
+                    bg={card.iconColor || dashboardCardsStyles.iconBoxDefaultBg}
                   >
                     <LucideIcon 
-                      name={card.icon} 
-                      size={20} 
-                      color={theme.tokens.colors.error500} 
+                      name={card.icon || 'Circle'} 
+                      size={dashboardCardsStyles.iconSize} 
+                      color={dashboardCardsStyles.iconColor} 
                     />
                   </Box>
 
                   {/* Title */}
-                  <VStack flex={1} space="xs">
-                    <Text 
-                      fontSize="$md" 
-                      fontWeight="$semibold" 
-                      color="$textForeground"
-                    >
+                  <VStack {...dashboardCardsStyles.titleContainer}>
+                    <Text {...dashboardCardsStyles.titleText}>
                       {t(card.title)}
                     </Text>
                   </VStack>
@@ -90,25 +79,20 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
                 {/* Right Arrow Icon */}
                 <LucideIcon 
                   name="ChevronRight" 
-                  size={20} 
-                  color="$textMutedForeground" 
+                  {...dashboardCardsStyles.chevronIcon}
                 />
               </HStack>
 
               {/* Description */}
-              <Text 
-                fontSize="$sm" 
-                color="$textMutedForeground" 
-                flex={1}
-              >
+              <Text {...dashboardCardsStyles.descriptionText}>
                 {t(card.description)}
               </Text>
 
               {/* Topics Badge */}
               {card.status && (
-                <HStack justifyContent="flex-start" alignItems="center">
-                  <Badge bg="$backgroundDark950" borderRadius="$md" px="$3" py="$1">
-                    <BadgeText color="$textLight0" fontSize="$xs">
+                <HStack {...dashboardCardsStyles.badgeContainer}>
+                  <Badge {...dashboardCardsStyles.badge}>
+                    <BadgeText {...dashboardCardsStyles.badgeText}>
                       {t(card.status.label)}
                     </BadgeText>
                   </Badge>
