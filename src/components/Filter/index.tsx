@@ -1,6 +1,7 @@
 import React from "react";
 import { VStack, HStack, Text, Image, Input, InputField, Pressable } from "@ui";
 import Select from "../ui/Inputs/Select";
+import DatePicker from "../ui/Inputs/DatePicker";
 import { filterStyles } from "./Styles";
 import filterIcon from "../../assets/images/FilterIcon.png";
 import { useLanguage } from "@contexts/LanguageContext";
@@ -21,6 +22,7 @@ export default function FilterButton({
 }: FilterButtonProps) {
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
+  const [openDatePicker, setOpenDatePicker] = React.useState<string | null>(null);
 
   // Notify parent when filters change
   React.useEffect(() => {
@@ -127,17 +129,20 @@ export default function FilterButton({
 
     // Render the appropriate input field based on type
     const renderInputField = () => {
-      // Date type field
+      // Date type field - uses custom DatePicker component
       if (item.type === 'date') {
         return (
-          <Input {...filterStyles.input}>
-            <InputField
-              {...({ type: 'date' } as any)}
-              placeholder={getPlaceholder()}
-              value={value?.[item.attr] || ""}
-              onChangeText={handleInputChange}
-            />
-          </Input>
+          <DatePicker
+            {...filterStyles.input}
+            value={value?.[item.attr] || ""}
+            onChange={handleInputChange}
+            placeholder={getPlaceholder()}
+            maximumDate={new Date()}
+            isOpen={openDatePicker === item.attr}
+            onOpenChange={(isOpen: boolean) => {
+              setOpenDatePicker(isOpen ? item.attr : null);
+            }}
+          />
         );
       }
 
