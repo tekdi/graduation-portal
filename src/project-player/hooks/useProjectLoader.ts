@@ -32,7 +32,6 @@ export const useProjectLoader = (
         if (config.mode === 'edit') {
           const { entityId, projectId, userStatus } = data;
 
-          if (!entityId || userStatus !== STATUS.NOT_ENROLLED) return;
 
           try {
             let projectData;
