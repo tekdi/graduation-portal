@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Box, VStack, Text, Button, ButtonText, LucideIcon } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { interventionPlanStyles } from './Styles';
@@ -9,18 +9,33 @@ import ProjectPlayer, {
 import { Task } from '../../../project-player/types/project.types';
 import { COMPLEX_PROJECT_DATA, MODE } from '@constants/PROJECTDATA';
 import { STATUS } from '@constants/app.constant';
-import type { InterventionPlanProps } from '../../../types/screens';
+import type { InterventionPlanProps, StatusType } from '../../../types/screens';
 import { useNavigation } from '@react-navigation/native';
 
 const InterventionPlan: React.FC<InterventionPlanProps> = ({
   participantStatus,
   participantId,
   participantProfile,
+  onIdpCreation,
 }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
-  const [isEditMode, setIsEditMode] = useState(false);
+  const [isEditMode] = useState(true);
   const [addedTasks, setAddedTasks] = useState<Set<string>>(new Set());
+  // Local state to track if IDP was just created successfully
+  const [localStatus, setLocalStatus] = useState<StatusType | undefined>(
+    participantStatus,
+  );
+  // State to store the projectId from IDP creation
+  const [projectId, setProjectId] = useState<string | undefined>(undefined);
+
+  // Update local status when prop changes
+  useEffect(() => {
+    setLocalStatus(participantStatus);
+  }, [participantStatus]);
+
+  // Use local status for rendering logic
+  const currentStatus = localStatus || participantStatus;
 
   // Define required optional tasks IDs needed for submission
   const REQUIRED_OPTIONAL_TASKS = ['subtask-sp-003', 'subtask-sp-004'];
@@ -41,15 +56,26 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     }
   };
 
+  // Handle successful IDP creation
+  const handleIdpCreationSuccess = useCallback((newProjectId?: string) => {
+    if (newProjectId) {
+      setProjectId(newProjectId);
+    }
+    if (onIdpCreation) {
+      onIdpCreation(newProjectId);
+    }
+  }, [onIdpCreation]);
+
   // Memoize ProjectPlayer config based on status and edit mode
   const config: ProjectPlayerConfig = useMemo(() => {
-    // Handle undefined participantStatus
-    if (!participantStatus) {
+    // Handle undefined currentStatus
+    if (!currentStatus) {
       return MODE.previewMode;
     }
 
     // Store in const to ensure TypeScript knows it's defined
-    const status = participantStatus;
+    const status = currentStatus;
+  //  const  isEditMode = status === STATUS.IN_PROGRESS  ? true :false;
 
     // ENROLLED status: use editMode if isEditMode is true, otherwise previewMode
     if (status === STATUS.ENROLLED) {
@@ -62,7 +88,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
           ...baseConfig,
           profileInfo: participantProfile,
           showSubmitButton: true,
-          onSubmitInterventionPlan: () => setIsEditMode(true),
+          onSubmitInterventionPlan: handleIdpCreationSuccess,
           isSubmitDisabled: !areAllOptionalTasksAdded,
           submitWarningMessage: t(
             'participantDetail.interventionPlan.socialProtectionWarning',
@@ -76,6 +102,20 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
         showAddCustomTaskButton,
       };
     }
+    else if(status === STATUS.IN_PROGRESS){
+       const baseConfig =  MODE.editMode;
+      const showAddCustomTaskButton = status === STATUS.IN_PROGRESS;
+      
+        return {
+          ...baseConfig,
+          profileInfo: participantProfile,
+          showSubmitButton: true,
+          onSubmitInterventionPlan: handleIdpCreationSuccess,
+          isSubmitDisabled: !areAllOptionalTasksAdded,
+         showAddCustomTaskButton
+        };
+      
+    }
 
     // Map other statuses to their respective configs
     const statusConfigMap: Record<string, ProjectPlayerConfig> = {
@@ -85,20 +125,21 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     };
 
     return statusConfigMap[status];
-  }, [participantStatus, isEditMode, areAllOptionalTasksAdded, t]);
+  }, [currentStatus, isEditMode, areAllOptionalTasksAdded, t, participantProfile, handleIdpCreationSuccess]);
 
   // Memoize ProjectPlayer data - all statuses use COMPLEX_PROJECT_DATA
   const projectPlayerData: ProjectPlayerData = useMemo(
     () => ({
       solutionId: config?.solutionId,
-      projectId: config?.projectId,
+      projectId: projectId || config?.projectId || participantProfile?.idpProjectId,
       data: COMPLEX_PROJECT_DATA,
+      pillarCategoryRelation: undefined,
     }),
-    [config?.solutionId, config?.projectId],
+    [config?.solutionId, config?.projectId, projectId],
   );
 
   // Show empty state for ENROLLED status when player is not shown yet
-  if (participantStatus === STATUS.ENROLLED) {
+  if (currentStatus === STATUS.ENROLLED) {
     return (
       <Box {...interventionPlanStyles.container}>
         <VStack {...interventionPlanStyles.content}>
@@ -130,7 +171,24 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     );
   }
 
-  // Single ProjectPlayer render point for all statuses
+  // Show ProjectPlayer for IN_PROGRESS, COMPLETED, and other statuses
+  if (
+    currentStatus === STATUS.IN_PROGRESS ||
+    currentStatus === STATUS.COMPLETED ||
+    currentStatus === STATUS.DROPOUT
+  ) {
+    return (
+      <Box flex={1}>
+        <ProjectPlayer
+          config={config}
+          data={projectPlayerData}
+          onTaskUpdate={handleTaskUpdate}
+        />
+      </Box>
+    );
+  }
+
+  // Fallback: render ProjectPlayer for any other status
   return (
     <Box flex={1}>
       <ProjectPlayer

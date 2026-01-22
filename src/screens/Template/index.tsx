@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   ScrollView,
   Box,
@@ -32,6 +32,7 @@ import {
 import { ProjectPlayerData } from 'src/project-player/types/components.types';
 import { getCategoryList } from '../../project-player/services/projectPlayerService';
 import { useAuth } from '@contexts/AuthContext';
+import { STATUS } from '@constants/app.constant';
 
 type SubCategory = {
   id: string;
@@ -84,6 +85,8 @@ const DevelopInterventionPlan: React.FC = () => {
     useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [idpCreated, setIdpCreated] = useState(false);
+  const [projectId, setProjectId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   /* -------------------- DERIVED -------------------- */
@@ -103,7 +106,7 @@ const DevelopInterventionPlan: React.FC = () => {
         }
       };
       fetchEntityDetails();
-    }, [participantId,user?.id]);
+    }, [participantId,user?.id, idpCreated]);
 
   const getCategoriesForPillar = (pillarId: string) =>
     pillarCategoryMap.find(p => p.pillarId === pillarId)?.categories || [];
@@ -118,12 +121,14 @@ const DevelopInterventionPlan: React.FC = () => {
     return selectedCategory?.subcategories || [];
   };
 
-  /**
-   * Get relationship between pillars with categories and their selected category/subcategory
-   * Returns an array of objects with pillarId and selectedCategoryId
-   * - If subcategory is selected, uses subCategoryId
-   * - If no subcategory but category is selected, uses categoryId
-   */
+  const handleIdpCreation = useCallback((newProjectId?: string) => {
+    console.log('idp created successfully', newProjectId);
+    setIdpCreated(true);
+    if (newProjectId) {
+      setProjectId(newProjectId);
+    }
+  }, []);
+
   const getPillarCategoryRelationships = useMemo(() => {
     // Get all pillars that have child categories from pillarData
     const pillarsWithCategories = pillarData.filter(
@@ -159,9 +164,7 @@ const DevelopInterventionPlan: React.FC = () => {
           const selectedCategory = categories.find(
             c => c.id === selection.categoryId,
           );
-
-          // If selected category has no subcategories, use categoryId
-          // Otherwise, return null (waiting for subcategory selection)
+          
           if (selectedCategory && !selectedCategory.hasChildren) {
             return {
               pillarId: pillarId,
@@ -178,8 +181,9 @@ const DevelopInterventionPlan: React.FC = () => {
   }, [pillarData, selectionByPillar, pillarCategoryMap]);
 
   // Determine ProjectPlayer config and data based on participant status
+
   const config = PROJECT_PLAYER_CONFIGS;
-  const selectedMode = MODE.previewMode;
+  const selectedMode = participant?.status === STATUS.IN_PROGRESS ? MODE.editMode : MODE.previewMode;
 
   
   const configData = {
@@ -188,8 +192,12 @@ const DevelopInterventionPlan: React.FC = () => {
     profileInfo: participant,
     showAddCustomTaskButton: true,
     showSubmitButton: true,
+    onSubmitInterventionPlan:handleIdpCreation
   };
 
+
+
+  
   // Combine pillarIdsToGetIdp with selected subcategory IDs
   const categoryIdsArray = useMemo(() => {
     const selectedSubCategoryIds = Object.values(selectionByPillar)
@@ -203,7 +211,7 @@ const DevelopInterventionPlan: React.FC = () => {
   const ProjectPlayerConfigData: ProjectPlayerData = useMemo(
     () => ({
       solutionId: config.data.solutionId,
-      projectId: config.data.projectId,
+      projectId: projectId || participant?.idpProjectId,
       categoryIds: categoryIdsArray, // Array of pillar IDs without categories + selected subcategory IDs
       selectedPathway: selectedPathway,
       pillarCategoryRelation: getPillarCategoryRelationships,
@@ -212,6 +220,7 @@ const DevelopInterventionPlan: React.FC = () => {
       categoryIdsArray,
       config.data.solutionId,
       config.data.projectId,
+      projectId,
       selectedPathway,
       getPillarCategoryRelationships,
     ],
@@ -287,8 +296,6 @@ const DevelopInterventionPlan: React.FC = () => {
 
   const handlePathwaySelection = async (id: string) => {
     try {
-      // setShowProjectPlayerPreview(true);
-      setIsModalOpen(true);
       setSelectedPathway(id);
       const res = await getCategoryList(id);
       const pillars = res?.data ?? [];
@@ -298,10 +305,19 @@ const DevelopInterventionPlan: React.FC = () => {
         .filter((pillar: any) => pillar?.hasChildCategories)
         .map((pillar: any) => pillar._id);
 
-             const pillarIdsWithoutCategories = pillars
+      const pillarIdsWithoutCategories = pillars
         .filter((pillar: any) => pillar?.hasChildCategories === false)
         .map((pillar: any) => pillar._id);
       setPillarIdsToGetIdp(pillarIdsWithoutCategories);
+
+      // If no pillars have child categories, skip modal and directly show project player
+      if (pillarIdsWithCategories.length === 0) {
+        setShowProjectPlayerPreview(true);
+        return;
+      }
+
+      // If pillars have child categories, show modal and fetch category hierarchy
+      setIsModalOpen(true);
 
       const pillarCategoryHierarchy: PillarCategoryMap[] = await Promise.all(
         pillarIdsWithCategories.map(async pillarId => {

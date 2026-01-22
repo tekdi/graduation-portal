@@ -97,7 +97,7 @@ export interface ProjectPlayerConfig {
   language?: string;
   showAddCustomTaskButton?: boolean; // Config to show/hide AddCustomTask button
   showSubmitButton?: boolean; // Config to show/hide Submit Intervention Plan button
-  onSubmitInterventionPlan?: () => void; // Callback for Submit Intervention Plan button
+  onSubmitInterventionPlan?: (projectId?: string) => void; // Callback for Submit Intervention Plan button
   isSubmitDisabled?: boolean; // Disable submit button until conditions are met
   submitWarningMessage?: string; // Warning message to show when submit is disabled
   profileInfo?: {
