@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { VStack, HStack, Button, Text, Image, Box, Pressable, Card, useToast, Toast, ToastTitle, Modal } from '@ui';
 import { View, Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
@@ -18,6 +18,8 @@ import { usePlatform } from '@utils/platform';
 import { userManagementStyles as styles } from './Styles';
 import { theme } from '@config/theme';
 import { getSignedUrl, uploadFileToSignedUrl, bulkUserCreate } from '../../services/bulkUploadService';
+import offlineStorage from '../../services/offlineStorage';
+import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -33,6 +35,30 @@ const UserManagementScreen = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // Log orgId and tenant_code from login API response
+  useEffect(() => {
+    const logUserData = async () => {
+      try {
+        const userData = await offlineStorage.read<any>(STORAGE_KEYS.AUTH_USER);
+        if (userData) {
+          const orgId = userData?.organizations?.[0]?.code;
+          const tenantCode = userData?.tenant_code;
+          
+          console.log('=== USER MANAGEMENT SCREEN ===');
+          console.log('OrgId from login response:', orgId);
+          console.log('Tenant Code from login response:', tenantCode);
+          console.log('Full user data:', userData);
+        } else {
+          console.log('No user data found in storage');
+        }
+      } catch (error) {
+        console.error('Error reading user data:', error);
+      }
+    };
+    
+    logUserData();
+  }, []);
   
   // Toast helpers
   const showErrorToast = (message: string) => {

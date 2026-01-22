@@ -111,18 +111,28 @@ export const bulkUserCreate = async (
     const tenantCode = userData?.tenant_code;
     const orgCode = userData?.organizations?.[0]?.code;
     
-    // Set headers to match Postman format (x-tenant-code, orgId)
+    console.log('=== BULK UPLOAD API HEADERS ===');
+    console.log('OrgId from login response:', orgCode);
+    console.log('Tenant Code from login response:', tenantCode);
+    
+    // Set headers as required by API (orgid, tenantid for admin override)
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
     };
     
-    if (tenantCode) {
-      headers['x-tenant-code'] = tenantCode;
+    // API expects 'orgid' (lowercase) and 'tenantid' headers for admin override
+    if (!orgCode) {
+      throw new Error('Organization code (orgid) is required but not found in user data');
     }
     
-    if (orgCode) {
-      headers['orgId'] = orgCode;
+    if (!tenantCode) {
+      throw new Error('Tenant code (tenantid) is required but not found in user data');
     }
+    
+    headers['orgid'] = orgCode;
+    headers['tenantid'] = tenantCode;
+    
+    console.log('Headers being sent:', headers);
     
     // Remove interceptor's default headers (tenant, organization) and use API-specific headers (x-tenant-code, orgId)
     // This is necessary because the bulkUserCreate API endpoint expects specific header names that differ from
