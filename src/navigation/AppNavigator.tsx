@@ -28,6 +28,7 @@ import LogVisit from '../screens/ParticipantDetail/LogVisit';
 import Observation from '../screens/Observation/Observation';
 import TemplateScreen from '../screens/Template';
 import CheckInsList from '../screens/ParticipantDetail/Check-ins-list';
+import PasswordPolicy from '../screens/PasswordPolicy';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -77,6 +78,11 @@ const getAccessPages = (
           name: 'user-management',
           path: '/user-management',
           component: UserManagementScreen,
+        },
+        {
+          name: 'PasswordPolicy',
+          path: '/password-policy',
+          component: PasswordPolicy,
         },
       ];
     case 'supervisor':

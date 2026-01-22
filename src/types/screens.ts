@@ -48,6 +48,7 @@ export interface InterventionPlanProps {
     participantStatus?: StatusType;
     participantId?: string;
     participantName?: string;
+    participantProfile?:any
 }
 
 export interface InterventionPlanProps {

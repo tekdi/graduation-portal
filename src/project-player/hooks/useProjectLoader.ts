@@ -12,11 +12,13 @@ import {
 import { STATUS } from '@constants/app.constant';
 import { updateEntityDetails } from '../../../src/services/participantService';
 import { getProjectCategoryList } from '../../../src/services/projectService';
+import { useAuth } from '@contexts/AuthContext';
 
 export const useProjectLoader = (
   config: ProjectPlayerConfig,
   data: ProjectPlayerData,
 ) => {
+  const {user} = useAuth();
   const [projectData, setProjectData] = useState<ProjectData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -39,14 +41,23 @@ export const useProjectLoader = (
               const res = await getProjectDetails(projectId);
               projectData = res.data;
             } else {
-              const res = await createProjectForEntity(entityId);
-              projectData = res.data;
+              try {
+                 const projectData = await createProjectForEntity(entityId);
 
               if (projectData?._id) {
-                await updateEntityDetails(entityId, {
-                  'metaInformation.onBoardingProjectId': projectData._id,
+                await updateEntityDetails({
+                  userId: `${user?.id}`,
+                  programId: process.env.GLOBAL_LC_PROGRAM_ID,
+                  entityId:entityId,
+                 entityUpdates:{
+                   onBoardedProjectId: projectData._id,
+                 }
                 });
               }
+              } catch (error) {
+                console.log(error)
+              }
+             
             }
             if (error) {
               throw new Error(error);
@@ -89,9 +100,12 @@ export const useProjectLoader = (
                 ? taskEntry?.[0]?.tasks ?? []
                 : taskEntry?.tasks ?? [];
 
+                const templateId = taskEntry?.[0]?._id
+
               return {
                 ...child,
                 tasks,
+                templateId
               };
             }),
           };

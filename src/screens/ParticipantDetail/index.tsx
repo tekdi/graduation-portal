@@ -13,10 +13,8 @@ import {
 import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
 import {
-  getParticipantProfile,
-  getSitesByProvince,
-  getEntityDetails,
-} from '../../services/participantService';
+  getParticipantsList,
+  getSitesByProvince} from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
 import { TabButton } from '@components/Tabs';
@@ -40,7 +38,7 @@ import {
   PROJECT_PLAYER_CONFIGS,
 } from '@constants/PROJECTDATA';
 import { PARTICIPANT_DETAILS_TABS, STATUS } from '@constants/app.constant';
-import { User } from '@contexts/AuthContext';
+import { useAuth, User } from '@contexts/AuthContext';
 
 /**
  * Route parameters type definition for ParticipantDetail screen
@@ -64,17 +62,15 @@ type ParticipantDetailRouteProp = RouteProp<{
  */
 export default function ParticipantDetail() {
   const route = useRoute<ParticipantDetailRouteProp>();
+  const {user} = useAuth()
   const { t } = useLanguage();
   const { showAlert } = useAlert();
   const { isWeb } = usePlatform();
   // Extract the id parameter from the route
   const participantId = route.params?.id;
-
   const [activeTab, setActiveTab] = useState<string>('intervention-plan');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [entityId, setEntityId] = useState('');
-  const [projectId, setProjectId] = useState('');
   const [status, setStatus] = useState('');
   const [editedAddress, setEditedAddress] = useState<{
     street: string;
@@ -90,21 +86,22 @@ export default function ParticipantDetail() {
 
   useEffect(() => {
     const fetchEntityDetails = async () => {
-      if (participantId) {
+      if (participantId && user?.id) {
         try {
-          const response = await getEntityDetails(participantId);
-          localStorage.setItem('userId', participantId);
-          setEntityId(response.data[0]._id);
-          setProjectId(response.data[0].metaInformation?.onBoardingProjectId);
-          setStatus(response.data[0].metaInformation?.status);
-          setParticipant(await getParticipantProfile(participantId));
+          const response = await getParticipantsList({entityId:participantId,userId:user?.id})
+          const {userDetails,...rest} = response?.result?.data?.[0]
+          const participantData = {...(userDetails || {}),...rest}
+          console.log(participantData)
+          
+          setParticipant(participantData);
+          setStatus(participantData?.status);
         } catch (error) {
           console.log(error);
         }
       }
     };
     fetchEntityDetails();
-  }, [participantId]);
+  }, [participantId,user?.id]);
 
   // Error State: Participant Not Found
   if (!participant) {
@@ -130,17 +127,14 @@ export default function ParticipantDetail() {
     ...config,
     ...selectedMode,
     showAddCustomTaskButton: false,
-    profileInfo: {
-      name: participantName,
-      id: id,
-    },
+    profileInfo: participant
   };
 
   const ProjectPlayerConfigData: ProjectPlayerData = {
     solutionId: config?.data?.solutionId,
-    projectId: projectId,
-    entityId: entityId,
-    userStatus: STATUS.NOT_ENROLLED,
+    projectId: participant?.onBoardedProjectId ? participant?.onBoardedProjectId : undefined,
+    entityId: participant?.entityId,
+    userStatus: participant?.status,
     // data: DUMMY_PROJECT_DATA,
   };
 
@@ -187,13 +181,13 @@ export default function ParticipantDetail() {
             <ParticipantHeader
               participantName={participantName}
               participantId={id}
-              status={status as ParticipantStatus}
+              status={participant.status as ParticipantStatus}
               pathway={'employment'}
               graduationProgress={20}
               graduationDate={''}
               onViewProfile={() => setIsProfileModalOpen(true)}
               areAllTasksCompleted={areAllTasksCompleted}
-              userEntityId={entityId}
+              userEntityId={participant?.entityId}
               onStatusUpdate={newStatus => {
                 setStatus(newStatus);
               }}
@@ -244,6 +238,7 @@ export default function ParticipantDetail() {
                       <InterventionPlan
                         participantStatus={status as ParticipantStatus}
                         participantId={id}
+                        participantProfile={participant}
                       />
                     )}
                     {activeTab ===

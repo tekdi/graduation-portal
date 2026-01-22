@@ -1,19 +1,11 @@
-import type {
-  ParticipantData,
-  ParticipantSearchParams,
-  ParticipantSearchResponse,
-  Site,
-} from '@app-types/participant';
-import {
-  PARTICIPANTS_DATA,
-  PROVINCES,
-  SITES,
-} from '@constants/PARTICIPANTS_LIST';
+import type { ParticipantData, ParticipantSearchParams, ParticipantSearchResponse, Site } from '@app-types/participant';
+import { PARTICIPANTS_DATA, PROVINCES, SITES } from '@constants/PARTICIPANTS_LIST';
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
 import { ROLE_NAMES } from '@constants/ROLES';
 import { getUserProfile } from './authenticationService';
 import { User } from '@contexts/AuthContext';
+
 
 /**
  * Get participants list for table view
@@ -22,19 +14,18 @@ import { User } from '@contexts/AuthContext';
  * @param params - Search parameters including user_ids array and optional query params
  * @returns A promise resolving to the search response from the API
  */
-export const getParticipantsList = async (
-  params: ParticipantSearchParams,
-): Promise<ParticipantSearchResponse> => {
+export const getParticipantsList = async (params: ParticipantSearchParams): Promise<ParticipantSearchResponse> => {
   try {
     const {
       userId,
       type = ROLE_NAMES.USER,
       page = 1,
-      limit = 20,
+      limit = 20, 
       search,
       status,
-      // entity_id,
+      entityId,
     } = params;
+
 
     // Build query string
     const queryParams = new URLSearchParams({
@@ -44,12 +35,14 @@ export const getParticipantsList = async (
       limit: limit.toString(),
       search: search || '',
       programId: process.env.GLOBAL_LC_PROGRAM_ID as string,
+      ...(entityId ? {entityId}:{})
     });
 
     // Add status to query params if provided
     if (status) {
       queryParams.append('status', status);
     }
+
 
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
     
@@ -98,9 +91,7 @@ export const getParticipantById = (id: string): any => {
  * Returns full participant data including contact info and address
  * Currently uses mock data, will be replaced with API call later
  */
-export const getParticipantProfile = async (
-  id: string,
-): Promise<User | undefined> => {
+export const getParticipantProfile = async (id: string): Promise<User |undefined> => {
   try {
     const userProfile = await getUserProfile(id);
 
@@ -114,7 +105,7 @@ export const getParticipantProfile = async (
 /**
  * Update participant address
  * Currently uses mock data update, will be replaced with API call later
- *
+ * 
  * @param id - Participant ID
  * @param address - New address object with street, province, and site
  * @returns Updated participant or undefined if not found
@@ -125,13 +116,13 @@ export const updateParticipantAddress = async (
     street: string;
     province: string;
     site: string;
-  },
+  }
 ): Promise<ParticipantData | undefined> => {
   // TODO: Replace with actual API call
   // Example: return await api.put(`/participants/${id}/address`, address);
-
+  
   // Mock implementation - simulate API delay
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(() => {
       const participant = PARTICIPANTS_DATA.find(p => p.id === id);
       if (participant) {
@@ -189,12 +180,11 @@ export const getEntityDetails = async (userId: string): Promise<any> => {
 };
 
 export const updateEntityDetails = async (
-  entityId: string,
   requestBody: any,
 ): Promise<any> => {
   try {
     const response = await api.post(
-      API_ENDPOINTS.UPDATE_ENTITY_DETAILS(entityId),
+      API_ENDPOINTS.UPDATE_ENTITY_DETAILS,
       requestBody,
     );
 

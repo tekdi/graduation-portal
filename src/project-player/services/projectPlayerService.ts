@@ -3,6 +3,7 @@ import { PROJECT_PLAYER_CONFIGS } from '../../constants/PROJECTDATA';
 import { ApiResponse } from '../types/components.types';
 import { API_ENDPOINTS } from './apiEndpoints';
 import { isWeb } from '@utils/platform';
+import { createProjectPlanPayload } from '../types';
 
 export const apiClient = axios.create({
   // Use baseUrl from PROJECT_PLAYER_CONFIGS (which gets from env, with fallback)
@@ -83,7 +84,7 @@ export const createProjectForEntity = async (
       entityId,
     });
 
-    return { data: response.data.result };
+    return  response.data.result ;
   } catch (error) {
     return handleApiError(error);
   }
@@ -154,6 +155,21 @@ export const getTaskDetails = async (
     );
     // const response = taskDetailsAPIMockResponse;
     return { data: response.data.result };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const submitInterventionPlan = async (
+  reqBody : createProjectPlanPayload
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.SUBMIT_INTERVENTION_PLAN,
+      reqBody,
+    );
+
+    return { data: response.data.result || response.data };
   } catch (error) {
     return handleApiError(error);
   }

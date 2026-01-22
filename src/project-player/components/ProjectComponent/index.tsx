@@ -22,9 +22,10 @@ import { projectComponentStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import Container from '@ui/Container';
-import { LucideIcon } from '@ui';
+import { LucideIcon, useAlert } from '@ui';
 import { theme } from '@config/theme';
 import { TASK_STATUS } from '@constants/app.constant';
+import { submitInterventionPlan } from '../../services/projectPlayerService';
 
 const ProjectComponent: React.FC = () => {
   const { projectData, mode, config } = useProjectContext();
@@ -32,6 +33,7 @@ const ProjectComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [previousPercent, setPreviousPercent] = useState(0);
   const toast = useToast();
+  const { showAlert } = useAlert();
 
   const hasChildren = !!projectData?.children?.length;
 
@@ -41,11 +43,76 @@ const ProjectComponent: React.FC = () => {
   // Only show progress bar and +Add Custom Task for projects with pillars (Intervention Plan), not flat tasks (Onboarding)
   const showPillarFeatures = isEditMode && hasChildren;
 
-  const shouldShowSubmitButton =
-    config.showSubmitButton &&
-    mode === 'preview' &&
-    config.onSubmitInterventionPlan;
+  const shouldShowSubmitButton = config.showSubmitButton && mode === 'preview';
 
+  const onSubmitInterventionPlan = async () => {
+    if (!projectData) return;
+
+    try {
+      // Collect all custom tasks grouped by template/pillar
+      const templates: Array<{
+        templateId: string;
+        targetTaskName?: string;
+        targetProjectName?: string;
+        customTasks: Array<{
+          name: string;
+          description: string;
+          type: string;
+        }>;
+      }> = [];
+
+      // Process children (templates/pillars)
+      if (projectData.children && projectData.children.length > 0) {
+        projectData.children.forEach((pillar: any) => {
+          // Get custom tasks from this pillar (check both tasks and children properties)
+          const pillarTasks = pillar.tasks || pillar.children || [];
+          const customTasks = pillarTasks
+            .filter((task: any) => task.isCustomTask === true)
+            .map((task: any) => ({
+              name: task.name,
+              description: task.description || '',
+              type: 'simple', // Map 'simple' to 'single' as per API requirement
+            }));
+
+          // Determine if this is a task or project based on type
+          const isProject = pillar.type === 'project';
+
+          templates.push({
+            templateId: pillar.templateId,
+            ...(isProject
+              ? { targetProjectName: pillar.name }
+              : { targetTaskName: pillar.name }),
+            customTasks,
+          });
+        });
+      }
+
+      // Format the payload
+      const reqBody = {
+        templates,
+        userId: config.profileInfo?.id,
+        entityId: config.profileInfo?.entityId, // Fallback to participantId if entityId not available
+        programName: `Participant ${config.profileInfo?.name}'s Program`,
+        isPrivateProgram: true,
+        projectConfig: {
+          name: `${config.profileInfo?.name}'s IDP`,
+          description: 'Individual Development Plan',
+        },
+        isATargetedSolution: false,
+      };
+
+      // Call API to submit intervention plan
+      const response = await submitInterventionPlan(reqBody);
+      console.log(response);
+      showAlert('success', t('template.IdpCreationSuccess'), {
+        placement: 'top',
+      });
+     
+    } catch (error) {
+      console.error('Error submitting intervention plan:', error);
+     
+    }
+  };
   // Handle Save Progress button click
   const handleSaveProgress = (currentPercent: number) => {
     // Save current percentage as previous
@@ -320,7 +387,7 @@ const ProjectComponent: React.FC = () => {
                 borderRadius="$md"
                 paddingHorizontal="$6"
                 paddingVertical="$2"
-                onPress={config.onSubmitInterventionPlan}
+                onPress={onSubmitInterventionPlan}
                 isDisabled={config.isSubmitDisabled}
                 opacity={config.isSubmitDisabled ? 0.5 : 1}
                 $hover-bg="$primary600"

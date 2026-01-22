@@ -13,4 +13,5 @@ export const API_ENDPOINTS = {
   GET_TASK_DETAILS: (ids: string) =>
     `${prefix}/project/v1/project/templates/list?categoryIds=${ids}&groupByCategory=true&taskDetails=true`,
   UPDATE_TASK: (id: string) => `${prefix}/project/v1/userProjects/update/${id}`,
+  SUBMIT_INTERVENTION_PLAN: `${prefix}/project/v1/userProjects/createProjectPlan`,
 } as const;

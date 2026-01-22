@@ -107,6 +107,7 @@ export interface ParticipantSearchParams {
   limit?: number;
   search?: string;
   status?: string;
+  entityId?: string;
 }
 
 export interface ParticipantOverview {
