@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 const InterventionPlan: React.FC<InterventionPlanProps> = ({
   participantStatus,
   participantId,
+  participantProfile,
 }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
@@ -59,6 +60,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
       if (!isEditMode) {
         return {
           ...baseConfig,
+          profileInfo: participantProfile,
           showSubmitButton: true,
           onSubmitInterventionPlan: () => setIsEditMode(true),
           isSubmitDisabled: !areAllOptionalTasksAdded,
@@ -70,6 +72,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
 
       return {
         ...baseConfig,
+        profileInfo: participantProfile,
         showAddCustomTaskButton,
       };
     }
