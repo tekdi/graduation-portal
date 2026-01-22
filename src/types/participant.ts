@@ -100,16 +100,34 @@ export interface Site {
  */
 
 export interface ParticipantSearchParams {
+  userId: string;
   type?: string;
   page?: number;
   limit?: number;
   search?: string;
-  userId:string;
   entityId?: string;
+  status?: string;
+}
+
+export interface ParticipantOverview {
+  assigned: number;
+  completed: number;
+  droppedout: number;
+  graduated: number;
+  inprogress: number;
+  lastModified: string;
+  lastRecalculated: string;
+  notonboarded: number;
+  onboarded: number;
 }
 
 export interface ParticipantSearchResponse {
   responseCode: string;
   message: string;
-  result: any;
+  result: {
+    data: any[];
+    overview?: ParticipantOverview;
+  };
+  count?: number;
+  total?: number;
 }

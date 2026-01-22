@@ -5,6 +5,8 @@ export const STATUS = {
   COMPLETED: 'Completed',
   DROPOUT: 'Dropped out',
   GRADUATED: 'Graduated',
+  NOT_ONBOARDED: 'NOT_ONBOARDED',
+  ONBOARDED: 'ONBOARDED',
 };
 
 // Task Status Constants

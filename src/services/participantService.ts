@@ -23,6 +23,7 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       limit = 20, 
       search,
       entityId,
+      status
     } = params;
 
 
@@ -36,6 +37,11 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       programId: process.env.GLOBAL_LC_PROGRAM_ID as string,
       ...(entityId ? {entityId}:{})
     });
+
+    // Add status to query params if provided
+    if (status) {
+      queryParams.append('status', status);
+    }
 
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
     
