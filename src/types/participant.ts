@@ -106,8 +106,8 @@ export interface ParticipantSearchParams {
   page?: number;
   limit?: number;
   search?: string;
-  entityId?: string;
   status?: string;
+  entityId?: string;
 }
 
 export interface ParticipantOverview {

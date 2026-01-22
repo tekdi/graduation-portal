@@ -27,8 +27,8 @@ import ProjectPlayer from '../screens/ProjectPlayer';
 import LogVisit from '../screens/ParticipantDetail/LogVisit';
 import Observation from '../screens/Observation/Observation';
 import TemplateScreen from '../screens/Template';
-import PasswordPolicy from '../screens/PasswordPolicy';
 import CheckInsList from '../screens/ParticipantDetail/Check-ins-list';
+import PasswordPolicy from '../screens/PasswordPolicy';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -55,13 +55,7 @@ class NavigationErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        this.props.fallback || (
-          <Spinner
-            height={isWeb ? '$100vh' : '$full'}
-            size="large"
-            color="$primary500"
-          />
-        )
+        this.props.fallback || <Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />
       );
     }
     return this.props.children;
@@ -107,7 +101,7 @@ const getAccessPages = (
         { name: 'project', path: '/project', component: ProjectPlayer },
       ];
     default:
-      return []; // Always return an array, even if empty
+      return []; // Always return an array even if empty
   }
 };
 
@@ -134,7 +128,7 @@ const getLinkingConfig = (
       // Prefer explicit 'path' property for each page, else fallback to name
       const screenPath = page.path
         ? // Remove leading slash for react-navigation config consistency
-          page.path.startsWith('/')
+        page.path.startsWith('/')
           ? page.path.slice(1)
           : page.path
         : page.name;
@@ -181,15 +175,7 @@ const RoleBasedNavigator: React.FC = () => {
   }
 
   return (
-    <Suspense
-      fallback={
-        <Spinner
-          height={isWeb ? '$100vh' : '$full'}
-          size="large"
-          color="$primary500"
-        />
-      }
-    >
+    <Suspense fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}>
       <AccessBaseNavigator accessPages={accessPages} />
     </Suspense>
   );
@@ -240,7 +226,6 @@ const AppNavigator: React.FC = () => {
   }, [isWeb]);
 
   // Create a stable key for NavigationContainer to prevent state issues
-  // when linking config changes
   // MUST be called before any conditional returns (Rules of Hooks)
   const navigationKey = useMemo(() => {
     return isLoggedIn
@@ -249,13 +234,7 @@ const AppNavigator: React.FC = () => {
   }, [isLoggedIn, user?.role, accessPages.length]);
 
   if (loading) {
-    return (
-      <Spinner
-        height={isWeb ? '$100vh' : '$full'}
-        size="large"
-        color="$primary500"
-      />
-    );
+    return <Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />;
   }
 
   return (
@@ -263,13 +242,7 @@ const AppNavigator: React.FC = () => {
       <NavigationContainer
         key={navigationKey}
         linking={linking}
-        fallback={
-          <Spinner
-            height={isWeb ? '$100vh' : '$full'}
-            size="large"
-            color="$primary500"
-          />
-        }
+        fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}
         onReady={() => {
           if (isWeb) {
             logger.log('Navigation container ready');
@@ -286,10 +259,10 @@ const AppNavigator: React.FC = () => {
             headerShown: false,
             cardStyle: isWeb
               ? ({
-                  width: '100%',
-                  minHeight: '100vh',
-                  height: 'auto',
-                } as any)
+                width: '100%',
+                minHeight: '100vh',
+                height: 'auto',
+              } as any)
               : ({ width: '100%' } as any),
           }}
         >

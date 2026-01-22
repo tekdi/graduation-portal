@@ -136,7 +136,6 @@ const ParticipantsList: React.FC = () => {
           page: currentPage,
           limit: pageSize,
         });
-        console.log('response', response);
         setParticipants(response.result.data || []);
         // Set overview from API response
         if (response.result.overview) {
