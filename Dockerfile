@@ -19,9 +19,14 @@ FROM node:22.21.1-alpine
 
 WORKDIR /app
 
-RUN yarn global add serve
-
+# Copy the built dist folder from builder stage
 COPY --from=builder /app/dist ./dist
 
+# Copy the custom server.js file
+COPY --from=builder /app/server.js ./server.js
+
 EXPOSE 3000
-CMD ["serve", "-s", "dist", "-l", "3000"]
+
+# Use custom Node.js server instead of serve package
+# This ensures proper SPA routing support
+CMD ["node", "server.js"]
