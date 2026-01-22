@@ -1,8 +1,8 @@
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
 import logger from '@utils/logger';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
+import offlineStorage from './offlineStorage';
 
 /**
  * Interface for signed URL response
@@ -106,9 +106,10 @@ export const bulkUserCreate = async (
       upload_type: uploadType,
     };
     
-    // Get organization and tenant codes from storage for headers
-    const orgCode = await AsyncStorage.getItem(STORAGE_KEYS.ORGANIZATION_CODE);
-    const tenantCode = await AsyncStorage.getItem(STORAGE_KEYS.TENANT_CODE);
+    // Get organization and tenant codes from stored user data
+    const userData = await offlineStorage.read<any>(STORAGE_KEYS.AUTH_USER);
+    const tenantCode = userData?.tenant_code;
+    const orgCode = userData?.organizations?.[0]?.code;
     
     // Set headers to match Postman format (x-tenant-code, orgId)
     const headers: Record<string, string> = {

@@ -22,8 +22,6 @@ declare const process:
 
 const TOKEN_STORAGE_KEY = STORAGE_KEYS.AUTH_TOKEN;
 const INTERNAL_ACCESS_TOKEN_KEY = STORAGE_KEYS.INTERNAL_ACCESS_TOKEN;
-const ORGANIZATION_CODE_KEY = STORAGE_KEYS.ORGANIZATION_CODE;
-const TENANT_CODE_KEY = STORAGE_KEYS.TENANT_CODE;
 
 /**
  * Create axios instance with base configuration
@@ -64,14 +62,15 @@ api.interceptors.request.use(
         config.headers['internal-access-token'] = internalAccessToken;
       }
 
-      // Add organization code header if available
-      const orgCode = await AsyncStorage.getItem(ORGANIZATION_CODE_KEY);
+      // Add organization code header if available (from stored user data)
+      const userData = await offlineStorage.read<any>(STORAGE_KEYS.AUTH_USER);
+      const orgCode = userData?.organizations?.[0]?.code;
       if (orgCode && config.headers) {
         config.headers['organization'] = orgCode;
       }
 
-      // Add tenant code header if available
-      const tenantCode = await AsyncStorage.getItem(TENANT_CODE_KEY);
+      // Add tenant code header if available (from stored user data)
+      const tenantCode = userData?.tenant_code;
       if (tenantCode && config.headers) {
         config.headers['tenant'] = tenantCode;
       }

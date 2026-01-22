@@ -15,9 +15,5 @@ export const STORAGE_KEYS = {
   AUTH_REFRESH_TOKEN: '@auth_refresh_token',
   /** Internal access token storage key */
   INTERNAL_ACCESS_TOKEN: '@internal_access_token',
-  /** Organization code storage key */
-  ORGANIZATION_CODE: '@organization_code',
-  /** Tenant code storage key */
-  TENANT_CODE: '@tenant_code',
 } as const;
 

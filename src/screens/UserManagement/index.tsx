@@ -33,7 +33,7 @@ const UserManagementScreen = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  
   // Toast helpers
   const showErrorToast = (message: string) => {
     toast.show({
@@ -56,7 +56,7 @@ const UserManagementScreen = () => {
       ),
     });
   };
-
+        
   // Handle CSV upload: closes options modal and triggers native file picker
   const handleUploadCSV = () => {
     setIsUploadModalOpen(false);
@@ -79,8 +79,8 @@ const UserManagementScreen = () => {
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
-      return;
-    }
+          return;
+        }
 
     setIsUploading(true);
     try {
@@ -88,11 +88,11 @@ const UserManagementScreen = () => {
       const signedUrlResponse = await getSignedUrl(file.name);
       if (!signedUrlResponse.result?.signedUrl) {
           throw new Error(t('admin.actions.uploadErrorSignedUrl'));
-      }
-      
+        }
+
       // Step 2: Upload file to signed URL
       await uploadFileToSignedUrl(signedUrlResponse.result.signedUrl, file);
-      
+
       // Step 3: Trigger bulk user creation
       const filePath = signedUrlResponse.result.filePath || signedUrlResponse.result.destFilePath;
       if (!filePath) {
@@ -109,17 +109,17 @@ const UserManagementScreen = () => {
     } catch (error: any) {
       // Determine which step failed and show appropriate error message
       let errorMessage = t('admin.actions.uploadError');
-      
+
       if (error.message?.includes('signed URL') || error.message?.includes('Failed to get upload URL')) {
         errorMessage = t('admin.actions.uploadErrorSignedUrl');
       } else if (error.message?.includes('File upload failed') || error.message?.includes('upload file')) {
         errorMessage = t('admin.actions.uploadErrorFileUpload');
       } else if (error.message?.includes('bulk user') || error.message?.includes('process')) {
         errorMessage = t('admin.actions.uploadErrorBulkCreate');
-      }
-      
+        }
+        
       showErrorToast(errorMessage);
-    } finally {
+      } finally {
       setIsUploading(false);
       // Reset file input
       if (fileInputRef.current) {
@@ -185,7 +185,7 @@ const UserManagementScreen = () => {
               count={stat.count}
               subLabel={stat.subLabel}
               color={stat.color}
-            />
+      />
           ))}
         </StatsRow>
       </View>
@@ -231,13 +231,13 @@ const UserManagementScreen = () => {
                     fontWeight="$medium"
                   >
                     {t('admin.actions.uploadCSV')}
-                  </Text>
+          </Text>
                   <Text 
                     {...TYPOGRAPHY.caption} 
                     color={theme.tokens.colors.textMutedForeground}
                   >
                     {t('admin.actions.uploadCSVDescription')}
-                  </Text>
+              </Text>
                 </VStack>
               </HStack>
             </Card>
@@ -254,11 +254,11 @@ const UserManagementScreen = () => {
                 <Box
                   {...(styles.addUserIconContainer as any)}
                 >
-                  <LucideIcon 
+                <LucideIcon
                     name="UserPlus" 
-                    size={16} 
+                  size={16}
                     color="#6B7280" 
-                  />
+                />
                 </Box>
                 
                 {/* Text Content */}
@@ -275,7 +275,7 @@ const UserManagementScreen = () => {
                     color={theme.tokens.colors.textMutedForeground}
                   >
                     {t('admin.actions.addUserDescription')}
-                  </Text>
+                </Text>
                 </VStack>
               </HStack>
             </Card>

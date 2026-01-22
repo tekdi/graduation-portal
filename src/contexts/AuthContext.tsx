@@ -10,16 +10,8 @@ import { getEntityDetails, login as loginService } from '../services/authenticat
 import offlineStorage from '../services/offlineStorage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import { getToken, removeToken } from '../services/api';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ADMIN_ROLES, LC_ROLES } from '@constants/ROLES';
 import { useLanguage } from './LanguageContext';
-
-// Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
-declare const process: {
-  env: {
-    [key: string]: string | undefined;
-  };
-} | undefined;
 
 export type UserRole = 'Admin' | 'Supervisor' | 'LC';
 
@@ -161,12 +153,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (loginResponse.result?.user) {
         const userData = loginResponse.result.user;
 
-        const entityDetails = await getEntityDetails(userData.id);
-         if(!entityDetails?.[0]) {
-          const message = t('auth.userEntityNotFound');
-          logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
-          return { success: false, message };
-        }
+        // const entityDetails = await getEntityDetails(userData.id);
+        //  if(!entityDetails?.[0]) {
+        //   const message = t('auth.userEntityNotFound');
+        //   logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
+        //   return { success: false, message };
+        // }
         // Determine user role (admin priority), throws if unauthorized
         let determinedRole: UserRole;
         try {
@@ -184,15 +176,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           role: determinedRole,
           ...userData, // Include any additional properties from API
         };
-
-        // [BULK UPLOAD FEATURE] Store organization and tenant codes during login
-        // These codes are required for bulk user upload API calls (used in api.ts interceptor)
-        // Get from environment variables with fallback to default values
-        const orgCode = (process?.env?.ORG_CODE as string);
-        const tenantCode = (process?.env?.TENANT_CODE as string);
-        
-        await AsyncStorage.setItem(STORAGE_KEYS.ORGANIZATION_CODE, orgCode);
-        await AsyncStorage.setItem(STORAGE_KEYS.TENANT_CODE, tenantCode);
 
         // Save the mapped user data to storage in one line
         await offlineStorage.create(STORAGE_KEYS.AUTH_USER, mappedUser);
@@ -224,11 +207,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       // Remove user data from storage
       await offlineStorage.remove(STORAGE_KEYS.AUTH_USER);
       await offlineStorage.remove(STORAGE_KEYS.AUTH_REFRESH_TOKEN);
-      
-      // [BULK UPLOAD FEATURE] Clear organization and tenant codes on logout
-      // These codes are only needed when user is logged in for API authentication
-      await AsyncStorage.removeItem(STORAGE_KEYS.ORGANIZATION_CODE);
-      await AsyncStorage.removeItem(STORAGE_KEYS.TENANT_CODE);
       
       // Clear context state
       setUser(null);
