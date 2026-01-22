@@ -154,7 +154,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         const userData = loginResponse.result.user;
 
         const entityDetails = await getEntityDetails(userData.id);
-         if(!entityDetails?.[0]) {
+        if(!entityDetails?.[0]) {
           const message = t('auth.userEntityNotFound');
           logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
           return { success: false, message };
