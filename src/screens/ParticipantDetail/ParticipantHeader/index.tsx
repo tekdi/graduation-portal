@@ -209,11 +209,7 @@ const {user} = useAuth()
       <Pressable onPress={handleBackPress}>
         <HStack {...participantHeaderStyles.backLinkContainer}>
           <Box mr="$2">
-            <LucideIcon
-              name="ArrowLeft"
-              size={18}
-              color={theme.tokens.colors.textForeground}
-            />
+            <LucideIcon name="ArrowLeft" size={18} color="$textForeground" />
           </Box>
           <Text
             {...participantHeaderStyles.backLinkText}

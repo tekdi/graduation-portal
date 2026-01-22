@@ -28,6 +28,7 @@ import LogVisit from '../screens/ParticipantDetail/LogVisit';
 import Observation from '../screens/Observation/Observation';
 import TemplateScreen from '../screens/Template';
 import PasswordPolicy from '../screens/PasswordPolicy';
+import CheckInsList from '../screens/ParticipantDetail/Check-ins-list';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -97,26 +98,11 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
-        {
-          name: 'participant-detail',
-          path: '/participants/:id',
-          component: ParticipantDetail,
-        },
-        {
-          name: 'log-visit',
-          path: '/participants/:id/log-visit',
-          component: LogVisit,
-        },
-        {
-          name: 'observation',
-          path: '/participants/:id/observation/:solutionId',
-          component: Observation,
-        },
-        {
-          name: 'template',
-          path: '/participants/:id/template',
-          component: TemplateScreen,
-        },
+        { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
+        { name: 'log-visit', path: '/participants/:id/log-visit', component: LogVisit },
+        { name: 'check-ins-list', path: '/participants/:id/check-ins-list', component: CheckInsList },
+        { name: 'observation', path: '/participants/:id/observation/:solutionId/:submissionNumber?', component: Observation },
+        { name: 'template', path: '/participants/:id/template', component: TemplateScreen },
         { name: 'participants', component: ParticipantsList },
         { name: 'project', path: '/project', component: ProjectPlayer },
       ];
