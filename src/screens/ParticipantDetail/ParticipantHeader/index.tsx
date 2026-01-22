@@ -71,7 +71,7 @@ const {user} = useAuth()
 
        await updateEntityDetails({
          userId: `${user?.id}`,
-         programId: process.env.GLOBAL_LC_PROGRAM_ID,
+         programId: process.env.GLOBAL_LC_PROGRAM_IDS,
          entityId: userEntityId,
          entityUpdates: {
            status: STATUS.ENROLLED,
