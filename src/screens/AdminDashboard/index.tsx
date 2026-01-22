@@ -1,8 +1,7 @@
 import React from 'react';
-import { VStack, Card, Heading, Text } from '@ui';
+import { VStack } from '@ui';
 
 import { adminDashboardStyles } from './Styles';
-import { useLanguage } from '@contexts/LanguageContext';
 import TitleHeader from '@components/TitleHeader';
 import FilterButton from '@components/Filter';
 import DashboardCards from './DashboardCards';
@@ -10,8 +9,6 @@ import { AdminDashboardFilterOptions } from '@constants/ADMIN_DASHBOARD_FILTERS'
 import { indicatorCards } from '@constants/ADMIN_DASHBOARD_CARDS';
 
 const AdminDashboard = () => {
-  const { t } = useLanguage();
-
   const handleFilterChange = (filters: Record<string, any>) => {
     console.log('Dashboard filters changed:', filters);
     // Add your filter logic here
@@ -28,16 +25,12 @@ const AdminDashboard = () => {
         onFilterChange={handleFilterChange}
       />
 
-      {/* Info Card */}
-      <Card {...adminDashboardStyles.infoCard}>
-        <Heading {...adminDashboardStyles.infoHeading}>
-          {t('admin.selectIndicatorType')}
-        </Heading>
-        <Text {...adminDashboardStyles.infoText}>{t('admin.indicatorTypeDescription')}</Text>
-      </Card>
-
-      {/* Indicator Cards */}
-      <DashboardCards cards={indicatorCards} />
+      {/* Dashboard Cards with Info Card */}
+      <DashboardCards 
+        cards={indicatorCards}
+        infoHeadingKey="admin.selectIndicatorType"
+        infoDescriptionKey="admin.indicatorTypeDescription"
+      />
     </VStack>
   );
 };
