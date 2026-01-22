@@ -33,11 +33,26 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
       try {
         const data = await getTargetedSolutions({
           type: 'observation',
-          'filter[keywords]': FILTER_KEYWORDS.ASSESSMENT_SURVEYS.join(','),
+          // 'filter[keywords]': FILTER_KEYWORDS.ASSESSMENT_SURVEYS.join(','),
         });
-        const dataNew = await Promise.all(data.map(async (item) => ({...item,entity:await getdetails({solutionId:item.solutionId,id:participant?.id})})));
-
-        setSolutions(dataNew);
+        const dataNew = await Promise.all(
+          data.map(async (item) => {
+            try {
+              const entity = await getdetails({
+                solutionId: item.solutionId,
+                id: participant?.id,
+              });
+              return { ...item, entity };
+            } catch (error) {
+              logger.error('Failed to fetch entity for solutionId:', item.solutionId, error);
+              // Skip this item by returning null
+              return null;
+            }
+          })
+        );
+        // Filter out failed items (nulls)
+        const filteredData = dataNew.filter(item => item !== null);
+        setSolutions(filteredData);
       } catch (error) {
         logger.error('Error fetching solutions:', error);
         setSolutions([]);

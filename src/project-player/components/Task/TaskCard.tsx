@@ -163,7 +163,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
       navigation.navigate('observation', {
         id: userId,
-        observationId: solutionId,
+        solutionId: solutionId,
       });
 
       // Show success toast
