@@ -47,7 +47,7 @@ export const useProjectLoader = (
               if (projectData?._id) {
                 await updateEntityDetails({
                   userId: `${user?.id}`,
-                  programId: process.env.GLOBAL_LC_PROGRAM_ID,
+                  programId: process.env.GLOBAL_LC_PROGRAM_IDS,
                   entityId:entityId,
                  entityUpdates:{
                    onBoardedProjectId: projectData._id,
