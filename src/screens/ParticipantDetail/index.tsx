@@ -56,10 +56,6 @@ type ParticipantDetailRouteProp = RouteProp<{
   params: ParticipantDetailRouteParams;
 }>;
 
-/**
- * ParticipantDetail Component
- * Displays participant details with status-based header variations.
- */
 export default function ParticipantDetail() {
   const route = useRoute<ParticipantDetailRouteProp>();
   const {user} = useAuth()
@@ -72,6 +68,7 @@ export default function ParticipantDetail() {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [status, setStatus] = useState('');
+  const [idpCreated, setIdpCreated] = useState(false);
   const [editedAddress, setEditedAddress] = useState<{
     street: string;
     province: string;
@@ -101,22 +98,20 @@ export default function ParticipantDetail() {
       }
     };
     fetchEntityDetails();
-  }, [participantId,user?.id]);
+  }, [participantId,user?.id, idpCreated ]);
 
+   const handleIdpCreated=()=>{
+    setIdpCreated(true)
+  }
   // Error State: Participant Not Found
   if (!participant) {
     return <NotFound message="participantDetail.notFound.title" />;
   }
 
-  // Extract participant data
-  // Type assertion not needed as participant is guaranteed to exist here
+  
   const {
     name: participantName,
     id,
-    // status = 'ONBOARDED',
-    // pathway,
-    // graduationProgress,
-    // graduationDate,
   } = participant;
 
   // Determine ProjectPlayer config and data based on participant status
@@ -127,15 +122,18 @@ export default function ParticipantDetail() {
     ...config,
     ...selectedMode,
     showAddCustomTaskButton: false,
-    profileInfo: participant
+    profileInfo: participant,
   };
 
   const ProjectPlayerConfigData: ProjectPlayerData = {
     solutionId: config?.data?.solutionId,
-    projectId: participant?.onBoardedProjectId ? participant?.onBoardedProjectId : undefined,
+    projectId : status === STATUS.IN_PROGRESS
+      ? participant?.idpProjectId
+      : status === STATUS.NOT_ENROLLED
+      ? participant?.onBoardedProjectId
+      :  participant?.onBoardedProjectId,
     entityId: participant?.entityId,
     userStatus: participant?.status,
-    // data: DUMMY_PROJECT_DATA,
   };
 
   const handleSaveAddress = async () => {
@@ -167,7 +165,7 @@ export default function ParticipantDetail() {
         placement: 'bottom-right',
       });
     }
-  };
+  }; 
 
   return (
     <>
@@ -239,6 +237,7 @@ export default function ParticipantDetail() {
                         participantStatus={status as ParticipantStatus}
                         participantId={id}
                         participantProfile={participant}
+                        onIdpCreation ={handleIdpCreated}
                       />
                     )}
                     {activeTab ===

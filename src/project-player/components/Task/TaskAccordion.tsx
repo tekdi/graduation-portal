@@ -122,15 +122,17 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
             paddingHorizontal={isWeb ? '$5' : '$2'}
           >
             <VStack {...taskAccordionStyles.cardContentStack}>
-              {task.tasks?.map((childTask, index) => (
-                <TaskComponent
-                  key={childTask._id}
-                  task={childTask}
-                  level={1}
-                  isLastTask={index === (task.tasks?.length || 0) - 1}
-                  isChildOfProject={true}
-                />
-              ))}
+              {(task?.children?.length ? task.children : task.tasks)?.map(
+                (childTask, index, arr) => (
+                  <TaskComponent
+                    key={childTask._id}
+                    task={childTask}
+                    level={1}
+                    isLastTask={index === arr.length - 1}
+                    isChildOfProject={true}
+                  />
+                ),
+              )}
             </VStack>
           </Box>
         </Card>
@@ -246,15 +248,17 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
             )}
 
             <VStack {...taskAccordionStyles.accordionContentStack}>
-              {task.tasks?.map((childTask, index) => (
-                <TaskComponent
-                  key={childTask._id}
-                  task={childTask}
-                  level={level + 1}
-                  isLastTask={index === task.tasks!.length - 1}
-                  isChildOfProject={true}
-                />
-              ))}
+              {(task?.children?.length ? task.children : task.tasks)?.map(
+                (childTask, index, arr) => (
+                  <TaskComponent
+                    key={childTask._id}
+                    task={childTask}
+                    level={1}
+                    isLastTask={index === arr.length - 1}
+                    isChildOfProject={true}
+                  />
+                ),
+              )}
 
               {/* Add Custom Task Button */}
               <AddCustomTask templateId={task._id} templateName={task.name} />
