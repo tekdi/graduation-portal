@@ -33,7 +33,7 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
       try {
         const data = await getTargetedSolutions({
           type: 'observation',
-          // 'filter[keywords]': FILTER_KEYWORDS.ASSESSMENT_SURVEYS.join(','),
+          'filter[keywords]': FILTER_KEYWORDS.ASSESSMENT_SURVEYS.join(','),
         });
         const dataNew = await Promise.all(
           data.map(async (item) => {
