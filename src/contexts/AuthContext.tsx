@@ -153,12 +153,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       if (loginResponse.result?.user) {
         const userData = loginResponse.result.user;
 
-        // const entityDetails = await getEntityDetails(userData.id);
-        //  if(!entityDetails?.[0]) {
-        //   const message = t('auth.userEntityNotFound');
-        //   logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
-        //   return { success: false, message };
-        // }
+        const entityDetails = await getEntityDetails(userData.id);
+         if(!entityDetails?.[0]) {
+          const message = t('auth.userEntityNotFound');
+          logger.warn(`${isAdmin ? 'Admin ' : ''}${message}`);
+          return { success: false, message };
+        }
         // Determine user role (admin priority), throws if unauthorized
         let determinedRole: UserRole;
         try {
@@ -174,6 +174,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         // Map API user data to User interface
         const mappedUser: User = {
           role: determinedRole,
+          entityDetails: entityDetails?.[0] || null,
           ...userData, // Include any additional properties from API
         };
 
