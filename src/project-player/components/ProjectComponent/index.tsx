@@ -35,7 +35,7 @@ const ProjectComponent: React.FC = () => {
   const toast = useToast();
   const { showAlert } = useAlert();
 
-  const hasChildren = !!projectData?.children?.length;
+  const hasChildren = !!projectData?.children?.length || projectData?.tasks?.some(task => !!task.children?.length);;
 
   const isEditMode =
     mode === 'edit' && config.showAddCustomTaskButton !== false;
@@ -88,29 +88,47 @@ const ProjectComponent: React.FC = () => {
       }
 
       // Format the payload
+      const userId = config.profileInfo?.id?.toString();
+      if (!userId) {
+        showAlert('error', t('projectPlayer.error.participantIdMissing'), {
+          placement: 'top',
+        });
+        return;
+      }
+
       const reqBody = {
         templates,
-        userId: config.profileInfo?.id,
-        entityId: config.profileInfo?.entityId, // Fallback to participantId if entityId not available
-        programName: `Participant ${config.profileInfo?.name}'s Program`,
-        isPrivateProgram: true,
-        projectConfig: {
-          name: `${config.profileInfo?.name}'s IDP`,
-          description: 'Individual Development Plan',
-        },
-        isATargetedSolution: false,
+        userId,
+        entityId: config.profileInfo?.entityId || userId, // Fallback to userId if entityId not available
+        projectConfig: { referenceFrom: process.env.GLOBAL_LC_PROGRAM_ID },
       };
 
       // Call API to submit intervention plan
       const response = await submitInterventionPlan(reqBody);
-      console.log(response);
-      showAlert('success', t('template.IdpCreationSuccess'), {
-        placement: 'top',
-      });
-     
+      const newProjectId = response?.data?.projectId
+      if (!response.error) {
+        showAlert('success', t('template.IdpCreationSuccess'), {
+          placement: 'top',
+        });
+
+        // Call the config callback if provided (this will update status to IN_PROGRESS)
+        if (config.onSubmitInterventionPlan) {
+          config.onSubmitInterventionPlan(newProjectId);
+        }
+      } else {
+        showAlert(
+          'error',
+          response.error || t('projectPlayer.error.submitFailed'),
+          {
+            placement: 'top',
+          },
+        );
+      }
     } catch (error) {
       console.error('Error submitting intervention plan:', error);
-     
+      showAlert('error', t('projectPlayer.error.submitFailed'), {
+        placement: 'top',
+      });
     }
   };
   // Handle Save Progress button click
@@ -166,7 +184,7 @@ const ProjectComponent: React.FC = () => {
     // Each tick = +3%, capped at 100%
     const percent = Math.min(completedCount * 3, 100);
     return { percent, completedCount, totalCount };
-  }, [projectData?.tasks, isEditMode]);
+  }, [projectData, isEditMode]);
 
   // Calculate tasks updated count
   const tasksUpdatedCount = Math.round(
@@ -260,18 +278,22 @@ const ProjectComponent: React.FC = () => {
               )}
 
               {hasChildren
-                ? projectData?.children?.map((task, index) => (
-                    <TaskComponent
-                      key={task._id}
-                      task={task}
-                      // isLastTask={index === projectData.children.length - 1}
-                    />
-                  ))
+                ? projectData?.children?.length
+                  ? projectData.children.map(task => (
+                      <TaskComponent key={task._id} task={task} />
+                    ))
+                  : projectData?.tasks  
+                      ?.filter(task => task.children?.length)
+                      ?.map(task => (
+                        <TaskComponent key={task._id} task={task} isChildOfProject={true}/>
+                      ))
                 : projectData?.tasks?.map((task, index) => (
                     <TaskComponent
                       key={task._id}
                       task={task}
-                      isLastTask={index === projectData.tasks.length - 1}
+                      isLastTask={
+                        index === (projectData.tasks?.length || 0) - 1
+                      }
                     />
                   ))}
 

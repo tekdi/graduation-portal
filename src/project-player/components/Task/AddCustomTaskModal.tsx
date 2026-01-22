@@ -21,6 +21,7 @@ import { addCustomTaskModalStyles } from './Styles';
 import { AddCustomTaskModalProps } from 'src/project-player/types';
 import { theme } from '@config/theme';
 import { usePlatform } from '@utils/platform';
+import { SERVICE_PROVIDER_LIST } from '@constants/PROFILE_MENU_OPTIONS';
 
 export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
   isOpen,
@@ -365,11 +366,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
             {t('projectPlayer.serviceProvider')}
           </Text>
           <Select
-            options={[
-              { label: 'Service Provider 1', value: 'provider1' },
-              { label: 'Service Provider 2', value: 'provider2' },
-              { label: 'Service Provider 3', value: 'provider3' },
-            ]}
+            options={SERVICE_PROVIDER_LIST}
             value={formData.serviceProvider}
             onChange={value => updateFormField('serviceProvider', value)}
             placeholder={t('projectPlayer.selectServiceProvider')}
