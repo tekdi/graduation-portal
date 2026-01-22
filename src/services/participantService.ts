@@ -44,9 +44,8 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
   try {
     const {
       user_ids,
-      tenant_code = process?.env?.TENANT_CODE || 'brac',
-      // Default type: if entity_id is provided, use participant type; otherwise use all role types
-      type = params.entity_id ? ROLE_NAMES.USER : [...ADMIN_ROLES, ...LC_ROLES].join(','),
+      tenant_code = process?.env?.TENANT_CODE_NAME || 'brac',
+      type = ROLE_NAMES.USER,
       page = 1,
       limit = 20, 
       search,

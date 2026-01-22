@@ -272,7 +272,7 @@ const UserManagementScreen = () => {
 
         const apiParams: ParticipantSearchParams = {
           tenant_code: 'brac',
-          type: apiType,
+          type: 'all',
           page: 1, // Always fetch from page 1, DataTable handles client-side pagination
           limit: 100, // Fetch all users at once for client-side pagination
         };
