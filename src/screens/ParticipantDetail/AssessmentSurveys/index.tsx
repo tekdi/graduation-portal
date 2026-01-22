@@ -83,7 +83,7 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
             <AssessmentCard
               key={card.id}
               card={card}
-              userId={participant?.id || ''}
+              userId={participant?.userId || ''}
             />
           ))
         ) : (
