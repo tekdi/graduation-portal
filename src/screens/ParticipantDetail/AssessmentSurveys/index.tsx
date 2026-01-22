@@ -7,7 +7,7 @@ import type {
   AssessmentSurveyCardData,
   ParticipantData,
 } from '@app-types/participant';
-import { getObservationEntities, getObservationSubmissions, getTargetedSolutions } from '../../../services/solutionService';
+import { getObservationEntities, getTargetedSolutions } from '../../../services/solutionService';
 import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
 import logger from '@utils/logger';
 import { isWeb } from '@utils/platform';
@@ -35,9 +35,24 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
           type: 'observation',
           'filter[keywords]': FILTER_KEYWORDS.ASSESSMENT_SURVEYS.join(','),
         });
-        const dataNew = await Promise.all(data.map(async (item) => ({...item,entity:await getdetails({solutionId:item.solutionId,id:participant?.id})})));
-
-        setSolutions(dataNew);
+        const dataNew = await Promise.all(
+          data.map(async (item) => {
+            try {
+              const entity = await getdetails({
+                solutionId: item.solutionId,
+                id: participant?.id,
+              });
+              return { ...item, entity };
+            } catch (error) {
+              logger.error('Failed to fetch entity for solutionId:', item.solutionId, error);
+              // Skip this item by returning null
+              return null;
+            }
+          })
+        );
+        // Filter out failed items (nulls)
+        const filteredData = dataNew.filter(item => item !== null);
+        setSolutions(filteredData);
       } catch (error) {
         logger.error('Error fetching solutions:', error);
         setSolutions([]);
@@ -47,7 +62,7 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
     };
 
     fetchSolutions();
-  }, []);
+  }, [participant?.id]);
 
   const getdetails = async ({solutionId,id}:{solutionId:string,id:string}) => {
     const observationData = await getObservationEntities({

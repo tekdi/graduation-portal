@@ -29,9 +29,10 @@ import { ParticipantData } from '@app-types/participant';
 import { AssessmentSurveyCardData } from '@app-types/participant';
 import logger from '@utils/logger';
 import { isWeb } from '@utils/platform';
-import { User } from '@contexts/AuthContext';
+import { useAuth, User } from '@contexts/AuthContext';
 import { ENTITY_TYPE } from '@constants/ROLES';
 import { StatusBadge } from '@components/ObservationCards';
+import { CARD_STATUS } from '@constants/app.constant';
 
 /**
  * Route parameters type definition for LogVisit screen
@@ -61,6 +62,7 @@ const LogVisit: React.FC = () => {
   const [participant, setParticipant] = useState<
     ParticipantData | User | undefined
   >(undefined);
+  const { user } = useAuth()
   const navigation = useNavigation();
   const { t } = useLanguage();
 
@@ -151,7 +153,7 @@ const LogVisit: React.FC = () => {
 
         // Map submissions from response
         const submissionsList =
-          submissionsData?.result || submissionsData?.data || [];
+          (submissionsData?.result || submissionsData?.data || []).filter((e:any) => e.status === CARD_STATUS.COMPLETED);
         setSubmissions(Array.isArray(submissionsList) ? submissionsList : []);
       } catch (error) {
         logger.error('Error fetching submissions:', error);
@@ -179,11 +181,6 @@ const LogVisit: React.FC = () => {
     }
   };
 
-  // Error State: Missing participant ID or participant not found
-  if (!participant) {
-    return <NotFound message="participantDetail.notFound.title" />;
-  }
-
   if (loading) {
     return (
       <Spinner
@@ -192,6 +189,11 @@ const LogVisit: React.FC = () => {
         color="$primary500"
       />
     );
+  }
+
+  // Error State: Missing participant ID or participant not found
+  if (!participant) {
+    return <NotFound message="participantDetail.notFound.title" />;
   }
 
   return (
@@ -267,8 +269,8 @@ const LogVisit: React.FC = () => {
                         <VStack flex={1} space="md">
                           <HStack alignItems="center" space="sm">
                             <Text {...assessmentSurveyCardStyles.title}>
-                              {submission.title} #
-                              {submission.submissionNumber || index + 1}
+                              {submission.observationName} #
+                              {submission.submissionNumber}
                             </Text>
                             {/* Status Badge - only show if status exists */}
                             {submission.status && (
@@ -276,41 +278,44 @@ const LogVisit: React.FC = () => {
                             )}
                           </HStack>
                           {/* Card Description */}
-                          <HStack space="sm">
-                            {submission.createdAt && (
+                          <HStack>
+                            {submission.submissionDate && (
                               <HStack alignItems="center" space="xs">
                                 <LucideIcon
                                   name="Calendar"
                                   size={16}
-                                  color="$muted400"
+                                  color="$textMutedForeground"
                                 />
                                 <Text
                                   {...assessmentSurveyCardStyles.description}
                                 >
                                   {new Date(
-                                    submission.createdAt,
+                                    submission.submissionDate,
                                   ).toLocaleString(undefined, {
                                     year: 'numeric',
                                     month: 'short',
                                     day: '2-digit',
                                     hour: '2-digit',
                                     minute: '2-digit',
+                                    hour12: true,
                                   })}
                                 </Text>
                               </HStack>
                             )}
-                            {submission.status && (
-                              <Text {...assessmentSurveyCardStyles.description}>
-                                {t('logVisit.status') || 'Status'}:
-                                {submission.status}
-                              </Text>
-                            )}
+                            <LucideIcon
+                              name="Dot"
+                              size={20}
+                              color="$textMutedForeground"
+                            />
+                            <Text {...assessmentSurveyCardStyles.description}>
+                              {t('logVisit.by')} {user?.name}
+                            </Text>
                           </HStack>
                           <Button
                             {...assessmentSurveyCardStyles.buttonSecondary}
                             onPress={() => {
                               // @ts-ignore
-                              navigation.navigate("observation" as never, {
+                              navigation.navigate('observation' as never, {
                                 id: participant?.id || '',
                                 solutionId: selectedSolution,
                                 submissionNumber: submission.submissionNumber,
@@ -335,13 +340,19 @@ const LogVisit: React.FC = () => {
               ))
             ) : (
               !submissionsLoading && (
-                <Text color="$textMutedForeground" textAlign="center" py="$4">
-                  {t('logVisit.noSubmissions') || 'No submissions found'}
-                </Text>
+                <Card {...assessmentSurveyCardStyles.emptyCard}>
+                  <LucideIcon name={'Clock'} size={48} />
+                  <Text {...assessmentSurveyCardStyles.emptyCardTitale}>
+                    {t('logVisit.noCheckInsYet')}
+                  </Text>
+                  <Text {...assessmentSurveyCardStyles.emptyCardTitale} pt="$0">
+                    {t('logVisit.noCheckInsYetDescription')}
+                  </Text>
+                </Card>
               )
             )}
           </VStack>
-        ):(
+        ) : (
           <Box {...logVisitStyles.selectSolutionContainer}>
             <Card
               {...assessmentSurveyCardStyles.cardContainer}

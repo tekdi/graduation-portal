@@ -1,6 +1,5 @@
 import React from 'react';
 import type { LucideProps } from 'lucide-react-native';
-import { Box } from '@ui';
 import { theme } from '@config/theme';
 
 /**

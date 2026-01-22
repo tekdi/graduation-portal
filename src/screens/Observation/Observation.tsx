@@ -80,7 +80,7 @@ const Observation = () => {
           observationSubmissionsLast = observationSubmissions.result?.[observationSubmissions.result.length - 1] || null;
         }
       }
-      if (observationSubmissionsLast) {
+      if (observationSubmissionsLast && observationSubmissionsLast.status !== CARD_STATUS.COMPLETED) {
         const submissionId = observationSubmissionsLast._id;
         observationSolution = await offlineStorage.read(submissionId, {
           dbName: 'questionnairePlayer',
@@ -134,11 +134,8 @@ const Observation = () => {
           return;
         }
         const observationId = observationData?.result?._id;
-        if (
-          observationData.result?.entityType === ENTITY_TYPE.PARTICIPANT &&
-          Array.isArray(observationData.result?.entities)
-        ) {
-          const newData = observationData.result.entities.find(
+        if (observationId) {
+          const newData = observationData?.result?.entities?.find(
             (entity: any) => entity.externalId === id,
           );
           if (newData) {
@@ -153,10 +150,9 @@ const Observation = () => {
               date: new Date().toISOString().split('T')[0],
             });
             setLoadingOff();
-          } else if (observationId) {
+          } else {
             const entitiesData = await searchObservationEntities({
               observationId: observationId,
-              // search: "sagar",
             });
             const entityData = entitiesData.result?.[0]?.data.find(
               (entity: any) => entity.externalId === id,
@@ -191,9 +187,6 @@ const Observation = () => {
                 setLoadingOff();
               }
             }
-          } else {
-            showAlert('error', t('observation.noParticipantFound'));
-            setLoadingOff();
           }
         } else {
           showAlert('error', t('observation.noParticipantFound'));
