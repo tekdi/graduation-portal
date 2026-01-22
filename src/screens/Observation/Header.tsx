@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ title, progress, participantInfo, onBac
           {...observationStyles.titleAndProgressContainer}
         >
           <Text {...TYPOGRAPHY.h4}>
-            {title || t('logVisit.individualEnterpriseVisit.title')}
+            {title}
           </Text>
 
           {/* Progress Badge */}
