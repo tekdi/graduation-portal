@@ -15,9 +15,9 @@ import { styles } from './Styles';
  * Extracts role label from nested user_organizations structure
  */
 const useRole = (user: any): string => {
-  return user?.user_organizations?.[0]?.organization?.roles?.[0]?.role?.label || 
-         user?.role || 
-         '-';
+  return user?.user_organizations?.[0]?.organization?.roles?.[0]?.role?.label ||
+    user?.role ||
+    '-';
 };
 
 /**
@@ -41,7 +41,7 @@ const getDistrict = (user: any): string => {
  */
 const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
   const isParticipant = role === 'Participant';
-  
+
   return (
     <HStack
       bg={styles.roleColors[role as keyof typeof styles.roleColors] || '$textSecondary'}
@@ -50,7 +50,7 @@ const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
       <Text
         {...TYPOGRAPHY.bodySmall}
         {...(isParticipant ? styles.roleBadgeParticipantColor : styles.roleBadgeText)}
-      
+
       >
         {role}
       </Text>
@@ -90,12 +90,12 @@ const DetailsCell: React.FC<{ details: AdminUserManagementData['details'] }> = (
 
   if (details.type === 'assigned') {
     return (
-        <Text
-          {...TYPOGRAPHY.bodySmall}
-          {...styles.districtText}
-        >
-          {details.value} assigned
-        </Text>
+      <Text
+        {...TYPOGRAPHY.bodySmall}
+        {...styles.districtText}
+      >
+        {details.value} assigned
+      </Text>
     );
   }
 
@@ -248,7 +248,7 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
     render: (user: any) => {
       // Extract all roles from user_organizations
       const roles = user?.user_organizations?.[0]?.roles?.map((role: any) => role.role.label) || [];
-      
+
       // If no roles found, show "-"
       if (roles.length === 0) {
         return (
@@ -288,7 +288,7 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
     flex: 1.2,
     render: (user: any) => (
       <Text {...TYPOGRAPHY.paragraph} {...styles.provinceText}>
-        {getProvince(user)}
+        {user?.province?.label || '-'}
       </Text>
     ),
     mobileConfig: {
@@ -301,9 +301,9 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
     label: 'admin.users.district',
     flex: 1.2,
     render: (user: any) => (
-        <Text {...TYPOGRAPHY.paragraph} {...styles.districtText}>
-          {getDistrict(user)}
-        </Text>
+      <Text {...TYPOGRAPHY.paragraph} {...styles.districtText}>
+        {user?.district?.label || '-'}
+      </Text>
     ),
     mobileConfig: {
       rightRank: 3,
@@ -316,7 +316,7 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
     flex: 1.2,
     render: (user) => (
       <Text {...TYPOGRAPHY.paragraph} {...styles.lastLoginText}>
-        {user.lastLogin}
+        -
       </Text>
     ),
     mobileConfig: {
@@ -328,7 +328,11 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
     key: 'details',
     label: 'admin.users.details',
     flex: 1.5,
-    render: (user) => <DetailsCell details={user.details} />,
+    render: (user) => (
+      <Text {...TYPOGRAPHY.paragraph} {...styles.lastLoginText}>
+        -
+      </Text>
+    ),
     mobileConfig: {
       leftRank: 4,
       showLabel: false,

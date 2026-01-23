@@ -1,11 +1,11 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { VStack, HStack, Button, Text, Image, Box } from '@ui';
 import { LucideIcon } from '@ui/index';
 
 import UploadIcon from '../../assets/images/UploadIcon.png';
 import ExportIcon from '../../assets/images/ExportIcon.png';
 import { useLanguage } from '@contexts/LanguageContext';
-import { SearchFilter, FilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
+import { useUserManagementFilters, mapStatusLabelToAPI } from '@constants/USER_MANAGEMENT_FILTERS';
 import FilterButton from '@components/Filter';
 import TitleHeader from '@components/TitleHeader';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
@@ -15,18 +15,7 @@ import { AdminUserManagementData } from '@app-types/participant';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
-// API service for fetching users, roles, provinces, and districts
-import { 
-  getParticipantsList, 
-  getRolesList, 
-  Role,
-  getEntityTypesList,
-  getEntityTypesFromStorage,
-  getProvincesByEntityType,
-  ProvinceEntity,
-  getDistrictsByProvinceEntity,
-  DistrictEntity
-} from '../../services/participantService';
+import { getParticipantsList, Role } from '../../services/participantService';
 import type { ParticipantSearchParams } from '@app-types/participant';
 
 /**
@@ -44,209 +33,26 @@ const UserManagementScreen = () => {
   // Note: currentPage and pageSize are managed by DataTable component for client-side pagination
   // API pageSize is set to 100 to fetch all users at once
   
-  // Roles state for dynamic filter
-  const [roles, setRoles] = useState<Role[]>([]);
-  
-  // Provinces state for dynamic filter
-  const [provinces, setProvinces] = useState<ProvinceEntity[]>([]);
-  
-  // Districts state for dynamic filter
-  const [districts, setDistricts] = useState<DistrictEntity[]>([]);
-  
   const columns = useMemo(() => getUsersColumns(), []);
+  
+  // Ref to track previous roles length to detect when roles are first loaded
+  const prevRolesLengthRef = useRef(0);
 
-  // Fetch roles from API on component mount - Dynamic role filter from API
+  // Use custom hook for filter management - handles all API calls for roles, provinces, districts
+  const { filters: filterOptions, roles, provinces, districts } = useUserManagementFilters(filters);
+
+  // Fetch users from API when filters change or when roles are first loaded
   useEffect(() => {
-    const fetchRoles = async () => {
-      try {
-        const response = await getRolesList({ page: 1, limit: 100 });
-        const allRoles = response.result?.data || [];
-        
-        // Filter only ACTIVE roles for the dropdown
-        const activeRoles = allRoles.filter((role: Role) => role.status === 'ACTIVE');
-        setRoles(activeRoles);
-      } catch (error) {
-        console.error('Error fetching roles:', error);
-        // Set empty array - filter will show only "All Roles" option
-        setRoles([]);
-      }
-    };
+    // Check if roles just loaded (length changed from 0 to > 0)
+    const rolesJustLoaded = prevRolesLengthRef.current === 0 && roles.length > 0;
+    prevRolesLengthRef.current = roles.length;
 
-    fetchRoles();
-  }, []);
+    // Don't fetch if roles haven't loaded yet (needed for type parameter)
+    // Unless a specific role filter is set or roles just loaded
+    if (roles.length === 0 && !filters.role && !rolesJustLoaded) {
+      return;
+    }
 
-  // Fetch provinces from API on component mount - Dynamic province filter from API
-  useEffect(() => {
-    const fetchProvinces = async () => {
-      try {
-        // First, check if entity types are in storage
-        let entityTypes = await getEntityTypesFromStorage();
-        
-        // If not in storage, fetch entity types from API
-        if (!entityTypes || !entityTypes['province']) {
-          await getEntityTypesList();
-          entityTypes = await getEntityTypesFromStorage();
-        }
-
-        // Get province entity type ID
-        const provinceEntityTypeId = entityTypes?.['province'];
-        
-        if (!provinceEntityTypeId) {
-          console.error('Province entity type ID not found');
-          setProvinces([]);
-          return;
-        }
-
-        // Fetch provinces using the entity type ID
-        const response = await getProvincesByEntityType(provinceEntityTypeId);
-        const provincesData = response.result || [];
-        setProvinces(provincesData);
-      } catch (error) {
-        console.error('Error fetching provinces:', error);
-        // Set empty array - filter will show only "All Provinces" option
-        setProvinces([]);
-      }
-    };
-
-    fetchProvinces();
-  }, []);
-
-  // Fetch districts when province filter changes - Dynamic district filter based on selected province
-  useEffect(() => {
-    const fetchDistricts = async () => {
-      // If no province selected or "All Provinces" is selected, clear districts
-      if (!filters.province || filters.province === 'all-provinces') {
-        setDistricts([]);
-        // Clear district filter if province is cleared
-        setFilters((prev) => {
-          if (prev.district) {
-            const updated = { ...prev };
-            delete updated.district;
-            return updated;
-          }
-          return prev;
-        });
-        return;
-      }
-
-      // Only fetch if provinces are loaded
-      if (provinces.length === 0) {
-        return;
-      }
-
-      try {
-        // Find the selected province from provinces array to get its _id
-        const selectedProvince = provinces.find(
-          (province: ProvinceEntity) => province.name === filters.province
-        );
-
-        if (!selectedProvince || !selectedProvince._id) {
-          console.error('Selected province not found or missing _id:', filters.province);
-          setDistricts([]);
-          return;
-        }
-
-        // Fetch districts using the province's entity ID (_id)
-        const response = await getDistrictsByProvinceEntity(selectedProvince._id, {
-          page: 1,
-          limit: 100,
-        });
-        
-        // Access districts from response.result.data (API returns { result: { count, data } })
-        const districtsData = Array.isArray(response.result?.data) ? response.result.data : [];
-        setDistricts(districtsData);
-
-        // Clear district filter when new districts are loaded (to avoid invalid selections)
-        setFilters((prev) => {
-          if (prev.district) {
-            const updated = { ...prev };
-            delete updated.district;
-            return updated;
-          }
-          return prev;
-        });
-      } catch (error) {
-        console.error('Error fetching districts:', error);
-        setDistricts([]);
-      }
-    };
-
-    fetchDistricts();
-  }, [filters.province, provinces]);
-
-  // Map filter status labels to API status format - Maps display labels to API format (e.g., "Active" → "ACTIVE")
-  const mapStatusLabelToAPI = useCallback((statusLabel: string): string => {
-    const statusMap: Record<string, string> = {
-      'Active': 'ACTIVE',
-      'Deactivated': 'DEACTIVATED',
-    };
-    return statusMap[statusLabel] || statusLabel;
-  }, []);
-
-  // Build dynamic filter options with API roles, provinces, and districts - Replace hardcoded filters with API data
-  const filterOptionsWithRoles = useMemo(() => {
-    // Get status filter from FilterOptions
-    const statusFilter = FilterOptions.find(f => f.attr === 'status');
-    
-    // Always build role filter from API roles (even if empty during loading)
-    // Use title as value to ensure unique identification (even if labels are duplicate)
-    const roleFilterOptions = [
-      { labelKey: 'admin.filters.allRoles', value: 'all-roles' },
-      ...roles.map((role: Role) => ({
-        label: role.label, // Display label in dropdown
-        value: role.title, // Use title as value for filtering (unique identifier)
-      })),
-    ];
-
-    // Always build province filter from API provinces (even if empty during loading)
-    const provinceFilterOptions = [
-      { labelKey: 'admin.filters.allProvinces', value: 'all-provinces' },
-      ...provinces.map((province: ProvinceEntity) => ({
-        label: province.name,
-        value: province.name, // Use name as value (e.g., "Eastern Cape")
-      })),
-    ];
-
-    // Build district filter from API districts
-    // District filter is disabled if no province is selected or "All Provinces" is selected
-    const isProvinceSelected = filters.province && filters.province !== 'all-provinces' && filters.province !== '';
-    const districtFilterOptions = [
-      { labelKey: 'admin.filters.allDistricts', value: 'all-districts' },
-      ...districts.map((district: DistrictEntity) => ({
-        label: district.name,
-        value: district.name, // Use name as value
-      })),
-    ];
-
-    return [
-      {
-        nameKey: 'admin.filters.role',
-        attr: 'role',
-        type: 'select' as const,
-        data: roleFilterOptions,
-      },
-      ...(statusFilter ? [statusFilter] : []),
-      {
-        nameKey: 'admin.filters.province',
-        attr: 'province',
-        type: 'select' as const,
-        data: provinceFilterOptions,
-      },
-      {
-        nameKey: 'admin.filters.district',
-        attr: 'district',
-        type: 'select' as const,
-        data: districtFilterOptions,
-        disabled: !isProvinceSelected, // Disable when no province is selected
-      },
-    ];
-  }, [roles, provinces, districts, filters.province]);
-
-  // Combine search filter with dynamic filter options
-  const data = useMemo(() => [SearchFilter, ...filterOptionsWithRoles], [filterOptionsWithRoles]);
-
-  // Fetch users from API when filters/pagination change
-  useEffect(() => {
     const fetchUsers = async () => {
       setIsLoading(true);
       try {
@@ -256,7 +62,6 @@ const UserManagementScreen = () => {
         if (filters.role && filters.role !== 'all-roles') {
           // Filter value is already the role title (not label), so use it directly
           apiType = filters.role;
-          console.log('Role filter applied - using type:', apiType);
         } else {
           // Build type parameter from all active roles fetched from API
           // Extract unique role titles from roles array
@@ -265,14 +70,13 @@ const UserManagementScreen = () => {
             .filter((title: string | undefined): title is string => !!title)
             .filter((title: string, index: number, self: string[]) => self.indexOf(title) === index); // Remove duplicates
           
-          // Use all role titles from API (no fallback)
-          apiType = allRoleTitles.join(',');
-          console.log('All Roles selected - using type:', apiType);
+          // Use all role titles from API, or 'all' if no roles available
+          apiType = allRoleTitles.length > 0 ? allRoleTitles.join(',') : 'all';
         }
 
         const apiParams: ParticipantSearchParams = {
           tenant_code: 'brac',
-          type: 'all',
+          type: apiType,
           page: 1, // Always fetch from page 1, DataTable handles client-side pagination
           limit: 100, // Fetch all users at once for client-side pagination
         };
@@ -280,19 +84,10 @@ const UserManagementScreen = () => {
         if (filters.search) {
           apiParams.search = filters.search;
         }
-
-        console.log('Filters object:', filters);
-        console.log('Role filter value:', filters.role);
-        console.log('Status filter value:', filters.status);
-        // Note: Role filter is handled via 'type' parameter above, not 'role' parameter
-        // We don't send 'role' parameter to avoid duplication
         if (filters.status && filters.status !== 'all-status') {
           // Map status filter value to API format (e.g., "Active" → "ACTIVE")
           const mappedStatus = mapStatusLabelToAPI(filters.status);
           apiParams.status = mappedStatus;
-          console.log('Status filter applied - mapped value:', mappedStatus);
-        } else {
-          console.log('Status filter not applied - value is:', filters.status);
         }
         if (filters.province && filters.province !== 'all-provinces') {
           // Since we're using province.name as both label and value, use it directly
@@ -306,9 +101,6 @@ const UserManagementScreen = () => {
         }
 
         const response = await getParticipantsList(apiParams);
-        console.log('API response:', response);
-        console.log('Users data:', response.result?.data);
-        console.log('Total count from API:', response.result?.count);
         
         // Get raw API data
         let usersData = response.result?.data || [];
@@ -324,17 +116,12 @@ const UserManagementScreen = () => {
             const userStatus = user.status?.toUpperCase();
             return userStatus === mappedStatus;
           });
-          console.log('Client-side status filter applied:', { 
-            filterStatus: mappedStatus, 
-            filteredCount: usersData.length 
-          });
         }
         
         setUsers(usersData);
         // Use API total count, not the length of returned data
         setTotalCount(apiTotalCount);
       } catch (error) {
-        console.error('Error fetching users:', error);
         setUsers([]);
         setTotalCount(0);
       } finally {
@@ -343,13 +130,20 @@ const UserManagementScreen = () => {
     };
 
     fetchUsers();
-  }, [filters, mapStatusLabelToAPI, roles]); // Removed currentPage and pageSize from dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters, roles.length]); // Depend on filters and roles.length to trigger when roles first load
 
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
+    // Clear district filter if province is cleared or changed
+    if (filters.province !== newFilters.province) {
+      if (newFilters.district) {
+        delete newFilters.district;
+      }
+    }
     setFilters(newFilters);
     // DataTable will reset to page 1 automatically when data changes
-  }, []);
+  }, [filters.province]);
 
 
   return (
@@ -399,7 +193,7 @@ const UserManagementScreen = () => {
       />
       
       <FilterButton 
-        data={data}
+        data={filterOptions}
         onFilterChange={handleFilterChange}
       />
       
@@ -453,7 +247,6 @@ const UserManagementScreen = () => {
           onPageChange={(newPage) => {
             // Note: This is for client-side pagination only
             // The DataTable handles pagination internally
-            console.log('Page changed to:', newPage);
           }}
           emptyMessage="admin.users.noUsersFound"
           loadingMessage="admin.users.loadingUsers"
