@@ -68,7 +68,7 @@ const ParticipantsList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [overview, setOverview] = useState<ParticipantOverview | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
   const [totalItems, setTotalItems] = useState(0);
   // Get status items directly from overview using STATUS constants
   const allStatusItems = useMemo<StatusFilterItem[]>(() => {

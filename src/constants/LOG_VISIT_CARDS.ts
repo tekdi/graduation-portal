@@ -37,6 +37,7 @@ export const LOG_VISIT_CARDS: AssessmentSurveyCardData[] = [
 
 export const FILTER_KEYWORDS = {
   LOG_VISIT: ["CHECK_INS"],
+  PARTICIPANT_LOG_VISIT: ["LOG_VISIT"],
   ASSESSMENT_SURVEYS: ["ASSESSMENT_SURVEY"]
 }
 
