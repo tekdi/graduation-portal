@@ -9,37 +9,18 @@ import {
   Button,
   ButtonText,
   LucideIcon,
+  showSuccessToast,
+  useToast,
+  useAlert,
 } from '@ui';
 import { participantHeaderStyles } from './Styles';
-import type { ParticipantStatus, PathwayType } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 import ParticipantProgressCard from './ParticipantProgressCard';
 import { STATUS } from '@constants/app.constant';
-import { theme } from '@config/theme';
 import { updateEntityDetails } from '../../../services/participantService';
 import { useAuth } from '@contexts/AuthContext';
+import { ParticipantHeaderProps } from '@app-types/screens';
 
-/**
- * ParticipantHeader Props
- * Component props for displaying participant header with status-based UI variations.
- */
-interface ParticipantHeaderProps {
-  participantName: string;
-  participantId: string;
-  status?: ParticipantStatus;
-  pathway?: PathwayType;
-  graduationProgress?: number;
-  graduationDate?: string;
-  onViewProfile?: () => void; // Callback to open profile modal
-  areAllTasksCompleted?: boolean; // Whether all tasks in the project are completed
-  userEntityId?: string;
-  onStatusUpdate?: (newStatus: string) => void; // Callback when status is updated
-}
-
-/**
- * ParticipantHeader Component
- * Displays participant header with status-based UI variations and action buttons.
- */
 const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   participantName,
   participantId,
@@ -48,17 +29,20 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   graduationProgress,
   graduationDate,
   onViewProfile,
-  areAllTasksCompleted = false, // Default to false if not provided
+  areAllTasksCompleted = false,
   userEntityId,
   onStatusUpdate,
 }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
-const {user} = useAuth()
-  /**
-   * Handle Back Navigation
-   * Navigates to the participants list page
-   */
+  const {user} = useAuth()
+  const toast = useToast();
+  const { showAlert } = useAlert();
+
+ const showSuccess = (message: string) => {
+    showSuccessToast(toast, message);
+  };
+  
   const handleBackPress = () => {
     // @ts-ignore
     navigation.navigate('participants');
@@ -68,37 +52,29 @@ const {user} = useAuth()
     if (!userEntityId) return;
 
     try {
+      await updateEntityDetails({
+        userId: `${user?.id}`,
+        entityId: userEntityId,
+        entityUpdates: {
+          status: STATUS.ENROLLED,
+        },
+      });
+      showSuccess(t('projectPlayer.enrolledParticiapantSucess'));
 
-       await updateEntityDetails({
-         userId: `${user?.id}`,
-         programId: process.env.GLOBAL_LC_PROGRAM_ID,
-         entityId: userEntityId,
-         entityUpdates: {
-           status: STATUS.ENROLLED,
-         },
-       });
       // Notify parent component about status update
       if (onStatusUpdate) {
         onStatusUpdate(STATUS.ENROLLED);
       }
     } catch (error) {
-      console.error('Failed to enroll participant', error);
+      showAlert('error', 'Something Went Wrong');
     }
   };
 
   const handleLogVisitPress = () => {
-    // Use push instead of navigate to ensure a new stack entry is created
-    // This allows goBack() to work properly in the LogVisit screen
-    // @ts-ignore
+// @ts-ignore
     navigation.push('log-visit', { id: participantId });
   };
 
-  /**
-   * Render Status Badge
-   * Shows red "Dropped Out" badge for dropout participants
-   *
-   * @returns Badge component if status is 'dropout', null otherwise
-   */
   const renderStatusBadge = () => {
     if (status === STATUS.DROPOUT) {
       return (

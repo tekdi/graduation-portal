@@ -124,7 +124,6 @@ export default function ParticipantDetail() {
   };
 
   const ProjectPlayerConfigData: ProjectPlayerData = {
-    solutionId: config?.data?.solutionId,
     projectId : status === STATUS.IN_PROGRESS
       ? participant?.idpProjectId
       : status === STATUS.NOT_ENROLLED

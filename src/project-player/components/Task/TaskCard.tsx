@@ -3,8 +3,6 @@ import {
   Box,
   HStack,
   Card,
-  Toast,
-  ToastTitle,
   useToast,
   Checkbox,
   CheckboxIndicator,
@@ -15,6 +13,7 @@ import {
   ButtonText,
   Pressable,
   CheckIcon,
+  showSuccessToast,
 } from '@ui';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useTaskActions } from '../../hooks/useTaskActions';
@@ -48,16 +47,17 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const route = useRoute();
   const navigation = useNavigation();
   // Retrieve updateTask from context
-  const { mode, config, projectData, updateTask } = useProjectContext();
+  const { mode, config, updateTask } = useProjectContext();
   const { deleteTask } = useProjectContext();
-  const { handleOpenForm, handleStatusChange, handleAddToPlan } =
+  // handleOpenForm
+  const {  handleStatusChange, handleAddToPlan } =
     useTaskActions();
   const { isWeb } = usePlatform();
   const { t } = useLanguage();
   const toast = useToast();
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-const participantId = route.params?.id;
+  const participantId = route.params?.id;
   // Modal state management (from Incoming)
   type ModalType = 'edit' | 'delete' | null;
   const [modalState, setModalState] = useState<{
@@ -71,8 +71,8 @@ const participantId = route.params?.id;
   const isPreview = mode === PROJECT_MODES.PREVIEW;
   const isEdit = mode === PROJECT_MODES.EDIT;
   // Use mixed logic for completion: check status or use helper
-  const isCompleted = isTaskCompleted(task.status);
-  const isAddedToPlan = task.metaInformation?.addedToPlan;
+  const isCompleted = isTaskCompleted(task?.status);
+  const isAddedToPlan = task?.metaInformation?.addedToPlan;
 
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
@@ -88,32 +88,8 @@ const participantId = route.params?.id;
     [isChildOfProject, isPreview, isEdit],
   );
 
-   const showSuccessToast = (message: string) => {
-    toast.show({
-      placement: 'bottom right',
-      render: ({ id }) => (
-        <Toast
-          nativeID={id}
-          action="success"
-          variant="solid"
-          {...taskCardStyles.successToast}
-        >
-          <HStack {...taskCardStyles.successToastContent}>
-            <Box {...taskCardStyles.successToastIcon}>
-              <LucideIcon
-                name="Check"
-                size={taskCardStyles.successToastIconSize}
-                color="white"
-                strokeWidth={3}
-              />
-            </Box>
-            <ToastTitle {...taskCardStyles.successToastTitle}>
-              {message}
-            </ToastTitle>
-          </HStack>
-        </Toast>
-      ),
-    });
+  const showSuccess = (message: string) => {
+    showSuccessToast(toast, message);
   };
 
   // Modal actions (Incoming)
@@ -130,16 +106,16 @@ const participantId = route.params?.id;
   };
 
   const handleConfirmDelete = () => {
-    deleteTask(task._id);
+    deleteTask(task?._id);
     closeModal();
-    showSuccessToast(t('projectPlayer.taskDeleted'));
+    showSuccess(t('projectPlayer.taskDeleted'));
   };
 
   // Task click handler (HEAD logic)
   const handleTaskClick = () => {
     if (!isEdit) return;
 
-    if (task.type === TASK_TYPE.OBSERVATION) {
+    if (task?.type === TASK_TYPE.OBSERVATION) {
       const solutionId = task?.solutionDetails?._id;
 
       if (!participantId || !solutionId) {
@@ -176,12 +152,12 @@ const participantId = route.params?.id;
     if (uiConfig.showCheckbox) {
       return (
         <Checkbox
-          value={task._id}
+          value={task?._id}
           isChecked={isCompleted}
           onChange={handleCheckboxChange}
           isDisabled={isReadOnly}
           size="md"
-          aria-label={`Mark ${task.name} as ${
+          aria-label={`Mark ${task?.name} as ${
             isCompleted ? 'incomplete' : 'complete'
           }`}
           opacity={isReadOnly ? 0.6 : 1}
@@ -203,7 +179,7 @@ const participantId = route.params?.id;
     const checkSize = 14;
 
     // Status Circle Logic
-    const isOptional = task.metaInformation?.isOptional;
+    const isOptional = task?.metaInformation?.isOptional;
 
     let circleBorderColor = '$textMuted';
     let circleBg = '$backgroundPrimary.light';
@@ -565,7 +541,7 @@ const participantId = route.params?.id;
         }
         setShowUploadModal(false);
         // Show success toast with task-specific message
-        showSuccessToast(t('projectPlayer.evidenceUploaded'));
+        showSuccess(t('projectPlayer.evidenceUploaded'));
       }}
     />
   );

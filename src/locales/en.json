@@ -137,7 +137,8 @@
     "slaUploaded": "SLA uploaded successfully",
     "selectedFiles": "Selected Files",
     "untitledFile": "Untitled File",
-    "unknownSize": "Unknown size"
+    "unknownSize": "Unknown size",
+    "enrolledParticiapantSucess" :"Participant Enrolled Successfully!"
   },
   "navigation": {
     "menu": "Menu",

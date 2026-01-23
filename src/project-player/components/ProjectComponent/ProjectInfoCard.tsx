@@ -5,7 +5,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useLanguage } from '@contexts/LanguageContext';
 import { projectInfoCardStyles } from './Styles';
-import { TASK_STATUS } from '@constants/app.constant';
+import { PLAYER_MODE, TASK_STATUS } from '@constants/app.constant';
 
 const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const { mode } = useProjectContext();
@@ -17,8 +17,9 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const totalTasks = project.tasks?.length || 0;
 
   // Check if any task is a project type (has children)
-  const hasChildren = !!project?.children?.length;
-
+const hasChildren =
+  !!project?.children?.length ||
+  project?.tasks?.some(task => task?.children?.length);
   // Count total pillars (project type tasks)
   const totalPillars = project?.children?.length || 0;
 
@@ -31,7 +32,7 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
       return acc;
     }, 0) || 0;
 
-  const isPreview = mode === 'preview';
+  const isPreview = mode === PLAYER_MODE.PREVIEW;
 
   return (
     <Box {...projectInfoCardStyles.container}>
