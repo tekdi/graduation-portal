@@ -15,6 +15,12 @@ export const TASK_STATUS = {
   COMPLETED: 'completed',
 } as const;
 
+export const PLAYER_MODE = {
+  EDIT: 'edit',
+  PREVIEW: 'preview',
+  READ_ONLY: 'readOnly',
+} as const;
+
 // Task Type Constants
 export const TASK_TYPE = {
   PROJECT: 'project',

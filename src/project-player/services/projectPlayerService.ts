@@ -165,8 +165,7 @@ export const submitInterventionPlan = async (
 ): Promise<ApiResponse<any>> => {
   try {
     const response = await apiClient.post(
-      API_ENDPOINTS.SUBMIT_INTERVENTION_PLAN,
-      reqBody,
+      API_ENDPOINTS.SUBMIT_INTERVENTION_PLAN, reqBody,
     );
 
     return { data: response.data.result || response.data };

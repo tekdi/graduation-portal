@@ -9,7 +9,6 @@ import {
   getProjectDetails,
   getTaskDetails,
 } from '../services/projectPlayerService';
-import { STATUS } from '@constants/app.constant';
 import { updateEntityDetails } from '../../../src/services/participantService';
 import { getProjectCategoryList } from '../../../src/services/projectService';
 import { useAuth } from '@contexts/AuthContext';
@@ -26,12 +25,11 @@ export const useProjectLoader = (
   useEffect(() => {
     const loadData = async () => {
       try {
-        setIsLoading(true);
+        // setIsLoading(true);
 
         // config.mode = "edit" and data contains  projectId.
         if (config.mode === 'edit') {
-          const { entityId, projectId, userStatus } = data;
-
+          const { entityId, projectId } = data;
 
           try {
             let projectData;
@@ -46,7 +44,6 @@ export const useProjectLoader = (
               if (projectData?._id) {
                 await updateEntityDetails({
                   userId: `${user?.id}`,
-                  programId: process.env.GLOBAL_LC_PROGRAM_ID,
                   entityId:entityId,
                  entityUpdates:{
                    onBoardedProjectId: projectData._id,
@@ -113,10 +110,6 @@ export const useProjectLoader = (
 
           setProjectData(updatedPathwayData);
         } else if (data.solutionId) {
-          // Load template
-          // TODO: Implement API call
-          // const response = await fetch(`/api/template/details/${data.solutionId}`);
-          // For now, set to null until API is implemented
           setProjectData(null);
         }
       } catch (err) {
@@ -127,7 +120,7 @@ export const useProjectLoader = (
     };
 
     loadData();
-  }, [config.mode, data.projectId, data.solutionId, data.data]);
+  }, [config.mode, data.projectId, data.solutionId, data.data, data,error, user?.id]);
 
   return { projectData, isLoading, error };
 };

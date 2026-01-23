@@ -72,9 +72,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
   // Get all pillars (project type tasks) for the dropdown - memoized
   const pillars = useMemo(
     () =>
-      projectData?.tasks
-        ?.filter(pillar => pillar.type === 'project')
-        .map(pillar => ({
+      projectData?.tasks?.map(pillar => ({
           label: `${pillar.name} (${pillar.children?.length || 0} ${t(
             'projectPlayer.tasks',
           )})`,

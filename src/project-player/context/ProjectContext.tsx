@@ -76,9 +76,12 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
         } else if (prev?.tasks?.some(task => task.children?.length)) {
           return {
             ...prev,
-            children: updateTaskRecursive(
-              prev.tasks.flatMap(task => task.children || []),
-            ),
+            tasks: prev.tasks.map(task => ({
+              ...task,
+              children: task.children
+                ? updateTaskRecursive(task.children)
+                : task.children,
+            })),
           };
         }
 
@@ -130,7 +133,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
       const addTaskToPillar = (tasks: Task[]): Task[] => {
         return tasks.map(t => {
           if (t._id === pillarId) {
-            // Found the pillar, add task to its children
             return {
               ...t,
               tasks: [...(t.tasks || []), task],
@@ -143,14 +145,39 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
               tasks: addTaskToPillar(t.tasks),
             };
           }
+          // if (t.children && t.children.length > 0) {
+          //   return {
+          //     ...t,
+          //     children: addTaskToPillar(t.children),
+          //   };
+          // }
+         
           return t;
         });
       };
 
-      return {
-        ...prev,
-        children: addTaskToPillar(prev?.children || []),
-      };
+      // if (prev.tasks?.length) {
+      //   return {
+      //     ...prev,
+      //     tasks: addTaskToPillar(prev.tasks),
+      //   };
+      // } else
+      //    if (prev?.tasks?.some(task => task.children?.length)) {
+      //   return {
+      //     ...prev,
+      //     tasks: prev.tasks.map(task => ({
+      //       ...task,
+      //       children: task.children
+      //         ? addTaskToPillar(task.children)
+      //         : task.children,
+      //     })),
+      //   };
+      // } else {
+        return {
+          ...prev,
+          children: addTaskToPillar(prev?.children || []),
+        };
+      // }
     });
   }, []);
 

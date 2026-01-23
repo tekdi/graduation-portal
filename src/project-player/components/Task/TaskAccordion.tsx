@@ -27,14 +27,14 @@ import { theme } from '../../../config/theme';
 import { taskAccordionStyles } from './Styles';
 import { usePlatform } from '@utils/platform';
 
-const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
+const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
   const { t } = useLanguage();
   const { mode } = useProjectContext();
   const { isWeb } = usePlatform();
 
   const isPreview = mode === 'preview';
   const isSocialProtection =
-    task.metadata?.category === PILLAR_CATEGORIES.PROTECTION ||
+    task?.metaInformation?.category === PILLAR_CATEGORIES.PROTECTION ||
     task.name.toLowerCase().includes(PILLAR_NAMES.SOCIAL_PROTECTION);
 
   // Helper function to get pillar icon and color
@@ -125,7 +125,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
               {(task?.children?.length ? task.children : task.tasks)?.map(
                 (childTask, index, arr) => (
                   <TaskComponent
-                    key={childTask._id}
+                    key={childTask?._id}
                     task={childTask}
                     level={1}
                     isLastTask={index === arr.length - 1}
@@ -227,7 +227,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
             paddingHorizontal={isWeb ? '$5' : '$1'}
           >
             {/* Info Banner - Only for Social Protection in Preview Mode */}
-            {task.metadata?.warningMessage && (
+            {task?.metaInformation?.warningMessage && (
               <Box {...taskAccordionStyles.infoBanner}>
                 <HStack {...taskAccordionStyles.infoBannerContent}>
                   <LucideIcon
@@ -240,7 +240,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
                       {t('projectPlayer.important')}
                     </Text>
                     <Text {...taskAccordionStyles.infoBannerMessage}>
-                      {task.metadata.warningMessage}
+                      {task?.metaInformation?.warningMessage}
                     </Text>
                   </VStack>
                 </HStack>
@@ -248,10 +248,10 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
             )}
 
             <VStack {...taskAccordionStyles.accordionContentStack}>
-              {(task?.children?.length ? task.children : task.tasks)?.map(
+              {(task?.children?.length ? task.children : task?.tasks)?.map(
                 (childTask, index, arr) => (
                   <TaskComponent
-                    key={childTask._id}
+                    key={childTask?._id}
                     task={childTask}
                     level={1}
                     isLastTask={index === arr.length - 1}
@@ -262,6 +262,11 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task, level = 0 }) => {
 
               {/* Add Custom Task Button */}
               <AddCustomTask templateId={task._id} templateName={task.name} />
+              {/* <AddCustomTaskModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                mode="add"
+              /> */}
             </VStack>
           </AccordionContent>
         </AccordionItem>
