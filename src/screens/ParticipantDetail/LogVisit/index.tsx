@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
-import { Box, Container, VStack, HStack, Text, Spinner } from '@ui';
+import { Box, Container, VStack, HStack, Text, Spinner, Button, ButtonText, ButtonIcon, LucideIcon } from '@ui';
 import { AssessmentCard } from '@components/ObservationCards';
 import { getParticipantProfile } from '../../../services/participantService';
 import { getTargetedSolutions } from '../../../services/solutionService';
@@ -89,7 +89,7 @@ const LogVisit: React.FC = () => {
     return <NotFound message="participantDetail.notFound.title" />;
   }
 
-  if(loading) {
+  if (loading) {
     return <Spinner height={isWeb ? ('$calc(100vh - 68px)' as any) : '$full'} size="large" color="$primary500" />;
   }
 
@@ -100,14 +100,13 @@ const LogVisit: React.FC = () => {
         title={t('participantDetail.header.logVisit')}
         subtitle={t('logVisit.selectVisitType', { name: participant?.name || '' })}
         onBackPress={handleBackPress}
-        actionButton={{
-          icon: 'Clock',
-          label: t('logVisit.viewCheckIns'),
-          onPress: () => {
-            // @ts-ignore
-            navigation.navigate('check-ins-list', { id: route.params?.id });
-          },
-        }}
+        rightSection={<Button variant="outlineghost" onPress={() => {
+          // @ts-ignore
+          navigation.navigate('check-ins-list', { id: route.params?.id });
+        }}>
+          <ButtonIcon as={LucideIcon} name="Clock" size={16} />
+          <ButtonText {...TYPOGRAPHY.bodySmall}>{t('logVisit.viewCheckIns')}</ButtonText>
+        </Button>}
       />
       <Container>
         {/* Cards */}
@@ -125,11 +124,11 @@ const LogVisit: React.FC = () => {
           )}
         </VStack>
         <VStack {...logVisitStyles.noteContainer}>
-           <HStack {...logVisitStyles.noteBox}>
-            <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">{t('logVisit.note')}  
+          <HStack {...logVisitStyles.noteBox}>
+            <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">{t('logVisit.note')}
               <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground" pl="$1">
-              {t('logVisit.logVisitNote')}
-              </Text> 
+                {t('logVisit.logVisitNote')}
+              </Text>
             </Text>
           </HStack>
         </VStack>

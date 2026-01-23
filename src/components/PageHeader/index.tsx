@@ -17,15 +17,6 @@ export interface PageHeaderProps {
   subtitle?: string;
   /** Callback function when back button is pressed */
   onBackPress?: () => void;
-  /** Optional action button configuration */
-  actionButton?: {
-    /** Icon name for the action button */
-    icon: string;
-    /** Label text for the action button */
-    label: string;
-    /** Callback function when action button is pressed */
-    onPress: () => void;
-  };
   /** Right section content */
   rightSection?: React.ReactNode;
   /** Children content */

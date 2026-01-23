@@ -12,21 +12,6 @@ export const logVisitStyles = {
     fontWeight: '$semibold',
     color: '$textForeground',
   },
-  headerContainer: {
-    bg: '$white' as const,
-    padding: '$4' as const,
-    '$md-paddingHorizontal': '$6' as const,
-    '$md-paddingVertical': '$4' as const,
-    borderBottomWidth: '$1' as const,
-    borderBottomColor: '$borderLight300' as const,
-  },
-  headerContent: {
-    justifyContent: 'space-between' as const,
-    alignItems: 'center' as const,
-    '$md-alignItems': 'flex-start' as const,
-    paddingHorizontal: '$0' as const,
-    gap: '$2' as const,
-  },
   viewCheckInsButton: {
     variant: 'outline' as const,
     padding: '$3' as const,
