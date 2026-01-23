@@ -11,7 +11,7 @@ export const STATUS = {
 
 // Task Status Constants
 export const TASK_STATUS = {
-  TO_DO: 'to-do',
+  TO_DO: 'notStarted',
   COMPLETED: 'completed',
 } as const;
 
