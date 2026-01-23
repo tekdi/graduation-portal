@@ -37,6 +37,7 @@ import { usePlatform } from '@utils/platform';
 import { isTaskCompleted } from './helpers';
 import { renderCustomTaskActions, renderModals } from './renderHelpers';
 import { useNavigation } from '@react-navigation/native';
+import { useRoute } from '@react-navigation/native';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
@@ -44,6 +45,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   isLastTask = false,
   isChildOfProject = false,
 }) => {
+  const route = useRoute();
   const navigation = useNavigation();
   // Retrieve updateTask from context
   const { mode, config, projectData, updateTask } = useProjectContext();
@@ -55,7 +57,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const toast = useToast();
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-
+const participantId = route.params?.id;
   // Modal state management (from Incoming)
   type ModalType = 'edit' | 'delete' | null;
   const [modalState, setModalState] = useState<{
@@ -75,28 +77,18 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
-  // Configuration (Merged from HEAD logic + helpers if needed)
-  // We keep HEAD logic mainly because of the 'Add to Plan' button requirement which uiConfig drives
-  const uiConfig = useMemo(
+    const uiConfig = useMemo(
     () => ({
       showAsCard: isChildOfProject,
       showAsInline: !isChildOfProject || isPreview,
       showCheckbox: isChildOfProject && !isPreview,
       showActionButton: isEdit,
-      // showActionButton:
-      //   task.metaInformation?.isOptional || // Always show for optional tasks (Add/Remove)
-      //   (!isPreview &&
-      //     (task.type === TASK_TYPE.FILE ||
-      //       task.type === TASK_TYPE.OBSERVATION ||
-      //       task.type === TASK_TYPE.PROFILE_UPDATE)),
       isInteractive: isEdit,
     }),
     [isChildOfProject, isPreview, isEdit],
   );
 
-  // Toast helpers
-
-  const showSuccessToast = (message: string) => {
+   const showSuccessToast = (message: string) => {
     toast.show({
       placement: 'bottom right',
       render: ({ id }) => (
@@ -148,26 +140,23 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (!isEdit) return;
 
     if (task.type === TASK_TYPE.OBSERVATION) {
-      updateTask(task._id, {
-        status: TASK_STATUS.COMPLETED,
-        _id: task._id,
-      });
-
-      const userId = localStorage.getItem('userId');
       const solutionId = task?.solutionDetails?._id;
 
-      if (!userId || !solutionId) {
+      if (!participantId || !solutionId) {
         console.error('Missing userId or solutionId');
         return;
       }
 
+      // Navigate to observation screen - task will be marked as completed on return
       navigation.navigate('observation', {
-        id: userId,
-        solutionId: solutionId,
+        id: participantId,
+        solutionId: solutionId
       });
 
-      // Show success toast
-      showSuccessToast(t('projectPlayer.taskCompleted'));
+      updateTask(task._id, {
+        status: TASK_STATUS.COMPLETED,
+        _id: task._id,
+      });
     } else {
       setShowUploadModal(true); // Open modal instead of file picker
     }
@@ -496,7 +485,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       ? taskCardStyles.actionButtonCard
       : taskCardStyles.actionButtonInline;
 
-    const iconName = task.metaInformation?.icon;
+    const iconName = task.metaInformation?.icon || 'Upload';
 
     return (
       <Button
@@ -533,7 +522,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 color={isHovered ? '$primary500' : '$textPrimary'}
               >
                 {' '}
-                {task.metaInformation?.buttonLabel}
+                {task.metaInformation?.buttonLabel || 'Upload Evidence'}
               </ButtonText>
             </HStack>
           );

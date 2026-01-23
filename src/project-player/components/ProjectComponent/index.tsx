@@ -280,7 +280,7 @@ const ProjectComponent: React.FC = () => {
               {hasChildren
                 ? projectData?.children?.length
                   ? projectData.children.map(task => (
-                      <TaskComponent key={task._id} task={task} />
+                      <TaskComponent key={task._id} task={task} isChildOfProject={true}/>
                     ))
                   : projectData?.tasks  
                       ?.filter(task => task.children?.length)

@@ -73,6 +73,13 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
             ...prev,
             children: updateTaskRecursive(prev.children),
           };
+        } else if (prev?.tasks?.some(task => task.children?.length)) {
+          return {
+            ...prev,
+            children: updateTaskRecursive(
+              prev.tasks.flatMap(task => task.children || []),
+            ),
+          };
         }
 
         return {
@@ -93,29 +100,19 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
 
       // Call API to update task on server
       if (currentProjectId) {
+       try {
         updateTaskAPI(currentProjectId, {
-          tasks: [
-            {
-              _id: taskId,
-              ...updates,
-            },
-          ],
-        })
-          .then(response => {
-            if (response.error) {
-              console.error('Failed to update task on server:', response.error);
-              // Optionally revert local state on error or show error message
-            } else {
-              console.log(
-                'Task updated successfully on server:',
-                response.data,
-              );
-            }
-          })
-          .catch(apiError => {
-            console.error('Error updating task on server:', apiError);
-            // Optionally revert local state on error or show error message
-          });
+      tasks: [
+        {
+          _id: taskId,
+          name: updatedTaskObj?.name,
+          ...updates,
+        },
+      ],
+    });
+       } catch (error) {
+        console.log(error)
+       }
       }
     },
     [onTaskUpdate],
