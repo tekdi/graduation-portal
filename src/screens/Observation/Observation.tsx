@@ -13,7 +13,6 @@ import {
 import { useLanguage } from '@contexts/LanguageContext';
 import Header from './Header';
 import offlineStorage from '../../services/offlineStorage';
-import { ENTITY_TYPE } from '@constants/ROLES';
 import { observationStyles } from './Styles';
 import { CARD_STATUS } from '@constants/app.constant';
 import logger from '@utils/logger';

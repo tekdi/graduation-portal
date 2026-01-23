@@ -34,6 +34,17 @@ export const SITES: Site[] = [
   { value: 'site-f', label: 'Site F - Peri-urban', type: 'Peri-urban' },
 ] as const;
 
+export const STATUS = {
+  NOT_ENROLLED: 'Not onboarded',
+  ENROLLED: 'Onboarded',
+  NOT_ONBOARDED: 'Not onboarded',
+  ONBOARDED: 'Onboarded',
+  IN_PROGRESS: 'In Progress',
+  COMPLETED: 'Completed',
+  DROPOUT: 'Dropped out',
+  GRADUATED: 'Graduated',
+};
+
 /**
  * Mock Participants Data
  * Single source of truth for all participant data
@@ -489,9 +500,7 @@ export const PARTICIPANTS_DATA: ParticipantData[] = [
  * Menu items configuration for Participants actions menu
  * Returns menu items with icon names and colors for participant actions
  */
-export const getParticipantsMenuItems = (
-  t: (key: string) => string,
-): MenuItemData[] => [
+export const getParticipantsMenuItems: MenuItemData[] = [
   {
     key: 'view-log',
     label: 'actions.viewLog',

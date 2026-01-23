@@ -385,7 +385,8 @@
       "graduatedOn": "Graduated on {{date}}",
       "graduationDateNotAvailable": "Graduation date not available",
       "participantDroppedOut": "Participant Dropped Out",
-      "dropoutWarning": "This participant has dropped out of the program. You are viewing their records in read-only mode. No changes can be made."
+      "dropoutWarning": "This participant has dropped out of the program. You are viewing their records in read-only mode. No changes can be made.",
+      "viewLog": "View Log"
     },
     "profileModal": {
       "title": "Participant Profile",
@@ -472,15 +473,17 @@
     "showingParticipants": "Showing {{count}} of {{total}} participants",
     "graduated": "Ready to Graduate",
     "active": "Active",
-    "inactive": "Inactive"
+    "inactive": "Inactive",
+    "groupCheckIns": "Group Check-ins"
   },
   "table": {
     "showing": "Showing {{start}} to {{end}} of {{total}} entries",
-    "itemsPerPage": "Items per page"
+    "limit": "Limit"
   },
   "actions": {
     "viewDetails": "View Details",
-    "logVisit": "Check-ins",
+    "logVisit": "Log Visit",
+    "viewLog": "View Log",
     "view": "View",
     "fill": "Fill",
     "dropout": "Dropout",

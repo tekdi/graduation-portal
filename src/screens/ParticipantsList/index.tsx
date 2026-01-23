@@ -4,17 +4,19 @@ import {
   VStack,
   HStack,
   Text,
-  Heading,
   Pressable,
   Container,
   ScrollView,
   Select,
+  LucideIcon,
+  Button,
+  ButtonIcon,
+  ButtonText,
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
 import DataTable from '@components/DataTable';
 import { getParticipantsColumns } from './ParticipantsTableConfig';
-import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { Participant } from '@app-types/screens';
 import { useLanguage } from '@contexts/LanguageContext';
 import { getParticipantsList } from '../../services/participantService';
@@ -24,6 +26,7 @@ import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
 import { useAuth } from '@contexts/AuthContext';
 import logger from '@utils/logger';
+import { PageHeader } from '@components/PageHeader';
 
 // Status key type (keys of STATUS object)
 type StatusKey = keyof typeof STATUS;
@@ -65,7 +68,7 @@ const ParticipantsList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [overview, setOverview] = useState<ParticipantOverview | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(5);
+  const [pageSize, setPageSize] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
   // Get status items directly from overview using STATUS constants
   const allStatusItems = useMemo<StatusFilterItem[]>(() => {
@@ -205,9 +208,9 @@ const ParticipantsList: React.FC = () => {
       <ScrollView {...styles.scrollView}>
         <VStack {...styles.headerVStack}>
           <Container>
-            <Heading {...TYPOGRAPHY.h4} color="text-foreground" {...styles.heading}>
-              {t('participants.myParticipants')}
-            </Heading>
+            <PageHeader
+              title={t('participants.myParticipants')}
+            />
           </Container>
           </VStack>
       
@@ -231,8 +234,13 @@ const ParticipantsList: React.FC = () => {
                   ]}
                   value={activeFilter}
                   onChange={(value) => setActiveFilter(value as 'active' | 'inactive')}
-                  {...styles.select}
                 />
+              </Box>
+              <Box {...styles.buttonContainer}>
+                <Button variant="solid" size="sm">
+                  <ButtonIcon as={LucideIcon} name="Users" />
+                  <ButtonText>{t('participants.groupCheckIns')}</ButtonText>
+                </Button>
               </Box>
             </HStack>
 
@@ -247,7 +255,6 @@ const ParticipantsList: React.FC = () => {
                   value={activeStatus}
                   onChange={(value) => handleStatusChange(value as StatusKey | '')}
                   placeholder={t('participants.selectStatus') || 'Select Status'}
-                  {...styles.select}
                 />
               </Box>
             ) : (
