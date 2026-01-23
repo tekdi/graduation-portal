@@ -181,5 +181,3 @@ export const theme = {
     },
   },
 } as const;
-
-console.log('theme', theme.components.Button.theme.variants.variant.ghost);

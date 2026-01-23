@@ -88,8 +88,6 @@ export default function ParticipantDetail() {
           const response = await getParticipantsList({entityId:participantId,userId:user?.id})
           const {userDetails,...rest} = response?.result?.data?.[0]
           const participantData = {...(userDetails || {}),...rest}
-          console.log(participantData)
-          
           setParticipant(participantData);
           setStatus(participantData?.status);
         } catch (error) {
