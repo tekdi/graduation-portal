@@ -1,6 +1,6 @@
 import React, { useState, useCallback } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { HStack, Text, Pressable, Box, VStack, Input, InputField, Modal } from '@ui';
+import { HStack, Text, Box, VStack, Input, InputField, Modal, ButtonText, ButtonIcon, Button } from '@ui';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -9,6 +9,7 @@ import { Participant } from '@app-types/screens';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
 import { getParticipantsMenuItems } from '@constants/PARTICIPANTS_LIST';
 import logger from '@utils/logger';
+import { usePlatform } from '@utils/platform';
 
 interface ActionColumnProps {
   participant: Participant;
@@ -18,13 +19,10 @@ interface ActionColumnProps {
  * Custom trigger for actions menu
  */
 const getCustomTrigger = (triggerProps: any) => (
-  <Pressable {...triggerProps} {...dataTableStyles.customTrigger}>
-    <LucideIcon
-      name="MoreVertical"
-      size={20}
-      color={theme.tokens.colors.textForeground}
-    />
-  </Pressable>
+  // @ts-ignore: Button variant
+  <Button variant="ghost" {...triggerProps}>
+    <ButtonIcon as={LucideIcon} name="MoreVertical" size={16} color="$primary500" />
+  </Button>
 );
 
 /**
@@ -34,6 +32,7 @@ const getCustomTrigger = (triggerProps: any) => (
 export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
+  const { isMobile } = usePlatform();
 
   // Dropout modal state - selectedParticipant controls modal visibility (null = closed, not null = open)
   const [dropoutReason, setDropoutReason] = useState('');
@@ -81,27 +80,12 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
   return (
     <Box>
       <HStack {...dataTableStyles.cardActionsSection}>
-        <Pressable
-          onPress={handleViewDetails}
-          {...dataTableStyles.viewDetailsButton}
-        >
-          <HStack space="sm" alignItems="center" justifyContent="center">
-            <LucideIcon
-              name="Eye"
-              size={18}
-              color={theme.tokens.colors.textForeground}
-            />
-            <Text
-              {...TYPOGRAPHY.bodySmall}
-              color="$textForeground"
-              fontWeight="$medium"
-            >
-              {t('actions.viewDetails')}
-            </Text>
-          </HStack>
-        </Pressable>
+      {/* @ts-ignore: Back Button */}
+        <Button variant={isMobile ? "outlineghost" : "ghost"} flex="1" onPress={handleViewDetails}>
+          <ButtonText {...TYPOGRAPHY.bodySmall} color="$primary500" fontWeight="$medium">{t('actions.viewDetails')}</ButtonText>
+        </Button>
         <Menu
-          items={getParticipantsMenuItems(t)}
+          items={getParticipantsMenuItems}
           placement="bottom right"
           offset={5}
           trigger={getCustomTrigger}
