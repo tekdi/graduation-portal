@@ -16,6 +16,7 @@ import offlineStorage from '../../services/offlineStorage';
 import { ENTITY_TYPE } from '@constants/ROLES';
 import { observationStyles } from './Styles';
 import { CARD_STATUS } from '@constants/app.constant';
+import logger from '@utils/logger';
 interface ObservationData {
   entityId: string;
   observationId: string;
@@ -268,6 +269,11 @@ const Observation = () => {
     [token, observation?.observationId, observation?.entityId, mockData, submissionNumber],
   );
   
+  const handleAfterSubmit = (event?: any) => {
+    logger.info('event', event);
+    handleBackPress();
+  };
+
   return (
     <>
       <VStack
@@ -296,6 +302,7 @@ const Observation = () => {
             {mockData &&
               <WebComponentPlayer
                 getProgress={handleProgressUpdate}
+                afterSubmitCallback={handleAfterSubmit}
                 playerConfig={playerConfigMemoized}
               />
             }
