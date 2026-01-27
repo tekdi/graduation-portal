@@ -20,13 +20,8 @@ const WelcomePage: React.FC = () => {
       alignItems="center"
       bg={theme.tokens.colors.error50}
     >
-      <Container>
-        <VStack
-          space="2xl"
-          alignItems="center"
-          marginHorizontal="$0"
-          $md-marginHorizontal="$12"
-        >
+      <Container padding="$5" $md-padding="$6">
+        <VStack space="2xl" alignItems="center">
           {/* Welcome Header */}
           <VStack
             space="sm"
