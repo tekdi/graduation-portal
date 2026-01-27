@@ -42,7 +42,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
 
   // Form state - merged into single object
   const [formData, setFormData] = useState({
-    selectedPillar: '',
+    selectedPillar: undefined,
     taskName: '',
     instructions: '',
     serviceProvider: '',
@@ -86,11 +86,9 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
   // Find parent pillar for a task
   const findParentPillar = useCallback(
     (taskId: string): Task | undefined => {
-      return projectData?.children?.find(pillar =>
-        pillar?.tasks?.some(child => child._id === taskId),
-      );
+      return pillars?.find(pillar => pillar.value === taskId);
     },
-    [projectData],
+    [pillars],
   );
   // Populate form when editing or set pillar when adding
   useEffect(() => {
@@ -148,13 +146,15 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
       // In preview mode, use propPillarId. In edit mode, use selectedPillar.
       const pillarIdToUse = propPillarId || selectedPillar;
       const newTask: Task = {
-        _id: `custom-${Date.now()}`,
+        _id: crypto.randomUUID(),
         name: taskName,
         description: instructions,
         type: 'simple',
+        externalId:crypto.randomUUID(),
         status: TASK_STATUS.TO_DO,
         isCustomTask: true,
         serviceProvider: serviceProvider || undefined,
+        parentId:pillarIdToUse
       };
       addTask(pillarIdToUse, newTask);
     }
@@ -178,8 +178,8 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
   );
 
   const parentPillarName =
-    propPillarName || findParentPillar(task?._id || '')?.name;
-
+    propPillarName || findParentPillar(  task?.parentId || '')?.label;
+// task?._id ||
   return (
     <Modal
       isOpen={isOpen}
@@ -287,7 +287,6 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
             )}
           </Text>
 
-          {/* Preview Mode → show Pillar: Pillar Name in one line */}
           {isPreviewMode ? (
             <HStack space="xs">
               <Text
@@ -301,14 +300,18 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
                 {parentPillarName || propPillarName}
               </Text>
             </HStack>
-          ) : propPillarId || isEditMode ? (
-            <Text {...TYPOGRAPHY.paragraph} color="$textPrimary">
-              {parentPillarName || propPillarName}
-            </Text>
           ) : (
             <Select
               options={pillars}
-              value={formData.selectedPillar}
+              value={
+                formData.selectedPillar  ??
+                (parentPillarName 
+                  ? {
+                      label: parentPillarName || propPillarName,
+                      value: propPillarId,
+                    }
+                  : undefined)
+              }
               onChange={value => updateFormField('selectedPillar', value)}
               placeholder={t('projectPlayer.selectPillarPlaceholder')}
               {...addCustomTaskModalStyles.select}
