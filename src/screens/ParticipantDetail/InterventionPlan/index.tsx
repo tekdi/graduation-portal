@@ -7,7 +7,7 @@ import ProjectPlayer, {
   ProjectPlayerConfig,
 } from '../../../project-player/index';
 import { Task } from '../../../project-player/types/project.types';
-import { COMPLEX_PROJECT_DATA, MODE } from '@constants/PROJECTDATA';
+import { MODE } from '@constants/PROJECTDATA';
 import { STATUS } from '@constants/app.constant';
 import type { InterventionPlanProps, StatusType } from '../../../types/screens';
 import { useNavigation } from '@react-navigation/native';
@@ -68,21 +68,16 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
 
   // Memoize ProjectPlayer config based on status and edit mode
   const config: ProjectPlayerConfig = useMemo(() => {
-    // Handle undefined currentStatus
     if (!currentStatus) {
       return MODE.previewMode;
     }
 
-    // Store in const to ensure TypeScript knows it's defined
     const status = currentStatus;
-  //  const  isEditMode = status === STATUS.IN_PROGRESS  ? true :false;
 
-    // ENROLLED status: use editMode if isEditMode is true, otherwise previewMode
     if (status === STATUS.ENROLLED) {
       const baseConfig = isEditMode ? MODE.editMode : MODE.previewMode;
       const showAddCustomTaskButton =
         status === STATUS.ENROLLED || status === STATUS.IN_PROGRESS;
-      // Add submit button config for ENROLLED status in preview mode
       if (!isEditMode) {
         return {
           ...baseConfig,
@@ -127,15 +122,12 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     return statusConfigMap[status];
   }, [currentStatus, isEditMode, areAllOptionalTasksAdded, t, participantProfile, handleIdpCreationSuccess]);
 
-  // Memoize ProjectPlayer data - all statuses use COMPLEX_PROJECT_DATA
   const projectPlayerData: ProjectPlayerData = useMemo(
     () => ({
-      solutionId: config?.solutionId,
-      projectId: projectId || config?.projectId || participantProfile?.idpProjectId,
-      data: COMPLEX_PROJECT_DATA,
+      projectId: projectId || participantProfile?.idpProjectId,
       pillarCategoryRelation: undefined,
     }),
-    [config?.solutionId, config?.projectId, projectId],
+    [projectId, participantProfile?.idpProjectId],
   );
 
   // Show empty state for ENROLLED status when player is not shown yet
@@ -159,7 +151,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
           <Button
             {...interventionPlanStyles.button}
             onPress={() => {
-              navigation.navigate('template', { id: participantId });
+              navigation.navigate('template', { id: participantId  });
             }}
           >
             <ButtonText {...interventionPlanStyles.buttonText}>

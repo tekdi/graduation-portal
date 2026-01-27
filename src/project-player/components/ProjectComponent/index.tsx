@@ -26,6 +26,7 @@ import { LucideIcon, useAlert } from '@ui';
 import { theme } from '@config/theme';
 import { TASK_STATUS } from '@constants/app.constant';
 import { submitInterventionPlan } from '../../services/projectPlayerService';
+import { addCustomTaskStyles } from '../Task/Styles';
 
 const ProjectComponent: React.FC = () => {
   const { projectData, mode, config } = useProjectContext();
@@ -203,89 +204,23 @@ const ProjectComponent: React.FC = () => {
             <VStack>
               <ProjectInfoCard project={projectData} />
 
-              {/* Pillar features only: Progress bar in Card (for Intervention Plan, not Onboarding) */}
-              {showPillarFeatures && (
-                <Box {...projectComponentStyles.progressCardContainer}>
-                  <Card {...projectComponentStyles.progressCard}>
-                    <HStack {...projectComponentStyles.progressHeader}>
-                      <Text
-                        {...TYPOGRAPHY.bodySmall}
-                        fontWeight="$medium"
-                        color="$textSecondary"
-                      >
-                        {t('projectPlayer.graduationReadiness')}
-                      </Text>
-                      <Text
-                        {...TYPOGRAPHY.bodySmall}
-                        fontWeight="$semibold"
-                        color="$progressBarFillColor"
-                      >
-                        {progressData.percent}%
-                      </Text>
-                    </HStack>
-                    {/* Progress bar */}
-                    <Box {...projectComponentStyles.progressBarBackground}>
-                      <Box
-                        {...projectComponentStyles.progressBarFill}
-                        width={`${Math.min(progressData.percent, 100)}%`}
-                      />
-                    </Box>
-                    <Text
-                      {...TYPOGRAPHY.caption}
-                      fontWeight="$medium"
-                      color="$textSecondary"
-                      {...projectComponentStyles.previousProgressText}
-                    >
-                      {t('projectPlayer.previousProgress', {
-                        percent: previousPercent,
-                      })}
-                    </Text>
-                  </Card>
-
-                  {/* Save Progress button - only show when there are unsaved changes */}
-                  {progressData.percent !== previousPercent && (
-                    <Pressable
-                      {...projectComponentStyles.saveProgressButton}
-                      onPress={() => handleSaveProgress(progressData.percent)}
-                    >
-                      <HStack
-                        {...projectComponentStyles.saveProgressButtonInner}
-                      >
-                        <LucideIcon
-                          name="CheckCircle"
-                          size={18}
-                          color="white"
-                        />
-                        <Text
-                          {...TYPOGRAPHY.button}
-                          fontWeight="$semibold"
-                          color="$white"
-                        >
-                          {t('projectPlayer.saveProgress')} (
-                          {tasksUpdatedCount === 1
-                            ? t('projectPlayer.taskUpdated', {
-                                count: tasksUpdatedCount,
-                              })
-                            : t('projectPlayer.tasksUpdated', {
-                                count: tasksUpdatedCount,
-                              })}
-                          )
-                        </Text>
-                      </HStack>
-                    </Pressable>
-                  )}
-                </Box>
-              )}
-
               {hasChildren
                 ? projectData?.children?.length
-                  ? projectData.children.map(task => (
-                      <TaskComponent key={task._id} task={task} isChildOfProject={true}/>
+                  ? projectData?.children.map(task => (
+                      <TaskComponent
+                        key={task?._id}
+                        task={task}
+                        isChildOfProject={true}
+                      />
                     ))
-                  : projectData?.tasks  
+                  : projectData?.tasks
                       ?.filter(task => task.children?.length)
                       ?.map(task => (
-                        <TaskComponent key={task._id} task={task} isChildOfProject={true}/>
+                        <TaskComponent
+                          key={task._id}
+                          task={task}
+                          isChildOfProject={true}
+                        />
                       ))
                 : projectData?.tasks?.map((task, index) => (
                     <TaskComponent
@@ -306,12 +241,13 @@ const ProjectComponent: React.FC = () => {
                         state?.hovered || state?.pressed || false;
                       return (
                         <Box
-                          {...projectComponentStyles.addCustomTaskButton}
-                          {...(isHovered
-                            ? projectComponentStyles.addCustomTaskButtonHovered
-                            : {})}
+                          {...addCustomTaskStyles.buttonBox}
+                          bg={isHovered ? '$primary100' : '$accent100'}
+                          borderColor={
+                            isHovered ? '$primary500' : '$mutedBorder'
+                          }
                         >
-                          <HStack space="sm" alignItems="center">
+                          <HStack {...addCustomTaskStyles.buttonContent}>
                             <LucideIcon
                               name="Plus"
                               size={18}
@@ -327,7 +263,7 @@ const ProjectComponent: React.FC = () => {
                               color={isHovered ? '$primary700' : '$primary500'}
                               fontWeight="$semibold"
                             >
-                              {t('projectPlayer.addCustomTask')}
+                              {t('projectPlayer.addTaskToPillar')}
                             </Text>
                           </HStack>
                         </Box>
@@ -344,12 +280,6 @@ const ProjectComponent: React.FC = () => {
             </VStack>
           </Card>
         </ScrollView>
-
-        {isEditMode && !showPillarFeatures && (
-          <Box {...projectComponentStyles.addTaskButtonContainer}>
-            <AddCustomTask />
-          </Box>
-        )}
 
         {/* Footer with Change Pathway and Submit Intervention Plan Buttons */}
         {shouldShowSubmitButton && (

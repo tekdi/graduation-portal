@@ -1,5 +1,6 @@
 import { User } from '@contexts/AuthContext';
 import { STATUS } from '../constants/app.constant';
+import { ParticipantStatus, PathwayType } from './participant';
 export type StatusType = (typeof STATUS)[keyof typeof STATUS];
 export interface Participant {
   userId: string;
@@ -66,4 +67,17 @@ export interface TemplateData {
     name: string;
     tasks: number;
   }[];
+}
+
+export interface ParticipantHeaderProps {
+  participantName: string;
+  participantId: string;
+  status?: ParticipantStatus;
+  pathway?: PathwayType;
+  graduationProgress?: number;
+  graduationDate?: string;
+  onViewProfile?: () => void;
+  areAllTasksCompleted?: boolean; 
+  userEntityId?: string;
+  onStatusUpdate?: (newStatus: string) => void;
 }

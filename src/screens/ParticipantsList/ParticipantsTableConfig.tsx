@@ -191,6 +191,7 @@ const allParticipantsColumns: ColumnDef<Participant>[] = [
     key: 'actions',
     label: 'participants.actions',
     flex: 2,
+    align: 'right',
     render: (participant) => <ActionColumn participant={participant} />,
     desktopConfig: {
       showColumn: true,

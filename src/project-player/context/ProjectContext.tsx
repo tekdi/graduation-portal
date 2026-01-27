@@ -77,9 +77,12 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
        else if (prev?.tasks?.some(task => task.children?.length)) {
           return {
             ...prev,
-            children: updateTaskRecursive(
-              prev.tasks.flatMap(task => task.children || []),
-            ),
+            tasks: prev.tasks.map(task => ({
+              ...task,
+              children: task.children
+                ? updateTaskRecursive(task.children)
+                : task.children,
+            })),
           };
         }
 
@@ -168,6 +171,13 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
               tasks: addTaskToPillar(t.tasks),
             };
           }
+          // if (t.children && t.children.length > 0) {
+          //   return {
+          //     ...t,
+          //     children: addTaskToPillar(t.children),
+          //   };
+          // }
+         
           return t;
         });
       };

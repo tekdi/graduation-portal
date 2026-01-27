@@ -5,8 +5,6 @@ import { API_ENDPOINTS } from './apiEndpoints';
 import { ROLE_NAMES } from '@constants/ROLES';
 import { getUserProfile } from './authenticationService';
 import { User } from '@contexts/AuthContext';
-
-
 /**
  * Get participants list for table view
  * Searches users by user IDs and returns the search response
@@ -179,10 +177,24 @@ export const getEntityDetails = async (userId: string): Promise<any> => {
   }
 };
 
-export const updateEntityDetails = async (
-  requestBody: any,
-): Promise<any> => {
+export const updateEntityDetails = async ({
+  userId,
+  entityId,
+  entityUpdates,
+}: {
+  userId:string;
+  entityId: string;
+  entityUpdates: any;
+}): Promise<any> => {
   try {
+
+    const requestBody = {
+      userId,
+      programId: process.env.GLOBAL_LC_PROGRAM_ID,
+      entityId,
+      entityUpdates,
+    };
+
     const response = await api.post(
       API_ENDPOINTS.UPDATE_ENTITY_DETAILS,
       requestBody,

@@ -137,6 +137,8 @@ export interface ModalProps extends Omit<ComponentProps<typeof GluestackModalTyp
   // Additional styling
   maxWidth?: number;
   contentProps?: any; // Additional props for ModalContent
+  bodyProps?: any; // Additional props for ModalBody
+  headerProps?: any; // Additional props for ModalHeader
 }
 
 export type ToastPlacement =
