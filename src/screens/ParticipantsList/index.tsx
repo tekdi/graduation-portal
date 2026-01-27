@@ -212,7 +212,6 @@ const ParticipantsList: React.FC = () => {
              title={t('participants.myParticipants')}
             />
           </Container>
-         
           </VStack>
       
         <Container>

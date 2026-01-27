@@ -16,10 +16,6 @@ export const projectComponentStyles = {
     maxWidth: 1200,
     width: '$full',
     alignSelf: 'center' as const,
-    // $md: {
-    //   padding: '$6',
-    // },
-    // padding: '$5',
   },
   addTaskButtonContainer: {
     padding: '$3',
