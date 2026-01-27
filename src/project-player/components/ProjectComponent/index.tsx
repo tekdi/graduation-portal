@@ -197,7 +197,7 @@ const ProjectComponent: React.FC = () => {
   }
 
   return (
-    <Container {...projectComponentStyles.container}>
+    <Box {...projectComponentStyles.container}>
       <VStack flex={1}>
         <ScrollView {...projectComponentStyles.scrollView}>
           <Card {...projectComponentStyles.card}>
@@ -360,7 +360,7 @@ const ProjectComponent: React.FC = () => {
           </VStack>
         )}
       </VStack>
-    </Container>
+    </Box>
   );
 };
 export default ProjectComponent;

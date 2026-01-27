@@ -189,7 +189,7 @@ export default function ParticipantDetail() {
             />
           </Container>
         </VStack>
-        <Container px="$4" py="$6" $md-px="$6">
+        <Container>
           {status === STATUS.NOT_ENROLLED ? (
             // NOT_ENROLLED: Show ProjectPlayer directly with editMode
             <ProjectPlayer

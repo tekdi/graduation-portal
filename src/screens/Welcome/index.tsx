@@ -34,7 +34,7 @@ const WelcomePage: React.FC = () => {
             marginTop="$8"
             marginBottom="$4"
           >
-            <Heading {...TYPOGRAPHY.h1} color="$textDark900">
+            <Heading {...TYPOGRAPHY.h1} color="$textDark900" textAlign="center">
               {t('welcome.welcomeBack')}
               {user?.name ? `, ${user.name}` : ''}
             </Heading>

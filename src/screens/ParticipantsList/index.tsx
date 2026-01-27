@@ -207,11 +207,9 @@ const ParticipantsList: React.FC = () => {
     <Box {...styles.mainContainer}>
       <ScrollView {...styles.scrollView}>
         <VStack {...styles.headerVStack}>
-          <Container>
-            <PageHeader
+          <PageHeader
               title={t('participants.myParticipants')}
             />
-          </Container>
           </VStack>
       
         <Container>
