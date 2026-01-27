@@ -187,7 +187,7 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
             : modalType === 'log-visit'
             ? t('actions.logVisit')
             : modalType === 'view-log'
-            ? t('participantDetail.header.checkInsHistory') || 'Check-ins History'
+            ? t('actions.observationLogs')
             : ''
         }
         headerIcon={
