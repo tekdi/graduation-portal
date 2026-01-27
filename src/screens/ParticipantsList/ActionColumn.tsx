@@ -15,6 +15,8 @@ import ObservationContent from '../Observation/ObservationContent';
 import CheckInsListContent from '../ParticipantDetail/Check-ins-list/CheckInsListContent';
 import { getTargetedSolutions } from '../../services/solutionService';
 import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
+import { updateEntityDetails } from '../../services/participantService';
+import { STATUS } from '@constants/app.constant';
 
 interface ActionColumnProps {
   participant: Participant;
@@ -45,6 +47,7 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
   
   // Dropout modal specific state
   const [dropoutReason, setDropoutReason] = useState('');
+  const [dropoutLoading, setDropoutLoading] = useState(false);
   
   // Log visit modal specific states
   const [selectedSolutionId, setSelectedSolutionId] = useState<string>('');
@@ -111,14 +114,47 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
     setSelectedSolutionId('');
   }, []);
 
-  const handleDropoutConfirm = useCallback((reason?: string) => {
-    logger.log('Dropout participant:', participant.userId, 'Reason:', reason);
-    // TODO: Implement dropout logic - API call to mark participant as dropout with reason
+  const handleDropoutConfirm = useCallback(async (reason?: string) => {
+    if (!user?.id) {
+      showAlert('error', t('common.error') || 'User not authenticated');
+      return;
+    }
+
+    // Get entityId from participant - it might be in different fields
+    const userEntityId = (participant as any).entityId || (participant as any).entity_id || participant.userId;
     
-    // Close modal and reset state
-    setDropoutReason('');
-    setModalType(null);
-  }, [participant.userId]);
+    if (!userEntityId) {
+      showAlert('error', t('common.error') || 'Participant entity ID not found');
+      return;
+    }
+
+    setDropoutLoading(true);
+    try {
+      await updateEntityDetails({
+        userId: `${user?.id}`,
+        entityId: userEntityId,
+        entityUpdates: {
+          status: STATUS.DROPOUT,
+          dropoutReason: reason || '',
+        },
+      });
+
+      showAlert('success', t('actions.dropoutSuccess'));
+      
+      // Close modal and reset state
+      setDropoutReason('');
+      setModalType(null);
+      
+      // Optionally refresh the page or trigger a callback to refresh participants list
+      // You might want to add a callback prop or use navigation to refresh
+    } catch (error: any) {
+      logger.error('Error marking participant as dropout:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || t('actions.dropoutError');
+      showAlert('error', errorMessage);
+    } finally {
+      setDropoutLoading(false);
+    }
+  }, [participant, user?.id, showAlert, t]);
 
   return (
     <Box>
@@ -162,9 +198,9 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
         maxWidth={modalType === 'dropout' ? 500 : 1200}
         showCloseButton={modalType !== 'dropout'}
         cancelButtonText={modalType === 'dropout' ? t('common.cancel') || 'Cancel' : undefined}
-        confirmButtonText={modalType === 'dropout' ? t('actions.confirmDropout') || 'Confirm Dropout' : undefined}
-        onCancel={modalType === 'dropout' ? handleCloseModal : undefined}
-        onConfirm={modalType === 'dropout' ? () => handleDropoutConfirm(dropoutReason) : undefined}
+        confirmButtonText={modalType === 'dropout' ? (dropoutLoading ? (t('common.loading') || 'Loading...') : (t('actions.confirmDropout') || 'Confirm Dropout')) : undefined}
+        onCancel={modalType === 'dropout' ? (dropoutLoading ? undefined : handleCloseModal) : undefined}
+        onConfirm={modalType === 'dropout' ? (dropoutLoading ? undefined : () => handleDropoutConfirm(dropoutReason)) : undefined}
         confirmButtonColor={modalType === 'dropout' ? '$error500' : undefined}
         bodyProps={modalType !== 'dropout' ? {padding: 0,paddingTop: 0,paddingBottom: 0} : {}}
         headerProps={modalType !== 'dropout' ? {paddingBottom: 0,paddingTop: "$2"} : {}}
