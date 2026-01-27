@@ -120,17 +120,17 @@ export const bulkUserCreate = async (
       'Content-Type': 'application/json',
     };
     
-    // API expects 'orgid' (lowercase) and 'tenantid' headers for admin override
+    // API expects 'orgid' (lowercase) and 'x-tenant-code' headers for admin override
     if (!orgCode) {
       throw new Error('Organization code (orgid) is required but not found in user data');
     }
     
     if (!tenantCode) {
-      throw new Error('Tenant code (tenantid) is required but not found in user data');
+      throw new Error('Tenant code (x-tenant-code) is required but not found in user data');
     }
     
     headers['orgid'] = orgCode;
-    headers['tenantid'] = tenantCode;
+    headers['x-tenant-code'] = tenantCode;
     
     console.log('Headers being sent:', headers);
     
