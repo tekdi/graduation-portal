@@ -11,8 +11,8 @@ const Container = ({ children, ...props }: ContainerProps) => {
   return (
     <Box
       // $md-px="$6"
-      px="$4"                     // padding like container padding
-      py="$6"
+      // px="$4"                     // padding like container padding
+      // py="$6"
       w="100%"                    // full width
       maxWidth={1152}             // mobile: 100%
       mx="auto"  

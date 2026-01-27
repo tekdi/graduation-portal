@@ -33,7 +33,9 @@ export const styles = {
   // Content container VStack
   contentVStack: {
     space: 'lg' as const,
-   // "$md-px":"$6",
+    "$md-px":"$6",
+    "px":"$4",
+    "py":"$6",
     flex: 1 as const,
   },
 
