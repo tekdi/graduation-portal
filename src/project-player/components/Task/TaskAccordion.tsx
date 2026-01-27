@@ -30,7 +30,7 @@ import { usePlatform } from '@utils/platform';
 const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
   const { t } = useLanguage();
   const { mode } = useProjectContext();
-  const { isWeb } = usePlatform();
+  const { isWeb, isMobile } = usePlatform();
 
   const isPreview = mode === 'preview';
   const isSocialProtection =
@@ -89,15 +89,16 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
     const totalTasks = task.children?.length || 0;
     const progressPercent =
       totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-
+      
     return (
-      <Box {...taskAccordionStyles.container}>
-        <Card {...taskAccordionStyles.card}>
+      <Box {...taskAccordionStyles.container} >
+        <Card {...taskAccordionStyles.card}  >
           {/* Card Header with Progress on right */}
-          <Box {...taskAccordionStyles.cardHeader}>
+          <Box {...taskAccordionStyles.cardHeader}  padding={isMobile ? '0' :'auto'}>
             <HStack
               {...taskAccordionStyles.cardHeaderContent}
               justifyContent="space-between"
+             
             >
               <HStack {...taskAccordionStyles.pillarHeaderRow}>
                 <LucideIcon
@@ -119,7 +120,8 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
           {/* Card Content - Always visible (no accordion) */}
           <Box
             {...taskAccordionStyles.cardContent}
-            paddingHorizontal={isWeb ? '$5' : '$2'}
+            // paddingHorizontal={isWeb ? '$5' : '$2'}
+            px={isMobile ? '0' :'auto'}
           >
             <VStack {...taskAccordionStyles.cardContentStack}>
               {(task?.children?.length ? task.children : task.tasks)?.map(

@@ -52,7 +52,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // handleOpenForm
   const {  handleStatusChange, handleAddToPlan } =
     useTaskActions();
-  const { isWeb } = usePlatform();
+  const { isWeb, isMobile } = usePlatform();
   const { t } = useLanguage();
   const toast = useToast();
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -578,37 +578,50 @@ const TaskCard: React.FC<TaskCardProps> = ({
             : taskCardStyles.childCard?.borderColor
         }
       >
-        <Box {...taskCardStyles.childCardContent}>
-          {isWeb ? (
-            // Web: All in one row
-            <HStack alignItems="flex-start" space="md">
-              <Box flexShrink={0} alignItems="center" justifyContent="center">
-                {renderStatusIndicator()}
-              </Box>
-              <Box flex={1} minWidth="$0">
-                {renderTaskInfo()}
-              </Box>
-              <Box flexShrink={0}>
-                <HStack space="xs" alignItems="center">
-                  {renderActionButton()}
-                  {renderCustomTaskActions({
-                    isCustomTask: task.isCustomTask || false,
-                    onEdit: openEditModal,
-                    onDelete: openDeleteModal,
-                  })}
-                </HStack>
-              </Box>
-            </HStack>
-          ) : (
-            // Mobile: Title/badge on top, button below
-            <VStack space="sm">
-              <HStack alignItems="flex-start" space="sm">
-                <Box flexShrink={0} alignItems="center" justifyContent="center">
+        <Box
+          {...taskCardStyles.childCardContent}
+          padding={isMobile ? '20px 0' : '$2 0'}
+        >
+          <HStack
+            alignItems="flex-start"
+            space="md"
+            flexDirection={isMobile ? 'column' : 'row'}
+          >
+            {isMobile ? (
+              <Box flexDirection="row">
+                <Box flexShrink={0} mt="$1">
                   {renderStatusIndicator()}
                 </Box>
-                <Box flex={1}>{renderTaskInfo()}</Box>
-              </HStack>
-              <Box alignItems="center" width="100%">
+                <Box flex={1} marginLeft="5px">
+                  {renderTaskInfo()}
+                </Box>
+              </Box>
+            ) : (
+              <>
+                <Box flexShrink={0} mt="$1">
+                  {renderStatusIndicator()}
+                </Box>
+                <Box flex={1} minWidth="$0">
+                  {renderTaskInfo()}
+                </Box>
+              </>
+            )}
+            <Box flexShrink={0} width={isMobile ? '100%' : 'auto'}>
+              {isMobile ? (
+                // 📱 Mobile → stacked, full width
+                <VStack space="sm" width="100%">
+                  <Box width="100%">{renderActionButton()}</Box>
+
+                  <Box width="100%">
+                    {renderCustomTaskActions({
+                      isCustomTask: task.isCustomTask || false,
+                      onEdit: openEditModal,
+                      onDelete: openDeleteModal,
+                    })}
+                  </Box>
+                </VStack>
+              ) : (
+                // 💻 Web → inline
                 <HStack space="xs" alignItems="center">
                   {renderActionButton()}
                   {renderCustomTaskActions({
@@ -617,9 +630,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                     onDelete: openDeleteModal,
                   })}
                 </HStack>
-              </Box>
-            </VStack>
-          )}
+              )}
+            </Box>
+          </HStack>
         </Box>
       </Card>
     );
@@ -655,30 +668,50 @@ const TaskCard: React.FC<TaskCardProps> = ({
     );
   } else {
     // Default inline style for regular tasks
-    mainContent = (
-      <Box
-        {...taskCardStyles.regularTaskContainer}
-        padding={isWeb ? '$5' : '$2'}
-        marginLeft={level * (isWeb ? 16 : 8)}
-      >
-        <HStack alignItems="flex-start" space={isWeb ? 'md' : 'sm'}>
+   mainContent = (
+  <Box
+    {...taskCardStyles.regularTaskContainer}
+    padding={isMobile ? '20px 0' : '$2 0'}
+  >
+    <HStack
+      alignItems="flex-start"
+      space={isWeb ? 'md' : 'sm'}
+      flexDirection={isMobile ? 'column' : 'row'}
+    >
+      {/* 🔹 Status + Info Section */}
+      {isMobile ? (
+        <Box flexDirection="row">
           <Box flexShrink={0} mt="$1">
             {renderStatusIndicator()}
           </Box>
-          <Box flex={1} minWidth={isWeb ? '$0' : undefined}>
+          <Box flex={1} marginLeft="5px">
             {renderTaskInfo()}
           </Box>
-          <Box flexShrink={0}>
-            {renderActionButton()}
-            {renderCustomTaskActions({
-              isCustomTask: task.isCustomTask || false,
-              onEdit: openEditModal,
-              onDelete: openDeleteModal,
-            })}
+        </Box>
+      ) : (
+        <>
+          <Box flexShrink={0} mt="$1">
+            {renderStatusIndicator()}
           </Box>
-        </HStack>
+          <Box flex={1} minWidth="$0">
+            {renderTaskInfo()}
+          </Box>
+        </>
+      )}
+
+      {/* 🔹 Actions Section */}
+      <Box flexShrink={0} width={isMobile ? '100%' : 'auto'}>
+        {renderActionButton()}
+        {renderCustomTaskActions({
+          isCustomTask: task.isCustomTask || false,
+          onEdit: openEditModal,
+          onDelete: openDeleteModal,
+        })}
       </Box>
-    );
+    </HStack>
+  </Box>
+);
+
   }
 
   return (

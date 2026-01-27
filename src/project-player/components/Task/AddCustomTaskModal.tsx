@@ -38,7 +38,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
     updateTask,
     mode: playerMode,
   } = useProjectContext();
-  const { isWeb } = usePlatform();
+  const { isMobile } = usePlatform();
 
   // Form state - merged into single object
   const [formData, setFormData] = useState({
@@ -193,83 +193,50 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
           : 'projectPlayer.addCustomTaskSubtitle'
       }
       maxWidth={550}
-      footerContent={
-        isWeb ? (
-          <HStack {...addCustomTaskModalStyles.footerButtons}>
-            {/* Cancel Button */}
-            <Button
-              {...addCustomTaskModalStyles.cancelButton}
-              onPress={handleCloseModal}
-            >
-              <ButtonText color="$textPrimary" {...TYPOGRAPHY.button}>
-                {t('common.cancel')}
-              </ButtonText>
-            </Button>
+     footerContent={
+  <HStack
+    {...addCustomTaskModalStyles.footerButtons}
+    flexDirection={isMobile ? 'column' : 'row'}
+    space={isMobile ? 'sm' : 'md'}   // spacing between buttons
+    width="100%"
+  >
+    <Button
+      {...addCustomTaskModalStyles.cancelButton}
+      onPress={handleCloseModal}
+      width={isMobile ? '100%' : 'auto'}
+    >
+      <ButtonText color="$textPrimary" {...TYPOGRAPHY.button}>
+        {t('common.cancel')}
+      </ButtonText>
+    </Button>
 
-            {/* Submit Button */}
-            <Button
-              {...addCustomTaskModalStyles.submitButton}
-              onPress={handleSubmit}
-              isDisabled={!isFormValid}
-              opacity={!isFormValid ? 0.5 : 1}
-            >
-              <HStack {...addCustomTaskModalStyles.submitButtonContent}>
-                <LucideIcon
-                  name={isEditMode ? 'Check' : 'Plus'}
-                  size={16}
-                  color={theme.tokens.colors.backgroundPrimary.light}
-                />
-                <ButtonText
-                  color="$backgroundPrimary.light"
-                  {...TYPOGRAPHY.button}
-                >
-                  {isEditMode
-                    ? t('projectPlayer.updateTask')
-                    : t('projectPlayer.addCustomTask')}
-                </ButtonText>
-              </HStack>
-            </Button>
-          </HStack>
-        ) : (
-          <VStack space="md" width="$full">
-            {/* Submit Button first on mobile */}
-            <Button
-              {...addCustomTaskModalStyles.submitButton}
-              width="$full"
-              onPress={handleSubmit}
-              isDisabled={!isFormValid}
-              opacity={!isFormValid ? 0.5 : 1}
-            >
-              <HStack {...addCustomTaskModalStyles.submitButtonContent}>
-                <LucideIcon
-                  name={isEditMode ? 'Check' : 'Plus'}
-                  size={16}
-                  color={theme.tokens.colors.backgroundPrimary.light}
-                />
-                <ButtonText
-                  color="$backgroundPrimary.light"
-                  {...TYPOGRAPHY.button}
-                >
-                  {isEditMode
-                    ? t('projectPlayer.updateTask')
-                    : t('projectPlayer.addCustomTask')}
-                </ButtonText>
-              </HStack>
-            </Button>
+    {/* ✅ Submit Button */}
+    <Button
+      {...addCustomTaskModalStyles.submitButton}
+      onPress={handleSubmit}
+      isDisabled={!isFormValid}
+      opacity={!isFormValid ? 0.5 : 1}
+      width={isMobile ? '100%' : 'auto'}
+    >
+      <HStack {...addCustomTaskModalStyles.submitButtonContent}>
+        <LucideIcon
+          name={isEditMode ? 'Check' : 'Plus'}
+          size={16}
+          color={theme.tokens.colors.backgroundPrimary.light}
+        />
+        <ButtonText
+          color="$backgroundPrimary.light"
+          {...TYPOGRAPHY.button}
+        >
+          {isEditMode
+            ? t('projectPlayer.updateTask')
+            : t('projectPlayer.addCustomTask')}
+        </ButtonText>
+      </HStack>
+    </Button>
+  </HStack>
+}
 
-            {/* Cancel Button */}
-            <Button
-              {...addCustomTaskModalStyles.cancelButton}
-              width="$full"
-              onPress={handleCloseModal}
-            >
-              <ButtonText color="$textPrimary" {...TYPOGRAPHY.button}>
-                {t('common.cancel')}
-              </ButtonText>
-            </Button>
-          </VStack>
-        )
-      }
     >
       {/* Modal Body - Form Fields */}
       <VStack {...addCustomTaskModalStyles.formStack}>
