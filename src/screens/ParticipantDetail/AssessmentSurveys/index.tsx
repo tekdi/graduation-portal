@@ -74,7 +74,7 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
       Array.isArray(observationData.result?.entities)
     ) {
       const newData = observationData.result.entities.find(
-        (entity: any) => entity.externalId === id,
+        (entity: any) => entity.externalId == id,
       );
       if (newData) {
         return newData;
