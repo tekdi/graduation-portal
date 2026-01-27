@@ -12,6 +12,7 @@ import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
 import logger from '@utils/logger';
 import { isWeb } from '@utils/platform';
 import { ENTITY_TYPE } from '@constants/ROLES';
+import { STATUS } from '@constants/app.constant';
 
 interface AssessmentSurveysProps {
   participant: ParticipantData;
@@ -33,7 +34,7 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
       try {
         const data = await getTargetedSolutions({
           type: 'observation',
-          'filter[keywords]': FILTER_KEYWORDS.ASSESSMENT_SURVEYS.join(','),
+          'filter[keywords]': participant?.status === STATUS.COMPLETED ? FILTER_KEYWORDS.PROGRAM_COMPLETED.join(',') : FILTER_KEYWORDS.ASSESSMENT_SURVEYS.join(','),
         });
         const dataNew = await Promise.all(
           data.map(async (item) => {
