@@ -210,19 +210,17 @@ const DevelopInterventionPlan: React.FC = () => {
 
   const ProjectPlayerConfigData: ProjectPlayerData = useMemo(
     () => ({
-      solutionId: config.data.solutionId,
       projectId: projectId || participant?.idpProjectId,
-      categoryIds: categoryIdsArray, // Array of pillar IDs without categories + selected subcategory IDs
+      categoryIds: categoryIdsArray, 
       selectedPathway: selectedPathway,
       pillarCategoryRelation: getPillarCategoryRelationships,
     }),
     [
       categoryIdsArray,
-      config.data.solutionId,
-      config.data.projectId,
       projectId,
       selectedPathway,
       getPillarCategoryRelationships,
+      participant?.idpProjectId
     ],
   );
 
@@ -320,7 +318,7 @@ const DevelopInterventionPlan: React.FC = () => {
       setIsModalOpen(true);
 
       const pillarCategoryHierarchy: PillarCategoryMap[] = await Promise.all(
-        pillarIdsWithCategories.map(async pillarId => {
+        pillarIdsWithCategories.map(async (pillarId:any) => {
           // 1️⃣ categories under pillar
           const categoryList = await getCategoryList(pillarId);
           // const categoryList = categoryDetailsMockData.result;

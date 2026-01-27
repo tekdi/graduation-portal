@@ -270,6 +270,7 @@ const CardView = <T,>({
 }: CardViewProps<T>) => {
   return (
     <Pressable onPress={() => onRowClick?.(item)}>
+      {/* @ts-ignore */}
       <Card {...styles.cardContainer}>
         <VStack {...styles.cardContent}>
         {layout.map((row, rowIndex) => {
@@ -583,7 +584,7 @@ const DataTable = <T,>({
       ))}
     </VStack>
   );
-console.log('paginationConfig', paginationConfig.isEnabled ,"&&", paginationConfig.totalPages > 1 ,"&&", pagination);
+
   return (
     <Box {...styles.mainContainer}>
       <Box

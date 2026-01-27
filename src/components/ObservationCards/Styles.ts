@@ -145,7 +145,7 @@ export const assessmentSurveyCardStyles = {
   },
   emptyCard:{
     alignItems: "center",
-    width:"$100%",
+    width: "$full",
   },
   emptyCardTitale: {
     color:"$textMutedForeground",

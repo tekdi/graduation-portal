@@ -1,14 +1,20 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { HStack, Text, Pressable, Box, VStack, Input, InputField, Modal } from '@ui';
+import { HStack, Text, Box, VStack, Input, InputField, Modal, ButtonText, ButtonIcon, Button, Spinner, useAlert } from '@ui';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
+import { useAuth } from '@contexts/AuthContext';
 import { LucideIcon, Menu } from '@ui';
 import { Participant } from '@app-types/screens';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
 import { getParticipantsMenuItems } from '@constants/PARTICIPANTS_LIST';
 import logger from '@utils/logger';
+import { usePlatform } from '@utils/platform';
+import ObservationContent from '../Observation/ObservationContent';
+import CheckInsListContent from '../ParticipantDetail/Check-ins-list/CheckInsListContent';
+import { getTargetedSolutions } from '../../services/solutionService';
+import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
 
 interface ActionColumnProps {
   participant: Participant;
@@ -18,13 +24,10 @@ interface ActionColumnProps {
  * Custom trigger for actions menu
  */
 const getCustomTrigger = (triggerProps: any) => (
-  <Pressable {...triggerProps} {...dataTableStyles.customTrigger}>
-    <LucideIcon
-      name="MoreVertical"
-      size={20}
-      color={theme.tokens.colors.textForeground}
-    />
-  </Pressable>
+  // @ts-ignore: Button variant
+  <Button variant="ghost" {...triggerProps}>
+    <ButtonIcon as={LucideIcon} name="MoreVertical" size={16} color="$primary500" />
+  </Button>
 );
 
 /**
@@ -34,10 +37,18 @@ const getCustomTrigger = (triggerProps: any) => (
 export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
-
-  // Dropout modal state - selectedParticipant controls modal visibility (null = closed, not null = open)
+  const { isMobile } = usePlatform();
+  const { user } = useAuth();
+  const { showAlert } = useAlert();
+  // Single modal state - tracks which modal is open (null = closed)
+  const [modalType, setModalType] = useState<'dropout' | 'log-visit' | 'view-log' | null>(null);
+  
+  // Dropout modal specific state
   const [dropoutReason, setDropoutReason] = useState('');
-  const [showDropoutModal, setShowDropoutModal] = useState(false);
+  
+  // Log visit modal specific states
+  const [selectedSolutionId, setSelectedSolutionId] = useState<string>('');
+  const [logVisitLoading, setLogVisitLoading] = useState(false);
 
   const handleViewDetails = () => {
     // @ts-ignore - Navigation type inference
@@ -45,24 +56,60 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
   };
 
   const handleMenuSelect = (key: string) => {
-    const participantId = participant.userId;
+    // const participantId = participant.userId;
     
     switch (key) {
       case 'view-log':
-        // @ts-ignore - Navigation type inference
-        navigation.navigate('participant-detail', { id: participantId });
+        setModalType('view-log');
+        setSelectedSolutionId('');
         break;
       case 'log-visit':
-        // @ts-ignore - Navigation type inference
-        navigation.push('log-visit', { participantId });
+        setModalType('log-visit');
+        setSelectedSolutionId('');
         break;
       case 'dropout':
-        setShowDropoutModal(true);
+        setModalType('dropout');
         break;
       default:
-        logger.log('Action:', key, 'for participant:', participantId);
+        logger.log('Action:', key, 'for participant:');
     }
   };
+  
+  // Fetch solutions for log visit modal and auto-select first solution
+  useEffect(() => {
+    const fetchLogVisitSolutions = async () => {
+      if (modalType !== 'log-visit' && modalType !== 'view-log') return;
+      
+      setLogVisitLoading(true);
+      try {
+        const data = await getTargetedSolutions({
+          type: 'observation',
+          // @ts-ignore - filter[keywords] is a valid parameter
+          "filter[keywords]": FILTER_KEYWORDS.PARTICIPANT_LOG_VISIT.join(',')
+        });
+        // Automatically select the first solution
+        if (data && data.length > 0) {
+          const firstSolution = data[0];
+          setSelectedSolutionId(firstSolution.solutionId || firstSolution.id || '');
+        } else {
+          setSelectedSolutionId('');
+        }
+      } catch (error) {
+        logger.error('Error fetching log visit solutions:', error);
+        setSelectedSolutionId('');
+      } finally {
+        setLogVisitLoading(false);
+      }
+    };
+
+    fetchLogVisitSolutions();
+  }, [modalType]);
+
+  const handleCloseModal = useCallback(() => {
+    setModalType(null);
+    setDropoutReason('');
+    setSelectedSolutionId('');
+  }, []);
 
   const handleDropoutConfirm = useCallback((reason?: string) => {
     logger.log('Dropout participant:', participant.userId, 'Reason:', reason);
@@ -70,38 +117,18 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
     
     // Close modal and reset state
     setDropoutReason('');
-    setShowDropoutModal(false);
+    setModalType(null);
   }, [participant.userId]);
-
-  const handleCloseDropoutModal = useCallback(() => {
-    setDropoutReason('');
-    setShowDropoutModal(false);
-  }, []);
 
   return (
     <Box>
       <HStack {...dataTableStyles.cardActionsSection}>
-        <Pressable
-          onPress={handleViewDetails}
-          {...dataTableStyles.viewDetailsButton}
-        >
-          <HStack space="sm" alignItems="center" justifyContent="center">
-            <LucideIcon
-              name="Eye"
-              size={18}
-              color={theme.tokens.colors.textForeground}
-            />
-            <Text
-              {...TYPOGRAPHY.bodySmall}
-              color="$textForeground"
-              fontWeight="$medium"
-            >
-              {t('actions.viewDetails')}
-            </Text>
-          </HStack>
-        </Pressable>
+      {/* @ts-ignore: Back Button */}
+        <Button variant={isMobile ? "outlineghost" : "ghost"} flex="1" onPress={handleViewDetails}>
+          <ButtonText {...TYPOGRAPHY.bodySmall} color="$primary500" fontWeight="$medium">{t('actions.viewDetails')}</ButtonText>
+        </Button>
         <Menu
-          items={getParticipantsMenuItems(t)}
+          items={getParticipantsMenuItems}
           placement="bottom right"
           offset={5}
           trigger={getCustomTrigger}
@@ -109,70 +136,118 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
         />
       </HStack>
 
-      {/* Dropout Confirmation Modal */}
+      {/* Single Modal - renders different content based on modalType */}
       <Modal
-        isOpen={showDropoutModal}
-        onClose={handleCloseDropoutModal}
-        headerTitle={t('actions.confirmDropout') || 'Confirm Dropout'}
-        headerIcon={
-          <LucideIcon
-            name="UserX"
-            size={24}
-            color={theme.tokens.colors.error.light}
-          />
+        isOpen={modalType !== null}
+        onClose={handleCloseModal}
+        headerTitle={
+          modalType === 'dropout'
+            ? t('actions.confirmDropout') || 'Confirm Dropout'
+            : modalType === 'log-visit'
+            ? t('actions.logVisit')
+            : modalType === 'view-log'
+            ? t('participantDetail.header.checkInsHistory') || 'Check-ins History'
+            : ''
         }
-        maxWidth={500}
-        cancelButtonText={t('common.cancel') || 'Cancel'}
-        confirmButtonText={t('actions.confirmDropout') || 'Confirm Dropout'}
-        onCancel={handleCloseDropoutModal}
-        onConfirm={() => handleDropoutConfirm(dropoutReason)}
-        confirmButtonColor="$error500"
+        headerIcon={
+          modalType === 'dropout' ? (
+            <LucideIcon
+              name="UserX"
+              size={24}
+              color={theme.tokens.colors.error.light}
+            />
+          ) : undefined
+        }
+        size={modalType === 'dropout' ? 'md' : 'full'}
+        maxWidth={modalType === 'dropout' ? 500 : 1200}
+        showCloseButton={modalType !== 'dropout'}
+        cancelButtonText={modalType === 'dropout' ? t('common.cancel') || 'Cancel' : undefined}
+        confirmButtonText={modalType === 'dropout' ? t('actions.confirmDropout') || 'Confirm Dropout' : undefined}
+        onCancel={modalType === 'dropout' ? handleCloseModal : undefined}
+        onConfirm={modalType === 'dropout' ? () => handleDropoutConfirm(dropoutReason) : undefined}
+        confirmButtonColor={modalType === 'dropout' ? '$error500' : undefined}
+        bodyProps={modalType !== 'dropout' ? {padding: 0,paddingTop: 0,paddingBottom: 0} : {}}
+        headerProps={modalType !== 'dropout' ? {paddingBottom: 0,paddingTop: "$2"} : {}}
       >
-        <VStack space="lg">
-          <Text
-            {...TYPOGRAPHY.paragraph}
-            color="$textSecondary"
-            lineHeight="$xl"
-          >
-            {t('actions.dropoutMessage', { name: participant.name || participant.userId || 'participant' }) ||
-              `Mark ${participant.name || participant.userId || 'participant'} as dropout from the program`}
-          </Text>
-
-          <VStack space="sm">
+        {modalType === 'dropout' && (
+          <VStack space="lg">
             <Text
-              {...TYPOGRAPHY.label}
-              color="$textPrimary"
-              fontWeight="$medium"
-            >
-              {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
-            </Text>
-            <Input
-              {...dataTableStyles.modalInput}
-              borderColor="$inputBorder"
-              bg="$modalBackground"
-              $focus-borderColor="$inputFocusBorder"
-              $focus-borderWidth={2}
-            >
-              <InputField
-                placeholder={
-                  t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
-                }
-                value={dropoutReason}
-                onChangeText={setDropoutReason}
-                {...dataTableStyles.modalInputField}
-                placeholderTextColor="$textMutedForeground"
-              />
-            </Input>
-            <Text
-              {...TYPOGRAPHY.bodySmall}
+              {...TYPOGRAPHY.paragraph}
               color="$textSecondary"
-              lineHeight="$sm"
+              lineHeight="$xl"
             >
-              {t('actions.dropoutHint') ||
-                'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
+              {t('actions.dropoutMessage', { name: participant.name || participant.userId || 'participant' }) ||
+                `Mark ${participant.name || participant.userId || 'participant'} as dropout from the program`}
             </Text>
+
+            <VStack space="sm">
+              <Text
+                {...TYPOGRAPHY.label}
+                color="$textPrimary"
+                fontWeight="$medium"
+              >
+                {t('actions.dropoutReasonLabel') || 'Reason for Dropout'}
+              </Text>
+              <Input
+                {...dataTableStyles.modalInput}
+                borderColor="$inputBorder"
+                bg="$modalBackground"
+                $focus-borderColor="$inputFocusBorder"
+                $focus-borderWidth={2}
+              >
+                <InputField
+                  placeholder={
+                    t('actions.dropoutReasonPlaceholder') || 'Enter reason for dropout...'
+                  }
+                  value={dropoutReason}
+                  onChangeText={setDropoutReason}
+                  {...dataTableStyles.modalInputField}
+                  placeholderTextColor="$textMutedForeground"
+                />
+              </Input>
+              <Text
+                {...TYPOGRAPHY.bodySmall}
+                color="$textSecondary"
+                lineHeight="$sm"
+              >
+                {t('actions.dropoutHint') ||
+                  'This will change the participant\'s status to "Not Enrolled" and log the action in their history.'}
+              </Text>
+            </VStack>
           </VStack>
-        </VStack>
+        )}
+
+        {(modalType === 'log-visit' || modalType === 'view-log') && (
+          <Box flex={1}>
+            {logVisitLoading ? (
+              <Box flex={1} justifyContent="center" alignItems="center">
+                <Spinner size="large" color="$primary500" />
+              </Box>
+            ) : selectedSolutionId && modalType === 'log-visit' ? (
+              <ObservationContent
+                id={participant.userId}
+                solutionId={selectedSolutionId}
+                onClose={handleCloseModal}
+                // @ts-ignore - showAlert is a valid prop
+                showAlert={showAlert}
+              />
+            ) : selectedSolutionId && modalType === 'view-log' ? (
+              <Box flex={1}>
+                <CheckInsListContent
+                  id={participant.userId}
+                  userName={user?.name}
+                  preSelectedSolution={selectedSolutionId}
+                />
+              </Box>
+            ) : (
+              <Box flex={1} justifyContent="center" alignItems="center">
+                <Text color="$textMutedForeground">
+                  {t('logVisit.noSolutions') || 'No solutions available'}
+                </Text>
+              </Box>
+            )}
+          </Box>
+        )}
       </Modal>
     </Box>
   );
