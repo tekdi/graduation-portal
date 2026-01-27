@@ -156,6 +156,9 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
     }
   }, [participant, user?.id, showAlert, t]);
 
+  // Check if participant is Graduated or Dropout - hide menu for these statuses
+  const isReadOnlyStatus = participant.status === STATUS.GRADUATED || participant.status === STATUS.DROPOUT;
+
   return (
     <Box>
       <HStack {...dataTableStyles.cardActionsSection}>
@@ -163,13 +166,15 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
         <Button variant={isMobile ? "outlineghost" : "ghost"} flex="1" onPress={handleViewDetails}>
           <ButtonText {...TYPOGRAPHY.bodySmall} color="$primary500" fontWeight="$medium">{t('actions.viewDetails')}</ButtonText>
         </Button>
-        <Menu
-          items={getParticipantsMenuItems}
-          placement="bottom right"
-          offset={5}
-          trigger={getCustomTrigger}
-          onSelect={handleMenuSelect}
-        />
+        {!isReadOnlyStatus && (
+          <Menu
+            items={getParticipantsMenuItems}
+            placement="bottom right"
+            offset={5}
+            trigger={getCustomTrigger}
+            onSelect={handleMenuSelect}
+          />
+        )}
       </HStack>
 
       {/* Single Modal - renders different content based on modalType */}
