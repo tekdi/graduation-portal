@@ -3,6 +3,7 @@ import WebComponentPlayer from '@components/WebComponent/WebComponentPlayer';
 import { Container, Spinner, VStack, Box } from '@ui';
 import { getToken } from '../../services/api';
 import {
+  createObservationSubmission,
   getObservationEntities,
   getObservationSolution,
   getObservationSubmissions,
@@ -73,10 +74,20 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
     submissionNumberInput: number | undefined;
   }) => {
     try {
-      const observationSubmissions = await getObservationSubmissions({
+      let observationSubmissions = await getObservationSubmissions({
         observationId,
         entityId,
       });
+      if(!observationSubmissions.result || observationSubmissions.result.length === 0) { 
+        await createObservationSubmission({
+          observationId: observationId,
+          entityId: entityId,
+        });
+        observationSubmissions = await getObservationSubmissions({
+          observationId,
+          entityId,
+        });
+      }
       let observationSubmissionsLast;
       let observationSolution: any = null;
       if(submissionNumberInput) {

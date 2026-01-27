@@ -274,3 +274,34 @@ export const getObservationSubmissions = async ({
     throw error;
   }
 }
+
+
+/**
+ * Create a new observation submission for a given observation and entity.
+ *
+ * @param params - Object containing observationId and entityId
+ * @param token - Optional auth token for the request (used for passing "X-auth-token" header if needed)
+ * @returns Promise resolving to API response data for the created submission
+ */
+export const createObservationSubmission = async (
+  {
+    observationId,
+    entityId,
+    data = {}
+  }: {
+    observationId: string;
+    entityId: string;
+    data?: any;
+  }
+): Promise<any> => {
+  try {
+    const response = await api.post(
+      `${API_ENDPOINTS.CREATE_OBSERVATION_SUBMISSION}/${observationId}?entityId=${entityId}`,
+      data
+    );
+    return response.data;
+  } catch (error) {
+    logger.error('Error creating observation submission:', error);
+    throw error;
+  }
+};
