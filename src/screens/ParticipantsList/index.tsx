@@ -209,7 +209,7 @@ const ParticipantsList: React.FC = () => {
         <VStack {...styles.headerVStack}>
           <Container>
             <PageHeader
-              title={t('participants.myParticipants')}
+             title={t('participants.myParticipants')}
             />
           </Container>
           </VStack>
