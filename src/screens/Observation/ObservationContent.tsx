@@ -293,7 +293,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
     logger.info('event', event);
     handleBackPress();
   };
-
+console.log('mockData', playerConfigMemoized,process.env.API_BASE_URL);
   return (
     <>
       <VStack
