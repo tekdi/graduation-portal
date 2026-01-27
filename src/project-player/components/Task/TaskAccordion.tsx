@@ -84,9 +84,9 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
   if (!isPreview) {
     // Calculate pillar progress percentage
     const completedTasks =
-      task.tasks?.filter(child => child.status === TASK_STATUS.COMPLETED)
+      task.children?.filter(child => child.status === TASK_STATUS.COMPLETED)
         .length || 0;
-    const totalTasks = task.tasks?.length || 0;
+    const totalTasks = task.children?.length || 0;
     const progressPercent =
       totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 

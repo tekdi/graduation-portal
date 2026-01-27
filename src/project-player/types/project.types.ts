@@ -43,6 +43,8 @@ export interface Task {
     buttonLabel?: string;
   };
   solutionDetails?: any;
+  parentId?:string;
+  externalId?:string;
 }
 
 export interface Attachment {

@@ -73,7 +73,8 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
             ...prev,
             children: updateTaskRecursive(prev.children),
           };
-        } else if (prev?.tasks?.some(task => task.children?.length)) {
+        }
+       else if (prev?.tasks?.some(task => task.children?.length)) {
           return {
             ...prev,
             tasks: prev.tasks.map(task => ({
@@ -128,7 +129,7 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
   const addTask = useCallback((pillarId: string, task: Task) => {
     setProjectData(prev => {
       if (!prev) return null;
-
+      const  currentProjectId = prev._id;
       // Recursive function to find pillar and add task to its children
       const addTaskToPillar = (tasks: Task[]): Task[] => {
         return tasks.map(t => {
@@ -139,7 +140,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
             };
           }
           if (t.tasks && t.tasks.length > 0) {
-            // Keep searching in children
             return {
               ...t,
               tasks: addTaskToPillar(t.tasks),
@@ -203,8 +203,18 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
         );
       };
 
-      // ✅ handle children vs root tasks correctly
-      if (prev.children?.length) {
+     if (prev?.tasks?.some(task => task.children?.length)) {
+          return {
+            ...prev,
+            tasks: prev.tasks.map(task => ({
+              ...task,
+              children: task.children
+                ? deleteRecursive(task.children)
+                : task.children,
+            })),
+          };
+        }
+        else if (prev.children?.length) {
         return {
           ...prev,
           children: deleteRecursive(prev.children),
