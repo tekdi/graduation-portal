@@ -493,16 +493,6 @@ const DevelopInterventionPlan: React.FC = () => {
                       {pathway?.children.length}{' '}
                       {t('template.pathwayCard.pillars')}
                     </Text>
-                    <Text
-                      {...TYPOGRAPHY.caption}
-                      color="$textMutedForeground"
-                      mr="$2"
-                    >
-                      •
-                    </Text>
-                    <Text {...TYPOGRAPHY.caption} color="$textMutedForeground">
-                      {pathway.version}
-                    </Text>
                   </HStack>
                   <Box {...(templateStyles.pillarsSection as any)}>
                     <Text {...TYPOGRAPHY.label} color="$textLight900" mb="$2">

@@ -134,10 +134,36 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
       const addTaskToPillar = (tasks: Task[]): Task[] => {
         return tasks.map(t => {
           if (t._id === pillarId) {
-            return {
-              ...t,
-              tasks: [...(t.tasks || []), task],
-            };
+            if (t?.children && t?.children.length) {
+              if (currentProjectId) {
+                // (async () => {
+                try {
+                  updateTaskAPI(currentProjectId, {
+                    // tasks: [task],
+                    tasks: [
+                      {
+                        _id: pillarId,
+                        name: t.name,
+                        children:[task],
+                        // taskSequence:[]
+                      },
+                    ],
+                  });
+                } catch (error) {
+                  console.log(error);
+                }
+              // })
+              }
+              return {
+                ...t,
+                children: [...(t.children || []), task],
+              };
+            } else {
+              return {
+                ...t,
+                tasks: [...(t.tasks || []), task],
+              };
+            }
           }
           if (t.tasks && t.tasks.length > 0) {
             return {
@@ -156,28 +182,17 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
         });
       };
 
-      // if (prev.tasks?.length) {
-      //   return {
-      //     ...prev,
-      //     tasks: addTaskToPillar(prev.tasks),
-      //   };
-      // } else
-      //    if (prev?.tasks?.some(task => task.children?.length)) {
-      //   return {
-      //     ...prev,
-      //     tasks: prev.tasks.map(task => ({
-      //       ...task,
-      //       children: task.children
-      //         ? addTaskToPillar(task.children)
-      //         : task.children,
-      //     })),
-      //   };
-      // } else {
+      if (prev.tasks?.length) {
+        return {
+          ...prev,
+          tasks: addTaskToPillar(prev.tasks),
+        };
+      } else{
         return {
           ...prev,
           children: addTaskToPillar(prev?.children || []),
         };
-      // }
+      }
     });
   }, []);
 

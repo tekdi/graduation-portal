@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
   HStack,
@@ -17,14 +17,14 @@ import { participantHeaderStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 import ParticipantProgressCard from './ParticipantProgressCard';
 import { STATUS } from '@constants/app.constant';
-import { updateEntityDetails } from '../../../services/participantService';
+import { getParticipantsList, updateEntityDetails } from '../../../services/participantService';
 import { useAuth } from '@contexts/AuthContext';
 import { ParticipantHeaderProps } from '@app-types/screens';
 
 const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   participantName,
   participantId,
-  status,
+  // status,
   pathway,
   graduationProgress,
   graduationDate,
@@ -39,10 +39,28 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   const toast = useToast();
   const { showAlert } = useAlert();
 
+  const [status, setStatus] = useState('')
  const showSuccess = (message: string) => {
     showSuccessToast(toast, message);
   };
   
+useEffect(() => {
+    const fetchEntityDetails = async () => {
+      if (participantId && user?.id) {
+        try {
+          const response = await getParticipantsList({entityId:participantId,userId:user?.id})
+          const {userDetails,...rest} = response?.result?.data?.[0]
+          const participantData = {...(userDetails || {}),...rest}
+          // setParticipant(participantData);
+          setStatus(participantData?.status);
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    fetchEntityDetails();
+  }, [participantId,user?.id]);
+
   const handleBackPress = () => {
     // @ts-ignore
     navigation.navigate('participants');
@@ -218,7 +236,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
             <Text {...participantHeaderStyles.participantId}>
               {participantId}
             </Text>
-            {pathway && (
+            { status === STATUS.IN_PROGRESS && pathway && (
               <>
                 <Text {...participantHeaderStyles.pathwaySeparator}>•</Text>
                 <Text {...participantHeaderStyles.pathway}>
