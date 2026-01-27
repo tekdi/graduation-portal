@@ -165,7 +165,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
             fetchObservationSolution({
               entityId: newData._id,
               observationId: observationId,
-              submissionNumberInput: submissionNumber,
+              submissionNumberInput: !observationData.result?.allowMultipleAssessemts ? 1 : submissionNumber,
             });
             // Set participant info
             setParticipantInfo({
@@ -190,7 +190,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
                   fetchObservationSolution({
                     entityId: entityData._id,
                     observationId: observationId,
-                    submissionNumberInput: submissionNumber,
+                    submissionNumberInput: !observationData.result?.allowMultipleAssessemts ? 1 : submissionNumber,
                   });
                   // Set participant info
                   setParticipantInfo({
@@ -293,7 +293,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
     logger.info('event', event);
     handleBackPress();
   };
-console.log('mockData', playerConfigMemoized,process.env.API_BASE_URL);
+  
   return (
     <>
       <VStack
