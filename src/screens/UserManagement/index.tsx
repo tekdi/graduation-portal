@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { VStack, HStack, Button, Text, Image, Box, Pressable, Card, useToast, Toast, ToastTitle, Modal } from '@ui';
+import { VStack, HStack, Button, Text, Image, Box, Pressable, Card, useAlert, Modal } from '@ui';
 import { View, Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
 
@@ -20,6 +20,7 @@ import { theme } from '@config/theme';
 import { getSignedUrl, uploadFileToSignedUrl, bulkUserCreate } from '../../services/bulkUploadService';
 import offlineStorage from '../../services/offlineStorage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
+import { API_ENDPOINTS } from '../../services/apiEndpoints';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -27,7 +28,7 @@ import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 const UserManagementScreen = () => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
-  const toast = useToast();
+  const { showAlert } = useAlert();
   const data = [SearchFilter, ...FilterOptions];
   
   // File upload state
@@ -59,29 +60,6 @@ const UserManagementScreen = () => {
     
     logUserData();
   }, []);
-  
-  // Toast helpers
-  const showErrorToast = (message: string) => {
-    toast.show({
-      placement: 'top',
-      render: ({ id }) => (
-        <Toast nativeID={id} action="error" variant="solid">
-          <ToastTitle>{message}</ToastTitle>
-        </Toast>
-      ),
-    });
-  };
-
-  const showSuccessToast = (message: string) => {
-    toast.show({
-      placement: 'top',
-      render: ({ id }) => (
-        <Toast nativeID={id} action="success" variant="solid">
-          <ToastTitle>{message}</ToastTitle>
-        </Toast>
-      ),
-    });
-  };
         
   // Handle CSV upload: closes options modal and triggers native file picker
   const handleUploadCSV = () => {
@@ -101,7 +79,7 @@ const UserManagementScreen = () => {
     
     // Validate CSV file extension
     if (!file.name.toLowerCase().endsWith('.csv')) {
-      showErrorToast(t('admin.actions.csvValidationError'));
+      showAlert('error', t('admin.actions.csvValidationError'));
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -109,17 +87,22 @@ const UserManagementScreen = () => {
         }
 
     setIsUploading(true);
+    let currentStep: 'getSignedUrl' | 'uploadFile' | 'bulkCreate' | null = null;
+    
     try {
       // Step 1: Get signed URL
+      currentStep = 'getSignedUrl';
       const signedUrlResponse = await getSignedUrl(file.name);
       if (!signedUrlResponse.result?.signedUrl) {
           throw new Error(t('admin.actions.uploadErrorSignedUrl'));
         }
 
       // Step 2: Upload file to signed URL
+      currentStep = 'uploadFile';
       await uploadFileToSignedUrl(signedUrlResponse.result.signedUrl, file);
 
       // Step 3: Trigger bulk user creation
+      currentStep = 'bulkCreate';
       const filePath = signedUrlResponse.result.filePath || signedUrlResponse.result.destFilePath;
       if (!filePath) {
         throw new Error(t('admin.actions.uploadErrorFilePathNotFound'));
@@ -128,23 +111,43 @@ const UserManagementScreen = () => {
       const bulkCreateResponse = await bulkUserCreate(filePath, ['name', 'email'], 'UPLOAD');
       
       // Show success toast
-      showSuccessToast(
-        t('admin.actions.uploadSuccess')
-      );
+      showAlert('success', t('admin.actions.uploadSuccess'));
       
     } catch (error: any) {
-      // Determine which step failed and show appropriate error message
+      // Determine which step failed based on currentStep or error response structure
       let errorMessage = t('admin.actions.uploadError');
 
-      if (error.message?.includes('signed URL') || error.message?.includes('Failed to get upload URL')) {
+      // Check which step failed using currentStep variable
+      if (currentStep === 'getSignedUrl') {
+        // Step 1 failed: Get signed URL
         errorMessage = t('admin.actions.uploadErrorSignedUrl');
-      } else if (error.message?.includes('File upload failed') || error.message?.includes('upload file')) {
+      } else if (currentStep === 'uploadFile') {
+        // Step 2 failed: File upload to S3
         errorMessage = t('admin.actions.uploadErrorFileUpload');
-      } else if (error.message?.includes('bulk user') || error.message?.includes('process')) {
+      } else if (currentStep === 'bulkCreate') {
+        // Step 3 failed: Bulk user creation
         errorMessage = t('admin.actions.uploadErrorBulkCreate');
-        }
+      } else {
+        // Fallback: Check error response structure
+        const errorUrl = error?.config?.url || error?.response?.config?.url || '';
         
-      showErrorToast(errorMessage);
+        if (errorUrl.includes(API_ENDPOINTS.GET_SIGNED_URL)) {
+          errorMessage = t('admin.actions.uploadErrorSignedUrl');
+        } else if (errorUrl.includes(API_ENDPOINTS.BULK_USER_CREATE)) {
+          errorMessage = t('admin.actions.uploadErrorBulkCreate');
+        } else if (error?.response?.data?.message) {
+          // Use API error message if available
+          errorMessage = error.response.data.message;
+        } else if (error?.response?.data?.responseCode) {
+          // Use responseCode from API response if available
+          const responseCode = error.response.data.responseCode;
+          if (responseCode === 'CLIENT_ERROR' || responseCode === 'SERVER_ERROR') {
+            errorMessage = error.response.data.message || t('admin.actions.uploadError');
+          }
+        }
+      }
+        
+      showAlert('error', errorMessage);
       } finally {
       setIsUploading(false);
       // Reset file input
