@@ -89,6 +89,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
     const totalTasks = task.children?.length || 0;
     const progressPercent =
       totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
     return (
       <Box {...taskAccordionStyles.container} >
         <Card {...taskAccordionStyles.card}  >
@@ -97,6 +98,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
             <HStack
               {...taskAccordionStyles.cardHeaderContent}
               justifyContent="space-between"
+              
             >
               <HStack {...taskAccordionStyles.pillarHeaderRow}>
                 <LucideIcon
