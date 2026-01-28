@@ -32,6 +32,8 @@ interface ObservationContentProps {
   submissionNumber?: number;
   onClose?: () => void;
   showAlert: (type: string, message: string, options?: any) => void;
+  defaultValues?: any;
+  userData?: any;
 }
 
 /**
@@ -43,10 +45,12 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
   solutionId,
   submissionNumber,
   onClose,
-  showAlert
+  showAlert,
+  userData,
 }) => {
   const { t } = useLanguage();
   const [observation, setObservation] = useState<ObservationData | null>(null);
+  const [defaultValuesLocal, setDefaultValuesLocal] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
   const [participantInfo, setParticipantInfo] = useState<{
@@ -132,6 +136,10 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
         observationSolution = response.result;
       }
       setSubmission(observationSubmissionsLast);
+      if(userData && mockData?.solution?.name === "Household Profile") {
+        const defaultValues = buildDefaultValuesFromObservation(observationSolution, userData);
+        setDefaultValuesLocal(defaultValues);
+      }
       setMockData(observationSolution);
       setObservation({
         entityId: entityId,
@@ -241,6 +249,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       setParticipantInfo(null);
       setProgress(0);
       setLoading(true);
+      setDefaultValuesLocal(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionId, id, submissionNumber]);
@@ -295,9 +304,10 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       progressCountOptionalFields:false,
       progressCalculationLevel: 'input' as const,
       mockData: mockData,
+      defaultValues: defaultValuesLocal,
       usePageQuestionsGrid: true,
     }),
-    [token, observation?.observationId, observation?.entityId, mockData, submissionNumber],
+    [token, observation?.observationId, observation?.entityId, mockData, submissionNumber, defaultValuesLocal],
   );
   
   const handleAfterSubmit = (event?: any) => {
@@ -347,3 +357,45 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
 
 export default ObservationContent;
 
+/**
+ * Extracts and builds default values from observationSolution using question externalIds and userData.
+ * This function can be used to prefill form data for an observation, using userData keys as source.
+ *
+ * @param observationSolution The observation solution object structure containing evidences & questions
+ * @param userData The participant/user object from which to pick default values
+ * @returns An object mapping question externalIds to userData values (or undefined if not present)
+ */
+const buildDefaultValuesFromObservation = (
+  observationSolution: any,
+  userData: any
+): Record<string, any> => {
+  if (!observationSolution?.assessment?.evidences) return {};
+
+  const userDataKeys = Object.keys(userData);
+  const defaultValues: Record<string, any> = {};
+
+  for (const evidence of observationSolution.assessment.evidences) {
+    if (!evidence.sections) continue;
+    for (const section of evidence.sections) {
+      if (!section.questions) continue;
+      for (const question of section.questions) {
+        // Handle questions with pageQuestions separately
+        if (question.responseType === 'pageQuestions' && Array.isArray(question.pageQuestions)) {
+          for (const pageQuestion of question.pageQuestions) {
+            const keyFound = userDataKeys.find(key => pageQuestion.question.includes(key));
+            if (keyFound !== undefined) {
+              defaultValues[pageQuestion._id] = { value: userData[keyFound], readonly: true };
+            }
+          }
+        } else {
+          const keyFound = userDataKeys.find(key => question.question.includes(key));
+          if (keyFound !== undefined && question.externalId) {
+            defaultValues[question.externalId] = { value: userData[keyFound], readonly: true };
+          }
+        }
+      }
+    }
+  }
+
+  return defaultValues;
+};
