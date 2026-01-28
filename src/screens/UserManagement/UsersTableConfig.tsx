@@ -310,20 +310,20 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
       showLabel: false,
     },
   },
-  {
-    key: 'lastLogin',
-    label: 'admin.users.lastLogin',
-    flex: 1.2,
-    render: (user) => (
-      <Text {...TYPOGRAPHY.paragraph} {...styles.lastLoginText}>
-        -
-      </Text>
-    ),
-    mobileConfig: {
-      leftRank: 5,
-      showLabel: false,
-    },
-  },
+  // {
+  //   key: 'lastLogin',
+  //   label: 'admin.users.lastLogin',
+  //   flex: 1.2,
+  //   render: (user) => (
+  //     <Text {...TYPOGRAPHY.paragraph} {...styles.lastLoginText}>
+  //       -
+  //     </Text>
+  //   ),
+  //   mobileConfig: {
+  //     leftRank: 5,
+  //     showLabel: false,
+  //   },
+  // },
   {
     key: 'details',
     label: 'admin.users.details',
