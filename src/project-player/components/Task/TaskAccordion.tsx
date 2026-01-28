@@ -98,7 +98,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
             <HStack
               {...taskAccordionStyles.cardHeaderContent}
               justifyContent="space-between"
-                 
+
             >
               <HStack {...taskAccordionStyles.pillarHeaderRow}>
                 <LucideIcon
