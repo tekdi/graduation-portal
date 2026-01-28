@@ -50,7 +50,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const { mode, config, updateTask } = useProjectContext();
   const { deleteTask } = useProjectContext();
   // handleOpenForm
-  const {  handleStatusChange, handleAddToPlan } =
+  const { handleStatusChange, handleAddToPlan } =
     useTaskActions();
   const { isWeb, isMobile } = usePlatform();
   const { t } = useLanguage();
@@ -77,7 +77,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
-    const uiConfig = useMemo(
+  const uiConfig = useMemo(
     () => ({
       showAsCard: isChildOfProject,
       showAsInline: !isChildOfProject || isPreview,
@@ -157,9 +157,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           onChange={handleCheckboxChange}
           isDisabled={isReadOnly}
           size="md"
-          aria-label={`Mark ${task?.name} as ${
-            isCompleted ? 'incomplete' : 'complete'
-          }`}
+          aria-label={`Mark ${task?.name} as ${isCompleted ? 'incomplete' : 'complete'
+            }`}
           opacity={isReadOnly ? 0.6 : 1}
         >
           <CheckboxIndicator
@@ -167,6 +166,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             bg={isCompleted ? '$primary500' : '$backgroundPrimary.light'}
             alignItems="center"
             justifyContent="center"
+            borderRadius="$full"
           >
             <CheckboxIcon as={CheckIcon} color="$accent100" />
           </CheckboxIndicator>
@@ -240,14 +240,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-            | 'line-through'
-            | 'none',
-          opacity: isCompleted ? 0.6 : 1,
-        }
+        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+          | 'line-through'
+          | 'none',
+        opacity: isCompleted ? 0.6 : 1,
+      }
       : {};
 
-    const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.h4 : TYPOGRAPHY.h3;
+    const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
 
     // Task badge rendering (Evidence Required / Optional)
     // In Edit mode, hide Optional badges - only show 'required' type badges
@@ -263,8 +263,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
-            ? '$optionalBadgeBg'
-            : '$backgroundLight100'
+              ? '$optionalBadgeBg'
+              : '$backgroundLight100'
         }
         paddingHorizontal="$2"
         paddingVertical="$1"
@@ -278,8 +278,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
-              ? '$optionalBadgeText'
-              : '$textMuted'
+                ? '$optionalBadgeText'
+                : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText}
@@ -567,15 +567,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBg'
             : isPreview && isAddedToPlan
-            ? '$addedToPlanBg'
-            : taskCardStyles.childCard?.bg
+              ? '$addedToPlanBg'
+              : taskCardStyles.childCard?.bg
         }
         borderColor={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBorder'
             : isPreview && isAddedToPlan
-            ? '$addedToPlanBorder'
-            : taskCardStyles.childCard?.borderColor
+              ? '$addedToPlanBorder'
+              : taskCardStyles.childCard?.borderColor
         }
       >
         <Box
@@ -588,14 +588,26 @@ const TaskCard: React.FC<TaskCardProps> = ({
             flexDirection={isMobile ? 'column' : 'row'}
           >
             {isMobile ? (
-              <Box flexDirection="row">
-                <Box flexShrink={0} mt="$1">
-                  {renderStatusIndicator()}
+              <VStack space="xs" width="100%">
+                {/* Row 1: Checkbox + Title + Edit/Delete icons */}
+                <HStack alignItems="flex-start" space="xs">
+                  <Box flexShrink={0} mt="$1">
+                    {renderStatusIndicator()}
+                  </Box>
+                  <Box flex={1}>
+                    {renderTaskInfo()}
+                  </Box>
+                  {renderCustomTaskActions({
+                    isCustomTask: task.isCustomTask || false,
+                    onEdit: openEditModal,
+                    onDelete: openDeleteModal,
+                  })}
+                </HStack>
+                {/* Row 2: Upload button full width */}
+                <Box width="100%">
+                  {renderActionButton()}
                 </Box>
-                <Box flex={1} marginLeft="5px">
-                  {renderTaskInfo()}
-                </Box>
-              </Box>
+              </VStack>
             ) : (
               <>
                 <Box flexShrink={0} mt="$1">
@@ -604,34 +616,18 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <Box flex={1} minWidth="$0">
                   {renderTaskInfo()}
                 </Box>
-              </>
-            )}
-            <Box flexShrink={0} width={isMobile ? '100%' : 'auto'}>
-              {isMobile ? (
-                // 📱 Mobile → stacked, full width
-                <VStack space="sm" width="100%">
-                  <Box width="100%">{renderActionButton()}</Box>
-
-                  <Box width="100%">
+                <Box flexShrink={0}>
+                  <HStack space="xs" alignItems="center">
+                    {renderActionButton()}
                     {renderCustomTaskActions({
                       isCustomTask: task.isCustomTask || false,
                       onEdit: openEditModal,
                       onDelete: openDeleteModal,
                     })}
-                  </Box>
-                </VStack>
-              ) : (
-                // 💻 Web → inline
-                <HStack space="xs" alignItems="center">
-                  {renderActionButton()}
-                  {renderCustomTaskActions({
-                    isCustomTask: task.isCustomTask || false,
-                    onEdit: openEditModal,
-                    onDelete: openDeleteModal,
-                  })}
-                </HStack>
-              )}
-            </Box>
+                  </HStack>
+                </Box>
+              </>
+            )}
           </HStack>
         </Box>
       </Card>
@@ -668,49 +664,49 @@ const TaskCard: React.FC<TaskCardProps> = ({
     );
   } else {
     // Default inline style for regular tasks
-   mainContent = (
-  <Box
-    {...taskCardStyles.regularTaskContainer}
-    padding={isMobile ? '20px 0' : '$2 0'}
-  >
-    <HStack
-      alignItems="flex-start"
-      space={isWeb ? 'md' : 'sm'}
-      flexDirection={isMobile ? 'column' : 'row'}
-    >
-      {/* 🔹 Status + Info Section */}
-      {isMobile ? (
-        <Box flexDirection="row">
-          <Box flexShrink={0} mt="$1">
-            {renderStatusIndicator()}
-          </Box>
-          <Box flex={1} marginLeft="5px">
-            {renderTaskInfo()}
-          </Box>
-        </Box>
-      ) : (
-        <>
-          <Box flexShrink={0} mt="$1">
-            {renderStatusIndicator()}
-          </Box>
-          <Box flex={1} minWidth="$0">
-            {renderTaskInfo()}
-          </Box>
-        </>
-      )}
+    mainContent = (
+      <Box
+        {...taskCardStyles.regularTaskContainer}
+        padding={isMobile ? '20px 0' : '$2 0'}
+      >
+        <HStack
+          alignItems="flex-start"
+          space={isWeb ? 'md' : 'sm'}
+          flexDirection={isMobile ? 'column' : 'row'}
+        >
+          {/* 🔹 Status + Info Section */}
+          {isMobile ? (
+            <Box flexDirection="row">
+              <Box flexShrink={0} mt="$1">
+                {renderStatusIndicator()}
+              </Box>
+              <Box flex={1} marginLeft="5px">
+                {renderTaskInfo()}
+              </Box>
+            </Box>
+          ) : (
+            <>
+              <Box flexShrink={0} mt="$1">
+                {renderStatusIndicator()}
+              </Box>
+              <Box flex={1} minWidth="$0">
+                {renderTaskInfo()}
+              </Box>
+            </>
+          )}
 
-      {/* 🔹 Actions Section */}
-      <Box flexShrink={0} width={isMobile ? '100%' : 'auto'}>
-        {renderActionButton()}
-        {renderCustomTaskActions({
-          isCustomTask: task.isCustomTask || false,
-          onEdit: openEditModal,
-          onDelete: openDeleteModal,
-        })}
+          {/* 🔹 Actions Section */}
+          <Box flexShrink={0} width={isMobile ? '100%' : 'auto'}>
+            {renderActionButton()}
+            {renderCustomTaskActions({
+              isCustomTask: task.isCustomTask || false,
+              onEdit: openEditModal,
+              onDelete: openDeleteModal,
+            })}
+          </Box>
+        </HStack>
       </Box>
-    </HStack>
-  </Box>
-);
+    );
 
   }
 
