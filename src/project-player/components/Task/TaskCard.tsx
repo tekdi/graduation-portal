@@ -50,7 +50,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const { mode, config, updateTask } = useProjectContext();
   const { deleteTask } = useProjectContext();
   // handleOpenForm
-  const {handleStatusChange, handleAddToPlan } =
+  const {  handleStatusChange, handleAddToPlan } =
     useTaskActions();
   const { isWeb, isMobile } = usePlatform();
   const { t } = useLanguage();
@@ -157,8 +157,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
           onChange={handleCheckboxChange}
           isDisabled={isReadOnly}
           size="md"
-          aria-label={`Mark ${task?.name} as ${isCompleted ? 'incomplete' : 'complete'
-            }`}
+          aria-label={`Mark ${task?.name} as ${
+            isCompleted ? 'incomplete' : 'complete'
+          }`}
           opacity={isReadOnly ? 0.6 : 1}
         >
           <CheckboxIndicator
