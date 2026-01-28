@@ -240,11 +240,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-          | 'line-through'
-          | 'none',
-        opacity: isCompleted ? 0.6 : 1,
-      }
+          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+            | 'line-through'
+            | 'none',
+          opacity: isCompleted ? 0.6 : 1,
+        }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -263,8 +263,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
-              ? '$optionalBadgeBg'
-              : '$backgroundLight100'
+            ? '$optionalBadgeBg'
+            : '$backgroundLight100'
         }
         paddingHorizontal="$2"
         paddingVertical="$1"
@@ -278,8 +278,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
-                ? '$optionalBadgeText'
-                : '$textMuted'
+              ? '$optionalBadgeText'
+              : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText}
@@ -568,15 +568,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBg'
             : isPreview && isAddedToPlan
-              ? '$addedToPlanBg'
-              : taskCardStyles.childCard?.bg
+            ? '$addedToPlanBg'
+            : taskCardStyles.childCard?.bg
         }
         borderColor={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBorder'
             : isPreview && isAddedToPlan
-              ? '$addedToPlanBorder'
-              : taskCardStyles.childCard?.borderColor
+            ? '$addedToPlanBorder'
+            : taskCardStyles.childCard?.borderColor
         }
       >
         <Box {...taskCardStyles.childCardContent}>

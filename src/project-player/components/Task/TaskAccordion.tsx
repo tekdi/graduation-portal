@@ -175,11 +175,11 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
                           sx={
                             isWeb
                               ? {
-                                ':hover': {
-                                  textDecorationLine: 'underline',
-                                  cursor: 'pointer',
-                                },
-                              }
+                                  ':hover': {
+                                    textDecorationLine: 'underline',
+                                    cursor: 'pointer',
+                                  },
+                                }
                               : undefined
                           }
                         >
