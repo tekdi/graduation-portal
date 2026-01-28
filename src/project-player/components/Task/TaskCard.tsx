@@ -50,7 +50,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const { mode, config, updateTask } = useProjectContext();
   const { deleteTask } = useProjectContext();
   // handleOpenForm
-  const { handleStatusChange, handleAddToPlan } =
+  const {handleStatusChange, handleAddToPlan } =
     useTaskActions();
   const { isWeb, isMobile } = usePlatform();
   const { t } = useLanguage();
@@ -77,7 +77,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
-  const uiConfig = useMemo(
+    const uiConfig = useMemo(
     () => ({
       showAsCard: isChildOfProject,
       showAsInline: !isChildOfProject || isPreview,
