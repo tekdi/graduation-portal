@@ -167,6 +167,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             bg={isCompleted ? '$primary500' : '$backgroundPrimary.light'}
             alignItems="center"
             justifyContent="center"
+            borderRadius="$full"
           >
             <CheckboxIcon as={CheckIcon} color="$accent100" />
           </CheckboxIndicator>
@@ -247,7 +248,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         }
       : {};
 
-    const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.h4 : TYPOGRAPHY.h3;
+    const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
 
     // Task badge rendering (Evidence Required / Optional)
     // In Edit mode, hide Optional badges - only show 'required' type badges
@@ -588,14 +589,26 @@ const TaskCard: React.FC<TaskCardProps> = ({
             flexDirection={isMobile ? 'column' : 'row'}
           >
             {isMobile ? (
-              <Box flexDirection="row">
-                <Box flexShrink={0} mt="$1">
-                  {renderStatusIndicator()}
+              <VStack space="xs" width="100%">
+                {/* Row 1: Checkbox + Title + Edit/Delete icons */}
+                <HStack alignItems="flex-start" space="xs">
+                  <Box flexShrink={0} mt="$1">
+                    {renderStatusIndicator()}
+                  </Box>
+                  <Box flex={1}>
+                    {renderTaskInfo()}
+                  </Box>
+                  {renderCustomTaskActions({
+                    isCustomTask: task.isCustomTask || false,
+                    onEdit: openEditModal,
+                    onDelete: openDeleteModal,
+                  })}
+                </HStack>
+                {/* Row 2: Upload button full width */}
+                <Box width="100%">
+                  {renderActionButton()}
                 </Box>
-                <Box flex={1} marginLeft="5px">
-                  {renderTaskInfo()}
-                </Box>
-              </Box>
+              </VStack>
             ) : (
               <>
                 <Box flexShrink={0} mt="$1">
@@ -604,34 +617,18 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 <Box flex={1} minWidth="$0">
                   {renderTaskInfo()}
                 </Box>
-              </>
-            )}
-            <Box flexShrink={0} width={isMobile ? '100%' : 'auto'}>
-              {isMobile ? (
-                // 📱 Mobile → stacked, full width
-                <VStack space="sm" width="100%">
-                  <Box width="100%">{renderActionButton()}</Box>
-
-                  <Box width="100%">
+                <Box flexShrink={0}>
+                  <HStack space="xs" alignItems="center">
+                    {renderActionButton()}
                     {renderCustomTaskActions({
                       isCustomTask: task.isCustomTask || false,
                       onEdit: openEditModal,
                       onDelete: openDeleteModal,
                     })}
-                  </Box>
-                </VStack>
-              ) : (
-                // 💻 Web → inline
-                <HStack space="xs" alignItems="center">
-                  {renderActionButton()}
-                  {renderCustomTaskActions({
-                    isCustomTask: task.isCustomTask || false,
-                    onEdit: openEditModal,
-                    onDelete: openDeleteModal,
-                  })}
-                </HStack>
-              )}
-            </Box>
+                  </HStack>
+                </Box>
+              </>
+            )}
           </HStack>
         </Box>
       </Card>
@@ -668,49 +665,49 @@ const TaskCard: React.FC<TaskCardProps> = ({
     );
   } else {
     // Default inline style for regular tasks
-   mainContent = (
-  <Box
-    {...taskCardStyles.regularTaskContainer}
-    padding={isMobile ? '20px 0' : '$2 0'}
-  >
-    <HStack
-      alignItems="flex-start"
-      space={isWeb ? 'md' : 'sm'}
-      flexDirection={isMobile ? 'column' : 'row'}
-    >
-      {/* 🔹 Status + Info Section */}
-      {isMobile ? (
-        <Box flexDirection="row">
-          <Box flexShrink={0} mt="$1">
-            {renderStatusIndicator()}
-          </Box>
-          <Box flex={1} marginLeft="5px">
-            {renderTaskInfo()}
-          </Box>
-        </Box>
-      ) : (
-        <>
-          <Box flexShrink={0} mt="$1">
-            {renderStatusIndicator()}
-          </Box>
-          <Box flex={1} minWidth="$0">
-            {renderTaskInfo()}
-          </Box>
-        </>
-      )}
+    mainContent = (
+      <Box
+        {...taskCardStyles.regularTaskContainer}
+        padding={isMobile ? '20px 0' : '$2 0'}
+      >
+        <HStack
+          alignItems="flex-start"
+          space={isWeb ? 'md' : 'sm'}
+          flexDirection={isMobile ? 'column' : 'row'}
+        >
+          {/* 🔹 Status + Info Section */}
+          {isMobile ? (
+            <Box flexDirection="row">
+              <Box flexShrink={0} mt="$1">
+                {renderStatusIndicator()}
+              </Box>
+              <Box flex={1} marginLeft="5px">
+                {renderTaskInfo()}
+              </Box>
+            </Box>
+          ) : (
+            <>
+              <Box flexShrink={0} mt="$1">
+                {renderStatusIndicator()}
+              </Box>
+              <Box flex={1} minWidth="$0">
+                {renderTaskInfo()}
+              </Box>
+            </>
+          )}
 
-      {/* 🔹 Actions Section */}
-      <Box flexShrink={0} width={isMobile ? '100%' : 'auto'}>
-        {renderActionButton()}
-        {renderCustomTaskActions({
-          isCustomTask: task.isCustomTask || false,
-          onEdit: openEditModal,
-          onDelete: openDeleteModal,
-        })}
+          {/* 🔹 Actions Section */}
+          <Box flexShrink={0} width={isMobile ? '100%' : 'auto'}>
+            {renderActionButton()}
+            {renderCustomTaskActions({
+              isCustomTask: task.isCustomTask || false,
+              onEdit: openEditModal,
+              onDelete: openDeleteModal,
+            })}
+          </Box>
+        </HStack>
       </Box>
-    </HStack>
-  </Box>
-);
+    );
 
   }
 
