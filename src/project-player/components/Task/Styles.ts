@@ -10,12 +10,12 @@ export const taskCardStyles = {
     variant: 'elevated' as const,
     bg: '#F6F7FB',
     borderRadius: '$md',
-    marginBottom: '$0.5',
+    marginBottom: '$2',
     borderWidth: 1,
     borderColor: '$borderLight300',
   },
   childCardContent: {
-    padding: '$0.5',
+    padding: '$0',
     paddingVertical: '$0.5',
   },
 
@@ -30,7 +30,7 @@ export const taskCardStyles = {
   // Default inline style for regular tasks
   regularTaskContainer: {
     bg: '$backgroundPrimary.light',
-    padding: '$5',
+    padding: '$2',
   },
   statusIndicatorContainer: {
     width: 40,
@@ -145,7 +145,7 @@ export const taskAccordionStyles = {
     borderRadius: '$lg',
   },
   cardHeader: {
-    padding: '$5',
+    padding: '$2',
     borderBottomWidth: 1,
     borderBottomColor: '$mutedBorder',
   },
@@ -154,16 +154,16 @@ export const taskAccordionStyles = {
     alignItems: 'center' as const,
   },
   cardContent: {
-    paddingHorizontal: '$5',
-    paddingBottom: '$5',
+    paddingHorizontal: '$0',
+    paddingBottom: '$0',
   },
   cardContentStack: {
-    space: 'md' as const,
-    paddingTop: '$3',
+    space: 'xs' as const,
+    paddingTop: '$2',
   },
   taskBadge: {
     bg: '$primary100',
-    paddingHorizontal: '$3',
+    paddingHorizontal: '$2',
     paddingVertical: '$1',
     borderRadius: '$full',
     borderColor: '$primary500',
@@ -184,7 +184,7 @@ export const taskAccordionStyles = {
     borderColor: '$mutedBorder',
   },
   accordionTrigger: {
-    padding: '$5',
+    padding: '$1',
   },
   accordionHeaderContent: {
     flex: 1,
@@ -195,12 +195,12 @@ export const taskAccordionStyles = {
     ml: '$4',
   },
   accordionContent: {
-    paddingHorizontal: '$5',
-    paddingBottom: '$5',
+    paddingHorizontal: '$1',
+    paddingBottom: '$1',
   },
   accordionContentStack: {
-    space: 'md' as const,
-    paddingTop: '$3',
+    space: 'xs' as const,
+    paddingTop: '$1',
   },
   // Progress percentage text
   progressText: {
@@ -278,8 +278,8 @@ export const addCustomTaskStyles = {
     borderWidth: 1,
     borderStyle: 'dashed' as const,
     borderColor: '$mutedBorder',
-    padding: '$1',
-    marginTop: '$3',
+    padding: '$0.5',
+    marginTop: '$1',
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
     bg: '$accent100',

@@ -119,7 +119,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
           {/* Card Content - Always visible (no accordion) */}
           <Box
             {...taskAccordionStyles.cardContent}
-            paddingHorizontal={isWeb ? '$5' : '$2'}
+            paddingHorizontal={isWeb ? '$1' : '$0'}
           >
             <VStack {...taskAccordionStyles.cardContentStack}>
               {(task?.children?.length ? task.children : task.tasks)?.map(
@@ -162,7 +162,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
           <AccordionHeader>
             <AccordionTrigger
               {...taskAccordionStyles.accordionTrigger}
-              padding={isWeb ? '$5' : '$1'}
+              padding={isWeb ? '$2' : '$1'}
             >
               {({ isExpanded }: { isExpanded: boolean }) => (
                 <>
@@ -170,16 +170,16 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
                     <VStack flex={1} space="xs">
                       <HStack alignItems="center" space="sm" flexWrap="wrap">
                         <Text
-                          {...TYPOGRAPHY.h4}
+                          {...TYPOGRAPHY.paragraph}
                           color="$textPrimary"
                           sx={
                             isWeb
                               ? {
-                                  ':hover': {
-                                    textDecorationLine: 'underline',
-                                    cursor: 'pointer',
-                                  },
-                                }
+                                ':hover': {
+                                  textDecorationLine: 'underline',
+                                  cursor: 'pointer',
+                                },
+                              }
                               : undefined
                           }
                         >
@@ -224,7 +224,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
           {/* Accordion Content - Collapsible in preview mode */}
           <AccordionContent
             {...taskAccordionStyles.accordionContent}
-            paddingHorizontal={isWeb ? '$5' : '$1'}
+            paddingHorizontal={isWeb ? '$1' : '$0'}
           >
             {/* Info Banner - Only for Social Protection in Preview Mode */}
             {task?.metaInformation?.warningMessage && (

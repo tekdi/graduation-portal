@@ -50,9 +50,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const { mode, config, updateTask } = useProjectContext();
   const { deleteTask } = useProjectContext();
   // handleOpenForm
-  const {  handleStatusChange, handleAddToPlan } =
+  const { handleStatusChange, handleAddToPlan } =
     useTaskActions();
-  const { isWeb } = usePlatform();
+  const { isWeb, isMobile } = usePlatform();
   const { t } = useLanguage();
   const toast = useToast();
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -77,7 +77,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
-    const uiConfig = useMemo(
+  const uiConfig = useMemo(
     () => ({
       showAsCard: isChildOfProject,
       showAsInline: !isChildOfProject || isPreview,
@@ -157,9 +157,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           onChange={handleCheckboxChange}
           isDisabled={isReadOnly}
           size="md"
-          aria-label={`Mark ${task?.name} as ${
-            isCompleted ? 'incomplete' : 'complete'
-          }`}
+          aria-label={`Mark ${task?.name} as ${isCompleted ? 'incomplete' : 'complete'
+            }`}
           opacity={isReadOnly ? 0.6 : 1}
         >
           <CheckboxIndicator
@@ -167,6 +166,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             bg={isCompleted ? '$primary500' : '$backgroundPrimary.light'}
             alignItems="center"
             justifyContent="center"
+            borderRadius="$full"
           >
             <CheckboxIcon as={CheckIcon} color="$accent100" />
           </CheckboxIndicator>
@@ -240,14 +240,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-            | 'line-through'
-            | 'none',
-          opacity: isCompleted ? 0.6 : 1,
-        }
+        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+          | 'line-through'
+          | 'none',
+        opacity: isCompleted ? 0.6 : 1,
+      }
       : {};
 
-    const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.h4 : TYPOGRAPHY.h3;
+    const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
 
     // Task badge rendering (Evidence Required / Optional)
     // In Edit mode, hide Optional badges - only show 'required' type badges
@@ -263,8 +263,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
-            ? '$optionalBadgeBg'
-            : '$backgroundLight100'
+              ? '$optionalBadgeBg'
+              : '$backgroundLight100'
         }
         paddingHorizontal="$2"
         paddingVertical="$1"
@@ -278,8 +278,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
-              ? '$optionalBadgeText'
-              : '$textMuted'
+                ? '$optionalBadgeText'
+                : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText}
@@ -475,6 +475,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         opacity={isReadOnly ? 0.5 : 1}
         $hover-bg={isEdit ? buttonStyles.hoverBg : 'transparent'}
         $hover-borderColor="$primary500"
+        width={isMobile && uiConfig.showAsCard ? '100%' : undefined}
       >
         {(state: any) => {
           const isHovered = state?.hovered || state?.pressed || false;
@@ -567,28 +568,48 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBg'
             : isPreview && isAddedToPlan
-            ? '$addedToPlanBg'
-            : taskCardStyles.childCard?.bg
+              ? '$addedToPlanBg'
+              : taskCardStyles.childCard?.bg
         }
         borderColor={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBorder'
             : isPreview && isAddedToPlan
-            ? '$addedToPlanBorder'
-            : taskCardStyles.childCard?.borderColor
+              ? '$addedToPlanBorder'
+              : taskCardStyles.childCard?.borderColor
         }
       >
         <Box {...taskCardStyles.childCardContent}>
-          {isWeb ? (
-            // Web: All in one row
-            <HStack alignItems="flex-start" space="md">
+          {/* Mobile: Vertical layout for all modes */}
+          {isMobile ? (
+            <VStack space="xs">
+              {/* Row 1: Checkbox + Title + Actions */}
+              <HStack alignItems="flex-start" space="xs">
+                <Box flexShrink={0} alignItems="center" justifyContent="center">
+                  {renderStatusIndicator()}
+                </Box>
+                <Box flex={1}>{renderTaskInfo()}</Box>
+                {renderCustomTaskActions({
+                  isCustomTask: task.isCustomTask || false,
+                  onEdit: openEditModal,
+                  onDelete: openDeleteModal,
+                })}
+              </HStack>
+              {/* Row 2: Upload button full width */}
+              <Box width="100%">
+                {renderActionButton()}
+              </Box>
+            </VStack>
+          ) : (
+            // Web: Horizontal layout for all modes
+            <HStack alignItems="flex-start" space="sm">
               <Box flexShrink={0} alignItems="center" justifyContent="center">
                 {renderStatusIndicator()}
               </Box>
               <Box flex={1} minWidth="$0">
                 {renderTaskInfo()}
               </Box>
-              <Box flexShrink={0}>
+              <Box flexShrink={0} alignSelf="center">
                 <HStack space="xs" alignItems="center">
                   {renderActionButton()}
                   {renderCustomTaskActions({
@@ -599,26 +620,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 </HStack>
               </Box>
             </HStack>
-          ) : (
-            // Mobile: Title/badge on top, button below
-            <VStack space="sm">
-              <HStack alignItems="flex-start" space="sm">
-                <Box flexShrink={0} alignItems="center" justifyContent="center">
-                  {renderStatusIndicator()}
-                </Box>
-                <Box flex={1}>{renderTaskInfo()}</Box>
-              </HStack>
-              <Box alignItems="center" width="100%">
-                <HStack space="xs" alignItems="center">
-                  {renderActionButton()}
-                  {renderCustomTaskActions({
-                    isCustomTask: task.isCustomTask || false,
-                    onEdit: openEditModal,
-                    onDelete: openDeleteModal,
-                  })}
-                </HStack>
-              </Box>
-            </VStack>
           )}
         </Box>
       </Card>
