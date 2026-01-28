@@ -21,6 +21,10 @@ export interface PageHeaderProps {
   rightSection?: React.ReactNode;
   /** Children content */
   children?: React.ReactNode;
+  /** Content styles */
+  _content?: any;
+  /** Container styles */
+  _container?: any;
 }
 
 /**
@@ -34,11 +38,13 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   backButtonText,
   rightSection,
   children,
+  _content,
+  _container
 }) => {
   return (
     <VStack {...pageHeaderStyles.container}>
-      <Container>
-        <HStack {...pageHeaderStyles.content}>
+      <Container {..._container}>
+        <HStack {...pageHeaderStyles.content} {..._content}>
           <HStack {...pageHeaderStyles.leftSection}>
             {/* @ts-ignore: ghost variant is defined in theme */}
             {onBackPress &&

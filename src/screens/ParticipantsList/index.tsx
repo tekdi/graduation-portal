@@ -206,14 +206,7 @@ const ParticipantsList: React.FC = () => {
   return (
     <Box {...styles.mainContainer}>
       <ScrollView {...styles.scrollView}>
-        <VStack {...styles.headerVStack}>
-          <Container>
-            <PageHeader
-             title={t('participants.myParticipants')}
-            />
-          </Container>
-          </VStack>
-      
+        <PageHeader title={t('participants.myParticipants')} />
         <Container>
           <VStack {...styles.contentVStack}>
             {/* Search Bar and Active/Inactive Filter */}

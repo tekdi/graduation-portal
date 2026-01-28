@@ -14,7 +14,8 @@ import ParticipantHeader from './ParticipantHeader';
 import { participantDetailStyles } from './Styles';
 import {
   getParticipantsList,
-  getSitesByProvince} from '../../services/participantService';
+  getSitesByProvince
+} from '../../services/participantService';
 import { useLanguage } from '@contexts/LanguageContext';
 import NotFound from '@components/NotFound';
 import { TabButton } from '@components/Tabs';
@@ -27,7 +28,7 @@ import type {
   ParticipantStatus,
   // PathwayType,
 } from '@app-types/participant';
-import { Modal, useAlert, Select, LucideIcon } from '@ui';
+import { Modal, useAlert, Select, LucideIcon, Loader } from '@ui';
 import { usePlatform } from '@utils/platform';
 import { profileStyles } from '@components/ui/Modal/Styles';
 import { theme } from '@config/theme';
@@ -58,12 +59,13 @@ type ParticipantDetailRouteProp = RouteProp<{
 
 export default function ParticipantDetail() {
   const route = useRoute<ParticipantDetailRouteProp>();
-  const {user} = useAuth()
+  const { user } = useAuth()
   const { t } = useLanguage();
   const { showAlert } = useAlert();
   const { isWeb } = usePlatform();
   // Extract the id parameter from the route
   const participantId = route.params?.id;
+  const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<string>('intervention-plan');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
@@ -85,28 +87,36 @@ export default function ParticipantDetail() {
     const fetchEntityDetails = async () => {
       if (participantId && user?.id) {
         try {
-          const response = await getParticipantsList({entityId:participantId,userId:user?.id})
-          const {userDetails,...rest} = response?.result?.data?.[0]
-          const participantData = {...(userDetails || {}),...rest}
+          setIsLoading(true);
+          const response = await getParticipantsList({ entityId: participantId, userId: user?.id })
+          const { userDetails, ...rest } = response?.result?.data?.[0]
+          const participantData = { ...(userDetails || {}), ...rest }
           setParticipant(participantData);
           setStatus(participantData?.status);
         } catch (error) {
           console.log(error);
+        } finally {
+          setIsLoading(false);
         }
       }
     };
     fetchEntityDetails();
-  }, [participantId,user?.id, idpCreated ]);
+  }, [participantId, user?.id, idpCreated]);
 
-   const handleIdpCreated=()=>{
+  const handleIdpCreated = () => {
     setIdpCreated(true)
   }
+
+  if (isLoading) {
+    return <Loader fullScreen message="Loading participant details..." />;
+  }
+
   // Error State: Participant Not Found
   if (!participant) {
     return <NotFound message="participantDetail.notFound.title" />;
   }
 
-  
+
   const {
     name: participantName,
     id,
@@ -124,11 +134,11 @@ export default function ParticipantDetail() {
   };
 
   const ProjectPlayerConfigData: ProjectPlayerData = {
-    projectId : status === STATUS.IN_PROGRESS
+    projectId: status === STATUS.IN_PROGRESS
       ? participant?.idpProjectId
       : status === STATUS.NOT_ENROLLED
-      ? participant?.onBoardedProjectId
-      :  participant?.onBoardedProjectId,
+        ? participant?.onBoardedProjectId
+        : participant?.onBoardedProjectId,
     entityId: participant?.entityId,
     userStatus: participant?.status,
   };
@@ -148,10 +158,10 @@ export default function ParticipantDetail() {
     try {
       setParticipant(
         (prev: User | undefined) =>
-          ({
-            ...(prev as User),
-            location: `${editedAddress.street}, ${editedAddress.province}, ${editedAddress.site}`,
-          } as User),
+        ({
+          ...(prev as User),
+          location: `${editedAddress.street}, ${editedAddress.province}, ${editedAddress.site}`,
+        } as User),
       );
       setIsEditingAddress(false);
       showAlert('success', t('participantDetail.profileModal.addressUpdated'), {
@@ -162,94 +172,85 @@ export default function ParticipantDetail() {
         placement: 'bottom-right',
       });
     }
-  }; 
+  };
 
   return (
-    <>
-      <Box flex={1} bg="$accent100">
-        <VStack
-          {...participantDetailStyles.container}
-          $web-boxShadow={participantDetailStyles.containerBoxShadow}
-        >
-          <Container>
-            {/* Participant Header with status-based variations */}
-            <ParticipantHeader
-              participantName={participantName}
-              participantId={id}
-              status={participant.status as ParticipantStatus}
-              pathway={'employment'}
-              graduationProgress={20}
-              graduationDate={''}
-              onViewProfile={() => setIsProfileModalOpen(true)}
-              areAllTasksCompleted={areAllTasksCompleted}
-              userEntityId={participant?.entityId}
-              onStatusUpdate={newStatus => {
-                setStatus(newStatus);
-              }}
-            />
-          </Container>
-        </VStack>
-        <Container px="$4" py="$6" $md-px="$6">
-          {status === STATUS.NOT_ENROLLED ? (
-            // NOT_ENROLLED: Show ProjectPlayer directly with editMode
-            <ProjectPlayer
-              config={configData}
-              data={ProjectPlayerConfigData}
-              onTaskCompletionChange={setAreAllTasksCompleted}
-            />
-          ) : (
-            // ENROLLED, IN_PROGRESS, DROPOUT: Show tabs with ProjectPlayer in InterventionPlan
-            <>
-              {/* Tabs */}
-              <Box width="$full" mt="$4" mb="$6">
-                <Box width="$full">
-                  <HStack
-                    width="$full"
-                    bg="$backgroundLight50"
-                    borderRadius={50}
-                    p={4}
-                    gap={4}
-                    alignItems="center"
-                  >
-                    {PARTICIPANT_DETAIL_TABS?.map(tab => (
-                      <TabButton
-                        key={tab.key}
-                        tab={tab}
-                        isActive={activeTab === tab.key}
-                        onPress={setActiveTab}
-                        variant="ButtonTab"
-                      />
-                    ))}
-                  </HStack>
-                </Box>
+    <Box flex={1} bg="$accent100">
+      {/* Participant Header with status-based variations */}
+      <ParticipantHeader
+        participantName={participantName}
+        participantId={id}
+        status={participant.status as ParticipantStatus}
+        pathway={'employment'}
+        graduationProgress={20}
+        graduationDate={''}
+        onViewProfile={() => setIsProfileModalOpen(true)}
+        areAllTasksCompleted={areAllTasksCompleted}
+        userEntityId={participant?.entityId}
+        onStatusUpdate={newStatus => {
+          setStatus(newStatus);
+        }}
+      />
+      <Container px="$4" py="$6" $md-px="$6">
+        {status === STATUS.NOT_ENROLLED ? (
+          // NOT_ENROLLED: Show ProjectPlayer directly with editMode
+          <ProjectPlayer
+            config={configData}
+            data={ProjectPlayerConfigData}
+            onTaskCompletionChange={setAreAllTasksCompleted}
+          />
+        ) : (
+          // ENROLLED, IN_PROGRESS, DROPOUT: Show tabs with ProjectPlayer in InterventionPlan
+          <>
+            {/* Tabs */}
+            <Box width="$full" mt="$4" mb="$6">
+              <Box width="$full">
+                <HStack
+                  width="$full"
+                  bg="$backgroundLight50"
+                  borderRadius={50}
+                  p={4}
+                  gap={4}
+                  alignItems="center"
+                >
+                  {PARTICIPANT_DETAIL_TABS?.map(tab => (
+                    <TabButton
+                      key={tab.key}
+                      tab={tab}
+                      isActive={activeTab === tab.key}
+                      onPress={setActiveTab}
+                      variant="ButtonTab"
+                    />
+                  ))}
+                </HStack>
               </Box>
+            </Box>
 
-              {/* Tab Content */}
-              <Box flex={1} mt="$3" mb="$6" bg="transparent">
+            {/* Tab Content */}
+            <Box flex={1} mt="$3" mb="$6" bg="transparent">
+              <Box width="$full">
                 <Box width="$full">
-                  <Box width="$full">
-                    {activeTab ===
-                      PARTICIPANT_DETAILS_TABS.INTERVENTION_PLAN && (
+                  {activeTab ===
+                    PARTICIPANT_DETAILS_TABS.INTERVENTION_PLAN && (
                       <InterventionPlan
                         participantStatus={status as ParticipantStatus}
                         participantId={id}
                         participantProfile={participant}
-                        onIdpCreation ={handleIdpCreated}
+                        onIdpCreation={handleIdpCreated}
                       />
                     )}
-                    {activeTab ===
-                      PARTICIPANT_DETAILS_TABS.ASSESSMENTS_SURVEYS && (
+                  {activeTab ===
+                    PARTICIPANT_DETAILS_TABS.ASSESSMENTS_SURVEYS && (
                       <AssessmentSurveys
                         participant={participant as ParticipantData}
                       />
                     )}
-                  </Box>
                 </Box>
               </Box>
-            </>
-          )}
-        </Container>
-      </Box>
+            </Box>
+          </>
+        )}
+      </Container>
 
       {/* Profile Modal */}
       <Modal
@@ -423,6 +424,7 @@ export default function ParticipantDetail() {
           )}
         </VStack>
       </Modal>
-    </>
+    </Box>
+
   );
 }
