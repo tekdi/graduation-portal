@@ -101,7 +101,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
               <LucideIcon
                 name="ArrowRight"
                 size={20}
-                color={theme.tokens.colors.textMutedForeground}
+                color={"$textMutedForeground"}
               />
             </Pressable>
           )}

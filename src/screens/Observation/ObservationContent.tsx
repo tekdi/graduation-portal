@@ -136,7 +136,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
         observationSolution = response.result;
       }
       setSubmission(observationSubmissionsLast);
-      if(userData && mockData?.solution?.name === "Household Profile") {
+      if(userData) {
         const defaultValues = buildDefaultValuesFromObservation(observationSolution, userData);
         setDefaultValuesLocal(defaultValues);
       }

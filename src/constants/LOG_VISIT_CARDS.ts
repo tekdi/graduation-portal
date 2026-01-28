@@ -48,7 +48,7 @@ export const ICONS = {
   "group-visit-form": {icon: "Users", color: "$blue500"},
   "midline-survey-form": {icon: "BarChart", color: "$warning500"},
   "household profile": {icon: "Users", color: "$white", iconColor: "$primary500"},
-  "midline survey": {icon: "BarChart", color: "$warning500"},
+  "midline survey": {icon: "BarChart", color: "$warning500",iconColor: "$primary500"},
   "group visit": {icon: "Users", color: "$blue500"},
   "log visit": {icon: "Users", color: "$blue500"},
   "intervention completion survey": {icon: "FileText", color: "$white", iconColor: "$primary500"},
