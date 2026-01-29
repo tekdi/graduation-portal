@@ -173,3 +173,19 @@ export const submitInterventionPlan = async (
     return handleApiError(error);
   }
 };
+
+export const getSolutionDetails = async (
+  solutionId: string,
+  taskId: string,
+  payload: any = {}
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.GET_SOLUTION_DETAILS(solutionId, taskId),
+      payload || {}
+    );
+    return { data: response.data.result?.solutionDetails };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
