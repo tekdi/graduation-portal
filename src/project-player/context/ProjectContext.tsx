@@ -12,6 +12,7 @@ import {
 } from '../types/components.types';
 import { setApiConfig } from '../utils/api';
 import { updateTask as updateTaskAPI } from '../services/projectPlayerService';
+import { MODE } from '@constants/PROJECTDATA';
 
 const ProjectContext = createContext<ProjectContextValue | undefined>(
   undefined,
@@ -28,6 +29,8 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
   );
   const [isLoading] = useState(false);
   const [error] = useState<Error | null>(null);
+
+  const isEditMode = config.mode === MODE.editMode.mode;
 
   // Initialize API configuration
   useEffect(() => {
@@ -73,8 +76,7 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
             ...prev,
             children: updateTaskRecursive(prev.children),
           };
-        }
-       else if (prev?.tasks?.some(task => task.children?.length)) {
+        } else if (prev?.tasks?.some(task => task.children?.length)) {
           return {
             ...prev,
             tasks: prev.tasks.map(task => ({
@@ -98,25 +100,42 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
         }, 0);
       }
       // ✅ If custom task → DO NOT call API
-      if (!updatedTaskObj || updatedTaskObj.isCustomTask) {
-        return;
-      }
+      // if (!updatedTaskObj || updatedTaskObj?.isCustomTask) {
+      //   return;
+      // }
 
       // Call API to update task on server
       if (currentProjectId) {
-       try {
-        updateTaskAPI(currentProjectId, {
-      tasks: [
-        {
-          _id: taskId,
-          name: updatedTaskObj?.name,
-          ...updates,
-        },
-      ],
-    });
-       } catch (error) {
-        console.log(error)
-       }
+        try {
+           if (updatedTaskObj?.isCustomTask && !isEditMode) {
+              return;
+           }
+          else if (updatedTaskObj?.isCustomTask && isEditMode) {
+            updateTaskAPI(currentProjectId, {
+              tasks: [
+                {
+                  _id: updatedTaskObj?.parentId,
+                  name: updates.pillarName,
+                  children: [
+                    { _id: taskId, name: updatedTaskObj?.name, ...updates },
+                  ],
+                },
+              ],
+            });
+          } else {
+            updateTaskAPI(currentProjectId, {
+              tasks: [
+                {
+                  _id: taskId,
+                  name: updatedTaskObj?.name,
+                  ...updates,
+                },
+              ],
+            });
+          }
+        } catch (error) {
+          console.log(error);
+        }
       }
     },
     [onTaskUpdate],
@@ -145,7 +164,6 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
                         _id: pillarId,
                         name: t.name,
                         children:[task],
-                        // taskSequence:[]
                       },
                     ],
                   });
@@ -170,14 +188,7 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
               ...t,
               tasks: addTaskToPillar(t.tasks),
             };
-          }
-          // if (t.children && t.children.length > 0) {
-          //   return {
-          //     ...t,
-          //     children: addTaskToPillar(t.children),
-          //   };
-          // }
-         
+          }         
           return t;
         });
       };
@@ -197,51 +208,79 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
   }, []);
 
   const deleteTask = useCallback((taskId: string) => {
-    setProjectData(prev => {
-      if (!prev) return null;
+  setProjectData(prev => {
+    if (!prev) return null;
+    const currentProjectId = prev._id;
 
-      const deleteRecursive = (tasks: Task[]): Task[] => {
-        return (
-          tasks
-            // ✅ remove matching task
-            .filter(task => task._id !== taskId)
-            .map(task => {
-              // ✅ recurse into nested tasks
-              if (task.tasks?.length) {
-                return {
-                  ...task,
-                  tasks: deleteRecursive(task.tasks),
-                };
-              }
-              return task;
-            })
-        );
-      };
+    let deletedTask: Task | null = null;
+    let parentId: string | null = null;
+    let parentName: string | null = null;
 
-     if (prev?.tasks?.some(task => task.children?.length)) {
-          return {
-            ...prev,
-            tasks: prev.tasks.map(task => ({
-              ...task,
-              children: task.children
-                ? deleteRecursive(task.children)
-                : task.children,
-            })),
-          };
+    const findTaskInfo = (tasks: Task[], parent?: Task) => {
+      for (const task of tasks) {
+        if (task._id === taskId) {
+          deletedTask = task;
+          parentId = parent?._id || null;
+          parentName = parent?.name || null;
+          return true;
         }
-        else if (prev.children?.length) {
-        return {
-          ...prev,
-          children: deleteRecursive(prev.children),
-        };
+        if (task.tasks?.length && findTaskInfo(task.tasks, task)) return true;
+        if (task.children?.length && findTaskInfo(task.children, task)) return true;
       }
+      return false;
+    };
 
+    findTaskInfo(prev.tasks || prev.children || []);
+
+    if (currentProjectId && deletedTask && parentId && isEditMode) {
+      updateTaskAPI(currentProjectId, {
+        tasks: [
+          {
+            _id: parentId,
+            name:parentName,
+            children: [{ _id: deletedTask._id, isDeleted: true }],
+          },
+        ],
+      }).catch(console.log);
+    }
+
+    // 🧹 Step 3: Remove task from state
+    const deleteRecursive = (tasks: Task[]): Task[] =>
+      tasks
+        .filter(task => task._id !== taskId)
+        .map(task => ({
+          ...task,
+          tasks: task.tasks ? deleteRecursive(task.tasks) : task.tasks,
+          children: task.children
+            ? deleteRecursive(task.children)
+            : task.children,
+        }));
+
+    if (prev?.tasks?.some(task => task.children?.length)) {
       return {
         ...prev,
-        tasks: deleteRecursive(prev.tasks || []),
+        tasks: prev.tasks.map(task => ({
+          ...task,
+          children: task.children
+            ? deleteRecursive(task.children)
+            : task.children,
+        })),
       };
-    });
-  }, []);
+    }
+
+    if (prev.children?.length) {
+      return {
+        ...prev,
+        children: deleteRecursive(prev.children),
+      };
+    }
+
+    return {
+      ...prev,
+      tasks: deleteRecursive(prev.tasks || []),
+    };
+  });
+}, []);
 
   const saveLocal = useCallback(() => {
     // TODO: Implement local save logic
