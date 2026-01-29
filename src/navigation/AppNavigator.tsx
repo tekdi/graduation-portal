@@ -28,6 +28,7 @@ import LogVisit from '../screens/ParticipantDetail/LogVisit';
 import Observation from '../screens/Observation/Observation';
 import TemplateScreen from '../screens/Template';
 import CheckInsList from '../screens/ParticipantDetail/Check-ins-list';
+import TemplateManagementScreen from '../screens/TemplateManagement';
 import CsvImportTemplates from '../screens/CsvImportTemplates';
 import PasswordPolicy from '../screens/PasswordPolicy';
 
@@ -79,6 +80,11 @@ const getAccessPages = (
           name: 'user-management',
           path: '/user-management',
           component: UserManagementScreen,
+        },
+        {
+          name: 'template-management',
+          path: '/template-managemnt',
+          component: TemplateManagementScreen,
         },
         {
           name: 'csv-templates',
