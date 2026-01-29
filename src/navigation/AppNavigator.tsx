@@ -31,6 +31,7 @@ import CheckInsList from '../screens/ParticipantDetail/Check-ins-list';
 import TemplateManagementScreen from '../screens/TemplateManagement';
 import CsvImportTemplates from '../screens/CsvImportTemplates';
 import PasswordPolicy from '../screens/PasswordPolicy';
+import AuditLogScreen from '../screens/AuditLog';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -95,6 +96,11 @@ const getAccessPages = (
           name: 'PasswordPolicy',
           path: '/password-policy',
           component: PasswordPolicy,
+        },
+        {
+          name: 'audit-log',
+          path: '/audit-log',
+          component: AuditLogScreen,
         },
       ];
     case 'supervisor':
