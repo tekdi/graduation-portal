@@ -5,10 +5,8 @@
 
 export const pageHeaderStyles = {
   container: {
+    width: '$full' as const,
     bg: '$white' as const,
-    px: '$4' as const,
-    py: '$4' as const,
-    '$md-px': '$6' as const,
     shadowColor: '$shadowColor' as const,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 1,
@@ -21,7 +19,9 @@ export const pageHeaderStyles = {
     justifyContent: 'space-between' as const,
     alignItems: 'center' as const,
     '$md-alignItems': 'flex-start' as const,
-    paddingHorizontal: '$0' as const,
+    px: '$4' as const,
+    py: '$4' as const,
+    '$md-px': '$6' as const,
     gap: '$2' as const,
   },
   leftSection: {

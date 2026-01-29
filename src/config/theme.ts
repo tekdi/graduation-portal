@@ -6,6 +6,7 @@ export const theme = {
     colors: {
       ...gluestackConfig.tokens.colors,
       shadowColor: '#0000001a',
+      primary50: '#ebeaef',
       primary500: '#8B2842',
       primary600: '#A53E54',
       primary700: '#6B1E31',
@@ -38,6 +39,7 @@ export const theme = {
       textSecondary: '#6B7280',
       textMuted: '#9CA3AF',
       iconBackground: 'rgba(139, 40, 66, 0.08)',
+      backgroundLightGray100: '#e3e9ef',
       hoverBackground: '#F9FAFB',
       textMutedForeground: '#64748b',
       textForeground: '#2d2d2d',

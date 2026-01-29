@@ -136,7 +136,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
         observationSolution = response.result;
       }
       setSubmission(observationSubmissionsLast);
-      if(userData && mockData?.solution?.name === "Household Profile") {
+      if(userData) {
         const defaultValues = buildDefaultValuesFromObservation(observationSolution, userData);
         setDefaultValuesLocal(defaultValues);
       }
@@ -250,6 +250,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       setProgress(0);
       setLoading(true);
       setDefaultValuesLocal(null);
+      setSubmission(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionId, id, submissionNumber]);

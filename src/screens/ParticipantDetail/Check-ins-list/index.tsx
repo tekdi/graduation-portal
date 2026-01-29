@@ -128,6 +128,7 @@ const LogVisit: React.FC<LogVisitProps> = ({ id: propId, onClose }) => {
         userName={user?.name}
         onClose={onClose}
         onNavigateToObservation={handleNavigateToObservation}
+        preSelectedSolution={selectedSolution}
       />
     </Box>
   );

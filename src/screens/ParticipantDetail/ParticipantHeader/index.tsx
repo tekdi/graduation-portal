@@ -5,13 +5,13 @@ import {
   VStack,
   Text,
   Box,
-  Pressable,
   Button,
   ButtonText,
   LucideIcon,
   showSuccessToast,
   useToast,
   useAlert,
+  ButtonIcon,
 } from '@ui';
 import { participantHeaderStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -19,7 +19,8 @@ import ParticipantProgressCard from './ParticipantProgressCard';
 import { STATUS } from '@constants/app.constant';
 import { getParticipantsList, updateEntityDetails } from '../../../services/participantService';
 import { useAuth } from '@contexts/AuthContext';
-import { ParticipantHeaderProps } from '@app-types/screens';
+import { ParticipantHeaderProps, ParticipantStatus } from '@app-types/screens';
+import { PageHeader } from '@components/PageHeader';
 
 const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   participantName,
@@ -35,22 +36,22 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
 }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
-  const {user} = useAuth()
+  const { user } = useAuth()
   const toast = useToast();
   const { showAlert } = useAlert();
 
   const [status, setStatus] = useState('')
- const showSuccess = (message: string) => {
+  const showSuccess = (message: string) => {
     showSuccessToast(toast, message);
   };
-  
-useEffect(() => {
+
+  useEffect(() => {
     const fetchEntityDetails = async () => {
       if (participantId && user?.id) {
         try {
-          const response = await getParticipantsList({entityId:participantId,userId:user?.id})
-          const {userDetails,...rest} = response?.result?.data?.[0]
-          const participantData = {...(userDetails || {}),...rest}
+          const response = await getParticipantsList({ entityId: participantId, userId: user?.id })
+          const { userDetails, ...rest } = response?.result?.data?.[0]
+          const participantData = { ...(userDetails || {}), ...rest }
           // setParticipant(participantData);
           setStatus(participantData?.status);
         } catch (error) {
@@ -59,7 +60,7 @@ useEffect(() => {
       }
     };
     fetchEntityDetails();
-  }, [participantId,user?.id]);
+  }, [participantId, user?.id]);
 
   const handleBackPress = () => {
     // @ts-ignore
@@ -89,7 +90,7 @@ useEffect(() => {
   };
 
   const handleLogVisitPress = () => {
-// @ts-ignore
+    // @ts-ignore
     navigation.push('log-visit', { id: participantId });
   };
 
@@ -111,13 +112,12 @@ useEffect(() => {
    * Common button rendered for all statuses
    */
   const renderViewProfileButton = () => (
-    <Button {...participantHeaderStyles.outlineButton} onPress={onViewProfile}>
-      <HStack {...participantHeaderStyles.outlineButtonContent}>
-        <LucideIcon name="User" size={16} color="#000" />
-        <ButtonText {...participantHeaderStyles.outlineButtonText}>
-          {t('participantDetail.header.viewProfile')}
-        </ButtonText>
-      </HStack>
+    // @ts-ignore
+    <Button variant="outlineghost" onPress={onViewProfile}>
+      <ButtonIcon as={LucideIcon} name="User" size={16} />
+      <ButtonText {...participantHeaderStyles.outlineButtonText}>
+        {t('participantDetail.header.viewProfile')}
+      </ButtonText>
     </Button>
   );
 
@@ -129,18 +129,16 @@ useEffect(() => {
     // Not Enrolled: Enroll Participant (enabled only if all tasks are completed)
     if (status === STATUS.NOT_ENROLLED) {
       return (
-        <Button
-          {...participantHeaderStyles.solidButtonPrimary}
+        <Button variant="solid"
           onPress={handleEnrollParticipant}
           isDisabled={!areAllTasksCompleted}
+          {...participantHeaderStyles.solidButtonPrimary}
           $md-width="auto"
         >
-          <HStack {...participantHeaderStyles.solidButtonContent}>
-            <LucideIcon name="User" size={16} color="#fff" />
-            <ButtonText {...participantHeaderStyles.solidButtonText}>
-              {t('participantDetail.header.enrollParticipant')}
-            </ButtonText>
-          </HStack>
+          <ButtonIcon as={LucideIcon} name="User" />
+          <ButtonText {...participantHeaderStyles.solidButtonText}>
+            {t('participantDetail.header.enrollParticipant')}
+          </ButtonText>
         </Button>
       );
     }
@@ -152,17 +150,11 @@ useEffect(() => {
 
     // Enrolled, In Progress, Completed: Log Visit
     return (
-      <Button
-        {...participantHeaderStyles.solidButtonPrimary}
+      <Button variant="solid" size="sm"
         onPress={handleLogVisitPress}
-        $md-width="auto"
       >
-        <HStack {...participantHeaderStyles.solidButtonContent}>
-          <LucideIcon name="FileText" size={16} color="#fff" />
-          <ButtonText {...participantHeaderStyles.solidButtonText}>
-            {t('participantDetail.header.logVisit')}
-          </ButtonText>
-        </HStack>
+        <ButtonIcon as={LucideIcon} name="FileText" />
+        <ButtonText>{t('participantDetail.header.logVisit')}</ButtonText>
       </Button>
     );
   };
@@ -195,27 +187,12 @@ useEffect(() => {
   };
 
   return (
-    <VStack
-      {...participantHeaderStyles.container}
-      // Responsive padding: keep mobile bottom padding, desktop uses default
+    <PageHeader
+      onBackPress={handleBackPress}
+      backButtonText={t('participantDetail.header.backToCaseload')}
+      _content={participantHeaderStyles.backLinkContainer}
+      _container={participantHeaderStyles.container}
     >
-      {/* Back Navigation Link */}
-      <Pressable onPress={handleBackPress}>
-        <HStack {...participantHeaderStyles.backLinkContainer}>
-          <Box mr="$2">
-            <LucideIcon name="ArrowLeft" size={18} color="$textForeground" />
-          </Box>
-          <Text
-            {...participantHeaderStyles.backLinkText}
-            $hover={{
-              color: '$primary500',
-            }}
-          >
-            {t('participantDetail.header.backToCaseload')}
-          </Text>
-        </HStack>
-      </Pressable>
-
       {/* Participant Info and Actions Row */}
       <HStack
         {...participantHeaderStyles.participantInfoRow}
@@ -236,7 +213,7 @@ useEffect(() => {
             <Text {...participantHeaderStyles.participantId}>
               {participantId}
             </Text>
-            { status === STATUS.IN_PROGRESS && pathway && (
+            {status === STATUS.IN_PROGRESS && pathway && (
               <>
                 <Text {...participantHeaderStyles.pathwaySeparator}>•</Text>
                 <Text {...participantHeaderStyles.pathway}>
@@ -255,11 +232,11 @@ useEffect(() => {
 
       {/* Participant Status Card/Warning */}
       <ParticipantProgressCard
-        status={status}
+        status={status as ParticipantStatus}
         graduationProgress={graduationProgress}
         graduationDate={graduationDate}
       />
-    </VStack>
+    </PageHeader>
   );
 };
 

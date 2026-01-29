@@ -129,16 +129,6 @@ export const assessmentSurveyCardStyles = {
     fontStyle: 'normal' as const,
     lineHeight: '$sm',
   },
-  buttonPrimary: {
-    ...buttonBaseStyles,
-    bg: theme.tokens.colors.primary500,
-  },
-  buttonSecondary: {
-    ...buttonBaseStyles,
-    bg: '$backgroundLight50',
-    borderWidth: 1,
-    borderColor: '$borderLight200',
-  },
   buttonText: {
     fontSize: '$sm',
     fontWeight: '$medium',
