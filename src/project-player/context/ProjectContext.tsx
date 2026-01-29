@@ -110,7 +110,7 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
            if (updatedTaskObj?.isCustomTask && !isEditMode) {
               return;
            }
-          else if (updatedTaskObj?.isCustomTask && isEditMode) {
+          else if ((updatedTaskObj?.isCustomTask || updatedTaskObj?.parentId) && isEditMode ) {
             updateTaskAPI(currentProjectId, {
               tasks: [
                 {
