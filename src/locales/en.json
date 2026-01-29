@@ -141,7 +141,7 @@
     "selectedFiles": "Selected Files",
     "untitledFile": "Untitled File",
     "unknownSize": "Unknown size",
-    "enrolledParticiapantSucess" :"Participant Enrolled Successfully!"
+    "enrolledParticiapantSucess": "Participant Enrolled Successfully!"
   },
   "navigation": {
     "menu": "Menu",
@@ -197,7 +197,21 @@
       "addUser": "Add User",
       "addUserDescription": "Manually add a single user",
       "downloadSampleCsv": "Download Sample CSV",
-      "uploadTemplateCsv": "Upload Template (CSV)"
+      "uploadTemplateCsv": "Upload Template (CSV)",
+      "viewDetails": "View Details",
+      "logVisit": "Log Visit",
+      "viewLog": "View Log",
+      "view": "View",
+      "fill": "Fill",
+      "dropout": "Dropout",
+      "confirmDropout": "Confirm Dropout",
+      "dropoutMessage": "Mark {{name}} as dropout from the program",
+      "dropoutReasonLabel": "Reason for Dropout",
+      "dropoutReasonPlaceholder": "Enter reason for dropout...",
+      "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history.",
+      "dropoutSuccess": "Participant marked as dropout",
+      "dropoutError": "Failed to mark participant as dropout",
+      "observationLogs": "Observation Logs"
     },
     "filters": {
       "role": "Role",
@@ -272,8 +286,8 @@
       "otherSupervisors": "Other supervisors (admin only)"
     },
     "templateManagement": {
-     "templateManagementDescription" : "Manage IDP templates via CSV upload. All templates are view-only after creation.",
-     "infoBox": {
+      "templateManagementDescription": "Manage IDP templates via CSV upload. All templates are view-only after creation.",
+      "infoBox": {
         "title": "CSV-Only Template Creation",
         "description": "For MVP, all template creation and editing is performed via CSV upload. Download the sample CSV template to ensure proper formatting. Templates can only be viewed or activated/deactivated through this interface."
       }
@@ -313,6 +327,41 @@
           "step3": "Upload completed CSV file",
           "step4": "Review and activate template"
         }
+      }
+    },
+    "auditLog": {
+      "description": "View audit log for all actions performed in the system",
+      "actions": {
+        "exportlogsCSV": "Export logs (CSV)"
+      },
+      "filters": {
+        "actionType": "Action Type",
+        "allActions": "All Actions",
+        "userImport": "User Import",
+        "passwordReset": "Password Reset",
+        "templateCreation": "Template Creation",
+        "userCreation": "User Creation",
+        "systemConfiguration": "System Configuration",
+        "dataView": "Data View",
+        "templateActivation": "Template Activation",
+        "userRole": "User Role",
+        "allRoles": "All Roles",
+        "administrator": "Administrator",
+        "supervisor": "Supervisor",
+        "learningCoach": "Learning Coach",
+        "participant": "Participant",
+        "dateFrom": "Date From",
+        "dateTo": "Date To",
+        "datePlaceholder": "dd/mm/yyyy"
+      },
+      "table": {
+        "timestamp": "Timestamp",
+        "action": "Action",
+        "user": "User",
+        "role": "Role",
+        "targetId": "Target ID",
+        "changeSummary": "Change Summary",
+        "noEntries": "No audit log entries found"
       }
     },
     "csvTemplatePage": {
@@ -432,42 +481,8 @@
         "canResetFor": "Can Reset For:",
         "cannotResetFor": "Cannot Reset For:",
         "selfServiceOnly": "Self-Service Only:"
-    },
-    "auditLog": {
-      "description": "View audit log for all actions performed in the system",
-      "actions": {
-        "exportlogsCSV": "Export logs (CSV)"
-      },
-      "filters": {
-        "actionType": "Action Type",
-        "allActions": "All Actions",
-        "userImport": "User Import",
-        "passwordReset": "Password Reset",
-        "templateCreation": "Template Creation",
-        "userCreation": "User Creation",
-        "systemConfiguration": "System Configuration",
-        "dataView": "Data View",
-        "templateActivation": "Template Activation",
-        "userRole": "User Role",
-        "allRoles": "All Roles",
-        "administrator": "Administrator",
-        "supervisor": "Supervisor",
-        "learningCoach": "Learning Coach",
-        "participant": "Participant",
-        "dateFrom": "Date From",
-        "dateTo": "Date To",
-        "datePlaceholder": "dd/mm/yyyy"
-      },
-      "table": {
-        "timestamp": "Timestamp",
-        "action": "Action",
-        "user": "User",
-        "role": "Role",
-        "targetId": "Target ID",
-        "noEntries": "No audit log entries found"
       }
     }
-   
   },
   "observation": {
     "noParticipantFound": "No entity found observation solution attached to this participant",
@@ -501,7 +516,6 @@
     "title": "Generating Better Livelihoods",
     "adminLogin": "Login as Admin / Supervisor",
     "adminLoginFailed": "Admin / Supervisor login failed"
-
   },
   "auth": {
     "loginAttemptedEmptyCredentials": "Login attempted with empty credentials",
@@ -659,13 +673,13 @@
     "observationLogs": "Observation Logs"
   },
   "logVisit": {
-    "noSolutions":"No solutions found",
+    "noSolutions": "No solutions found",
     "viewForm": "View Form",
     "selectSolution": "Select Solution",
     "selectSolutionPlaceholder": "Select a solution...",
     "selectVisitType": "Select visit type for {{name}}",
     "viewCheckIns": "View Check-Ins",
-    "by":"By",
+    "by": "By",
     "multipleAssessemtsNotAllowed": "Multiple assessments are not allowed for this participant",
     "thisFormNotFound": "This form not found with submission number",
     "note": "Note:",
@@ -682,8 +696,8 @@
       "title": "Midline Survey",
       "description": "Conduct a midline assessment survey to track progress"
     },
-    "noCheckInsYet":"No Check-Ins Yet",
-    "noCheckInsYetDescription":"Check-ins will appear here once forms and surveys are completed for this participant."
+    "noCheckInsYet": "No Check-Ins Yet",
+    "noCheckInsYetDescription": "Check-ins will appear here once forms and surveys are completed for this participant."
   },
   "lcProfile": {
     "myProfile": "My Profile",
@@ -718,7 +732,7 @@
     "pageTitle": "Develop Intervention Plan",
     "pageSubtitle": "Select a development plan template for {{name}}",
     "backButton": "Back",
-    "IdpCreationSuccess":"IDP Created Successfully!",
+    "IdpCreationSuccess": "IDP Created Successfully!",
     "categoryModal": {
       "title": "Select Livelihood Category",
       "forParticipant": "For participant: {{name}}",
