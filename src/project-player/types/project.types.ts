@@ -45,6 +45,7 @@ export interface Task {
   solutionDetails?: any;
   parentId?:string;
   externalId?:string;
+  isDeleted?:boolean;
 }
 
 export interface Attachment {
