@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { VStack, HStack, Button, Text, Image, Box, Pressable, Card, useAlert, Modal } from '@ui';
 import { View, Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
@@ -18,9 +18,6 @@ import { usePlatform } from '@utils/platform';
 import { userManagementStyles as styles } from './Styles';
 import { theme } from '@config/theme';
 import { getSignedUrl, uploadFileToSignedUrl, bulkUserCreate } from '../../services/bulkUploadService';
-import offlineStorage from '../../services/offlineStorage';
-import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
-import { API_ENDPOINTS } from '../../services/apiEndpoints';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -37,30 +34,6 @@ const UserManagementScreen = () => {
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  // Log orgId and tenant_code from login API response
-  useEffect(() => {
-    const logUserData = async () => {
-      try {
-        const userData = await offlineStorage.read<any>(STORAGE_KEYS.AUTH_USER);
-        if (userData) {
-          const orgId = userData?.organizations?.[0]?.code;
-          const tenantCode = userData?.tenant_code;
-          
-          console.log('=== USER MANAGEMENT SCREEN ===');
-          console.log('OrgId from login response:', orgId);
-          console.log('Tenant Code from login response:', tenantCode);
-          console.log('Full user data:', userData);
-        } else {
-          console.log('No user data found in storage');
-        }
-      } catch (error) {
-        console.error('Error reading user data:', error);
-      }
-    };
-    
-    logUserData();
-  }, []);
-        
   // Handle CSV upload: closes options modal and triggers native file picker
   const handleUploadCSV = () => {
     setIsUploadModalOpen(false);
@@ -87,22 +60,18 @@ const UserManagementScreen = () => {
         }
 
     setIsUploading(true);
-    let currentStep: 'getSignedUrl' | 'uploadFile' | 'bulkCreate' | null = null;
     
     try {
       // Step 1: Get signed URL
-      currentStep = 'getSignedUrl';
       const signedUrlResponse = await getSignedUrl(file.name);
       if (!signedUrlResponse.result?.signedUrl) {
           throw new Error(t('admin.actions.uploadErrorSignedUrl'));
         }
 
       // Step 2: Upload file to signed URL
-      currentStep = 'uploadFile';
       await uploadFileToSignedUrl(signedUrlResponse.result.signedUrl, file);
 
       // Step 3: Trigger bulk user creation
-      currentStep = 'bulkCreate';
       const filePath = signedUrlResponse.result.filePath || signedUrlResponse.result.destFilePath;
       if (!filePath) {
         throw new Error(t('admin.actions.uploadErrorFilePathNotFound'));
@@ -114,38 +83,11 @@ const UserManagementScreen = () => {
       showAlert('success', t('admin.actions.uploadSuccess'));
       
     } catch (error: any) {
-      // Determine which step failed based on currentStep or error response structure
-      let errorMessage = t('admin.actions.uploadError');
-
-      // Check which step failed using currentStep variable
-      if (currentStep === 'getSignedUrl') {
-        // Step 1 failed: Get signed URL
-        errorMessage = t('admin.actions.uploadErrorSignedUrl');
-      } else if (currentStep === 'uploadFile') {
-        // Step 2 failed: File upload to S3
-        errorMessage = t('admin.actions.uploadErrorFileUpload');
-      } else if (currentStep === 'bulkCreate') {
-        // Step 3 failed: Bulk user creation
-        errorMessage = t('admin.actions.uploadErrorBulkCreate');
-      } else {
-        // Fallback: Check error response structure
-        const errorUrl = error?.config?.url || error?.response?.config?.url || '';
-        
-        if (errorUrl.includes(API_ENDPOINTS.GET_SIGNED_URL)) {
-          errorMessage = t('admin.actions.uploadErrorSignedUrl');
-        } else if (errorUrl.includes(API_ENDPOINTS.BULK_USER_CREATE)) {
-          errorMessage = t('admin.actions.uploadErrorBulkCreate');
-        } else if (error?.response?.data?.message) {
-          // Use API error message if available
-          errorMessage = error.response.data.message;
-        } else if (error?.response?.data?.responseCode) {
-          // Use responseCode from API response if available
-          const responseCode = error.response.data.responseCode;
-          if (responseCode === 'CLIENT_ERROR' || responseCode === 'SERVER_ERROR') {
-            errorMessage = error.response.data.message || t('admin.actions.uploadError');
-          }
-        }
-      }
+      // Use API error message if available, otherwise use generic error message
+      const errorMessage = 
+        error?.response?.data?.message || 
+        error?.message || 
+        t('admin.actions.uploadError');
         
       showAlert('error', errorMessage);
       } finally {
