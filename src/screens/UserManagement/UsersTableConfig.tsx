@@ -29,11 +29,11 @@ const getProvince = (user: any): string => {
 };
 
 /**
- * Helper function to extract district from user object
- * Extracts district from API response, returns "-" if not found
+ * Helper function to extract site from user object
+ * Extracts site from API response, returns "-" if not found
  */
-const getDistrict = (user: any): string => {
-  return user?.district || user?.district_name || user?.location?.district || '-';
+const getSite = (user: any): string => {
+  return user?.site || user?.site_name || user?.location?.site || '-';
 };
 
 /**
@@ -297,12 +297,12 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
     },
   },
   {
-    key: 'district',
-    label: 'admin.users.district',
+    key: 'site',
+    label: 'admin.users.site',
     flex: 1.2,
     render: (user: any) => (
       <Text {...TYPOGRAPHY.paragraph} {...styles.districtText}>
-        {user?.district?.label || '-'}
+        {user?.site?.label || user?.site || '-'}
       </Text>
     ),
     mobileConfig: {

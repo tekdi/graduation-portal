@@ -219,7 +219,7 @@
       "role": "Role",
       "status": "Status",
       "province": "Province",
-      "district": "District",
+      "site": "Site",
       "lastLogin": "Last Login",
       "details": "Details",
       "actions": "Actions",
