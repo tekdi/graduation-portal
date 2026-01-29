@@ -7,12 +7,11 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   getRolesList,
-  Role,
   getEntityTypesList,
   getEntityTypesFromStorage,
   getProvincesByEntityType,
-  ProvinceEntity,
-} from '../services/participantService';
+} from '../services/usersService';
+import type { Role, ProvinceEntity } from '@app-types/Users';
 
 // Type definition for filter configuration
 export type FilterConfig = {

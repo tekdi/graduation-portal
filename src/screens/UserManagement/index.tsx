@@ -10,12 +10,12 @@ import TitleHeader from '@components/TitleHeader';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import DataTable from '@components/DataTable';
 import { getUsersColumns } from './UsersTableConfig';
-import { AdminUserManagementData } from '@app-types/participant';
+import { AdminUserManagementData } from '@app-types/Users';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
-import { getParticipantsList, Role } from '../../services/participantService';
-import type { ParticipantSearchParams } from '@app-types/participant';
+import { getUsersList } from '../../services/usersService';
+import type { UserSearchParams, Role } from '@app-types/Users';
 
 /**
  * UserManagementScreen - Layout is automatically applied by navigation based on user role
@@ -73,7 +73,7 @@ const UserManagementScreen = () => {
           apiType = allRoleTitles.length > 0 ? allRoleTitles.join(',') : 'all';
         }
 
-        const apiParams: ParticipantSearchParams = {
+        const apiParams: UserSearchParams = {
           tenant_code: 'brac',
           type: apiType,
           page: 1, // Always fetch from page 1, DataTable handles client-side pagination
@@ -94,7 +94,7 @@ const UserManagementScreen = () => {
           apiParams.province = filters.province;
         }
 
-        const response = await getParticipantsList(apiParams);
+        const response = await getUsersList(apiParams);
         
         // Get raw API data
         let usersData = response.result?.data || [];
