@@ -18,6 +18,8 @@
     "save": "Save",
     "saving": "Saving...",
     "cancel": "Cancel",
+    "upload": "Upload",
+    "uploading": "Uploading...",
     "delete": "Delete",
     "edit": "Edit",
     "close": "Close",
@@ -25,6 +27,7 @@
     "filter": "Filter",
     "filters": "Filters",
     "clearFilters": "Clear Filters",
+    "clear": "Clear",
     "submit": "Submit",
     "back": "Back",
     "next": "Next",
@@ -174,10 +177,10 @@
       "createUser": "Create User",
       "main": "Main Navigation",
       "quickActions": "Quick Actions",
-      "moreInformation": "More Information",
+      "moreInformation": "MORE INFORMATION",
       "csvImportTemplates": "CSV Import Templates",
       "passwordManagementPolicy": "Password Management Policy",
-      "profileFieldEditPermissions": "Profile Permissions"
+      "profileFieldEditPermissions": "Profile Field Edit Permissions"
     },
     "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
     "assignUsersDescription": "Assign Linkage Champions to Supervisors and Participants to LCs",
@@ -185,11 +188,20 @@
       "bulkUploadCSV": "Bulk Upload (CSV)",
       "createUser": "Create User",
       "lctosupervisior": "LC to Supervisor",
-      "participanttolc": "Participant to LC"
+      "participanttolc": "Participant to LC",
+      "exportCSV": "Export CSV",
+      "uploadUsers": "Upload Users",
+      "uploadUsersDescription": "Choose how you would like to add users to the system.",
+      "uploadCSV": "Upload CSV",
+      "uploadCSVDescription": "Import multiple users from a CSV file",
+      "addUser": "Add User",
+      "addUserDescription": "Manually add a single user"
     },
     "filters": {
       "role": "Role",
       "status": "Status",
+      "province": "Province",
+      "district": "District",
       "searchPlaceholder": "Search by name or email...",
       "allRoles": "All Roles",
       "admin": "Admin",
@@ -202,7 +214,33 @@
       "filterByProvince": "Filter by Province",
       "selectSupervisor": "Select Supervisor",
       "allProvinces": "All Provinces",
-      "allDistrict": "ALl District"
+      "allDistrict": "ALl District",
+      "allDistricts": "All Districts",
+      "site": "Sites",
+      "allSites": "All Sites"
+    },
+    "users": {
+      "allUsers": "All Users",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "province": "Province",
+      "site": "Site",
+      "lastLogin": "Last Login",
+      "details": "Details",
+      "actions": "Actions",
+      "noUsersFound": "No users found",
+      "loadingUsers": "Loading users...",
+      "showing": "Showing {{count}} of {{total}} users",
+      "actionMenu": {
+        "viewProfile": "View Profile",
+        "edit": "Edit",
+        "resetPassword": "Reset Password",
+        "deactivate": "Deactivate",
+        "confirmDeactivate": "Confirm Deactivation",
+        "deactivateMessage": "Are you sure you want to deactivate {{name}}? This will prevent them from accessing the system."
+      }
     },
     "stats": {
       "totalUsers": "Total Users",
@@ -232,6 +270,45 @@
       "otherSupervisors": "Other supervisors (admin only)"
     },
     "csvTemplatePage": {
+      "pageTitle": "CSV Import Templates",
+      "pageSubtitle": "Download pre-formatted CSV templates for bulk user operations",
+      "sectionTitle": "CSV Import Templates",
+      "sectionSubtitle": "Download pre-formatted CSV templates for bulk operations",
+      "downloadTemplate": "Download Template",
+      "templates": {
+        "user_import": {
+          "title": "Bulk User Import",
+          "description": "Import multiple users at once"
+        },
+        "participant_assignment": {
+          "title": "Participant Assignment",
+          "description": "Assign participants to Linkage Champions"
+        },
+        "lc_supervisor_mapping": {
+          "title": "LC to Supervisor Mapping",
+          "description": "Map Linkage Champions to Supervisors"
+        },
+        "bulk_status_update": {
+          "title": "Bulk Status Update",
+          "description": "Activate or deactivate multiple users"
+        },
+        "geographic_reassignment": {
+          "title": "Geographic Reassignment",
+          "description": "Update province and district assignments"
+        }
+      },
+      "guidelines": {
+        "title": "CSV Import Guidelines",
+        "items": [
+          "Ensure all required fields are filled in",
+          "Use the exact format provided in the template",
+          "Email addresses must be unique and valid",
+          "Role values must match exactly: Admin, Supervisor, Linkage Champion, or Participant",
+          "Province and District values must match the system's configured administrative divisions",
+          "File size limit: 5MB (approximately 5,000 rows)",
+          "Duplicates will be skipped with a warning"
+        ]
+      },
       "downloadSuccess": "Downloaded {{title}} template",
       "downloadMobileInfo": "Download available on Desktop/Web"
     },

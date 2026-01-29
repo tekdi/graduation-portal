@@ -17,4 +17,7 @@ export const API_ENDPOINTS = {
   GET_ENTITY_DETAILS: (id: string) =>
     `${prefix}/entity-management/v1/entities/details/${id}`,
   UPDATE_ENTITY_DETAILS: `${prefix}/project/v1/programUsers/createOrUpdate`,
+  USER_ROLES_LIST: `${prefix}/user/v1/user-role/list`,  // Fetch available user roles for dynamic filter
+  ENTITY_TYPES_LIST: `${prefix}/entity-management/v1/entityTypes/list`,  // Fetch entity types (province, district, etc.)
+  ENTITIES_BY_TYPE: `${prefix}/entity-management/v1/entities/listByEntityType`,  // Fetch entities by type (e.g., provinces)
 };
