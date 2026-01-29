@@ -1,9 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { VStack, HStack, Button, Text, Image, Box, Pressable, Card, Modal, useAlert } from '@ui';
+import { VStack, HStack, Button, Text, Box, Pressable, Card, Modal, useAlert, ButtonIcon, ButtonText } from '@ui';
 import { Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
-import UploadIcon from '../../assets/images/UploadIcon.png';
-import ExportIcon from '../../assets/images/ExportIcon.png';
 import { useLanguage } from '@contexts/LanguageContext';
 import { useUserManagementFilters, mapStatusLabelToAPI } from '@constants/USER_MANAGEMENT_FILTERS';
 import FilterButton from '@components/Filter';
@@ -27,7 +25,7 @@ const UserManagementScreen = () => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
   const { showAlert } = useAlert();
-  
+
   // API state management
   const [filters, setFilters] = useState<Record<string, any>>({});
   const [users, setUsers] = useState<AdminUserManagementData[]>([]);
@@ -35,15 +33,14 @@ const UserManagementScreen = () => {
   const [totalCount, setTotalCount] = useState(0);
   // Note: currentPage and pageSize are managed by DataTable component for client-side pagination
   // API pageSize is set to 100 to fetch all users at once
-  
+
   // File upload state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const columns = useMemo(() => getUsersColumns(), []);
-  
+
   // Ref to track previous roles length to detect when roles are first loaded
   const prevRolesLengthRef = useRef(0);
 
@@ -78,7 +75,7 @@ const UserManagementScreen = () => {
             .map((role: Role) => role.title)
             .filter((title: string | undefined): title is string => !!title)
             .filter((title: string, index: number, self: string[]) => self.indexOf(title) === index); // Remove duplicates
-          
+
           // Use all role titles from API, or 'all' if no roles available
           apiType = allRoleTitles.length > 0 ? allRoleTitles.join(',') : 'all';
         }
@@ -105,13 +102,13 @@ const UserManagementScreen = () => {
         }
 
         const response = await getUsersList(apiParams);
-        
+
         // Get raw API data
         let usersData = response.result?.data || [];
-        
+
         // Get total count from API response (if available), otherwise use data length
         const apiTotalCount = response.result?.count ?? usersData.length;
-        
+
         // Apply client-side status filtering if status filter is set (fallback if API doesn't filter)
         // This ensures status filter works even if API doesn't support status parameter
         if (filters.status && filters.status !== 'all-status') {
@@ -121,7 +118,7 @@ const UserManagementScreen = () => {
             return userStatus === mappedStatus;
           });
         }
-        
+
         setUsers(usersData);
         // Use API total count, not the length of returned data
         setTotalCount(apiTotalCount);
@@ -158,7 +155,7 @@ const UserManagementScreen = () => {
     if (!files || files.length === 0) return;
 
     const file = files[0];
-    
+
     // Validate CSV file extension
     if (!file.name.toLowerCase().endsWith('.csv')) {
       showAlert('error', t('admin.actions.csvValidationError'));
@@ -169,7 +166,7 @@ const UserManagementScreen = () => {
     }
 
     setIsUploading(true);
-    
+
     try {
       // Step 1: Get signed URL
       const signedUrlResponse = await getSignedUrl(file.name);
@@ -185,23 +182,23 @@ const UserManagementScreen = () => {
       if (!filePath) {
         throw new Error(t('admin.actions.uploadErrorFilePathNotFound'));
       }
-      
-      const bulkCreateResponse = await bulkUserCreate(filePath, ['name', 'email'], 'UPLOAD');
-      
+
+      await bulkUserCreate(filePath, ['name', 'email'], 'UPLOAD');
+
       // Show success toast
       showAlert('success', t('admin.actions.uploadSuccess'));
-      
+
       // Refresh users list after successful upload
       // Trigger fetchUsers by updating a dummy filter or refetching
       setFilters((prev) => ({ ...prev, _refresh: Date.now() }));
-      
+
     } catch (error: any) {
       // Use API error message if available, otherwise use generic error message
-      const errorMessage = 
-        error?.response?.data?.message || 
-        error?.message || 
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
         t('admin.actions.uploadError');
-        
+
       showAlert('error', errorMessage);
     } finally {
       setIsUploading(false);
@@ -220,49 +217,31 @@ const UserManagementScreen = () => {
         description="admin.userManagementDescription"
         right={
           <HStack space="md" alignItems="center">
-            <Button
-              {...titleHeaderStyles.outlineButton}
+            <Button variant={"outlineghost" as any}
               onPress={() => setIsUploadModalOpen(true)}
               isDisabled={isUploading}
             >
-              <HStack space="sm" alignItems="center">
-                <Image
-                  source={UploadIcon}
-                  style={{ width: 16, height: 16 }}
-                  alt="Upload icon"
-                />
-                <Text {...titleHeaderStyles.outlineButtonText}>
-                  {t('admin.actions.bulkUploadCSV')}
-                </Text>
-              </HStack>
+              <ButtonIcon as={LucideIcon} name="Upload" size={16} />
+              <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.actions.bulkUploadCSV')}</ButtonText>
             </Button>
-
-            <Button
-              {...titleHeaderStyles.solidButton}
+            <Button variant={"solid" as any}
               onPress={() => {
                 // Handle create user
               }}
+              isDisabled={isUploading}
             >
-              <HStack space="sm" alignItems="center">
-                <Image
-                  source={ExportIcon}
-                  style={{ width: 16, height: 16 }}
-                  alt="Export icon"
-                />
-                <Text {...titleHeaderStyles.solidButtonText}>
-                  {t('admin.actions.createUser')}
-                </Text>
-              </HStack>
+              <ButtonIcon as={LucideIcon} name="SquarePen" size={16} />
+              <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.actions.createUser')}</ButtonText>
             </Button>
           </HStack>
         }
       />
-      
-      <FilterButton 
+
+      <FilterButton
         data={filterOptions}
         onFilterChange={handleFilterChange}
       />
-      
+
       {/* Table Header with Title, Count, and Export Button */}
       <Box {...styles.tableContainer}>
         <HStack {...styles.tableHeader}>
@@ -330,39 +309,36 @@ const UserManagementScreen = () => {
       >
         <VStack space="md" width="100%">
           {/* Upload CSV Option */}
-          <Pressable 
+          <Pressable
             onPress={handleUploadCSV}
-            // @ts-ignore - Web-specific event handlers
-            onMouseEnter={() => Platform.OS === 'web' && setIsHovered(true)}
-            onMouseLeave={() => Platform.OS === 'web' && setIsHovered(false)}
           >
             <Card
               {...(styles.uploadOptionCard as any)}
-              bg={isHovered ? "$accent200" : "$white"}
+              bg="$white"
             >
               <HStack space="md" alignItems="center">
                 {/* Icon Container */}
                 <Box
                   {...(styles.uploadCSVIconContainer as any)}
                 >
-                  <LucideIcon 
-                    name="FileUp" 
-                    size={16} 
-                    color={theme.tokens.colors.primary500} 
+                  <LucideIcon
+                    name="FileUp"
+                    size={16}
+                    color={theme.tokens.colors.primary500}
                   />
                 </Box>
-                
+
                 {/* Text Content */}
                 <VStack flex={1} space="xs">
-                  <Text 
-                    {...TYPOGRAPHY.bodySmall} 
+                  <Text
+                    {...TYPOGRAPHY.bodySmall}
                     color={theme.tokens.colors.textPrimary}
                     fontWeight="$medium"
                   >
                     {t('admin.actions.uploadCSV')}
                   </Text>
-                  <Text 
-                    {...TYPOGRAPHY.caption} 
+                  <Text
+                    {...TYPOGRAPHY.caption}
                     color={theme.tokens.colors.textMutedForeground}
                   >
                     {t('admin.actions.uploadCSVDescription')}
@@ -384,23 +360,23 @@ const UserManagementScreen = () => {
                   {...(styles.addUserIconContainer as any)}
                 >
                   <LucideIcon
-                    name="UserPlus" 
+                    name="UserPlus"
                     size={16}
-                    color="#6B7280" 
+                    color="#6B7280"
                   />
                 </Box>
-                
+
                 {/* Text Content */}
                 <VStack flex={1} space="xs">
-                  <Text 
-                    {...TYPOGRAPHY.bodySmall} 
+                  <Text
+                    {...TYPOGRAPHY.bodySmall}
                     color={theme.tokens.colors.textPrimary}
                     fontWeight="$medium"
                   >
                     {t('admin.actions.addUser')}
                   </Text>
-                  <Text 
-                    {...TYPOGRAPHY.caption} 
+                  <Text
+                    {...TYPOGRAPHY.caption}
                     color={theme.tokens.colors.textMutedForeground}
                   >
                     {t('admin.actions.addUserDescription')}
