@@ -78,8 +78,8 @@ export const getUsersList = async (params: UserSearchParams): Promise<UserSearch
     });
     console.log('Query Parameters:', paramsObj);
     
-    // GET request to fetch users
-    const response = await api.get<UserSearchResponse>(endpoint);
+    // POST request to fetch users
+    const response = await api.post<UserSearchResponse>(endpoint, {});
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor
