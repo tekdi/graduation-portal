@@ -63,7 +63,7 @@ jobs:
         with:
           host: ${{ secrets.HOST_NAME_QA }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.EC2_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.PORT }}
           script: |
             set -e
