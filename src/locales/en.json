@@ -38,7 +38,8 @@
     "actions": "Actions",
     "noDataFound": "No data found",
     "optional": "(Optional)",
-    "participant": "Participant"
+    "participant": "Participant",
+    "complete": "Complete"
   },
   "projectPlayer": {
     "status": "Status",
@@ -53,16 +54,21 @@
     },
     "completeForm": "Complete Form",
     "uploadFile": "Upload File",
+    "upload": "Upload",
     "updateProfile": "Update Profile",
     "viewTask": "View Task",
     "attachments": "Attachments",
     "uploading": "Uploading...",
+    "uploadEvidence": "Upload Evidence",
+    "toDo": "To Do",
+    "done": "Done",
     "clickToUpload": "📎 Click to upload files",
     "maxFileSize": "Max file size: {{size}}MB",
     "fileSizeError": "Some files exceed the maximum size of {{maxSize}}MB. Please choose smaller files.",
     "uploadFailed": "Upload failed. Please try again.",
     "uploadSuccess": "Files uploaded successfully!",
     "uploadedFiles": "Uploaded Files",
+    "previouslyUploadedFiles": "Previously Uploaded Files",
     "observationForm": "Observation Form",
     "formId": "Form ID",
     "formFieldsPlaceholder": "Form fields will be rendered here",
@@ -92,35 +98,46 @@
       "project": "Project"
     },
     "addTask": "Add Task",
+    "chooseUploadMethod": "Choose Upload Method",
+    "uploadDocumentationFor": "Upload consent documentation for {{name}}",
+    "takePhoto": "Take a Photo",
+    "useDeviceCamera": "Use your device camera",
+    "uploadFromDevice": "Upload from Device",
+    "chooseFromGallery": "Choose from gallery or files",
+    "uploadSignedDocumentation": "Upload signed consent documentation for program enrollment.",
+    "uploadConsent": "Upload Consent",
+    "uploadSLA": "Upload SLA",
+    "completeProfile": "Complete Profile",
     "tasks": "tasks",
     "updateTask": "Update Task",
     "deleteTask": "Delete Task",
     "confirmDeleteTask": "Are you sure you want to delete '{{taskName}}'? This action cannot be undone.",
     "taskDeleted": "Task deleted successfully",
+    "evidencePreview": "Evidence Preview",
+    "viewAllUploadedEvidence": "View all uploaded evidence files for this task",
+    "imagePreviewPlaceholder": "Image preview would be displayed here",
+    "noFilesUploaded": "No files uploaded yet",
+    "uploadedBy": "Uploaded by {{name}}",
+    "cameraPermissionDenied": "Camera permission was denied",
+    "storagePermissionDenied": "Storage permission was denied",
+    "cannotOpenFile": "Cannot open file",
+    "unableToOpenFile": "Unable to open this file link.",
+    "file": "file",
+    "files": "files",
     "graduationReadiness": "Graduation Readiness",
+    "progressSaved": "Progress saved successfully",
     "previousProgress": "Previous: {{percent}}%",
     "saveProgress": "Save Progress",
     "taskUpdated": "{{count}} task updated",
     "tasksUpdated": "{{count}} tasks updated",
-    "progressSaved": "Progress saved successfully",
-    "toDo": "To Do",
-    "done": "Done",
     "addToPlan": "Add to Plan",
     "remove": "Remove",
-    "file": "file",
-    "files": "files",
-    "uploadEvidence": "Upload Evidence",
-    "uploadConsent": "Upload Consent",
-    "uploadSLA": "Upload SLA",
-    "completeProfile": "Complete Profile",
     "evidenceUploaded": "Evidence uploaded successfully",
     "consentUploaded": "Consent uploaded successfully",
     "slaUploaded": "SLA uploaded successfully",
-    "evidencePreview": "Evidence Preview",
-    "viewAllUploadedEvidence": "View all uploaded evidence for this task",
-    "imagePreviewPlaceholder": "Image preview",
-    "noFilesUploaded": "No files uploaded",
-    "uploadedBy": "Uploaded by {{name}}"
+    "selectedFiles": "Selected Files",
+    "untitledFile": "Untitled File",
+    "unknownSize": "Unknown size"
   },
   "navigation": {
     "menu": "Menu",
@@ -155,7 +172,11 @@
       "uploadUsers": "Upload Users",
       "createUser": "Create User",
       "main": "Main Navigation",
-      "quickActions": "Quick Actions"
+      "quickActions": "Quick Actions",
+      "moreInformation": "MORE INFORMATION",
+      "csvImportTemplates": "CSV Import Templates",
+      "passwordManagementPolicy": "Password Management Policy",
+      "profileFieldEditPermissions": "Profile Field Edit Permissions"
     },
     "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
     "actions": {
@@ -247,8 +268,131 @@
           "step4": "Review and activate template"
         }
       }
+    },
+    "csvTemplatePage": {
+      "pageTitle": "CSV Import Templates",
+      "pageSubtitle": "Download pre-formatted CSV templates for bulk user operations",
+      "sectionTitle": "CSV Import Templates",
+      "sectionSubtitle": "Download pre-formatted CSV templates for bulk operations",
+      "downloadTemplate": "Download Template",
+      "templates": {
+        "user_import": {
+          "title": "Bulk User Import",
+          "description": "Import multiple users at once"
+        },
+        "participant_assignment": {
+          "title": "Participant Assignment",
+          "description": "Assign participants to Linkage Champions"
+        },
+        "lc_supervisor_mapping": {
+          "title": "LC to Supervisor Mapping",
+          "description": "Map Linkage Champions to Supervisors"
+        },
+        "bulk_status_update": {
+          "title": "Bulk Status Update",
+          "description": "Activate or deactivate multiple users"
+        },
+        "geographic_reassignment": {
+          "title": "Geographic Reassignment",
+          "description": "Update province and district assignments"
+        }
+      },
+      "guidelines": {
+        "title": "CSV Import Guidelines",
+        "items": [
+          "Ensure all required fields are filled in",
+          "Use the exact format provided in the template",
+          "Email addresses must be unique and valid",
+          "Role values must match exactly: Admin, Supervisor, Linkage Champion, or Participant",
+          "Province and District values must match the system's configured administrative divisions",
+          "File size limit: 5MB (approximately 5,000 rows)",
+          "Duplicates will be skipped with a warning"
+        ]
+      },
+      "downloadSuccess": "Downloaded {{title}} template",
+      "downloadMobileInfo": "Download available on Desktop/Web"
+    },
+    "passwordPolicyPage": {
+      "pageTitle": "Password Management Policy",
+      "pageSubtitle": "Comprehensive password reset permissions and security requirements for the GBL Learning Management Console",
+      "section1": {
+        "title": "Password Reset Hierarchy",
+        "subtitle": "Who can reset passwords for whom in the user hierarchy"
+      },
+      "cards": {
+        "admin": {
+          "title": "Admin",
+          "badge": "Full Password Control",
+          "canResetFor": [
+            "All Admins",
+            "All Supervisors",
+            "All Linkage Champions",
+            "All Participants"
+          ],
+          "note": "No restrictions: Admins can reset passwords for any user in the system regardless of role or location."
+        },
+        "supervisor": {
+          "title": "Supervisor",
+          "badge": "District-Limited",
+          "canResetFor": [
+            "LCs under their supervision",
+            "Participants under their LCs"
+          ],
+          "cannotResetFor": [
+            "Other Supervisors",
+            "Admins",
+            "Users outside their district"
+          ]
+        },
+        "lc": {
+          "title": "LC",
+          "badge": "Participant",
+          "selfServiceOnly": [
+            "Can change own password",
+            "Must know current password",
+            "Password strength rules apply"
+          ],
+          "cannotResetFor": [
+            "Any other users",
+            "Participants (LC role)",
+            "Must request reset from supervisor"
+          ]
+        }
+      },
+      "section2": {
+        "title": "Password Requirements & Security Policy",
+        "strengthRequirements": {
+          "title": "Strength Requirements:",
+          "items": [
+            "Minimum 8 characters",
+            "At least one uppercase letter",
+            "At least one lowercase letter",
+            "At least one number",
+            "At least one special character (@$!%*?&)"
+          ]
+        },
+        "resetProcess": {
+          "title": "Reset Process:",
+          "items": [
+            "Temporary password sent via email",
+            "Must change on first login",
+            "Reset link expires in 24 hours",
+            "Cannot reuse last 3 passwords",
+            "Password expires every 90 days"
+          ]
+        }
+      },
+      "labels": {
+        "canResetFor": "Can Reset For:",
+        "cannotResetFor": "Cannot Reset For:",
+        "selfServiceOnly": "Self-Service Only:"
+      }
     }
    
+  },
+  "observation": {
+    "noParticipantFound": "No entity found observation solution attached to this participant",
+    "noParticipantFoundError": "Failed to update observation entities."
   },
   "brand": {
     "primaryName": "brac",
@@ -266,18 +410,24 @@
     "logIn": "Log In",
     "testAccounts": "Test Accounts:",
     "welcomeToYourAccount": "Welcome To Your Account",
-    "welcomeToYourAccountAdmin": "Welcome To Your Account Admin / Supervisor",
     "logInToContinue": "Log in to Continue",
-    "backToLogin": "Back to Login",
     "description": "Log in to Continue",
     "username": "Username",
     "password": "Password",
     "rememberMe": "Remember Me",
     "rememberMeDescription": "Remember me on this device for 30 days",
     "testAccountsCredentials": "admin@brac.net | supervisor@brac.net | lc@brac.net",
-    "title": "Generating Better Livelihoods",
-    "adminLogin": "Login as Admin / Supervisor",
-    "adminLoginFailed": "Admin / Supervisor login failed"
+    "title": "Generating Better Livelihoods"
+  },
+  "auth": {
+    "loginAttemptedEmptyCredentials": "Login attempted with empty credentials",
+    "loginAttemptedEmptyCredentialsAdmin": "Admin Login attempted with empty credentials",
+    "userEntityNotFound": "User entity not found: You are not authorized to access the system",
+    "roleNotAuthorized": "Unauthorized: This role is not authorized to access the system",
+    "userLoggedInSuccessfully": "User logged in successfully",
+    "userLoggedInSuccessfullyAdmin": "Admin User logged in successfully",
+    "noUserDataInResponse": "No user data in response",
+    "errorOccurredDuringLogin": "An error occurred during login"
   },
   "welcome": {
     "welcomeBack": "Welcome back",
@@ -332,12 +482,13 @@
       "assessmentSurveys": "Assessment Surveys"
     },
     "interventionPlan": {
-      "noPlanAssigned": "No Intervention Plan Assigned",
-      "noPlanDescription": "Pillars and tasks will appear here once an intervention plan is assigned to this participant.",
+      "noPlanAssigned": "No intervention plan has been assigned yet.",
+      "noPlanDescription": "Develop a personalized intervention plan to support this participant's goals.",
       "developPlan": "Develop Intervention Plan",
       "submitInterventionPlan": "Submit Intervention Plan",
       "changePathway": "Change Pathway",
-      "socialProtectionWarning": "Please add Social Protection tasks to your plan before submitting."
+      "socialProtectionWarning": "Please review and address all Social Protection tasks before assigning the intervention plan.",
+      "actionRequired": "Action Required"
     },
     "assessmentSurveys": {
       "title": "Assessment Surveys",
@@ -414,6 +565,7 @@
     "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history."
   },
   "logVisit": {
+    "noSolutions":"No solutions found",
     "selectVisitType": "Select visit type for {{name}}",
     "viewCheckIns": "View Check-Ins",
     "note": "Note:",
@@ -482,5 +634,21 @@
       "tasksLabel": "tasks"
     },
     "loadError": "Failed to load templates. Please try again."
+  },
+  "permissions": {
+    "camera": {
+      "title": "Camera Permission",
+      "message": "App needs access to your camera",
+      "buttonNeutral": "Ask Me Later",
+      "buttonNegative": "Cancel",
+      "buttonPositive": "OK"
+    },
+    "storage": {
+      "title": "Storage Permission",
+      "message": "App needs access to your storage",
+      "buttonNeutral": "Ask Me Later",
+      "buttonNegative": "Cancel",
+      "buttonPositive": "OK"
+    }
   }
 }

@@ -1,6 +1,5 @@
 import { AssessmentSurveyCardData } from '@app-types/participant';
 import { CARD_STATUS } from './app.constant';
-import { theme } from '@config/theme';
 
 /**
  * Assessment Survey Cards Mock Data
@@ -13,6 +12,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     description: 'participantDetail.assessmentSurveys.householdProfile.description',
     icon: 'Users',
     iconColor: "$primary500",
+    navigationUrl: 'observation',
     status: {
       type: CARD_STATUS.NOT_STARTED,
       label: 'participantDetail.assessmentSurveys.status.notStarted',
@@ -31,6 +31,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     additionalInfo: 'participantDetail.assessmentSurveys.midlineSurvey.additionalInfo',
     icon: 'FileText',
     iconColor: "$blue500",
+    navigationUrl: 'observation',
     status: {
       type: CARD_STATUS.IN_PROGRESS,
       label: 'participantDetail.assessmentSurveys.status.percentComplete',
@@ -53,6 +54,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     additionalInfo: 'participantDetail.assessmentSurveys.graduationReadiness.additionalInfo',
     icon: 'FileText',
     iconColor: "$warning500",
+    navigationUrl: 'observation',
     status: {
       type: CARD_STATUS.COMPLETED,
       label: 'participantDetail.assessmentSurveys.status.completed',
@@ -61,7 +63,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
       label: 'participantDetail.assessmentSurveys.graduationReadiness.actionButton',
       icon: 'FileText',
       variant: 'primary',
-    },
+      },
     // Graduation Readiness Survey shows for completed and graduated participants
     visibilityRules: {
       showForStatuses: ['Completed', 'Graduated'],
@@ -74,6 +76,7 @@ export const ASSESSMENT_SURVEY_CARDS: AssessmentSurveyCardData[] = [
     additionalInfo: 'participantDetail.assessmentSurveys.endlineSurvey.additionalInfo',
     icon: 'FileText',
     iconColor: "$purple500",
+    navigationUrl: 'observation',
     status: {
       type: CARD_STATUS.IN_PROGRESS,
       label: 'participantDetail.assessmentSurveys.status.percentComplete',
