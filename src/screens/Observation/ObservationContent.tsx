@@ -250,6 +250,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       setProgress(0);
       setLoading(true);
       setDefaultValuesLocal(null);
+      setSubmission(null);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [solutionId, id, submissionNumber]);

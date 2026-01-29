@@ -29,7 +29,7 @@ type RawOption = string | { label?: string; name?: string; value: string | null 
 type SelectProps = {
   options: RawOption[];
   value: string;
-  onChange: (value: string) => void;
+  onChange: (value: string, label: string) => void;
   placeholder?: string;
   bg?: string;
   borderColor?: string;
@@ -111,7 +111,7 @@ export default function Select({
       const stringValue = String(newValue);
       // Allow empty strings and special markers (like __NULL_VALUE__) to pass through
       // Empty strings are valid selections for filters (e.g., "String Null" option)
-      onChange(stringValue);
+      onChange(stringValue, selectedOption?.name || '');
     }
   };
 
