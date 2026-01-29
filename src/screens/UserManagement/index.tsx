@@ -38,8 +38,8 @@ const UserManagementScreen = () => {
   // Ref to track previous roles length to detect when roles are first loaded
   const prevRolesLengthRef = useRef(0);
 
-  // Use custom hook for filter management - handles all API calls for roles, provinces, districts
-  const { filters: filterOptions, roles, provinces, districts } = useUserManagementFilters(filters);
+  // Use custom hook for filter management - handles all API calls for roles, provinces
+  const { filters: filterOptions, roles, provinces } = useUserManagementFilters(filters);
 
   // Fetch users from API when filters change or when roles are first loaded
   useEffect(() => {
@@ -94,11 +94,6 @@ const UserManagementScreen = () => {
           // The API expects the province name (e.g., "Eastern Cape")
           apiParams.province = filters.province;
         }
-        if (filters.district && filters.district !== 'all-districts') {
-          // Since we're using district.name as both label and value, use it directly
-          // The API expects the district name (e.g., "Alfred Nzo")
-          apiParams.district = filters.district;
-        }
 
         const response = await getParticipantsList(apiParams);
         
@@ -135,15 +130,9 @@ const UserManagementScreen = () => {
 
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
-    // Clear district filter if province is cleared or changed
-    if (filters.province !== newFilters.province) {
-      if (newFilters.district) {
-        delete newFilters.district;
-      }
-    }
     setFilters(newFilters);
     // DataTable will reset to page 1 automatically when data changes
-  }, [filters.province]);
+  }, []);
 
 
   return (

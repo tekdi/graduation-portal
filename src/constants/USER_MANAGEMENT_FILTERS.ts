@@ -12,8 +12,6 @@ import {
   getEntityTypesFromStorage,
   getProvincesByEntityType,
   ProvinceEntity,
-  getDistrictsByProvinceEntity,
-  DistrictEntity,
 } from '../services/participantService';
 
 // Type definition for filter configuration
@@ -69,7 +67,6 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
   // State for API data
   const [roles, setRoles] = useState<Role[]>([]);
   const [provinces, setProvinces] = useState<ProvinceEntity[]>([]);
-  const [districts, setDistricts] = useState<DistrictEntity[]>([]);
 
   // Fetch roles and provinces from API on component mount
   useEffect(() => {
@@ -116,48 +113,6 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
     fetchInitialData();
   }, []);
 
-  // Fetch districts when province filter changes
-  useEffect(() => {
-    const fetchDistricts = async () => {
-      // If no province selected or "All Provinces" is selected, clear districts
-      if (!filters.province || filters.province === 'all-provinces') {
-        setDistricts([]);
-        return;
-      }
-
-      // Only fetch if provinces are loaded
-      if (provinces.length === 0) {
-        return;
-      }
-
-      try {
-        // Find the selected province from provinces array to get its _id
-        const selectedProvince = provinces.find(
-          (province: ProvinceEntity) => province.name === filters.province
-        );
-
-        if (!selectedProvince || !selectedProvince._id) {
-          setDistricts([]);
-          return;
-        }
-
-        // Fetch districts using the province's entity ID (_id)
-        const response = await getDistrictsByProvinceEntity(selectedProvince._id, {
-          page: 1,
-          limit: 100,
-        });
-        
-        // Access districts from response.result.data
-        const districtsData = Array.isArray(response.result?.data) ? response.result.data : [];
-        setDistricts(districtsData);
-      } catch (error) {
-        setDistricts([]);
-      }
-    };
-
-    fetchDistricts();
-  }, [filters.province, provinces]);
-
   // Build dynamic filter options with API data
   const filterOptions = useMemo(() => {
     // Build role filter from API roles
@@ -175,17 +130,6 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
       ...provinces.map((province: ProvinceEntity) => ({
         label: province.name,
         value: province.name, // Use name as value (e.g., "Eastern Cape")
-      })),
-    ];
-
-    // Build district filter from API districts
-    // District filter is disabled if no province is selected or "All Provinces" is selected
-    const isProvinceSelected = filters.province && filters.province !== 'all-provinces' && filters.province !== '';
-    const districtFilterOptions = [
-      { labelKey: 'admin.filters.allDistricts', value: 'all-districts' },
-      ...districts.map((district: DistrictEntity) => ({
-        label: district.name,
-        value: district.name, // Use name as value
       })),
     ];
 
@@ -220,20 +164,20 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
         data: provinceFilterOptions,
       },
       {
-        nameKey: 'admin.filters.district',
-        attr: 'district',
+        nameKey: 'admin.filters.site',
+        attr: 'site',
         type: 'select' as const,
-        data: districtFilterOptions,
-        disabled: !isProvinceSelected, // Disable when no province is selected
+        data: [
+          { labelKey: 'admin.filters.allSites', value: 'all-sites' },
+        ],
       },
     ];
-  }, [roles, provinces, districts, filters.province]);
+  }, [roles, provinces]);
 
   return {
     filters: filterOptions,
     roles,
     provinces,
-    districts,
   };
 };
 

@@ -53,7 +53,7 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       role,
       status,
       province,
-      district,
+      site,
     } = params;
 
     // Build query string
@@ -79,8 +79,8 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
     if (province) {
       queryParams.append('province', province);
     }
-    if (district) {
-      queryParams.append('district', district);
+    if (site) {
+      queryParams.append('site', site);
     }
 
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
@@ -273,7 +273,7 @@ export interface ProvinceEntity {
 }
 
 /**
- * Get entity types list and store in local storage - Cache entity types for province/district filters
+ * Get entity types list and store in local storage - Cache entity types for province filters
  * Stores entity type name-id pairs for later use
  */
 export const getEntityTypesList = async (): Promise<EntityTypesListResponse> => {
@@ -348,56 +348,4 @@ export const getProvincesByEntityType = async (
   }
 };
 
-/**
- * District data from API
- */
-export interface DistrictEntity {
-  _id: string;
-  externalId: string;
-  name: string;
-  locationId: string;
-}
-
-/**
- * Get districts list by province entity ID - Dynamic district filter based on selected province
- * Uses the province entity ID to fetch all districts for that province
- */
-export const getDistrictsByProvinceEntity = async (
-  provinceEntityId: string,
-  params?: { page?: number; limit?: number }
-): Promise<{
-  message: string;
-  status: number;
-  result: {
-    count: number;
-    data: DistrictEntity[];
-  };
-}> => {
-  try {
-    const { page = 1, limit = 100 } = params || {};
-    
-    const queryParams = new URLSearchParams({
-      type: 'district',
-      page: page.toString(),
-      limit: limit.toString(),
-    });
-
-    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${provinceEntityId}?${queryParams.toString()}`;
-    
-    // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
-    const response = await api.get<{
-      message: string;
-      status: number;
-      result: {
-        count: number;
-        data: DistrictEntity[];
-      };
-    }>(endpoint);
-
-    return response.data;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
-    throw error;
-  }
-};
 

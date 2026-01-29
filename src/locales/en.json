@@ -208,7 +208,9 @@
       "active": "Active",
       "deactivated": "Deactivated",
       "allProvinces": "All Provinces",
-      "allDistricts": "All Districts"
+      "allDistricts": "All Districts",
+      "site": "Sites",
+      "allSites": "All Sites"
     },
     "users": {
       "allUsers": "All Users",

@@ -110,7 +110,7 @@ export interface ParticipantSearchParams {
   role?: string;
   status?: string;
   province?: string;
-  district?: string;
+  site?: string;
 }
 
 export interface ParticipantSearchResponse {
@@ -130,7 +130,6 @@ export interface AdminUserManagementData {
   role: 'BRAC admin' | 'Supervisor' | 'Linkage Champion' | 'Participant';
   status: 'Active' | 'Deactivated';
   province: string;
-  district: string;
   lastLogin: string;
   details: {
     type: 'assigned' | 'progress';
