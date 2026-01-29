@@ -220,7 +220,7 @@ const TableRow = <T,>({
     <Box>
       <Pressable
         onPress={() => onRowClick?.(item)}
-        $web-cursor={onRowClick ? 'pointer' : undefined}
+        $web-cursor={onRowClick ? 'pointer' : 'auto'}
       >
         <HStack
           {...styles.tableRow}
@@ -269,8 +269,10 @@ const CardView = <T,>({
   onRowClick,
 }: CardViewProps<T>) => {
   return (
-    <Pressable onPress={() => onRowClick?.(item)}>
-      {/* @ts-ignore */}
+    <Pressable 
+      onPress={() => onRowClick?.(item)}
+      $web-cursor={onRowClick ? 'pointer' : 'auto'}
+    >
       <Card {...styles.cardContainer}>
         <VStack {...styles.cardContent}>
         {layout.map((row, rowIndex) => {
@@ -606,12 +608,12 @@ const DataTable = <T,>({
           tableContent
         )}
       </Box>
-      {paginationConfig.isEnabled && pagination && (
+      {paginationConfig.isEnabled && paginationConfig.totalPages > 1 && pagination && (
         <PaginationControls
-          currentPage={paginationConfig.currentPage}
+          currentPage={currentPage}
           totalPages={paginationConfig.totalPages}
           pageSize={paginationConfig.safePageSize}
-          totalItems={paginationConfig.totalItems}
+          totalItems={data.length}
           startIndex={paginationConfig.startIndex}
           endIndex={paginationConfig.endIndex}
           onPageChange={handlePageChange}
