@@ -19,12 +19,12 @@ export const MAIN_MENU_ITEMS: SidebarItem[] = [
   //   icon: 'FileText', // Lucide icon name
   //   route: 'template-management',
   // },
-  {
-    key: 'audit-log',
-    label: 'admin.menu.auditLog',
-    icon: 'Activity', // Lucide icon name for activity log
-    route: 'audit-log',
-  },
+  // {
+  //   key: 'audit-log',
+  //   label: 'admin.menu.auditLog',
+  //   icon: 'Activity', // Lucide icon name for activity log
+  //   route: 'audit-log',
+  // },
 ];
 
 export const QUICK_ACTION_MENU_ITEMS: SidebarItem[] = [
