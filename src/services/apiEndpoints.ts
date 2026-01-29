@@ -21,4 +21,6 @@ export const API_ENDPOINTS = {
   ENTITY_TYPES_LIST: `${prefix}/entity-management/v1/entityTypes/list`,  // Fetch entity types (province, district, etc.)
   ENTITIES_BY_TYPE: `${prefix}/entity-management/v1/entities/listByEntityType`,  // Fetch entities by type (e.g., provinces)
   USERS_LIST: `${prefix}/user/v1/account/search`,  // Search users for user management
+  GET_SIGNED_URL: `${prefix}/user/v1/cloud-services/file/getSignedUrl`,
+  BULK_USER_CREATE: `${prefix}/user/v1/tenant/bulkUserCreate`,
 };

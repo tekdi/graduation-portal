@@ -211,7 +211,14 @@
       "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history.",
       "dropoutSuccess": "Participant marked as dropout",
       "dropoutError": "Failed to mark participant as dropout",
-      "observationLogs": "Observation Logs"
+      "observationLogs": "Observation Logs",
+      "uploadSuccess": "CSV file uploaded successfully!",
+      "uploadError": "Failed to upload CSV file. Please try again.",
+      "uploadErrorSignedUrl": "Failed to get upload URL. Please try again.",
+      "uploadErrorFileUpload": "Failed to upload file. Please try again.",
+      "uploadErrorBulkCreate": "File uploaded but failed to process. Please contact support.",
+      "csvValidationError": "Please select a valid CSV file",
+      "uploadErrorFilePathNotFound": "File path not found in upload response. Please try again."
     },
     "filters": {
       "role": "Role",
