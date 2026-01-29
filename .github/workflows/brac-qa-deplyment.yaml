@@ -1,14 +1,15 @@
-name: Dev Build & Deploy Graduation Portal (BRAC)
+name: Tag Build & Deploy User Service (BRAC)
 
 on:
   push:
-    branches:
-      - release-1.0.0
+    tags:
+      - "v*"
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
-  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_BRAC }}
   AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+  ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_BRAC }}
+  TAG: ${{ github.ref_name }}
 
 jobs:
   build-and-deploy:
@@ -16,22 +17,16 @@ jobs:
 
     permissions:
       contents: read
-      id-token: write
 
     steps:
-      # =========================
-      # Checkout
-      # =========================
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # =========================
-      # Prepare ENV for Build
-      # =========================
       - name: Create .env for Docker build
         run: |
-          echo "${{ secrets.DEV_ENV_BRAC }}" > .env
+          echo "${{ secrets.QA_ENV_BRAC }}" > .env
           ls -ltra .env
+
 
       # =========================
       # AWS Authentication
@@ -44,34 +39,31 @@ jobs:
           aws-region: ${{ env.AWS_REGION }}
 
       # =========================
-      # Login to ECR
+      # Login to Amazon ECR
       # =========================
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v2
 
       # =========================
-      # Build & Push Image
+      # Build & Push Docker Image
       # =========================
       - name: Build and Push Docker Image to ECR
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          build-args: |
-            DEV_ENV_BRAC=${{ secrets.DEV_ENV_BRAC }}
           tags: |
-            ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:latest
-            ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+            ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.TAG }}
 
       # =========================
-      # Deploy on Server
+      # Deploy on QA Server
       # =========================
-      - name: Deploy Stack
+      - name: Deploy Stack to QA
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.HOST_NAME_DEV }}
+          host: ${{ secrets.HOST_NAME_QA }}
           username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
+          key: ${{ secrets.EC2_KEY }}
           port: ${{ secrets.PORT }}
           script: |
             set -e
@@ -80,13 +72,17 @@ jobs:
             export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
             export AWS_REGION=${{ env.AWS_REGION }}
 
-            cd ${{ secrets.TARGET_DIR_DEV }}
+            cd ${{ secrets.TARGET_DIR_QA }}
 
+            # Backup old env if exists
             if [ -f .env ]; then
               mv .env .env-bkp
             fi
 
-            echo '${{ secrets.DEV_ENV_BRAC }}' > .env
+            # Write env safely (MULTILINE SAFE)
+            cat << 'EOF' > .env
+            ${{ secrets.QA_ENV_BRAC }}
+            EOF
 
             aws ecr get-login-password --region ${AWS_REGION} \
               | docker login \
@@ -94,4 +90,4 @@ jobs:
                 --password-stdin \
                 ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${AWS_REGION}.amazonaws.com
 
-            ./deploy.sh
+            ./deploy.sh ${{ env.TAG }}
