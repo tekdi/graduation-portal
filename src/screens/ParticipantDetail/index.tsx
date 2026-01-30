@@ -182,7 +182,6 @@ export default function ParticipantDetail() {
         participantId={id}
         status={participant.status as ParticipantStatus}
         pathway={'employment'}
-        graduationProgress={20}
         graduationDate={''}
         onViewProfile={() => setIsProfileModalOpen(true)}
         areAllTasksCompleted={areAllTasksCompleted}

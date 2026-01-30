@@ -16,18 +16,18 @@ import {
 import { participantHeaderStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 import ParticipantProgressCard from './ParticipantProgressCard';
-import { STATUS } from '@constants/app.constant';
+import { STATUS, TASK_STATUS } from '@constants/app.constant';
 import { getParticipantsList, updateEntityDetails } from '../../../services/participantService';
 import { useAuth } from '@contexts/AuthContext';
-import { ParticipantHeaderProps, ParticipantStatus } from '@app-types/screens';
+import { Participant, ParticipantHeaderProps, ParticipantStatus } from '@app-types/screens';
 import { PageHeader } from '@components/PageHeader';
+import { getProjectDetails } from '../../../project-player/services/projectPlayerService';
 
 const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   participantName,
   participantId,
   // status,
   pathway,
-  graduationProgress,
   graduationDate,
   onViewProfile,
   areAllTasksCompleted = false,
@@ -41,6 +41,8 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   const { showAlert } = useAlert();
 
   const [status, setStatus] = useState('')
+  const [graduationProgress, setGraduationProgress] = useState(0)
+  const [participant, setParticipant] = useState<Participant | null>(null);
   const showSuccess = (message: string) => {
     showSuccessToast(toast, message);
   };
@@ -52,7 +54,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
           const response = await getParticipantsList({ entityId: participantId, userId: user?.id })
           const { userDetails, ...rest } = response?.result?.data?.[0]
           const participantData = { ...(userDetails || {}), ...rest }
-          // setParticipant(participantData);
+          setParticipant(participantData);
           setStatus(participantData?.status);
         } catch (error) {
           console.log(error);
@@ -61,6 +63,46 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
     };
     fetchEntityDetails();
   }, [participantId, user?.id]);
+
+  useEffect(() => {
+    const fetchProjectProgress = async () => {
+      if (participant?.idpProjectId) {
+        try {
+          if (participant?.idpProjectId) {
+            const res = await getProjectDetails(participant?.idpProjectId);
+            const tasks = res.data?.tasks || [];
+            let totalChildTasks = 0;
+            let completedChildTasks = 0;
+
+            tasks.forEach((task: any) => {
+              if (task?.children?.length) {
+                const validChildren = task.children.filter(
+                  (childTask: any) => !childTask.isDeleted,
+                );
+
+                totalChildTasks += validChildren.length;
+
+                completedChildTasks += validChildren.filter(
+                  (childTask: any) =>
+                    childTask.status === TASK_STATUS.COMPLETED,
+                ).length;
+              }
+            });
+
+            const progress =
+              totalChildTasks > 0
+                ? Math.round((completedChildTasks / totalChildTasks) * 100)
+                : 0;
+
+            setGraduationProgress(progress);
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    };
+    fetchProjectProgress();
+  }, [participant?.idpProjectId]);
 
   const handleBackPress = () => {
     // @ts-ignore

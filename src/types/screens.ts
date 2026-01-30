@@ -8,6 +8,7 @@ export interface Participant {
   progress?: number;
   status?: StatusType;
   userDetails?: User;
+  idpProjectId?:string;
 }
 
 export type StatusCount = {
