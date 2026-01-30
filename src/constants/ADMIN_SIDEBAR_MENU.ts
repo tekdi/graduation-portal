@@ -13,6 +13,12 @@ export const MAIN_MENU_ITEMS: SidebarItem[] = [
     icon: 'Users', // Lucide icon name
     route: 'user-management',
   },
+  {
+    key: 'assign-users',
+    label: 'admin.menu.assignUsers',
+    icon: 'UserCheck', // Lucide icon name - distinct from Users icon
+    route: 'assign-users',
+  },
   // {
   //   key: 'template-management',
   //   label: 'admin.menu.templateManagement',
