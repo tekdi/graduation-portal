@@ -179,7 +179,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
                     <VStack flex={1} space="xs">
                       <HStack alignItems="center" space="sm" flexWrap="wrap">
                         <Text
-                          {...TYPOGRAPHY.h4}
+                          {...TYPOGRAPHY.paragraph}
                           color="$textPrimary"
                           sx={
                             isWeb
