@@ -103,6 +103,9 @@ export const theme = {
       pillarFinancialInclusion: '#1d4ed8',
       pillarSocialProtection: '#f97316',   
       borderColor : '#e2e8f0',
+      'bgPrimary/5' : '#F9F4F5',
+      'bgPrimaryBorder/5' : '#E9D5DA',
+      'bgPrimary/10' : '#8B28421A',
     },
     fonts: {
       ...((gluestackConfig.tokens as any).fonts || {}),

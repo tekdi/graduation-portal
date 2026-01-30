@@ -18,7 +18,8 @@ export default function FilterButton({
   data,
   onFilterChange,
   showClearButton = true,
-  rightContent,
+  rightContent
+  // disabled prop is passed via data items - Used for district filter when no province selected
 }: FilterButtonProps) {
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
@@ -30,6 +31,27 @@ export default function FilterButton({
 
   // Get default display values for UI (not included in output)
   const getDefaultDisplayValue = (item: any) => {
+    // If placeholder is set, don't auto-select unless first item is an "all" option
+    if (item.placeholderKey || item.placeholder) {
+      // Check if first item is an "all" option (e.g., "all-Provinces", "all-roles", "all-status")
+      if (item.data && item.data.length > 0) {
+        const firstItem = item.data[0];
+        let firstValue = '';
+        if (typeof firstItem === 'string') {
+          firstValue = firstItem;
+        } else if (firstItem?.value !== undefined) {
+          firstValue = String(firstItem.value);
+        }
+        // Only auto-select if it's an "all" option
+        if (firstValue.toLowerCase().startsWith('all-') || firstValue.toLowerCase() === 'all') {
+          return firstValue;
+        }
+      }
+      // Otherwise, return empty to show placeholder
+      return "";
+    }
+    
+    // Default behavior: auto-select first item if no placeholder
     if (item.type !== 'search' && item.data && item.data.length > 0) {
       const firstItem = item.data[0];
       // Extract the actual value string from the first item
@@ -140,6 +162,11 @@ export default function FilterButton({
               }));
             }
           }}
+          placeholder={
+            item.placeholderKey 
+              ? t(item.placeholderKey) 
+              : item.placeholder
+          }
           options={
             item?.data?.map((option: any) => {
               // If it's a string, return as-is (backward compatibility)
