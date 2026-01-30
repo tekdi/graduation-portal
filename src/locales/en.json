@@ -45,12 +45,15 @@
     "complete": "Complete"
   },
   "projectPlayer": {
+    "onboarding": "Onboarding the",
+    "participant": "Participant",
     "status": "Status",
     "progress": "Progress",
     "pillar": "Pillar",
     "pillars": "pillars",
     "complete": "complete",
     "stepsComplete": "Steps Complete",
+    "onboardingDescription": "Complete all required steps before enrolling the participant",
     "statusTypes": {
       "to-do": "To Do",
       "completed": "Completed"
@@ -667,7 +670,6 @@
         "selfServiceOnly": "Self-Service Only:"
       }
     }
-   
   },
   "observation": {
     "noParticipantFound": "No entity found observation solution attached to this participant",
