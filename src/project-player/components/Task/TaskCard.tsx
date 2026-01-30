@@ -834,7 +834,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
         </HStack>
       </Box>
     );
-
   }
 
   return (

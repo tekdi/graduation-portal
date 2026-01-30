@@ -185,5 +185,4 @@ const hasChildren =
     </Box>
   );
 };
-
 export default ProjectInfoCard;
