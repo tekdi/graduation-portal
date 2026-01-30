@@ -5,16 +5,20 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useLanguage } from '@contexts/LanguageContext';
 import { projectInfoCardStyles } from './Styles';
-import { PLAYER_MODE, TASK_STATUS } from '@constants/app.constant';
+import { PLAYER_MODE, TASK_STATUS, ONBOARDING_PROJECT_TITLES } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
 
 const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const { mode } = useProjectContext();
   const { t } = useLanguage();
- const { isMobile } = usePlatform();
+  const { isMobile } = usePlatform();
+
+  // For onboarding tasks, count based on file uploads (attachments), not completion status
   const completedTasks =
-    project?.tasks?.filter(task => task.status === TASK_STATUS.COMPLETED)
-      .length || 0;
+    project?.tasks?.filter(task => {
+      // Check if task has uploaded files
+      return task.attachments && task.attachments.length > 0;
+    }).length || 0;
   const totalTasks = project.tasks?.length || 0;
 
   // Check if any task is a project type (has children)
@@ -38,23 +42,96 @@ const hasChildren =
   return (
     <Box {...projectInfoCardStyles.container}>
       <HStack {...projectInfoCardStyles.header} flexDirection={isMobile ? 'column' : 'row'}
-          alignItems={isMobile ? 'flex-start' : 'center'}
-          justifyContent="space-between"
-          gap="$3">
-       
-         
+        alignItems={isMobile ? 'flex-start' : 'center'}
+        justifyContent="space-between"
+        gap="$3">
 
-          {/* ✅ Title + Description Section */}
-          <VStack
-            {...projectInfoCardStyles.leftSection}
-            width="100%"
-            order={isMobile ? 2 : 1} // comes below badge on mobile
-          >
+
+
+        {/* ✅ Title + Description Section */}
+        <VStack
+          {...projectInfoCardStyles.leftSection}
+          width="100%"
+          order={isMobile ? 2 : 1} // comes below badge on mobile
+        >
+          {!hasChildren &&
+            (ONBOARDING_PROJECT_TITLES.includes(project?.title || '') ||
+              ONBOARDING_PROJECT_TITLES.includes(project?.name || '')) ? (
+            isMobile ? (
+              <VStack>
+                <Text {...TYPOGRAPHY.h3} color="$textPrimary" lineHeight="$xs">
+                  {t('projectPlayer.onboarding')}
+                </Text>
+                <HStack
+                  alignItems="center"
+                  justifyContent="space-between"
+                  width="100%"
+                  space="md"
+                  flexWrap="wrap"
+                >
+                  <Text {...TYPOGRAPHY.h3} color="$textPrimary" lineHeight="$xs">
+                    {t('projectPlayer.participant')}
+                  </Text>
+                  <Box
+                    {...projectInfoCardStyles.stepsCompleteBadge}
+                    marginLeft="$0"
+                  >
+                    <HStack {...projectInfoCardStyles.stepsCompleteText}>
+                      <Text
+                        {...TYPOGRAPHY.caption}
+                        color="$modalBackground"
+                        fontWeight="$semibold"
+                      >
+                        {completedTasks} of {totalTasks}{' '}
+                        {t('projectPlayer.stepsComplete')}
+                      </Text>
+                    </HStack>
+                  </Box>
+                </HStack>
+              </VStack>
+            ) : (
+              <HStack
+                alignItems="center"
+                justifyContent="space-between"
+                width="100%"
+              >
+                <Text {...TYPOGRAPHY.h3} color="$textPrimary">
+                  {t('projectPlayer.onboarding')} {t('projectPlayer.participant')}
+                </Text>
+                <Box
+                  {...projectInfoCardStyles.stepsCompleteBadge}
+                  marginLeft="$4"
+                >
+                  <HStack {...projectInfoCardStyles.stepsCompleteText}>
+                    <Text
+                      {...TYPOGRAPHY.caption}
+                      color="$modalBackground"
+                      fontWeight="$semibold"
+                    >
+                      {completedTasks} of {totalTasks}{' '}
+                      {t('projectPlayer.stepsComplete')}
+                    </Text>
+                  </HStack>
+                </Box>
+              </HStack>
+            )
+          ) : (
             <Text {...TYPOGRAPHY.h3} color="$textPrimary">
               {project?.title || project?.name}
             </Text>
+          )}
 
-            {project?.description && (
+          {!hasChildren ? (
+            <Text
+              {...TYPOGRAPHY.paragraph}
+              color="$textSecondary"
+              lineHeight="$lg"
+              mt="$1"
+            >
+              {t('projectPlayer.onboardingDescription')}
+            </Text>
+          ) : (
+            project?.description && (
               <Text
                 {...TYPOGRAPHY.paragraph}
                 color="$textSecondary"
@@ -63,28 +140,29 @@ const hasChildren =
               >
                 {project?.description}
               </Text>
-            )}
-          </VStack>
-
- {/* ✅ Steps Complete Badge */}
-          {!hasChildren && (
-            <Box
-              {...projectInfoCardStyles.stepsCompleteBadge}
-              alignSelf={isMobile ? 'flex-end' : 'auto'} // moves to right on mobile
-              order={isMobile ? 1 : 2} // shows first on mobile
-            >
-              <HStack {...projectInfoCardStyles.stepsCompleteText}>
-                <Text
-                  {...TYPOGRAPHY.caption}
-                  color="$modalBackground"
-                  fontWeight="$semibold"
-                >
-                  {completedTasks} of {totalTasks}{' '}
-                  {t('projectPlayer.stepsComplete')}
-                </Text>
-              </HStack>
-            </Box>
+            )
           )}
+        </VStack>
+
+        {/* ✅ Steps Complete Badge - only for non-onboarding projects now */}
+        {!hasChildren && !(project?.title === 'Onboarding Participants' || project?.name === 'Onboarding Participants') && (
+          <Box
+            {...projectInfoCardStyles.stepsCompleteBadge}
+            alignSelf={isMobile ? 'flex-end' : 'auto'} // moves to right on mobile
+            order={isMobile ? 1 : 2} // shows first on mobile
+          >
+            <HStack {...projectInfoCardStyles.stepsCompleteText}>
+              <Text
+                {...TYPOGRAPHY.caption}
+                color="$modalBackground"
+                fontWeight="$semibold"
+              >
+                {completedTasks} of {totalTasks}{' '}
+                {t('projectPlayer.stepsComplete')}
+              </Text>
+            </HStack>
+          </Box>
+        )}
         {!hasChildren && isPreview && (
           <Box {...projectInfoCardStyles.taskCountPreview}>
             <Text {...TYPOGRAPHY.caption} color="$primary500">
@@ -107,5 +185,4 @@ const hasChildren =
     </Box>
   );
 };
-
 export default ProjectInfoCard;

@@ -134,37 +134,45 @@ const ProjectComponent: React.FC = () => {
     <Container {...projectComponentStyles.container}>
       <VStack flex={1}>
         <ScrollView {...projectComponentStyles.scrollView}>
-          <Card {...projectComponentStyles.card}>
+          <Card
+            {...projectComponentStyles.card}
+            {...(hasChildren ? {} : projectComponentStyles.onboardingCard)}
+          >
             <VStack>
               <ProjectInfoCard project={projectData} />
 
               {hasChildren
                 ? projectData?.children?.length
                   ? projectData?.children.map(task => (
+                    <TaskComponent
+                      key={task?._id}
+                      task={task}
+                      isChildOfProject={true}
+                    />
+                  ))
+                  : projectData?.tasks
+                    ?.filter(task => task.children?.length)
+                    ?.map(task => (
                       <TaskComponent
-                        key={task?._id}
+                        key={task._id}
                         task={task}
                         isChildOfProject={true}
                       />
                     ))
-                  : projectData?.tasks
-                      ?.filter(task => task.children?.length)
-                      ?.map(task => (
-                        <TaskComponent
-                          key={task._id}
-                          task={task}
-                          isChildOfProject={true}
-                        />
-                      ))
-                : projectData?.tasks?.map((task, index) => (
-                    <TaskComponent
-                      key={task._id}
-                      task={task}
-                      isLastTask={
-                        index === (projectData.tasks?.length || 0) - 1
-                      }
-                    />
-                  ))}
+                : (
+                  <Box paddingHorizontal="$5" paddingTop="$2" paddingBottom="$4">
+                    {projectData?.tasks?.map((task, index) => (
+                      <TaskComponent
+                        key={task._id}
+                        task={task}
+                        isLastTask={
+                          index === (projectData.tasks?.length || 0) - 1
+                        }
+                        isOnboardingTask={true}
+                      />
+                    ))}
+                  </Box>
+                )}
 
               {/* Pillar features only: +Add Custom Task button (for Intervention Plan, not Onboarding) */}
               {showPillarFeatures && (

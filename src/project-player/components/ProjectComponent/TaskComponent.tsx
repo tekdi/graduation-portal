@@ -7,7 +7,8 @@ const TaskComponent: React.FC<TaskComponentProps> = ({
   task,
   level = 0,
   isLastTask = false,
-  isChildOfProject = false, // New prop
+  isChildOfProject = false,
+  isOnboardingTask = false,
 }) => {
   // If task is a project type with children, render as ProjectAsTaskComponent
 if (
@@ -24,7 +25,8 @@ if (task?.isDeleted) return null;
       task={task}
       level={level}
       isLastTask={isLastTask}
-      isChildOfProject={isChildOfProject} // Pass down the prop
+      isChildOfProject={isChildOfProject}
+      isOnboardingTask={isOnboardingTask}
     />
   );
 };

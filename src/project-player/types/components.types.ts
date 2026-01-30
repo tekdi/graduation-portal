@@ -9,6 +9,7 @@ export interface TaskCardProps {
   level?: number;
   isLastTask?: boolean;
   isChildOfProject?: boolean;
+  isOnboardingTask?: boolean;
 }
 
 export interface TaskStatusProps {
@@ -26,7 +27,8 @@ export interface TaskComponentProps {
   task: Task;
   level?: number;
   isLastTask?: boolean;
-  isChildOfProject?: boolean; // New prop
+  isChildOfProject?: boolean;
+  isOnboardingTask?: boolean;
 }
 
 export interface UploadComponentProps {
