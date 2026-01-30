@@ -54,21 +54,26 @@ export const getUsersList = async (params: UserSearchParams): Promise<UserSearch
       queryParams.append('search', search);
     }
 
-    // Add optional filter parameters
+    // Add optional filter parameters (except province - it goes in body)
     if (role) {
       queryParams.append('role', role);
     }
     if (status) {
       queryParams.append('status', status);
     }
-    if (province) {
-      queryParams.append('province', province);
-    }
     if (site) {
       queryParams.append('site', site);
     }
 
     const endpoint = `${API_ENDPOINTS.USERS_LIST}?${queryParams.toString()}`;
+    
+    // Build request body - province goes in meta.province
+    const requestBody: any = {};
+    if (province) {
+      requestBody.meta = {
+        province: province, // Province ID (e.g., "6952163ae83c1c00147132a8")
+      };
+    }
     
     // Log the complete API URL with query parameters (for debugging)
     console.log('API URL:', endpoint);
@@ -77,9 +82,10 @@ export const getUsersList = async (params: UserSearchParams): Promise<UserSearch
       paramsObj[key] = value;
     });
     console.log('Query Parameters:', paramsObj);
+    console.log('Request Body:', requestBody);
     
     // POST request to fetch users
-    const response = await api.post<UserSearchResponse>(endpoint, {});
+    const response = await api.post<UserSearchResponse>(endpoint, requestBody);
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor

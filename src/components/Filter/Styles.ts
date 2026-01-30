@@ -29,19 +29,12 @@ export const filterStyles = {
     },
     justifyContent: 'space-between' as const,
   },
-  searchContainer: {
-    flex: 1,
-    minWidth: '100%' as const,
-    $lg: {
-      minWidth: 485,
-    },
-  },
   roleContainer: {
     flex: 1,
     minWidth: '100%' as const,
     $md: {
       minWidth: 240,
-      maxWidth: 240,
+     // maxWidth: 240,
     },
   },
   input: {
