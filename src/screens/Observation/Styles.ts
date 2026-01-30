@@ -1,15 +1,4 @@
 export const observationStyles = {
-  headerContainer: {
-    space: 'md' as const,
-    backgroundColor: '$white' as const,
-    borderBottomWidth: '$1' as const,
-    borderBottomColor: '$borderLight300' as const,
-  },
-  headerContent: {
-    justifyContent: 'space-between' as const,
-    alignItems: 'flex-start' as const,
-    width: '$full' as const,
-  },
   backButton: {
     alignItems: 'center' as const,
     space: 'xs' as const,
@@ -25,21 +14,6 @@ export const observationStyles = {
     alignItems: 'center' as const,
     width: '$full' as const,
     marginTop: '$4' as const,
-  },
-  progressBadge: {
-    bg: '$gray100' as const,
-    paddingHorizontal: '$3' as const,
-    paddingVertical: '$1' as const,
-    borderRadius: '$full' as const,
-    display: 'flex' as const,
-    flexDirection: 'row' as const,
-    alignItems: 'center' as const,
-    gap: '$1' as const,
-  },
-  progressBadgeText: {
-    fontSize: '$sm' as const,
-    color: '$gray700' as const,
-    fontWeight: '$medium' as const,
   },
   progressBarContainer: {
     width: '$full' as const,

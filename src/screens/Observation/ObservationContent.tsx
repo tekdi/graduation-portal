@@ -134,8 +134,11 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
           evidenceCode:observationSubmissionsLast?.evidencesStatus?.[0]?.code,
         });
         observationSolution = response.result;
+        setSubmission({status:CARD_STATUS.IN_PROGRESS});
+      } else {
+        setSubmission(observationSubmissionsLast);
       }
-      setSubmission(observationSubmissionsLast);
+
       if(userData) {
         const defaultValues = buildDefaultValuesFromObservation(observationSolution, userData);
         setDefaultValuesLocal(defaultValues);
