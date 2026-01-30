@@ -99,15 +99,21 @@ export default function FilterButton({
   };
 
   // Render a single filter item
-  const renderFilterItem = (item: any) => (
-    <VStack 
-      key={item.key || item.attr} // Use custom key if provided, otherwise use attr
-      {...(item.type === 'search' 
-        ? filterStyles.searchContainer 
-        : filterStyles.roleContainer)}
-      width="$full"
-      $md-width="auto"
-    >
+  const renderFilterItem = (item: any, index: number) => {
+    // Safety check: return null if item is undefined or null
+    if (!item) {
+      return null;
+    }
+    
+    return (
+      <VStack 
+        key={item.key || item.attr || `filter-${index}`} // Use custom key if provided, otherwise use attr, fallback to index
+        {...(item.type === 'search' 
+          ? filterStyles.searchContainer 
+          : filterStyles.roleContainer)}
+        width="$full"
+        $md-width="auto"
+      >
       {/* <Text {...filterStyles.label}>
         {item.nameKey ? t(item.nameKey) : item.name}
       </Text> */}
@@ -189,7 +195,8 @@ export default function FilterButton({
         />
       )}
     </VStack>
-  );
+    );
+  };
 
   return (
     <VStack {...filterStyles.container}>
@@ -211,7 +218,7 @@ export default function FilterButton({
 
       {/* Filters Row */}
       <HStack {...filterStyles.filterFieldsContainer}>
-        {data.map((item: any) => renderFilterItem(item))}
+        {data.map((item: any, index: number) => renderFilterItem(item, index))}
       </HStack>
     </VStack>
   );
