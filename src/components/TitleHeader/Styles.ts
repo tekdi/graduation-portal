@@ -11,6 +11,7 @@ export const titleHeaderStyles = {
     color: '$textMutedForeground',
     fontSize: '$md',
     lineHeight: '$md',
+    fontWeight: '$normal',
   },
   // Button styles for right-side action buttons
   outlineButton: {

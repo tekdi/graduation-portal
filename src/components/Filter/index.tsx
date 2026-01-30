@@ -1,9 +1,10 @@
-import React from 'react';
-import { VStack, HStack, Text, Image, Input, InputField, Pressable } from '@ui';
-import Select from '../ui/Inputs/Select';
-import { filterStyles } from './Styles';
-import filterIcon from '../../assets/images/FilterIcon.png';
-import { useLanguage } from '@contexts/LanguageContext';
+import React from "react";
+import { VStack, HStack, Text, Image, Input, InputField, Pressable } from "@ui";
+import Select from "../ui/Inputs/Select";
+import DatePicker from "../ui/Inputs/DatePicker";
+import { filterStyles } from "./Styles";
+import filterIcon from "../../assets/images/FilterIcon.png";
+import { useLanguage } from "@contexts/LanguageContext";
 
 interface FilterButtonProps {
   data: any[];
@@ -23,6 +24,7 @@ export default function FilterButton({
 }: FilterButtonProps) {
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
+  const [openDatePicker, setOpenDatePicker] = React.useState<string | null>(null);
 
   // Notify parent when filters change
   React.useEffect(() => {
@@ -99,80 +101,111 @@ export default function FilterButton({
   };
 
   // Render a single filter item
-  const renderFilterItem = (item: any, index: number) => {
-    // Safety check: return null if item is undefined or null
-    if (!item) {
-      return null;
-    }
+  const renderFilterItem = (item: any) => {
+    const useSearchContainer = item.type === 'search';
     
-    return (
-      <VStack 
-        key={item.key || item.attr || `filter-${index}`} // Use custom key if provided, otherwise use attr, fallback to index
-        {...(item.type === 'search' 
-          ? filterStyles.searchContainer 
-          : filterStyles.roleContainer)}
-        width="$full"
-        $md-width="auto"
-      >
-      {/* <Text {...filterStyles.label}>
-        {item.nameKey ? t(item.nameKey) : item.name}
-      </Text> */}
-      {item.type === 'search' ? (
-        <Input {...filterStyles.input}>
-          <InputField
-            placeholder={
-              item.placeholderKey
-                ? t(item.placeholderKey)
-                : item.placeholder ||
-                  (item.nameKey
-                    ? `${t('common.search')} ${t(
-                        item.nameKey,
-                      ).toLowerCase()}...`
-                    : `Search ${item.name?.toLowerCase()}...`)
-            }
-            value={value?.[item.attr] || ''}
-            onChangeText={(text: string) => {
-              if (!text || text.trim() === '') {
-                setValue((prev: any) => {
-                  const updated = { ...prev };
-                  delete updated[item.attr];
-                  return updated;
-                });
-              } else {
-                setValue((prev: any) => ({ ...prev, [item.attr]: text }));
-              }
+    // Handle value change for input fields (text, date, search)
+    const handleInputChange = (text: string) => {
+      if (!text || text.trim() === "") {
+        setValue((prev: any) => {
+          const updated = { ...prev };
+          delete updated[item.attr];
+          return updated;
+        });
+      } else {
+        setValue((prev: any) => ({ ...prev, [item.attr]: text }));
+      }
+    };
+
+    // Handle value change for select fields
+    const handleSelectChange = (v: any) => {
+      // ❗ If actual null (marked), empty string, or undefined → remove from state
+      // Note: String "null" is kept in state, only actual null/empty removes the key
+      if (v == null || v === '__NULL_VALUE__' || v === '') {
+        setValue((prev: any) => {
+          const updated = { ...prev };
+          delete updated[item.attr];
+          return updated;
+        });
+      } else {
+        // Otherwise store the selected value (including string "null")
+        setValue((prev: any) => ({
+          ...prev,
+          [item.attr]: v,
+        }));
+      }
+    };
+
+    // Get placeholder text
+    const getPlaceholder = () => {
+      if (item.placeholderKey) {
+        return t(item.placeholderKey);
+      }
+      if (item.placeholder) {
+        return item.placeholder;
+      }
+      if (item.type === 'search' && item.nameKey) {
+        return `${t('common.search')} ${t(item.nameKey).toLowerCase()}...`;
+      }
+      if (item.type === 'search' && item.name) {
+        return `Search ${item.name.toLowerCase()}...`;
+      }
+      return '';
+    };
+
+    // Render the appropriate input field based on type
+    const renderInputField = () => {
+      // Date type field - uses custom DatePicker component
+      if (item.type === 'date') {
+        return (
+          <DatePicker
+            {...filterStyles.input}
+            value={value?.[item.attr] || ""}
+            onChange={handleInputChange}
+            placeholder={getPlaceholder()}
+            maximumDate={new Date()}
+            isOpen={openDatePicker === item.attr}
+            onOpenChange={(isOpen: boolean) => {
+              setOpenDatePicker(isOpen ? item.attr : null);
             }}
           />
-        </Input>
-      ) : (
+        );
+      }
+
+      // Text type field
+      if (item.type === 'text') {
+        return (
+          <Input {...filterStyles.input}>
+            <InputField
+              type="text"
+              placeholder={getPlaceholder()}
+              value={value?.[item.attr] || ""}
+              onChangeText={handleInputChange}
+            />
+          </Input>
+        );
+      }
+
+      // Search type field
+      if (item.type === 'search') {
+        return (
+          <Input {...filterStyles.input}>
+            <InputField
+              {...({ type: 'search' } as any)}
+              placeholder={getPlaceholder()}
+              value={value?.[item.attr] || ""}
+              onChangeText={handleInputChange}
+            />
+          </Input>
+        );
+      }
+
+      // Select type field (default for 'select' type or undefined type)
+      return (
         <Select
           key={`select-${item.attr}-${item.data?.length || 0}`} // Force re-render when options change
           value={value?.[item.attr] || getDefaultDisplayValue(item)}
-          onChange={(v) => {
-            // Don't allow changes if filter is disabled
-            if (item.disabled) return;
-            
-            // ❗ If actual null (marked), empty string, or undefined → remove from state
-            // Note: String "null" is kept in state, only actual null/empty removes the key
-            if (v == null || v === '__NULL_VALUE__' || v === '') {
-              setValue((prev: any) => {
-                const updated = { ...prev };
-                delete updated[item.attr];
-                return updated;
-              });
-            } else {
-              // Otherwise store the selected value (including string "null")
-              setValue((prev: any) => ({
-                ...prev,
-                [item.attr]: v,
-              }));
-            }
-          }}
-          placeholder={
-            item.placeholderKey 
-              ? t(item.placeholderKey) 
-              : item.placeholder
-          }
+          onChange={handleSelectChange}
           options={
             item?.data?.map((option: any) => {
               // If it's a string, return as-is (backward compatibility)
@@ -193,8 +226,23 @@ export default function FilterButton({
           disabled={item.disabled} // Disable filter when dependent filter not selected (e.g., district)
           {...filterStyles.input}
         />
-      )}
-    </VStack>
+      );
+    };
+    
+    return (
+      <VStack 
+        key={item.attr}
+        {...(useSearchContainer 
+          ? filterStyles.searchContainer 
+          : filterStyles.roleContainer)}
+        width="$full"
+        $md-width="auto"
+      >
+        {/* <Text {...filterStyles.label}>
+          {item.nameKey ? t(item.nameKey) : item.name}
+        </Text> */}
+        {renderInputField()}
+      </VStack>
     );
   };
 
