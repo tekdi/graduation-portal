@@ -1,23 +1,13 @@
-import { theme } from '@config/theme';
-
 /**
  * AssessmentCard Styles
  * Centralized styles for AssessmentCard component
  */
 
-// Common button base styles shared by primary and secondary variants
-const buttonBaseStyles = {
-  borderRadius: '$xl' as const,
-  px: '$4' as const,
-  py: '$3' as const,
-  alignSelf: 'flex-start' as const,
-};
-
 // Common status badge base styles
 const statusBadgeBaseStyles = {
   borderRadius: '$full' as const,
-  px: '$3' as const,
-  py: '$1' as const,
+  px: '$2' as const,
+  py: '$0.5' as const,
   alignItems: 'center' as const,
   justifyContent: 'center' as const,
 };

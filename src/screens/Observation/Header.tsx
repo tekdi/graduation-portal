@@ -1,21 +1,16 @@
 import React from 'react';
 import {
   HStack,
-  VStack,
   Text,
   Box,
   Progress,
   ProgressFilledTrack,
-  LucideIcon,
-  Container,
-  Button,
-  ButtonText,
-  ButtonIcon
 } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { observationStyles } from './Styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { StatusBadge } from '@components/ObservationCards';
+import { PageHeader } from '@components/PageHeader';
 
 interface HeaderProps {
   title: string;
@@ -32,53 +27,36 @@ const Header: React.FC<HeaderProps> = ({ title, progress, participantInfo, onBac
   const { t } = useLanguage();
 
   return (
-    <VStack {...observationStyles.headerContainer}>
-      <Container $md-px='$6' px='$4' py='$4'>
-        {/* Top Row: Back Button and Action Buttons */}
-        <HStack
-          {...observationStyles.headerContent}
-        >
-          {/* @ts-ignore: Back Button */}
-          <Button variant="ghost" onPress={onBackPress}>
-            <ButtonIcon as={LucideIcon} name="ArrowLeft" size={16} />
-            <ButtonText {...TYPOGRAPHY.bodySmall}>{t('common.back')}</ButtonText>
-          </Button>
-        </HStack>
+    <PageHeader
+      onBackPress={onBackPress}
+      backButtonText={t('common.back')}
+      _content={{ "$md-px": '$0', px: '$0', py: '$0' }}
+      _container={{ "$md-px": '$6', px: '$4', py: '$4' }}
+    >
+      {/* Title and Progress Badge Row */}
+      <HStack
+        {...observationStyles.titleAndProgressContainer}
+      >
+        <Text {...TYPOGRAPHY.h4}>
+          {title}
+        </Text>
+        <StatusBadge status={status} preFix={<Text {...TYPOGRAPHY.caption}> {progress}% </Text>} />
+      </HStack>
 
-        {/* Title and Progress Badge Row */}
-        <HStack
-          {...observationStyles.titleAndProgressContainer}
-        >
-          <Text {...TYPOGRAPHY.h4}>
-            {title}
-          </Text>
+      {/* Progress Bar */}
+      <Box {...observationStyles.progressBarContainer}>
+        <Progress value={progress} {...observationStyles.progressBar}>
+          <ProgressFilledTrack {...observationStyles.progressBarFill} />
+        </Progress>
+      </Box>
 
-          {/* Progress Badge */}
-          <Box
-            {...observationStyles.progressBadge}
-          >
-            <Text {...observationStyles.progressBadgeText}>
-              {progress}% 
-            </Text>
-            <StatusBadge status={status} />
-          </Box>
-        </HStack>
-
-        {/* Progress Bar */}
-        <Box {...observationStyles.progressBarContainer}>
-          <Progress value={progress} {...observationStyles.progressBar}>
-            <ProgressFilledTrack {...observationStyles.progressBarFill} />
-          </Progress>
-        </Box>
-
-        {/* Participant Name and Date */}
-        {participantInfo && (
-          <Text {...observationStyles.participantInfoText}>
-            {participantInfo.name} • {participantInfo.date}
-          </Text>
-        )}
-      </Container>
-    </VStack>
+      {/* Participant Name and Date */}
+      {participantInfo && (
+        <Text {...observationStyles.participantInfoText}>
+          {participantInfo.name} • {participantInfo.date}
+        </Text>
+      )}
+    </PageHeader>
   );
 };
 

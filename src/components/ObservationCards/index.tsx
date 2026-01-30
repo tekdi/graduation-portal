@@ -15,7 +15,6 @@ import { AssessmentSurveyCardProps } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
 import { assessmentSurveyCardStyles } from './Styles';
-import { theme } from '@config/theme';
 import { CARD_STATUS } from '@constants/app.constant';
 import logger from '@utils/logger';
 import { ICONS } from '@constants/LOG_VISIT_CARDS';
@@ -154,7 +153,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   );
 };
 
-export const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+export const StatusBadge: React.FC<{ status: string,preFix?: any }> = ({ status, preFix }) => {
   // Get status badge styling based on status type
   const getStatusBadgeStyle = () => {
     if (!status) return null;
@@ -182,6 +181,7 @@ export const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
               color={status === CARD_STATUS.GRADUATED ? '$white' : '$success600'}
             />
           )}
+        {preFix && preFix}
         <Text
           {...(status === CARD_STATUS.GRADUATED
             ? assessmentSurveyCardStyles.statusBadgeTextGraduated
