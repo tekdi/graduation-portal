@@ -11,14 +11,14 @@ const TaskComponent: React.FC<TaskComponentProps> = ({
   isOnboardingTask = false,
 }) => {
   // If task is a project type with children, render as ProjectAsTaskComponent
-  if (
-    task?.tasks ||
-    (task?.children && task.children.length > 0)
-  ) {
-    return <ProjectAsTaskComponent task={task} level={level} />;
-  }
+if (
+  task?.tasks ||
+  (task?.children && task.children.length > 0)
+) {
+  return <ProjectAsTaskComponent task={task} level={level} />;
+}
 
-  if (task?.isDeleted) return null;
+if (task?.isDeleted) return null;
   // Otherwise render as a regular task card
   return (
     <TaskCard

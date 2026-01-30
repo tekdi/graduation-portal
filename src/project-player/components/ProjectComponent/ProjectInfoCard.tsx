@@ -5,7 +5,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useLanguage } from '@contexts/LanguageContext';
 import { projectInfoCardStyles } from './Styles';
-import { PLAYER_MODE, TASK_STATUS } from '@constants/app.constant';
+import { PLAYER_MODE, TASK_STATUS, ONBOARDING_PROJECT_TITLES } from '@constants/app.constant';
 import { usePlatform } from '@utils/platform';
 
 const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
@@ -54,7 +54,9 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
           width="100%"
           order={isMobile ? 2 : 1} // comes below badge on mobile
         >
-          {!hasChildren && (project?.title === 'Onboarding Participants' || project?.name === 'Onboarding Participants') ? (
+          {!hasChildren &&
+            (ONBOARDING_PROJECT_TITLES.includes(project?.title || '') ||
+              ONBOARDING_PROJECT_TITLES.includes(project?.name || '')) ? (
             isMobile ? (
               <VStack>
                 <Text {...TYPOGRAPHY.h3} color="$textPrimary" lineHeight="$xs">

@@ -122,7 +122,7 @@ export const taskCardStyles = {
   },
   successToastIconSize: 14,
   successToastTitle: {
-    color: '$textPrimary',
+    color: '$textPrimary', 
     fontSize: '$sm',
     fontWeight: '$medium',
   },
