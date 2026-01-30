@@ -33,6 +33,7 @@ import CsvImportTemplates from '../screens/CsvImportTemplates';
 import PasswordPolicy from '../screens/PasswordPolicy';
 import AuditLogScreen from '../screens/AuditLog';
 import AssignUsersScreen from '../screens/AssignUsers';
+import AdminDashboard from '../screens/AdminDashboard';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -78,6 +79,7 @@ const getAccessPages = (
     case 'admin':
       return [
         { name: 'home', path: '/', component: HomeScreen },
+        { name: 'admin-dashboard', path: '/admin-dashboard', component: AdminDashboard },
         {
           name: 'user-management',
           path: '/user-management',

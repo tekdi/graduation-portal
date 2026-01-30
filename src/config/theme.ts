@@ -106,6 +106,7 @@ export const theme = {
       'bgPrimary/5' : '#F9F4F5',
       'bgPrimaryBorder/5' : '#E9D5DA',
       'bgPrimary/10' : '#8B28421A',
+      'bgPrimary/30' : '#f9fafb4d',
     },
     fonts: {
       ...((gluestackConfig.tokens as any).fonts || {}),
