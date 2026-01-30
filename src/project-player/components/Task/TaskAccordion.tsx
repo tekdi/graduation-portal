@@ -83,22 +83,29 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
   // For Edit/Read-Only modes: Show as Card (always expanded)
   if (!isPreview) {
     // Calculate pillar progress percentage
-    const completedTasks =
-      task.children?.filter(child => child.status === TASK_STATUS.COMPLETED)
-        .length || 0;
-    const totalTasks = task.children?.length || 0;
+    const validChildren =
+      task.children?.filter(child => !child.isDeleted) || [];
+
+    const completedTasks = validChildren.filter(
+      child => child.status === TASK_STATUS.COMPLETED,
+    ).length;
+
+    const totalTasks = validChildren.length;
+
     const progressPercent =
       totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
-      
+
     return (
-      <Box {...taskAccordionStyles.container} >
-        <Card {...taskAccordionStyles.card}  >
+      <Box {...taskAccordionStyles.container}>
+        <Card {...taskAccordionStyles.card}>
           {/* Card Header with Progress on right */}
-          <Box {...taskAccordionStyles.cardHeader}  padding={isMobile ? '0' :'auto'}>
+          <Box
+            {...taskAccordionStyles.cardHeader}
+            padding={isMobile ? '0' : 'auto'}
+          >
             <HStack
               {...taskAccordionStyles.cardHeaderContent}
               justifyContent="space-between"
-             
             >
               <HStack {...taskAccordionStyles.pillarHeaderRow}>
                 <LucideIcon
@@ -121,7 +128,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
           <Box
             {...taskAccordionStyles.cardContent}
             // paddingHorizontal={isWeb ? '$5' : '$2'}
-            px={isMobile ? '0' :'auto'}
+            px={isMobile ? '0' : 'auto'}
           >
             <VStack {...taskAccordionStyles.cardContentStack}>
               {(task?.children?.length ? task.children : task.tasks)?.map(
