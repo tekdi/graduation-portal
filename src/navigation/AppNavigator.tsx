@@ -28,7 +28,12 @@ import LogVisit from '../screens/ParticipantDetail/LogVisit';
 import Observation from '../screens/Observation/Observation';
 import TemplateScreen from '../screens/Template';
 import CheckInsList from '../screens/ParticipantDetail/Check-ins-list';
+import TemplateManagementScreen from '../screens/TemplateManagement';
+import CsvImportTemplates from '../screens/CsvImportTemplates';
 import PasswordPolicy from '../screens/PasswordPolicy';
+import AuditLogScreen from '../screens/AuditLog';
+import AssignUsersScreen from '../screens/AssignUsers';
+import AdminDashboard from '../screens/AdminDashboard';
 
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -74,15 +79,36 @@ const getAccessPages = (
     case 'admin':
       return [
         { name: 'home', path: '/', component: HomeScreen },
+        { name: 'admin-dashboard', path: '/admin-dashboard', component: AdminDashboard },
         {
           name: 'user-management',
           path: '/user-management',
           component: UserManagementScreen,
         },
         {
+          name: 'template-management',
+          path: '/template-managemnt',
+          component: TemplateManagementScreen,
+        },
+        {
+          name: 'csv-templates',
+          path: '/csv-templates',
+          component: CsvImportTemplates,
+        },
+        {
           name: 'PasswordPolicy',
           path: '/password-policy',
           component: PasswordPolicy,
+        },
+        {
+          name: 'audit-log',
+          path: '/audit-log',
+          component: AuditLogScreen,
+        },
+        {
+          name: 'assign-users',
+          path: '/assign-users',
+          component: AssignUsersScreen,
         },
       ];
     case 'supervisor':

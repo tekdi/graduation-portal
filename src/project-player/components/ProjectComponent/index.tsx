@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   VStack,
@@ -9,14 +9,10 @@ import {
   HStack,
   Text,
   Pressable,
-  useToast,
-  Toast,
-  ToastTitle,
 } from '@gluestack-ui/themed';
 import { useProjectContext } from '../../context/ProjectContext';
 import ProjectInfoCard from './ProjectInfoCard';
 import TaskComponent from './TaskComponent';
-import AddCustomTask from '../Task/AddCustomTask';
 import AddCustomTaskModal from '../Task/AddCustomTaskModal';
 import { projectComponentStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -24,7 +20,6 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import Container from '@ui/Container';
 import { LucideIcon, useAlert } from '@ui';
 import { theme } from '@config/theme';
-import { TASK_STATUS } from '@constants/app.constant';
 import { submitInterventionPlan } from '../../services/projectPlayerService';
 import { addCustomTaskStyles } from '../Task/Styles';
 
@@ -32,8 +27,6 @@ const ProjectComponent: React.FC = () => {
   const { projectData, mode, config } = useProjectContext();
   const { t } = useLanguage();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [previousPercent, setPreviousPercent] = useState(0);
-  const toast = useToast();
   const { showAlert } = useAlert();
 
   const hasChildren = !!projectData?.children?.length || projectData?.tasks?.some(task => !!task.children?.length);;
@@ -132,65 +125,6 @@ const ProjectComponent: React.FC = () => {
       });
     }
   };
-  // Handle Save Progress button click
-  const handleSaveProgress = (currentPercent: number) => {
-    // Save current percentage as previous
-    setPreviousPercent(currentPercent);
-
-    toast.show({
-      placement: 'bottom right',
-      render: ({ id }) => (
-        <Toast
-          nativeID={id}
-          action="success"
-          variant="solid"
-          {...projectComponentStyles.toast}
-        >
-          <HStack {...projectComponentStyles.toastContent}>
-            <LucideIcon
-              name="CheckCircle"
-              size={18}
-              color={theme.tokens.colors.success600}
-            />
-            <ToastTitle
-              color="$textPrimary"
-              {...TYPOGRAPHY.bodySmall}
-              fontWeight="$medium"
-            >
-              {t('projectPlayer.progressSaved')}
-            </ToastTitle>
-          </HStack>
-        </Toast>
-      ),
-    });
-  };
-
-  // Calculate total progress for Edit mode - each completed task = +3%
-  const progressData = useMemo(() => {
-    if (!isEditMode || !projectData)
-      return { percent: 0, completedCount: 0, totalCount: 0 };
-
-    let completedCount = 0;
-    let totalCount = 0;
-
-    projectData?.tasks?.forEach(pillar => {
-      pillar.children?.forEach(task => {
-        totalCount++;
-        if (task.status === TASK_STATUS.COMPLETED) {
-          completedCount++;
-        }
-      });
-    });
-
-    // Each tick = +3%, capped at 100%
-    const percent = Math.min(completedCount * 3, 100);
-    return { percent, completedCount, totalCount };
-  }, [projectData, isEditMode]);
-
-  // Calculate tasks updated count
-  const tasksUpdatedCount = Math.round(
-    Math.abs(progressData.percent - previousPercent) / 3,
-  );
 
   if (!projectData) {
     return null;

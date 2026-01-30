@@ -80,7 +80,7 @@ export const styles = {
 
   // Desktop filter container
   desktopFilterContainer: {
-    bg: '$backgroundLight50' as const,
+    bg: '$accent200' as const,
     borderRadius: '$lg' as const,
     padding: '$1' as const,
     width: '$full' as const,
@@ -95,8 +95,8 @@ export const styles = {
   // Status item Pressable
   statusItemPressable: {
     flex: 1 as const,
-    paddingVertical: '$3' as const,
-    paddingHorizontal: '$2' as const,
+    py: '$2' as const,
+    px: '$4' as const,
     borderRadius: '$md' as const,
     $web: {
       cursor: 'pointer' as const,
@@ -111,7 +111,10 @@ export const styles = {
 
   // Status item Pressable - Active state
   statusItemPressableActive: {
-    bg: '$white' as const,
+    bg: "$primary50" as const,
+    borderBottomWidth: 3 as const,
+    borderColor: "$primary500" as const,
+    borderRadius: '$lg' as const,
   },
 
   // Status item Pressable - Inactive state
@@ -161,7 +164,7 @@ export const styles = {
 
   // Count badge Box - Inactive state
   countBadgeBoxInactive: {
-    bg: '$backgroundLight200',
+    bg: '$backgroundLightGray100',
   },
 
   // Count Text

@@ -9,12 +9,12 @@ import {
   Button,
   ButtonText,
   Pressable,
+  ButtonIcon,
 } from '@ui';
 import { AssessmentSurveyCardProps } from '@app-types/participant';
 import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
 import { assessmentSurveyCardStyles } from './Styles';
-import { theme } from '@config/theme';
 import { CARD_STATUS } from '@constants/app.constant';
 import logger from '@utils/logger';
 import { ICONS } from '@constants/LOG_VISIT_CARDS';
@@ -44,13 +44,6 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
       ICONS?.[card?.name?.toLowerCase() as keyof typeof ICONS];
     setIconMeta(iconMeta as IconMeta);
   }, [card]);
-
-  // Get button styling based on variant
-  const getButtonStyle = () => {
-    return entity?.status === CARD_STATUS.COMPLETED
-      ? assessmentSurveyCardStyles.buttonSecondary
-      : assessmentSurveyCardStyles.buttonPrimary;
-  };
 
   return (
     <Card
@@ -107,7 +100,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
               <LucideIcon
                 name="ArrowRight"
                 size={20}
-                color={theme.tokens.colors.textMutedForeground}
+                color={"$textMutedForeground"}
               />
             </Pressable>
           )}
@@ -121,7 +114,9 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
             {/* Action Button */}
             {entity?.status && (
               <Button
-                {...getButtonStyle()}
+                $md-width="fit-content"
+                // @ts-ignore
+                variant={entity?.status === CARD_STATUS.COMPLETED ? "outlineghost" : "solid"}
                 onPress={() => {
                   if (navigationUrl && userId) {
                     // @ts-ignore
@@ -135,31 +130,20 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
                   }
                 }}
               >
-                <HStack alignItems="center" gap="$2">
-                  <LucideIcon
-                    name={'FileText'}
-                    size={16}
-                    color={
-                      entity?.status === CARD_STATUS.COMPLETED
-                        ? '$textForeground'
-                        : '$white'
-                    }
-                  />
-                  <ButtonText
-                    {...assessmentSurveyCardStyles.buttonText}
-                    color={
-                      entity?.status === CARD_STATUS.COMPLETED
-                        ? '$textForeground'
-                        : '$white'
-                    }
-                  >
-                    {t(
-                      entity?.status === CARD_STATUS.COMPLETED
-                        ? `${t('actions.view')} ${card?.name}`
-                        : `${t('actions.fill')} ${card?.name}`,
-                    )}
-                  </ButtonText>
-                </HStack>
+                <ButtonIcon
+                  as={LucideIcon}
+                  name="FileText"
+                  size={16}
+
+                />
+                <ButtonText
+                  {...assessmentSurveyCardStyles.buttonText}
+
+                >
+                  {entity?.status === CARD_STATUS.COMPLETED
+                    ? `${t('actions.view')} ${t(card?.name)}`
+                    : `${t('actions.fill')} ${t(card?.name)}`}
+                </ButtonText>
               </Button>
             )}
           </VStack>
@@ -169,7 +153,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   );
 };
 
-export const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+export const StatusBadge: React.FC<{ status: string,preFix?: any }> = ({ status, preFix }) => {
   // Get status badge styling based on status type
   const getStatusBadgeStyle = () => {
     if (!status) return null;
@@ -191,20 +175,21 @@ export const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
       <HStack alignItems="center" gap="$1">
         {(status === CARD_STATUS.GRADUATED ||
           status === CARD_STATUS.COMPLETED) && (
-          <LucideIcon
-            name="CheckCircle"
-            size={12}
-            color={status === CARD_STATUS.GRADUATED ? '$white' : '$success600'}
-          />
-        )}
+            <LucideIcon
+              name="CheckCircle"
+              size={12}
+              color={status === CARD_STATUS.GRADUATED ? '$white' : '$success600'}
+            />
+          )}
+        {preFix && preFix}
         <Text
           {...(status === CARD_STATUS.GRADUATED
             ? assessmentSurveyCardStyles.statusBadgeTextGraduated
             : status === CARD_STATUS.COMPLETED
-            ? assessmentSurveyCardStyles.statusBadgeTextCompleted
-            : status === CARD_STATUS.IN_PROGRESS
-            ? assessmentSurveyCardStyles.statusBadgeTextWarning
-            : assessmentSurveyCardStyles.statusBadgeText)}
+              ? assessmentSurveyCardStyles.statusBadgeTextCompleted
+              : status === CARD_STATUS.IN_PROGRESS
+                ? assessmentSurveyCardStyles.statusBadgeTextWarning
+                : assessmentSurveyCardStyles.statusBadgeText)}
         >
           {status}
         </Text>

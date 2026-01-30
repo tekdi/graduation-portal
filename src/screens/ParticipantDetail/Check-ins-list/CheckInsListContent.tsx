@@ -9,6 +9,7 @@ import {
   Card,
   Button,
   ButtonText,
+  ButtonIcon,
 } from '@ui';
 import { LucideIcon, Select } from '@ui';
 import { getParticipantProfile } from '../../../services/participantService';
@@ -28,6 +29,7 @@ import { isWeb } from '@utils/platform';
 import { ENTITY_TYPE } from '@constants/ROLES';
 import { StatusBadge } from '@components/ObservationCards';
 import { CARD_STATUS } from '@constants/app.constant';
+import { ICONS } from '@constants/LOG_VISIT_CARDS';
 
 /**
  * CheckInsListContent Component Props
@@ -60,6 +62,7 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
   const [selectedSolution, setSelectedSolution] = useState<string>('');
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [submissionsLoading, setSubmissionsLoading] = useState<boolean>(false);
+  const [iconMeta, setIconMeta] = useState(null);
   const [participant, setParticipant] = useState<
     ParticipantData | undefined
   >(undefined);
@@ -77,7 +80,7 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
         setSolutions(data);
         if (id) {
           const participantData = await getParticipantProfile(id);
-          setParticipant(participantData);
+          setParticipant(participantData as ParticipantData);
         }
         if (preSelectedSolution) {
           setSelectedSolution(preSelectedSolution);
@@ -91,7 +94,7 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
     };
 
     fetchSolutions();
-  }, [id]);
+  }, [id, preSelectedSolution]);
 
   /**
    * Fetch submissions when a solution is selected
@@ -113,6 +116,8 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
           setSubmissions([]);
           return;
         }
+        const iconMetanew = ICONS?.[solution?.name?.toLowerCase() as keyof typeof ICONS];
+        setIconMeta(iconMetanew as any);
 
         // Get observation entities to find observationId and entityId
         const observationData = await getObservationEntities({
@@ -214,16 +219,18 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
                     {/* Card Header with Icon, Title, Description, and Navigation Arrow */}
                     <HStack {...assessmentSurveyCardStyles.cardHeader}>
                       <HStack alignItems="flex-start" space="lg" flex={1}>
-                        <Box
-                          {...assessmentSurveyCardStyles.iconContainer}
-                          bg="$primary500"
-                        >
-                          <LucideIcon
-                            name="FileText"
-                            size={24}
-                            color="$white"
-                          />
-                        </Box>
+                      <Box
+                        {...{
+                          ...assessmentSurveyCardStyles.iconContainer,
+                          bg: iconMeta?.color || '$primary500',
+                        }}
+                      >
+                        <LucideIcon
+                          name={iconMeta?.icon || 'info'}
+                          size={24}
+                          color={iconMeta?.iconColor || '$white'}
+                        />
+                      </Box>
                         <VStack flex={1} space="md">
                           <HStack alignItems="center" space="sm">
                             <Text {...assessmentSurveyCardStyles.title}>
@@ -270,18 +277,15 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
                             </Text>
                           </HStack>
                           <Button
-                            {...assessmentSurveyCardStyles.buttonSecondary}
+                            $md-width="fit-content"
+                            // @ts-ignore
+                            variant={"outlineghost"}
                             onPress={() => handleViewForm(submission.submissionNumber)}
                           >
-                            <HStack alignItems="center" gap="$2">
-                              <LucideIcon name={'Eye'} size={16} />
-                              <ButtonText
-                                {...assessmentSurveyCardStyles.buttonText}
-                                color="$textForeground"
-                              >
-                                {t('logVisit.viewForm')}
-                              </ButtonText>
-                            </HStack>
+                            <ButtonIcon as={LucideIcon} name="Eye" size={16} />
+                            <ButtonText {...assessmentSurveyCardStyles.buttonText}>
+                              {t('logVisit.viewForm')}
+                            </ButtonText>
                           </Button>
                         </VStack>
                       </HStack>

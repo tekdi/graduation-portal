@@ -189,8 +189,8 @@ const TableHeader = <T,>({ columns, minWidth }: TableHeaderProps<T>) => {
               column.align === 'center'
                 ? 'center'
                 : column.align === 'right'
-                ? 'flex-end'
-                : 'flex-start'
+                  ? 'flex-end'
+                  : 'flex-start'
             }
           >
             {showLabel && (
@@ -216,46 +216,58 @@ const TableRow = <T,>({
   minWidth,
   isLast = false,
 }: TableRowProps<T>) => {
+  // Only wrap in Pressable if onRowClick is provided
   return (
-    <Box>
-      <Pressable
-        onPress={() => onRowClick?.(item)}
-        $web-cursor={onRowClick ? 'pointer' : undefined}
+    <TableRowWrapper
+      onRowClick={() => onRowClick?.(item)}
+    >
+      <HStack
+        {...styles.tableRow}
+        borderBottomWidth={isLast ? styles.tableRowLast.borderBottomWidth : styles.tableRowNotLast.borderBottomWidth}
+        minWidth={minWidth}
       >
-        <HStack
-          {...styles.tableRow}
-          borderBottomWidth={isLast ? styles.tableRowLast.borderBottomWidth : styles.tableRowNotLast.borderBottomWidth}
-          minWidth={minWidth}
-        >
-          {columns.map(column => (
-            <Box
-              key={column.key}
-              flex={column.flex}
-              width={column.width}
-              alignItems={
-                column.align === 'center'
-                  ? 'center'
-                  : column.align === 'right'
+        {columns.map(column => (
+          <Box
+            key={column.key}
+            flex={column.flex}
+            width={column.width}
+            alignItems={
+              column.align === 'center'
+                ? 'center'
+                : column.align === 'right'
                   ? 'flex-end'
                   : 'flex-start'
-              }
-            >
-              {column.render ? (
-                column.render(item)
-              ) : (
-                <Text
-                  {...TYPOGRAPHY.paragraph}
-                  color="$textMutedForeground"
-                >
-                  {String((item as any)[column.key] ?? '-')}
-                </Text>
-              )}
-            </Box>
-          ))}
-        </HStack>
-      </Pressable>
-    </Box>
+            }
+          >
+            {column.render ? (
+              column.render(item)
+            ) : (
+              <Text
+                {...TYPOGRAPHY.paragraph}
+                color="$textMutedForeground"
+              >
+                {String((item as any)[column.key] ?? '-')}
+              </Text>
+            )}
+          </Box>
+        ))}
+      </HStack>
+    </TableRowWrapper>
   );
+};
+
+const TableRowWrapper = ({ children, onRowClick }: { children: ReactNode, onRowClick: () => void }) => {
+  if (onRowClick) {
+    return (
+      <Pressable
+        onPress={onRowClick}
+        $web-cursor="pointer"
+      >
+        {children}
+      </Pressable>
+    );
+  }
+  return children;
 };
 
 /**
@@ -269,23 +281,65 @@ const CardView = <T,>({
   onRowClick,
 }: CardViewProps<T>) => {
   return (
-    <Pressable onPress={() => onRowClick?.(item)}>
-      {/* @ts-ignore */}
+    <Pressable
+      onPress={() => onRowClick?.(item)}
+      $web-cursor={onRowClick ? 'pointer' : 'auto'}
+    >
       <Card {...styles.cardContainer}>
         <VStack {...styles.cardContent}>
-        {layout.map((row, rowIndex) => {
-          // Full width rows
-          if (row.type === 'fullWidth') {
+          {layout.map((row, rowIndex) => {
+            // Full width rows
+            if (row.type === 'fullWidth') {
+              return (
+                <VStack key={rowIndex} {...styles.cardFullWidthRow}>
+                  {row.columns.map((col, colIndex) => {
+                    if (!col) return null;
+                    return (
+                      <VStack key={col.key || colIndex} {...styles.cardColumn}>
+                        {col.showLabel && (
+                          <Text
+                            {...TYPOGRAPHY.label}
+                            color="$textMutedForeground"
+                            fontSize="$xs"
+                          >
+                            {col.label}
+                          </Text>
+                        )}
+                        <Box>
+                          {col.render ? (
+                            col.render(item)
+                          ) : (
+                            <Text {...TYPOGRAPHY.paragraph}>
+                              {col.defaultValue ?? String((item as any)[col.key] ?? '')}
+                            </Text>
+                          )}
+                        </Box>
+                      </VStack>
+                    );
+                  })}
+                </VStack>
+              );
+            }
+
+            // Left + Right rows
             return (
-              <VStack key={rowIndex} {...styles.cardFullWidthRow}>
-                {row.columns.map((col, colIndex) => {
-                  if (!col) return null;
+              <HStack
+                key={rowIndex}
+                {...styles.cardLeftRightRow}
+                justifyContent="space-between"
+              >
+                {row.columns.map((col, pos) => {
+                  if (!col) return <Box key={pos} flex={1} />;
                   return (
-                    <VStack key={col.key || colIndex} {...styles.cardColumn}>
+                    <VStack
+                      key={col.key || pos}
+                      flex={1}
+                      space="xs"
+                      alignItems={col.isRightColumn ? 'flex-end' : 'flex-start'}
+                    >
                       {col.showLabel && (
                         <Text
                           {...TYPOGRAPHY.label}
-                          color="$textMutedForeground"
                           fontSize="$xs"
                         >
                           {col.label}
@@ -303,51 +357,11 @@ const CardView = <T,>({
                     </VStack>
                   );
                 })}
-              </VStack>
+              </HStack>
             );
-          }
-
-          // Left + Right rows
-          return (
-            <HStack
-              key={rowIndex}
-              {...styles.cardLeftRightRow}
-              justifyContent="space-between"
-            >
-              {row.columns.map((col, pos) => {
-                if (!col) return <Box key={pos} flex={1} />;
-                return (
-                  <VStack
-                    key={col.key || pos}
-                    flex={1}
-                    space="xs"
-                    alignItems={col.isRightColumn ? 'flex-end' : 'flex-start'}
-                  >
-                    {col.showLabel && (
-                      <Text
-                        {...TYPOGRAPHY.label}
-                        fontSize="$xs"
-                      >
-                        {col.label}
-                      </Text>
-                    )}
-                    <Box>
-                      {col.render ? (
-                        col.render(item)
-                      ) : (
-                        <Text {...TYPOGRAPHY.paragraph}>
-                          {col.defaultValue ?? String((item as any)[col.key] ?? '')}
-                        </Text>
-                      )}
-                    </Box>
-                  </VStack>
-                );
-              })}
-            </HStack>
-          );
-        })}
-      </VStack>
-    </Card>
+          })}
+        </VStack>
+      </Card>
     </Pressable>
   );
 };
@@ -431,22 +445,22 @@ const DataTable = <T,>({
   // Optimized pagination calculations - memoized to prevent recalculation on every render
   const paginationConfig = useMemo(() => {
     const safePageSize = Math.max(1, pageSize);
-    
+
     // Use server-side pagination if provided, otherwise calculate from data
     const isServerSide = pagination?.serverSide !== undefined;
-    const totalItems = isServerSide 
+    const totalItems = isServerSide
       ? pagination.serverSide!.total
       : data.length;
-    const totalPages = isServerSide 
+    const totalPages = isServerSide
       ? Math.max(1, Math.ceil(totalItems / safePageSize))
       : (isPaginationEnabled ? Math.max(1, Math.ceil(data.length / safePageSize)) : 1);
-    const serverCurrentPage = isServerSide 
+    const serverCurrentPage = isServerSide
       ? pagination.serverSide!.count
       : currentPage;
-    
+
     // For server-side pagination, don't slice data (it's already paginated)
     // For client-side pagination, slice the data
-    const startIndex = isServerSide 
+    const startIndex = isServerSide
       ? (serverCurrentPage - 1) * safePageSize
       : (isPaginationEnabled ? (currentPage - 1) * safePageSize : 0);
     const endIndex = isServerSide
@@ -455,7 +469,7 @@ const DataTable = <T,>({
     const paginatedData = isServerSide || !isPaginationEnabled
       ? data
       : data.slice(startIndex, endIndex);
-    
+
     return {
       isEnabled: isPaginationEnabled,
       isServerSide,
@@ -468,17 +482,17 @@ const DataTable = <T,>({
       currentPage: isServerSide ? serverCurrentPage : currentPage,
     };
   }, [isPaginationEnabled, pageSize, currentPage, data, pagination?.serverSide]);
-  
+
   // Sync pageSize from props and reset to page 1 when data changes
   useEffect(() => {
     if (!isPaginationEnabled) return;
-    
+
     if (pagination?.pageSize && pagination.pageSize !== pageSize) {
       setPageSize(Math.max(1, pagination.pageSize));
       setCurrentPage(1);
     }
   }, [isPaginationEnabled, pagination?.pageSize, pageSize]);
-  
+
   // Handle page change
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= paginationConfig.totalPages) {
@@ -488,7 +502,7 @@ const DataTable = <T,>({
       onPageChange?.(newPage);
     }
   };
-  
+
   // Handle page size change with validation
   const handlePageSizeChange = (newPageSize: number) => {
     if (!Number.isFinite(newPageSize) || newPageSize <= 0) return;
@@ -588,7 +602,7 @@ const DataTable = <T,>({
   return (
     <Box {...styles.mainContainer}>
       <Box
-        bg={theme.tokens.colors.backgroundPrimary.light}  
+        bg={theme.tokens.colors.backgroundPrimary.light}
         {...styles.tableWrapper}
         {...(!isMobile ? styles.tableWrapperWeb : {})}
         overflow={shouldShowCardView ? 'hidden' : isMobile ? 'hidden' : 'visible'}
@@ -606,12 +620,12 @@ const DataTable = <T,>({
           tableContent
         )}
       </Box>
-      {paginationConfig.isEnabled && pagination && (
+      {paginationConfig.isEnabled && paginationConfig.totalPages > 1 && pagination && (
         <PaginationControls
-          currentPage={paginationConfig.currentPage}
+          currentPage={currentPage}
           totalPages={paginationConfig.totalPages}
           pageSize={paginationConfig.safePageSize}
-          totalItems={paginationConfig.totalItems}
+          totalItems={data.length}
           startIndex={paginationConfig.startIndex}
           endIndex={paginationConfig.endIndex}
           onPageChange={handlePageChange}
