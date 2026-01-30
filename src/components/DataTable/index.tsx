@@ -620,12 +620,12 @@ const DataTable = <T,>({
           tableContent
         )}
       </Box>
-      {paginationConfig.isEnabled && paginationConfig.totalPages > 1 && pagination && (
+      {paginationConfig.isEnabled && paginationConfig.totalPages > 1 && paginationConfig.totalItems > 0 && data.length > 0 && pagination && (
         <PaginationControls
-          currentPage={currentPage}
+          currentPage={paginationConfig.currentPage}
           totalPages={paginationConfig.totalPages}
           pageSize={paginationConfig.safePageSize}
-          totalItems={data.length}
+          totalItems={paginationConfig.totalItems}
           startIndex={paginationConfig.startIndex}
           endIndex={paginationConfig.endIndex}
           onPageChange={handlePageChange}
