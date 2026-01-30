@@ -18,6 +18,8 @@
     "save": "Save",
     "saving": "Saving...",
     "cancel": "Cancel",
+    "upload": "Upload",
+    "uploading": "Uploading...",
     "delete": "Delete",
     "edit": "Edit",
     "close": "Close",
@@ -25,6 +27,7 @@
     "filter": "Filter",
     "filters": "Filters",
     "clearFilters": "Clear Filters",
+    "clear": "Clear",
     "submit": "Submit",
     "back": "Back",
     "next": "Next",
@@ -138,7 +141,7 @@
     "selectedFiles": "Selected Files",
     "untitledFile": "Untitled File",
     "unknownSize": "Unknown size",
-    "enrolledParticiapantSucess" :"Participant Enrolled Successfully!"
+    "enrolledParticiapantSucess": "Participant Enrolled Successfully!"
   },
   "navigation": {
     "menu": "Menu",
@@ -174,10 +177,10 @@
       "createUser": "Create User",
       "main": "Main Navigation",
       "quickActions": "Quick Actions",
-      "moreInformation": "More Information",
+      "moreInformation": "MORE INFORMATION",
       "csvImportTemplates": "CSV Import Templates",
       "passwordManagementPolicy": "Password Management Policy",
-      "profileFieldEditPermissions": "Profile Permissions"
+      "profileFieldEditPermissions": "Profile Field Edit Permissions"
     },
     "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
     "assignUsersDescription": "Assign Linkage Champions to Supervisors and Participants to LCs",
@@ -185,11 +188,43 @@
       "bulkUploadCSV": "Bulk Upload (CSV)",
       "createUser": "Create User",
       "lctosupervisior": "LC to Supervisor",
-      "participanttolc": "Participant to LC"
+      "participanttolc": "Participant to LC",
+      "exportCSV": "Export CSV",
+      "uploadUsers": "Upload Users",
+      "uploadUsersDescription": "Choose how you would like to add users to the system.",
+      "uploadCSV": "Upload CSV",
+      "uploadCSVDescription": "Import multiple users from a CSV file",
+      "addUser": "Add User",
+      "addUserDescription": "Manually add a single user",
+      "downloadSampleCsv": "Download Sample CSV",
+      "uploadTemplateCsv": "Upload Template (CSV)",
+      "viewDetails": "View Details",
+      "logVisit": "Log Visit",
+      "viewLog": "View Log",
+      "view": "View",
+      "fill": "Fill",
+      "dropout": "Dropout",
+      "confirmDropout": "Confirm Dropout",
+      "dropoutMessage": "Mark {{name}} as dropout from the program",
+      "dropoutReasonLabel": "Reason for Dropout",
+      "dropoutReasonPlaceholder": "Enter reason for dropout...",
+      "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history.",
+      "dropoutSuccess": "Participant marked as dropout",
+      "dropoutError": "Failed to mark participant as dropout",
+      "observationLogs": "Observation Logs",
+      "uploadSuccess": "CSV file uploaded successfully!",
+      "uploadError": "Failed to upload CSV file. Please try again.",
+      "uploadErrorSignedUrl": "Failed to get upload URL. Please try again.",
+      "uploadErrorFileUpload": "Failed to upload file. Please try again.",
+      "uploadErrorBulkCreate": "File uploaded but failed to process. Please contact support.",
+      "csvValidationError": "Please select a valid CSV file",
+      "uploadErrorFilePathNotFound": "File path not found in upload response. Please try again."
     },
     "filters": {
       "role": "Role",
       "status": "Status",
+      "province": "Province",
+      "district": "District",
       "searchPlaceholder": "Search by name or email...",
       "allRoles": "All Roles",
       "admin": "Admin",
@@ -202,7 +237,33 @@
       "filterByProvince": "Filter by Province",
       "selectSupervisor": "Select Supervisor",
       "allProvinces": "All Provinces",
-      "allDistrict": "ALl District"
+      "allDistrict": "ALl District",
+      "allDistricts": "All Districts",
+      "site": "Sites",
+      "allSites": "All Sites"
+    },
+    "users": {
+      "allUsers": "All Users",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role",
+      "status": "Status",
+      "province": "Province",
+      "site": "Site",
+      "lastLogin": "Last Login",
+      "details": "Details",
+      "actions": "Actions",
+      "noUsersFound": "No users found",
+      "loadingUsers": "Loading users...",
+      "showing": "Showing {{count}} of {{total}} users",
+      "actionMenu": {
+        "viewProfile": "View Profile",
+        "edit": "Edit",
+        "resetPassword": "Reset Password",
+        "deactivate": "Deactivate",
+        "confirmDeactivate": "Confirm Deactivation",
+        "deactivateMessage": "Are you sure you want to deactivate {{name}}? This will prevent them from accessing the system."
+      }
     },
     "stats": {
       "totalUsers": "Total Users",
@@ -231,7 +292,125 @@
       "linkageChampions": "Linkage Champions (supervisors+)",
       "otherSupervisors": "Other supervisors (admin only)"
     },
+    "templateManagement": {
+      "templateManagementDescription": "Manage IDP templates via CSV upload. All templates are view-only after creation.",
+      "infoBox": {
+        "title": "CSV-Only Template Creation",
+        "description": "For MVP, all template creation and editing is performed via CSV upload. Download the sample CSV template to ensure proper formatting. Templates can only be viewed or activated/deactivated through this interface."
+      }
+    },
+    "templates": {
+      "tableTitle": "Template Library (View Only)",
+      "templateName": "Template Name",
+      "status": "Status",
+      "creator": "Creator",
+      "tasks": "Tasks",
+      "tasksLabel": "tasks",
+      "createdDate": "Created Date",
+      "actions": "Actions",
+      "uploadedViaCsv": "Uploaded via CSV",
+      "noTemplatesFound": "No templates found",
+      "loadingTemplates": "Loading templates...",
+      "actionMenu": {
+        "view": "View (Read-Only)",
+        "deactivate": "Deactivate",
+        "export": "Export as CSV"
+      },
+      "csvUploadGuide": {
+        "title": "CSV Upload Guide",
+        "requiredColumns": "Required CSV Columns",
+        "templateWorkflow": "Template Workflow",
+        "columns": {
+          "templateName": "Name of the IDP template",
+          "taskId": "Unique identifier for each task",
+          "taskName": "Name of the development task",
+          "taskDescription": "Detailed description",
+          "outputIndicator": "Output measurement criteria",
+          "outcomeIndicator": "Outcome measurement criteria"
+        },
+        "steps": {
+          "step1": "Download sample CSV template",
+          "step2": "Fill in template details and tasks",
+          "step3": "Upload completed CSV file",
+          "step4": "Review and activate template"
+        }
+      }
+    },
+    "auditLog": {
+      "description": "View audit log for all actions performed in the system",
+      "actions": {
+        "exportlogsCSV": "Export logs (CSV)"
+      },
+      "filters": {
+        "actionType": "Action Type",
+        "allActions": "All Actions",
+        "userImport": "User Import",
+        "passwordReset": "Password Reset",
+        "templateCreation": "Template Creation",
+        "userCreation": "User Creation",
+        "systemConfiguration": "System Configuration",
+        "dataView": "Data View",
+        "templateActivation": "Template Activation",
+        "userRole": "User Role",
+        "allRoles": "All Roles",
+        "administrator": "Administrator",
+        "supervisor": "Supervisor",
+        "learningCoach": "Learning Coach",
+        "participant": "Participant",
+        "dateFrom": "Date From",
+        "dateTo": "Date To",
+        "datePlaceholder": "dd/mm/yyyy"
+      },
+      "table": {
+        "timestamp": "Timestamp",
+        "action": "Action",
+        "user": "User",
+        "role": "Role",
+        "targetId": "Target ID",
+        "changeSummary": "Change Summary",
+        "noEntries": "No audit log entries found"
+      }
+    },
     "csvTemplatePage": {
+      "pageTitle": "CSV Import Templates",
+      "pageSubtitle": "Download pre-formatted CSV templates for bulk user operations",
+      "sectionTitle": "CSV Import Templates",
+      "sectionSubtitle": "Download pre-formatted CSV templates for bulk operations",
+      "downloadTemplate": "Download Template",
+      "templates": {
+        "user_import": {
+          "title": "Bulk User Import",
+          "description": "Import multiple users at once"
+        },
+        "participant_assignment": {
+          "title": "Participant Assignment",
+          "description": "Assign participants to Linkage Champions"
+        },
+        "lc_supervisor_mapping": {
+          "title": "LC to Supervisor Mapping",
+          "description": "Map Linkage Champions to Supervisors"
+        },
+        "bulk_status_update": {
+          "title": "Bulk Status Update",
+          "description": "Activate or deactivate multiple users"
+        },
+        "geographic_reassignment": {
+          "title": "Geographic Reassignment",
+          "description": "Update province and district assignments"
+        }
+      },
+      "guidelines": {
+        "title": "CSV Import Guidelines",
+        "items": [
+          "Ensure all required fields are filled in",
+          "Use the exact format provided in the template",
+          "Email addresses must be unique and valid",
+          "Role values must match exactly: Admin, Supervisor, Linkage Champion, or Participant",
+          "Province and District values must match the system's configured administrative divisions",
+          "File size limit: 5MB (approximately 5,000 rows)",
+          "Duplicates will be skipped with a warning"
+        ]
+      },
       "downloadSuccess": "Downloaded {{title}} template",
       "downloadMobileInfo": "Download available on Desktop/Web"
     },
@@ -344,7 +523,6 @@
     "title": "Generating Better Livelihoods",
     "adminLogin": "Login as Admin / Supervisor",
     "adminLoginFailed": "Admin / Supervisor login failed"
-
   },
   "auth": {
     "loginAttemptedEmptyCredentials": "Login attempted with empty credentials",
@@ -502,13 +680,13 @@
     "observationLogs": "Observation Logs"
   },
   "logVisit": {
-    "noSolutions":"No solutions found",
+    "noSolutions": "No solutions found",
     "viewForm": "View Form",
     "selectSolution": "Select Solution",
     "selectSolutionPlaceholder": "Select a solution...",
     "selectVisitType": "Select visit type for {{name}}",
     "viewCheckIns": "View Check-Ins",
-    "by":"By",
+    "by": "By",
     "multipleAssessemtsNotAllowed": "Multiple assessments are not allowed for this participant",
     "thisFormNotFound": "This form not found with submission number",
     "note": "Note:",
@@ -525,8 +703,8 @@
       "title": "Midline Survey",
       "description": "Conduct a midline assessment survey to track progress"
     },
-    "noCheckInsYet":"No Check-Ins Yet",
-    "noCheckInsYetDescription":"Check-ins will appear here once forms and surveys are completed for this participant."
+    "noCheckInsYet": "No Check-Ins Yet",
+    "noCheckInsYetDescription": "Check-ins will appear here once forms and surveys are completed for this participant."
   },
   "lcProfile": {
     "myProfile": "My Profile",
@@ -561,7 +739,7 @@
     "pageTitle": "Develop Intervention Plan",
     "pageSubtitle": "Select a development plan template for {{name}}",
     "backButton": "Back",
-    "IdpCreationSuccess":"IDP Created Successfully!",
+    "IdpCreationSuccess": "IDP Created Successfully!",
     "categoryModal": {
       "title": "Select Livelihood Category",
       "forParticipant": "For participant: {{name}}",

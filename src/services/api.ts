@@ -21,6 +21,7 @@ declare const process:
   | undefined;
 
 const TOKEN_STORAGE_KEY = STORAGE_KEYS.AUTH_TOKEN;
+const INTERNAL_ACCESS_TOKEN_KEY = STORAGE_KEYS.INTERNAL_ACCESS_TOKEN;
 
 /**
  * Create axios instance with base configuration
@@ -56,6 +57,24 @@ api.interceptors.request.use(
         config.headers['x-auth-token'] = token;
       }
 
+      // Add internal-access-token header if available - Required for entity-management API endpoints
+      const internalAccessToken = await AsyncStorage.getItem(INTERNAL_ACCESS_TOKEN_KEY);
+      if (internalAccessToken && config.headers) {
+        config.headers['internal-access-token'] = internalAccessToken;
+      }
+
+      // Add organization code header if available (from stored user data)
+      const userData = await offlineStorage.read<any>(STORAGE_KEYS.AUTH_USER);
+      const orgCode = userData?.organizations?.[0]?.code;
+      if (orgCode && config.headers) {
+        config.headers['organization'] = orgCode;
+      }
+
+      // Add tenant code header if available (from stored user data)
+      const tenantCode = userData?.tenant_code;
+      if (tenantCode && config.headers) {
+        config.headers['tenant'] = tenantCode;
+      }
       // Log request details (optional - can be removed in production)
       // logger.info(`API Request: ${config.method?.toUpperCase()} ${config.url}`, {
       //   headers: config.headers,

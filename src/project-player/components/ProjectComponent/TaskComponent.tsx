@@ -17,7 +17,7 @@ if (
   return <ProjectAsTaskComponent task={task} level={level} />;
 }
 
-
+if (task?.isDeleted) return null;
   // Otherwise render as a regular task card
   return (
     <TaskCard
