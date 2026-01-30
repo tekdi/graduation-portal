@@ -81,25 +81,12 @@ const UserManagementScreen = () => {
         }
 
         const apiParams: UserSearchParams = {
+          ...filters,
           tenant_code: 'brac',
           type: apiType,
           page: 1, // Always fetch from page 1, DataTable handles client-side pagination
           limit: 100, // Fetch all users at once for client-side pagination
         };
-
-        if (filters.search) {
-          apiParams.search = filters.search;
-        }
-        if (filters.status && filters.status !== 'all-status') {
-          // Map status filter value to API format (e.g., "Active" → "ACTIVE")
-          const mappedStatus = mapStatusLabelToAPI(filters.status);
-          apiParams.status = mappedStatus;
-        }
-        if (filters.province && filters.province !== 'all-provinces') {
-          // Since we're using province.name as both label and value, use it directly
-          // The API expects the province name (e.g., "Eastern Cape")
-          apiParams.province = filters.province;
-        }
 
         const response = await getUsersList(apiParams);
 
