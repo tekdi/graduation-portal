@@ -130,7 +130,7 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
       { labelKey: 'admin.filters.allProvinces', value: 'all-provinces' },
       ...provinces.map((province: ProvinceEntity) => ({
         label: province.name,
-        value: province._id, // Use _id as value for API (e.g., "6952163ae83c1c00147132a8")
+        value: province._id,
       })),
     ];
 
