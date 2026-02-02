@@ -118,7 +118,6 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (!isEdit) return;
 
     if (task?.type === TASK_TYPE.OBSERVATION) {
-      console.log('task?.solutionDetails', task);
       const projectTemplateId = projectData?._id;
       if (!participantId || !projectTemplateId) {
         console.error('Missing userId or projectTemplateId');
