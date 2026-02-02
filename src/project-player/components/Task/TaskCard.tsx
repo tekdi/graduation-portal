@@ -37,12 +37,14 @@ import { isTaskCompleted } from './helpers';
 import { renderCustomTaskActions, renderModals } from './renderHelpers';
 import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
+import { getSolutionDetails } from '../../services/projectPlayerService';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
   isLastTask = false,
   isChildOfProject = false,
 }) => {
+  const { projectData } = useProjectContext();
   const route = useRoute();
   const navigation = useNavigation();
   // Retrieve updateTask from context
@@ -123,27 +125,24 @@ const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   // Task click handler (HEAD logic)
-  const handleTaskClick = () => {
+  const handleTaskClick = async () => {
     if (!isEdit) return;
 
     if (task?.type === TASK_TYPE.OBSERVATION) {
-      const solutionId = task?.solutionDetails?._id;
-
-      if (!participantId || !solutionId) {
-        console.error('Missing userId or solutionId');
+      const projectTemplateId = projectData?._id;
+      if (!participantId || !projectTemplateId) {
+        console.error('Missing userId or projectTemplateId');
         return;
       }
-
-      // Navigate to observation screen - task will be marked as completed on return
-      navigation.navigate('observation', {
-        id: participantId,
-        solutionId: solutionId
-      });
-
-      updateTask(task._id, {
-        status: TASK_STATUS.COMPLETED,
-        _id: task._id,
-      });
+      const solutionDetails = await getSolutionDetails(projectTemplateId, task._id);
+      
+      if(solutionDetails.data._id) {
+        // @ts-ignore Navigate to observation screen - task will be marked as completed on return
+        navigation.navigate('observation', {
+          id: participantId,
+          solutionId: solutionDetails.data._id
+        });
+      }
     } else {
       setShowUploadModal(true); // Open modal instead of file picker
     }
