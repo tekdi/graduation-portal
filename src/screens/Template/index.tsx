@@ -33,29 +33,7 @@ import { ProjectPlayerData } from 'src/project-player/types/components.types';
 import { getCategoryList } from '../../project-player/services/projectPlayerService';
 import { useAuth } from '@contexts/AuthContext';
 import { STATUS } from '@constants/app.constant';
-
-type SubCategory = {
-  id: string;
-  label: string;
-};
-
-type Category = {
-  id: string;
-  label: string;
-  hasChildren: boolean;
-  subcategories: SubCategory[];
-};
-
-type PillarCategoryMap = {
-  pillarId: string;
-  categories: Category[];
-};
-type PillarSelection = {
-  categoryId?: string;
-  subCategoryId?: string;
-  categoryName?:string;
-  subCategoryName?:string;
-};
+import { Category, PillarCategoryMap, PillarSelection, SubCategory } from '@app-types/screens';
 
 const DevelopInterventionPlan: React.FC = () => {
   const navigation = useNavigation();
@@ -129,6 +107,16 @@ const DevelopInterventionPlan: React.FC = () => {
     }
   }, []);
 
+  const handleChangePathway = useCallback(() => {
+    setShowProjectPlayerPreview(false);
+    setIsModalOpen(false);
+    setSelectedPathway('');
+    setPillarData([]);
+    setPillarIdsToGetIdp([]);
+    setSelectionByPillar({});
+    setPillarCategoryMap([]);
+  }, []);
+
   const getPillarCategoryRelationships = useMemo(() => {
     // Get all pillars that have child categories from pillarData
     const pillarsWithCategories = pillarData.filter(
@@ -192,7 +180,8 @@ const DevelopInterventionPlan: React.FC = () => {
     profileInfo: participant,
     showAddCustomTaskButton: true,
     showSubmitButton: true,
-    onSubmitInterventionPlan:handleIdpCreation
+    onSubmitInterventionPlan: handleIdpCreation,
+    onChangePathway: handleChangePathway,
   };
 
 
@@ -247,7 +236,6 @@ const DevelopInterventionPlan: React.FC = () => {
         const templatesData = await getProjectCategoryList();
 
         if (!isMounted) return;
-        console.log('templatesData', templatesData);
         setTemplates(templatesData || []);
       } catch (err) {
         console.error('Failed to fetch project data', err);

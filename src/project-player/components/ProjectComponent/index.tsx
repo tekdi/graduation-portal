@@ -24,12 +24,19 @@ import { submitInterventionPlan } from '../../services/projectPlayerService';
 import { addCustomTaskStyles } from '../Task/Styles';
 
 const ProjectComponent: React.FC = () => {
-  const { projectData, mode, config } = useProjectContext();
+  const {
+    projectData,
+    mode,
+    config,
+    addedToPlanTaskIds,
+    taskPlanActionPerformedIds,
+  } =
+    useProjectContext();
   const { t } = useLanguage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { showAlert } = useAlert();
 
-  const hasChildren = !!projectData?.children?.length || projectData?.tasks?.some(task => !!task.children?.length);;
+  const hasChildren = !!projectData?.children?.length || projectData?.tasks?.some(task => !!task.children?.length);
 
   const isEditMode =
     mode === 'edit' && config.showAddCustomTaskButton !== false;
@@ -38,6 +45,35 @@ const ProjectComponent: React.FC = () => {
   const showPillarFeatures = isEditMode && hasChildren;
 
   const shouldShowSubmitButton = config.showSubmitButton && mode === 'preview';
+
+  const getExcludedTaskIds = (
+    tasks: any[] = [],
+    addedToPlanSet: Set<string>,
+  ): string[] => {
+    return tasks.flatMap(task => {
+      const nested = [
+        ...(task.name === 'Social Protection' && task.tasks
+          ? getExcludedTaskIds(task.tasks, addedToPlanSet)
+          : []),
+      ];
+      const isOptional = task?.isDeletable === true;
+      const isAddedToPlan = addedToPlanSet.has(task._id);
+      const excluded = isOptional && !isAddedToPlan ? [task._id] : [];
+      return [...excluded, ...nested];
+    });
+  };
+
+  const getDeletableTaskIds = (tasks: any[] = []): string[] => {
+    return tasks.flatMap(task => {
+      const nested = [
+        ...(task.name === 'Social Protection' && task.tasks
+          ? getDeletableTaskIds(task.tasks)
+          : []),
+      ];
+      const isDeletable = task?.isDeletable === true;
+      return [...(isDeletable ? [task._id] : []), ...nested];
+    });
+  };
 
   const onSubmitInterventionPlan = async () => {
     if (!projectData) return;
@@ -90,11 +126,23 @@ const ProjectComponent: React.FC = () => {
         return;
       }
 
+      const excludedTaskIds = Array.from(
+        new Set(
+          getExcludedTaskIds(
+            [
+              ...(projectData.children || []),
+            ],
+            new Set(addedToPlanTaskIds),
+          ),
+        ),
+      );
+
       const reqBody = {
         templates,
         userId,
         entityId: config.profileInfo?.entityId || userId, // Fallback to userId if entityId not available
         projectConfig: { referenceFrom: process.env.GLOBAL_LC_PROGRAM_ID },
+        excludedTaskIds,
       };
 
       // Call API to submit intervention plan
@@ -224,8 +272,20 @@ const ProjectComponent: React.FC = () => {
             borderTopColor="$borderLight300"
             bg="$backgroundPrimary.light"
           >
+            {(() => {
+              const deletableTaskIds = getDeletableTaskIds(
+                projectData.children || [],
+              );
+              const allActionsCompleted = deletableTaskIds.every(id =>
+                taskPlanActionPerformedIds.includes(id),
+              );
+              const isSubmitDisabled =
+                config.isSubmitDisabled || !allActionsCompleted;
+
+              return (
+                <>
             {/* Warning Banner - Show when Submit is disabled */}
-            {config.isSubmitDisabled && config.submitWarningMessage && (
+            {isSubmitDisabled && config.submitWarningMessage && (
               <Box
                 bg="$warning50"
                 borderWidth={1}
@@ -252,7 +312,10 @@ const ProjectComponent: React.FC = () => {
                 paddingHorizontal="$4"
                 paddingVertical="$2"
                 onPress={() => {
-                  // TODO: Implement change pathway functionality
+                  if (config.onChangePathway) {
+                    config.onChangePathway();
+                    return;
+                  }
                 }}
                 $hover-borderColor="$primary500"
                 $hover-bg="$error50"
@@ -274,8 +337,8 @@ const ProjectComponent: React.FC = () => {
                 paddingHorizontal="$6"
                 paddingVertical="$2"
                 onPress={onSubmitInterventionPlan}
-                isDisabled={config.isSubmitDisabled}
-                opacity={config.isSubmitDisabled ? 0.5 : 1}
+                isDisabled={isSubmitDisabled}
+                opacity={isSubmitDisabled ? 0.5 : 1}
                 $hover-bg="$primary600"
                 $web-cursor="pointer"
                 {...projectComponentStyles.submitButton}
@@ -291,6 +354,9 @@ const ProjectComponent: React.FC = () => {
                 </ButtonText>
               </Button>
             </Box>
+                </>
+              );
+            })()}
           </VStack>
         )}
       </VStack>
