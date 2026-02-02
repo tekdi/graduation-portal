@@ -184,11 +184,11 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
                           sx={
                             isWeb
                               ? {
-                                  ':hover': {
-                                    textDecorationLine: 'underline',
-                                    cursor: 'pointer',
-                                  },
-                                }
+                                ':hover': {
+                                  textDecorationLine: 'underline',
+                                  cursor: 'pointer',
+                                },
+                              }
                               : undefined
                           }
                         >
@@ -235,8 +235,8 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
             {...taskAccordionStyles.accordionContent}
             paddingHorizontal={isWeb ? '$5' : '$1'}
           >
-            {/* Info Banner - Only for Social Protection in Preview Mode */}
-            {task?.metaInformation?.warningMessage && (
+            {/* Info Banner - Always show for Social Protection in Preview Mode */}
+            {isSocialProtection && (
               <Box {...taskAccordionStyles.infoBanner}>
                 <HStack {...taskAccordionStyles.infoBannerContent}>
                   <LucideIcon
@@ -249,7 +249,8 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
                       {t('projectPlayer.important')}
                     </Text>
                     <Text {...taskAccordionStyles.infoBannerMessage}>
-                      {task?.metaInformation?.warningMessage}
+                      {task?.metaInformation?.warningMessage ||
+                        t('projectPlayer.socialProtectionPreviewInfo')}
                     </Text>
                   </VStack>
                 </HStack>
