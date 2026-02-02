@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Box,
   HStack,
@@ -40,7 +40,6 @@ import { useRoute } from '@react-navigation/native';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
-  level = 0,
   isLastTask = false,
   isChildOfProject = false,
   isOnboardingTask = false,
@@ -48,7 +47,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const route = useRoute();
   const navigation = useNavigation();
   // Retrieve updateTask from context
-  const { mode, config, updateTask } = useProjectContext();
+  const { mode, config, updateTask, addedToPlanTaskIds } =
+    useProjectContext();
   const { deleteTask } = useProjectContext();
   // handleOpenForm
   const {  handleStatusChange, handleAddToPlan } =
@@ -58,6 +58,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const toast = useToast();
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [isAddedToPlan, setIsAddedToPlan] = useState(
+    Boolean(!task?.isDeletable),
+  );
   const participantId = route.params?.id;
   // Modal state management (from Incoming)
   type ModalType = 'edit' | 'delete' | null;
@@ -73,20 +76,19 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const isEdit = mode === PROJECT_MODES.EDIT;
   // Use mixed logic for completion: check status or use helper
   const isCompleted = isTaskCompleted(task?.status);
-  const isAddedToPlan = task?.metaInformation?.addedToPlan;
 
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
-    const uiConfig = useMemo(
+  const uiConfig = useMemo(
     () => ({
       showAsCard: isChildOfProject,
       showAsInline: !isChildOfProject || isPreview,
       showCheckbox: isChildOfProject && !isPreview,
-      showActionButton: isEdit,
+      showActionButton: isEdit || task?.isDeletable,
       isInteractive: isEdit,
     }),
-    [isChildOfProject, isPreview, isEdit],
+    [isChildOfProject, isPreview, isEdit, task?.isDeletable],
   );
 
   const showSuccess = (message: string) => {
@@ -110,6 +112,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
     deleteTask(task?._id);
     closeModal();
     showSuccess(t('projectPlayer.taskDeleted'));
+  };
+
+  useEffect(() => {
+    setIsAddedToPlan(addedToPlanTaskIds.includes(task?._id));
+  }, [addedToPlanTaskIds, task?._id]);
+
+  const updateAddToPlan = (added: boolean) => {
+    handleAddToPlan(task._id, added);
+    setIsAddedToPlan(added);
   };
 
   // Task click handler (HEAD logic)
@@ -180,7 +191,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     const checkSize = 12;
 
     // Status Circle Logic
-    const isOptional = task?.metaInformation?.isOptional;
+    const isOptional = task?.isDeletable;
 
     let circleBorderColor = '$textMuted';
     let circleBg = '$backgroundPrimary.light';
@@ -189,13 +200,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Onboarding: empty circle initially, brown tick only when document uploaded / task completed
     if (isOnboardingTask) {
-      // Show tick when files are uploaded (check attachments array)
-      const hasUploadedFiles = task.attachments && task.attachments.length > 0;
-      const showTick = hasUploadedFiles;
-      circleBorderColor = showTick ? '$primary500' : '$textMuted';
-      circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
-      checkColor = theme.tokens.colors.backgroundPrimary.light;
-      showCheck = showTick;
+      if (isOptional && task?.isDeletable) {
+        // Show tick when files are uploaded (check attachments array)
+        const hasUploadedFiles = task.attachments && task.attachments.length > 0;
+        const showTick = hasUploadedFiles;
+        circleBorderColor = showTick ? '$primary500' : '$textMuted';
+        circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
+        checkColor = theme.tokens.colors.backgroundPrimary.light;
+        showCheck = showTick;
+      }
     } else if (isChildOfProject) {
       if (isOptional) {
         if (isAddedToPlan) {
@@ -250,11 +263,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-            | 'line-through'
-            | 'none',
-          opacity: isCompleted ? 0.6 : 1,
-        }
+        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+          | 'line-through'
+          | 'none',
+        opacity: isCompleted ? 0.6 : 1,
+      }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -273,8 +286,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
-            ? '$optionalBadgeBg'
-            : '$backgroundLight100'
+              ? '$optionalBadgeBg'
+              : '$backgroundLight100'
         }
         paddingHorizontal="$2"
         paddingVertical="$1"
@@ -288,8 +301,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
-              ? '$optionalBadgeText'
-              : '$textMuted'
+                ? '$optionalBadgeText'
+                : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText}
@@ -429,7 +442,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (!uiConfig.showActionButton) return null;
 
     // In Preview mode only: If task is optional, show "Add to Plan" / "Remove" button
-    if (isPreview && task.metaInformation?.isOptional) {
+    if (isPreview && task?.isDeletable) {
       if (isAddedToPlan) {
         return (
           <Button
@@ -437,9 +450,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
             size={isWeb ? 'sm' : 'xs'}
             bg="$error500"
             borderColor="$error500"
-            onPress={() =>
-              handleAddToPlan(task._id, task.metaInformation, false)
-            }
+            onPress={() => {
+              updateAddToPlan(false);
+            }}
             sx={{
               ':hover': { bg: '$error600' },
             }}
@@ -455,7 +468,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
           variant="outline"
           size={isWeb ? 'sm' : 'xs'}
           borderColor="$success500"
-          onPress={() => handleAddToPlan(task._id, task.metaInformation, true)}
+          onPress={() => {
+            updateAddToPlan(true);
+          }}
           sx={{
             ':hover': { bg: '$success50' },
           }}
@@ -694,15 +709,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBg'
             : isPreview && isAddedToPlan
-            ? '$addedToPlanBg'
-            : taskCardStyles.childCard?.bg
+              ? '$addedToPlanBg'
+              : taskCardStyles.childCard?.bg
         }
         borderColor={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBorder'
             : isPreview && isAddedToPlan
-            ? '$addedToPlanBorder'
-            : taskCardStyles.childCard?.borderColor
+              ? '$addedToPlanBorder'
+              : taskCardStyles.childCard?.borderColor
         }
       >
         <Box

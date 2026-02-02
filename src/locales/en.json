@@ -837,7 +837,8 @@
     "graduated": "Ready to Graduate",
     "active": "Active",
     "inactive": "Inactive",
-    "groupCheckIns": "Group Check-ins"
+    "groupCheckIns": "Group Check-ins",
+    "selectStatus":"Select Status"
   },
   "table": {
     "showing": "Showing {{start}} to {{end}} of {{total}} entries",

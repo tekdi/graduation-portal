@@ -29,6 +29,10 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
   );
   const [isLoading] = useState(false);
   const [error] = useState<Error | null>(null);
+  const [addedToPlanTaskIds, setAddedToPlanTaskIds] = useState<string[]>([]);
+  const [taskPlanActionPerformedIds, setTaskPlanActionPerformedIds] = useState<
+    string[]
+  >([]);
 
   const isEditMode = config.mode === MODE.editMode.mode;
 
@@ -42,11 +46,40 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
     }
   }, [config.baseUrl, config.accessToken]);
 
+  useEffect(() => {
+    if (
+      !projectData ||
+      addedToPlanTaskIds.length > 0 ||
+      taskPlanActionPerformedIds.length > 0
+    )
+      return;
+
+    const collectAddedToPlanIds = (tasks: Task[] = []): string[] =>
+      tasks.flatMap(task => {
+        const nested = [
+          ...(task.children ? collectAddedToPlanIds(task.children) : []),
+          ...(task.tasks ? collectAddedToPlanIds(task.tasks) : []),
+        ];
+        const isAdded = task?.metaInformation?.addedToPlan === true;
+        return [...(isAdded ? [task._id] : []), ...nested];
+      });
+
+    const initialIds = collectAddedToPlanIds([
+      ...(projectData.children || []),
+      ...(projectData.tasks || []),
+    ]);
+
+    if (initialIds.length > 0) {
+      setAddedToPlanTaskIds(initialIds);
+      setTaskPlanActionPerformedIds(initialIds);
+    }
+  }, [projectData, addedToPlanTaskIds.length, taskPlanActionPerformedIds.length]);
+
   const updateTask = useCallback(
     (taskId: string, updates: Partial<Task>) => {
       let updatedTaskObj: Task | null = null;
       let currentProjectId: string | null = null;
-
+      
       // Update local state first (optimistic update)
       setProjectData(prev => {
         if (!prev) return null;
@@ -93,17 +126,12 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
           tasks: updateTaskRecursive(prev.tasks || []),
         };
       });
-      // ✅ Notify parent after state update
       if (onTaskUpdate) {
         setTimeout(() => {
           if (updatedTaskObj) onTaskUpdate(updatedTaskObj);
         }, 0);
       }
-      // ✅ If custom task → DO NOT call API
-      // if (!updatedTaskObj || updatedTaskObj?.isCustomTask) {
-      //   return;
-      // }
-
+      
       // Call API to update task on server
       if (currentProjectId) {
         try {
@@ -292,6 +320,24 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
     console.log('syncToServer');
   }, []);
 
+  const setTaskAddedToPlan = useCallback(
+    (taskId: string, added: boolean) => {
+      setAddedToPlanTaskIds(prev => {
+        if (added) {
+          return prev.includes(taskId) ? prev : [...prev, taskId];
+        }
+        return prev.filter(id => id !== taskId);
+      });
+    },
+    [],
+  );
+
+  const setTaskPlanActionPerformed = useCallback((taskId: string) => {
+    setTaskPlanActionPerformedIds(prev =>
+      prev.includes(taskId) ? prev : [...prev, taskId],
+    );
+  }, []);
+
   const value: ProjectContextValue = {
     projectData,
     isLoading,
@@ -304,6 +350,10 @@ export const ProjectProvider: React.FC<ProjectProviderProps> = ({
     deleteTask,
     saveLocal,
     syncToServer,
+    addedToPlanTaskIds,
+    setTaskAddedToPlan,
+    taskPlanActionPerformedIds,
+    setTaskPlanActionPerformed,
     onTaskUpdate,
   };
 

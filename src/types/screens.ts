@@ -82,3 +82,26 @@ export interface ParticipantHeaderProps {
   userEntityId?: string;
   onStatusUpdate?: (newStatus: string) => void;
 }
+
+export type SubCategory = {
+  id: string;
+  label: string;
+};
+
+export type Category = {
+  id: string;
+  label: string;
+  hasChildren: boolean;
+  subcategories: SubCategory[];
+};
+
+export type PillarCategoryMap = {
+  pillarId: string;
+  categories: Category[];
+};
+export type PillarSelection = {
+  categoryId?: string;
+  subCategoryId?: string;
+  categoryName?:string;
+  subCategoryName?:string;
+};

@@ -106,8 +106,6 @@ export const useProjectLoader = (
             }),
           };
 
-          console.log(updatedPathwayData);
-
           setProjectData(updatedPathwayData);
         } else if (data.solutionId) {
           setProjectData(null);

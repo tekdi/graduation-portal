@@ -46,6 +46,8 @@ export interface Task {
   parentId?:string;
   externalId?:string;
   isDeleted?:boolean;
+  isDeletable?:boolean;
+  excludedTaskIds?:string[];
 }
 
 export interface Attachment {
@@ -137,6 +139,7 @@ export interface createProjectPlanPayload{
     entityId: string;
     programName: string;
     isPrivateProgram: boolean;
+    excludedTaskIds?: string[];
     projectConfig: {
       name: string;
       description: string;
