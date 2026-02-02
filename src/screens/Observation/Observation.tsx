@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
 import ObservationContent from './ObservationContent';
-import { useAlert } from '@ui';
+import { Loader, useAlert } from '@ui';
 import { getParticipantsList } from '../../services/participantService';
 import { useAuth } from '@contexts/AuthContext';
 
@@ -36,6 +36,7 @@ const Observation: React.FC = () => {
   const solutionId = routeParams?.solutionId || '';
   const submissionNumber = routeParams?.submissionNumber;
   const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const {user} = useAuth();
   const { showAlert } = useAlert();
   const handleBackPress = () => {
@@ -64,10 +65,15 @@ const Observation: React.FC = () => {
         "And what is your email address?":newData?.email,
       };
       setUserData(preFillData);
+      setIsLoading(false);
     };
     fetchUserData();
   }, [id,user]);
   
+  if (isLoading) {
+    return <Loader fullScreen message="Loading observation..." />;
+  }
+
   if (!id || !solutionId || !userData) {
     return null;
   }
