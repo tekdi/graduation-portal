@@ -55,7 +55,7 @@ export const StatusFilter: FilterConfig = {
 export const mapStatusLabelToAPI = (statusLabel: string): string => {
   const statusMap: Record<string, string> = {
     'Active': 'ACTIVE',
-    'Deactivated': 'DEACTIVATED',
+    'Deactivated': 'INACTIVE',
   };
   return statusMap[statusLabel] || statusLabel;
 };
@@ -130,7 +130,7 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
       { labelKey: 'admin.filters.allProvinces', value: 'all-provinces' },
       ...provinces.map((province: ProvinceEntity) => ({
         label: province.name,
-        value: province.name, // Use name as value (e.g., "Eastern Cape")
+        value: province._id,
       })),
     ];
 
