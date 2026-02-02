@@ -5,15 +5,14 @@ import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ViewProps, TextProps } from 'react-native';
 import {
- lcFilterOptions,
- participantLCFilterOptions,
- SearchFilter,
- ParticipantSearchFilter,
- selectedLCList,
- participantFilterOptions,
- participantList,
-} from '@constants/USER_MANAGEMENT_FILTERS';
-import { supervisorFilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
+  lcFilterOptions,
+  participantLCFilterOptions,
+  SearchFilter,
+  selectedLCList,
+  participantFilterOptions,
+  participantList,
+  useAssignUsersFilters,
+} from '@constants/ASSIGN_USERS_FILTERS';
 import SelectionCard from '@components/SelectionCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
@@ -21,9 +20,8 @@ import { theme } from '@config/theme';
 const AssignUsersScreen = () => {
  const { t } = useLanguage();
  const AssignLCFilterOptions = [SearchFilter, ...lcFilterOptions];
- const AssignParticipantFilterOptions = [ParticipantSearchFilter, ...participantFilterOptions];
+ const AssignParticipantFilterOptions = [SearchFilter, ...participantFilterOptions];
  type AssignTab = 'LC_TO_SUPERVISOR' | 'PARTICIPANT_TO_LC';
-
 
  const [activeTab, setActiveTab] = useState<AssignTab>('LC_TO_SUPERVISOR');
  const [selectedLc, setSelectedLc] = useState<any>(null);
@@ -31,6 +29,9 @@ const AssignUsersScreen = () => {
  const [supervisorFilterValues, setSupervisorFilterValues] = useState<
    Record<string, any>
  >({});
+
+ // Use custom hook for filter management - handles API calls for provinces
+ const { filters: supervisorFilterOptions } = useAssignUsersFilters(supervisorFilterValues);
  const [lcFilterValues, setLcFilterValues] = useState<Record<string, any>>({});
  // State to track assigned LCs
  const [assignedLCs, setAssignedLCs] = useState<any[]>([]);
