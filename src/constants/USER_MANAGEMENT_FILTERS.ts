@@ -55,7 +55,7 @@ export const StatusFilter: FilterConfig = {
 export const mapStatusLabelToAPI = (statusLabel: string): string => {
   const statusMap: Record<string, string> = {
     'Active': 'ACTIVE',
-    'Deactivated': 'DEACTIVATED',
+    'Deactivated': 'INACTIVE',
   };
   return statusMap[statusLabel] || statusLabel;
 };

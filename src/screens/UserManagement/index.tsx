@@ -80,13 +80,38 @@ const UserManagementScreen = () => {
           apiType = allRoleTitles.length > 0 ? allRoleTitles.join(',') : 'all';
         }
 
+        // Build API params with proper status mapping
         const apiParams: UserSearchParams = {
-          ...filters,
           tenant_code: 'brac',
           type: apiType,
           page: currentPage,
           limit: pageSize,
         };
+
+        // Add search parameter if present
+        if (filters.search) {
+          apiParams.search = filters.search;
+        }
+
+        // Add status parameter if present - map to API format (Active -> ACTIVE, Deactivated -> INACTIVE)
+        if (filters.status && filters.status !== 'all-status') {
+          apiParams.status = mapStatusLabelToAPI(filters.status);
+        }
+
+        // Add role parameter if present
+        if (filters.role && filters.role !== 'all-roles') {
+          apiParams.role = filters.role;
+        }
+
+        // Add province parameter if present
+        if (filters.province && filters.province !== 'all-provinces') {
+          apiParams.province = filters.province;
+        }
+
+        // Add site parameter if present
+        if (filters.site && filters.site !== 'all-sites') {
+          apiParams.site = filters.site;
+        }
 
         const response = await getUsersList(apiParams);
 
@@ -94,17 +119,7 @@ const UserManagementScreen = () => {
         let usersData = response.result?.data || [];
 
         // Get total count from API response (if available), otherwise use data length
-        //const apiTotalCount = response.result?.count ?? usersData.length;
         const apiTotalCount = response.result?.count ?? response.result?.total ?? usersData.length;
-        // Apply client-side status filtering if status filter is set (fallback if API doesn't filter)
-        // This ensures status filter works even if API doesn't support status parameter
-        if (filters.status && filters.status !== 'all-status') {
-          const mappedStatus = mapStatusLabelToAPI(filters.status);
-          usersData = usersData.filter((user: any) => {
-            const userStatus = user.status?.toUpperCase();
-            return userStatus === mappedStatus;
-          });
-        }
 
         setUsers(usersData);
         // Use API total count
