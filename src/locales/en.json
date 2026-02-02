@@ -840,7 +840,7 @@
     "active": "Active",
     "inactive": "Inactive",
     "groupCheckIns": "Group Check-ins",
-    "selectStatus": "Select Status"
+    "selectStatus":"Select Status"
   },
   "table": {
     "showing": "Showing {{start}} to {{end}} of {{total}} entries",
