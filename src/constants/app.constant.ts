@@ -110,3 +110,8 @@ export const BADGE_TYPES = {
   REQUIRED: 'required',
   OPTIONAL: 'optional',
 } as const;
+
+export const ONBOARDING_PROJECT_TITLES = [
+  'Onboarding Participants',
+  'Onboarding the Participant',
+];
