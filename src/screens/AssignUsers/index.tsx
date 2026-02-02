@@ -5,21 +5,22 @@ import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ViewProps, TextProps } from 'react-native';
 import {
- lcFilterOptions,
- participantLCFilterOptions,
- SearchFilter,
- ParticipantSearchFilter,
- selectedLCList,
- participantFilterOptions,
- participantList,
-} from '@constants/USER_MANAGEMENT_FILTERS';
-import { supervisorFilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
+  lcFilterOptions,
+  participantLCFilterOptions,
+  SearchFilter,
+  ParticipantSearchFilter,
+  selectedLCList,
+  participantFilterOptions,
+  participantList,
+  useAssignUsersFilters,
+} from '@constants/ASSIGN_USERS_FILTERS';
 import SelectionCard from '@components/SelectionCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
 
 const AssignUsersScreen = () => {
  const { t } = useLanguage();
+ 
  const AssignLCFilterOptions = [SearchFilter, ...lcFilterOptions];
  const AssignParticipantFilterOptions = [ParticipantSearchFilter, ...participantFilterOptions];
  type AssignTab = 'LC_TO_SUPERVISOR' | 'PARTICIPANT_TO_LC';
@@ -31,6 +32,10 @@ const AssignUsersScreen = () => {
  const [supervisorFilterValues, setSupervisorFilterValues] = useState<
    Record<string, any>
  >({});
+ 
+ // Use custom hook for filter management - handles API calls for provinces
+ // Pass current filter values to enable province-based supervisor filtering
+ const { supervisorFilterOptions } = useAssignUsersFilters(supervisorFilterValues);
  const [lcFilterValues, setLcFilterValues] = useState<Record<string, any>>({});
  // State to track assigned LCs
  const [assignedLCs, setAssignedLCs] = useState<any[]>([]);
@@ -85,35 +90,12 @@ const AssignUsersScreen = () => {
    // Example: fetchFilteredLCs(values);
  };
 
- // Handler for when LCs are assigned to supervisor
- const handleAssignLCs = (selectedLCs: any[]) => {
-   // Generate additional data for assigned LCs (email, LC ID, site)
-   const lcsWithFullData = selectedLCs.map((lc, index) => {
-     // Generate email from name (simple conversion)
-     const nameParts = lc.labelKey.toLowerCase().split(' ');
-     const email = nameParts.length > 1
-       ? `${nameParts[0]}.${nameParts[1]}@gbl.co.za`
-       : `${nameParts[0]}@gbl.co.za`;
-     
-     // Generate LC ID (increment from existing)
-     const lcId = `LC-${String(assignedLCs.length + 2 + index).padStart(3, '0')}`;
-     
-     // Extract site from location or use default
-     const site = lc.location?.includes('eThekwini') ? 'Site B' : 
-                  lc.location?.includes('Johannesburg') ? 'Site A' : 'Site C';
-     
-     return {
-       ...lc,
-       email,
-       lcId,
-       site,
-     };
-   });
-   
-   // Add to assigned LCs list
-   setAssignedLCs((prev) => [...prev, ...lcsWithFullData]);
-   console.log('LCs assigned:', lcsWithFullData);
- };
+// Handler for when LCs are assigned to supervisor
+const handleAssignLCs = (selectedLCs: any[]) => {
+  // TODO: Implement API call to assign LCs to supervisor
+  setAssignedLCs((prev) => [...prev, ...selectedLCs]);
+  console.log('LCs assigned:', selectedLCs);
+};
 
  // Filter out assigned LCs from the available list
  const getAvailableLCs = () => {
@@ -121,37 +103,12 @@ const AssignUsersScreen = () => {
    return selectedLCList.filter((lc: any) => !assignedLCValues.has(lc.value));
  };
 
- // Handler for when participants are assigned to LC
- const handleAssignParticipants = (selectedParticipants: any[]) => {
-   // Generate additional data for assigned participants (email, participant ID)
-   const participantsWithFullData = selectedParticipants.map((participant, index) => {
-     // Generate email from name (simple conversion)
-     const nameParts = participant.labelKey.toLowerCase().split(' ');
-     const email = nameParts.length > 1
-       ? `${nameParts[0]}.${nameParts[1]}@example.com`
-       : `${nameParts[0]}@example.com`;
-     
-     // Generate Participant ID (increment from existing)
-     const participantId = `PAR-${String(assignedParticipants.length + 1 + index).padStart(3, '0')}`;
-     
-     // Extract bio and productivity from location (format: "Bio • Productivity")
-     const locationParts = participant.location?.split(' • ') || [];
-     const bio = locationParts[0] || '';
-     const productivity = locationParts[1] || '';
-     
-     return {
-       ...participant,
-       email,
-       participantId,
-       bio,
-       productivity,
-     };
-   });
-   
-   // Add to assigned participants list
-   setAssignedParticipants((prev) => [...prev, ...participantsWithFullData]);
-   console.log('Participants assigned:', participantsWithFullData);
- };
+// Handler for when participants are assigned to LC
+const handleAssignParticipants = (selectedParticipants: any[]) => {
+  // TODO: Implement API call to assign participants to LC
+  setAssignedParticipants((prev) => [...prev, ...selectedParticipants]);
+  console.log('Participants assigned:', selectedParticipants);
+};
 
  // Filter out assigned participants from the available list
  const getAvailableParticipants = () => {
@@ -243,139 +200,103 @@ const AssignUsersScreen = () => {
               lcList={getAvailableLCs()}
             />
 
-            {/* Hardcoded List of LCs Mapped to Supervisor - TODO: Replace with API data */}
-            <Card {...(AssignUsersStyles.tableCardStyles as ViewProps)}>
-              <VStack width="100%">
-                <VStack space="xs">
-                  <Text {...(AssignUsersStyles.tableTitleText as TextProps)}>
-                    {t('admin.assignUsers.listOfLcsMappedToSupervisor')}
-                  </Text>
-                  <Text {...(AssignUsersStyles.tableSubtitleText as TextProps)}>
-                    {t('admin.assignUsers.currentLcAssignmentsFor').replace(
-                      '{{supervisor}}',
-                      supervisorFilterValues.selectSupervisor || 'Supervisor'
-                    )}
-                  </Text>
-                </VStack>
+            {/* List of LCs Mapped to Supervisor - TODO: Replace with API data */}
+            {assignedLCs.length > 0 && (
+              <Card {...(AssignUsersStyles.tableCardStyles as ViewProps)}>
+                <VStack width="100%">
+                  <VStack space="xs">
+                    <Text {...(AssignUsersStyles.tableTitleText as TextProps)}>
+                      {t('admin.assignUsers.listOfLcsMappedToSupervisor')}
+                    </Text>
+                    <Text {...(AssignUsersStyles.tableSubtitleText as TextProps)}>
+                      {t('admin.assignUsers.currentLcAssignmentsFor').replace(
+                        '{{supervisor}}',
+                        supervisorFilterValues.selectSupervisor || 'Supervisor'
+                      )}
+                    </Text>
+                  </VStack>
 
-                {/* Table Header */}
-                <HStack {...(AssignUsersStyles.tableHeaderHStack as ViewProps)}>
-                  <Box flex={2}>
-                    <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                      {t('admin.assignUsers.linkageChampion')}
-                    </Text>
-                  </Box>
-                  <Box flex={2}>
-                    <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                      {t('admin.assignUsers.email')}
-                    </Text>
-                  </Box>
-                  <Box flex={2}>
-                    <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                      {t('admin.assignUsers.location')}
-                    </Text>
-                  </Box>
-                  <Box flex={1}>
-                    <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                      {t('admin.assignUsers.site')}
-                    </Text>
-                  </Box>
-                </HStack>
-
-                {/* Table Rows - Hardcoded + Dynamically Assigned */}
-                <VStack space="xs">
-                  {/* Hardcoded Row: Nomsa Dlamini */}
-                  <HStack {...(AssignUsersStyles.tableRowHStack as ViewProps)}>
+                  {/* Table Header */}
+                  <HStack {...(AssignUsersStyles.tableHeaderHStack as ViewProps)}>
                     <Box flex={2}>
-                      <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                        <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                          <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>ND</AvatarFallbackText>
-                        </Avatar>
-                        <VStack space="xs">
-                          <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                            Nomsa Dlamini
-                          </Text>
-                          <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                            LC-002
-                          </Text>
-                        </VStack>
-                      </HStack>
-                    </Box>
-                    <Box flex={2}>
-                      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                        nomsa.dlamini@gbl.co.za
+                      <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
+                        {t('admin.assignUsers.linkageChampion')}
                       </Text>
                     </Box>
                     <Box flex={2}>
-                      <HStack {...(AssignUsersStyles.locationHStack as ViewProps)}>
-                        <LucideIcon name="MapPin" size={12} color={theme.tokens.colors.textMutedForeground} />
-                        <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                          eThekwini, KwaZulu-Natal
-                        </Text>
-                      </HStack>
+                      <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
+                        {t('admin.assignUsers.email')}
+                      </Text>
+                    </Box>
+                    <Box flex={2}>
+                      <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
+                        {t('admin.assignUsers.location')}
+                      </Text>
                     </Box>
                     <Box flex={1}>
-                      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                        Site B
+                      <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
+                        {t('admin.assignUsers.site')}
                       </Text>
                     </Box>
                   </HStack>
 
-                  {/* Dynamically Assigned LCs */}
-                  {assignedLCs.map((lc, index) => {
-                    // Get initials from name
-                    const nameParts = lc.labelKey.split(' ');
-                    const initials = nameParts.length > 1
-                      ? `${nameParts[0][0]}${nameParts[1][0]}`
-                      : nameParts[0].substring(0, 2).toUpperCase();
+                  {/* Table Rows - Assigned LCs */}
+                  <VStack space="xs">
+                    {assignedLCs.map((lc, index) => {
+                      // Get initials from name
+                      const nameParts = (lc.labelKey || '').split(' ');
+                      const initials = nameParts.length > 1
+                        ? `${nameParts[0][0]}${nameParts[1][0]}`
+                        : nameParts[0]?.substring(0, 2).toUpperCase() || '';
 
-                    return (
-                      <HStack
-                        key={`${lc.value}-${index}`}
-                        {...(AssignUsersStyles.tableRowHStack as ViewProps)}
-                        borderBottomWidth={index === assignedLCs.length - 1 ? 0 : 1}
-                      >
-                        <Box flex={2}>
-                          <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                            <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                              <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>{initials}</AvatarFallbackText>
-                            </Avatar>
-                            <VStack space="xs">
-                              <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                                {lc.labelKey}
-                              </Text>
-                              <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                                {lc.lcId}
-                              </Text>
-                            </VStack>
-                          </HStack>
-                        </Box>
-                        <Box flex={2}>
-                          <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                            {lc.email}
-                          </Text>
-                        </Box>
-                        <Box flex={2}>
-                          <HStack {...(AssignUsersStyles.locationHStack as ViewProps)}>
+                      return (
+                        <HStack
+                          key={`${lc.value}-${index}`}
+                          {...(AssignUsersStyles.tableRowHStack as ViewProps)}
+                          borderBottomWidth={index === assignedLCs.length - 1 ? 0 : 1}
+                        >
+                          <Box flex={2}>
+                            <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
+                              <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
+                                <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>{initials}</AvatarFallbackText>
+                              </Avatar>
+                              <VStack space="xs">
+                                <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
+                                  {lc.labelKey || ''}
+                                </Text>
+                                {lc.lcId && (
+                                  <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
+                                    {lc.lcId}
+                                  </Text>
+                                )}
+                              </VStack>
+                            </HStack>
+                          </Box>
+                          <Box flex={2}>
                             <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                              📍
+                              {lc.email || ''}
                             </Text>
+                          </Box>
+                          <Box flex={2}>
+                            <HStack {...(AssignUsersStyles.locationHStack as ViewProps)}>
+                              <LucideIcon name="MapPin" size={12} color={theme.tokens.colors.textMutedForeground} />
+                              <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+                                {lc.location || ''}
+                              </Text>
+                            </HStack>
+                          </Box>
+                          <Box flex={1}>
                             <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                              {lc.location}
+                              {lc.site || ''}
                             </Text>
-                          </HStack>
-                        </Box>
-                        <Box flex={1}>
-                          <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                            {lc.site}
-                          </Text>
-                        </Box>
-                      </HStack>
-                    );
-                  })}
+                          </Box>
+                        </HStack>
+                      );
+                    })}
+                  </VStack>
                 </VStack>
-              </VStack>
-            </Card>
+              </Card>
+            )}
           </>
         )}
       </>
@@ -433,145 +354,113 @@ const AssignUsersScreen = () => {
                onAssign={handleAssignParticipants}
              />
 
-             {/* Hardcoded List of Participants Mapped to LC - TODO: Replace with API data */}
-             <Card {...(AssignUsersStyles.tableCardStyles as ViewProps)}>
-               <VStack space="md" width="100%">
-                 <VStack space="sm">
-                   <Text {...(AssignUsersStyles.tableTitleText as TextProps)}>
-                     {t('admin.assignUsers.listOfParticipantsMappedToLc')}
-                   </Text>
-                   <Text {...(AssignUsersStyles.tableSubtitleText as TextProps)}>
-                     {t('admin.assignUsers.currentParticipantAssignmentsFor').replace(
-                       '{{lc}}',
-                       selectedLc?.labelKey || 'LC'
-                     )}
-                   </Text>
-                 </VStack>
+             {/* List of Participants Mapped to LC - TODO: Replace with API data */}
+             {assignedParticipants.length > 0 && (
+               <Card {...(AssignUsersStyles.tableCardStyles as ViewProps)}>
+                 <VStack space="md" width="100%">
+                   <VStack space="sm">
+                     <Text {...(AssignUsersStyles.tableTitleText as TextProps)}>
+                       {t('admin.assignUsers.listOfParticipantsMappedToLc')}
+                     </Text>
+                     <Text {...(AssignUsersStyles.tableSubtitleText as TextProps)}>
+                       {t('admin.assignUsers.currentParticipantAssignmentsFor').replace(
+                         '{{lc}}',
+                         selectedLc?.labelKey || 'LC'
+                       )}
+                     </Text>
+                   </VStack>
 
-                 {/* Table Header */}
-                 <HStack {...(AssignUsersStyles.tableHeaderHStack as ViewProps)}>
-                   <Box flex={2}>
-                     <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                       {t('admin.assignUsers.participant')}
-                     </Text>
-                   </Box>
-                   <Box flex={2}>
-                     <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                       {t('admin.assignUsers.email')}
-                     </Text>
-                   </Box>
-                   <Box flex={1.5}>
-                     <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                       {t('admin.filters.bio')}
-                     </Text>
-                   </Box>
-                   <Box flex={1.5}>
-                     <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                       {t('admin.filters.productivity')}
-                     </Text>
-                   </Box>
-                 </HStack>
-
-                 {/* Table Rows - Hardcoded + Dynamically Assigned */}
-                 <VStack space="xs">
-                   {/* Hardcoded Row: Mandla Zwane */}
-                   <HStack {...(AssignUsersStyles.tableRowHStack as ViewProps)}>
+                   {/* Table Header */}
+                   <HStack {...(AssignUsersStyles.tableHeaderHStack as ViewProps)}>
                      <Box flex={2}>
-                       <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                         <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                           <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>MZ</AvatarFallbackText>
-                         </Avatar>
-                         <VStack space="xs">
-                           <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                             Mandla Zwane
-                           </Text>
-                           <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                             PAR-001
-                           </Text>
-                         </VStack>
-                       </HStack>
+                       <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
+                         {t('admin.assignUsers.participant')}
+                       </Text>
                      </Box>
                      <Box flex={2}>
-                       <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                         mandla.zwane@example.com
+                       <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
+                         {t('admin.assignUsers.email')}
                        </Text>
                      </Box>
                      <Box flex={1.5}>
-                       <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                         Youth Development
+                       <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
+                         {t('admin.filters.bio')}
                        </Text>
                      </Box>
                      <Box flex={1.5}>
-                       <Badge {...(AssignUsersStyles.productivityBadgeButton as ViewProps)} bg="$primary500">
-                         <BadgeText {...(AssignUsersStyles.productivityBadgeText as TextProps)}>
-                           High
-                         </BadgeText>
-                       </Badge>
+                       <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
+                         {t('admin.filters.productivity')}
+                       </Text>
                      </Box>
                    </HStack>
 
-                   {/* Dynamically Assigned Participants */}
-                   {assignedParticipants.map((participant, index) => {
-                     // Get initials from name
-                     const nameParts = participant.labelKey.split(' ');
-                     const initials = nameParts.length > 1
-                       ? `${nameParts[0][0]}${nameParts[1][0]}`
-                       : nameParts[0].substring(0, 2).toUpperCase();
+                   {/* Table Rows - Assigned Participants */}
+                   <VStack space="xs">
+                     {assignedParticipants.map((participant, index) => {
+                       // Get initials from name
+                       const nameParts = (participant.labelKey || '').split(' ');
+                       const initials = nameParts.length > 1
+                         ? `${nameParts[0][0]}${nameParts[1][0]}`
+                         : nameParts[0]?.substring(0, 2).toUpperCase() || '';
 
-                     // Determine productivity badge color
-                     const productivityColor = 
-                       participant.productivity?.toLowerCase() === 'high' ? '$primary500' :
-                       participant.productivity?.toLowerCase() === 'medium' ? '$textSecondary' :
-                       '$white';
+                       // Determine productivity badge color
+                       const productivityColor = 
+                         participant.productivity?.toLowerCase() === 'high' ? '$primary500' :
+                         participant.productivity?.toLowerCase() === 'medium' ? '$textSecondary' :
+                         '$white';
 
-                     return (
-                       <HStack
-                         key={`${participant.value}-${index}`}
-                         {...(AssignUsersStyles.tableRowHStack as ViewProps)}
-                         borderBottomWidth={index === assignedParticipants.length - 1 ? 0 : 1}
-                       >
-                         <Box flex={2}>
-                           <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                             <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                               <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>{initials}</AvatarFallbackText>
-                             </Avatar>
-                             <VStack space="xs">
-                               <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                                 {participant.labelKey}
-                               </Text>
-                               <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                                 {participant.participantId}
-                               </Text>
-                             </VStack>
-                           </HStack>
-                         </Box>
-                         <Box flex={2}>
-                           <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                             {participant.email}
-                           </Text>
-                         </Box>
-                         <Box flex={1.5}>
-                           <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                             {participant.bio}
-                           </Text>
-                         </Box>
-                         <Box flex={1.5}>
-                           <Badge
-                             {...(AssignUsersStyles.productivityBadgeButton as ViewProps)}
-                             bg={productivityColor}
-                           >
-                             <BadgeText {...(AssignUsersStyles.productivityBadgeText as TextProps)}>
-                               {participant.productivity}
-                             </BadgeText>
-                             
-                           </Badge>
-                         </Box>
-                       </HStack>
-                     );
-                   })}
+                       return (
+                         <HStack
+                           key={`${participant.value}-${index}`}
+                           {...(AssignUsersStyles.tableRowHStack as ViewProps)}
+                           borderBottomWidth={index === assignedParticipants.length - 1 ? 0 : 1}
+                         >
+                           <Box flex={2}>
+                             <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
+                               <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
+                                 <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>{initials}</AvatarFallbackText>
+                               </Avatar>
+                               <VStack space="xs">
+                                 <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
+                                   {participant.labelKey || ''}
+                                 </Text>
+                                 {participant.participantId && (
+                                   <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
+                                     {participant.participantId}
+                                   </Text>
+                                 )}
+                               </VStack>
+                             </HStack>
+                           </Box>
+                           <Box flex={2}>
+                             <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+                               {participant.email || ''}
+                             </Text>
+                           </Box>
+                           <Box flex={1.5}>
+                             <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+                               {participant.bio || ''}
+                             </Text>
+                           </Box>
+                           <Box flex={1.5}>
+                             {participant.productivity && (
+                               <Badge
+                                 {...(AssignUsersStyles.productivityBadgeButton as ViewProps)}
+                                 bg={productivityColor}
+                               >
+                                 <BadgeText {...(AssignUsersStyles.productivityBadgeText as TextProps)}>
+                                   {participant.productivity}
+                                 </BadgeText>
+                               </Badge>
+                             )}
+                           </Box>
+                         </HStack>
+                       );
+                     })}
+                   </VStack>
                  </VStack>
-               </VStack>
-             </Card>
+               </Card>
+             )}
            </>
          )}
        </>

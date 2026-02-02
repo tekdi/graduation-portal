@@ -21,7 +21,7 @@ import FilterButton from '@components/Filter';
 import { AssignUsersStyles } from './Styles';
 import type { TextProps, ViewProps } from 'react-native';
 import { useLanguage } from '@contexts/LanguageContext';
-import { selectedLCList } from '@constants/USER_MANAGEMENT_FILTERS';
+import { selectedLCList } from '@constants/ASSIGN_USERS_FILTERS';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
