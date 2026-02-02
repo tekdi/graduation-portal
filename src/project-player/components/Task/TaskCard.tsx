@@ -51,7 +51,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     useProjectContext();
   const { deleteTask } = useProjectContext();
   // handleOpenForm
-  const {  handleStatusChange, handleAddToPlan } =
+  const { handleStatusChange, handleAddToPlan } =
     useTaskActions();
   const { isWeb, isMobile } = usePlatform();
   const { t } = useLanguage();
@@ -80,7 +80,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
-    const uiConfig = useMemo(
+  const uiConfig = useMemo(
     () => ({
       showAsCard: isChildOfProject,
       showAsInline: !isChildOfProject || isPreview,
@@ -188,7 +188,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Simple status circle
     const circleSize = 20;
-    const checkSize = 12;
+    const checkSize = 22;
 
     // Status Circle Logic
     const isOptional = task?.isDeletable;
@@ -202,6 +202,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (isOnboardingTask) {
       if (isOptional && task?.isDeletable) {
         // Show tick when files are uploaded (check attachments array)
+        const hasUploadedFiles = task.attachments && task.attachments.length > 0;
+        const showTick = hasUploadedFiles;
+        circleBorderColor = showTick ? '$primary500' : '$textMuted';
+        circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
+        checkColor = theme.tokens.colors.backgroundPrimary.light;
+        showCheck = showTick;
+      } else {
+        // Mandatory onboarding tasks - show tick when files are uploaded
         const hasUploadedFiles = task.attachments && task.attachments.length > 0;
         const showTick = hasUploadedFiles;
         circleBorderColor = showTick ? '$primary500' : '$textMuted';
