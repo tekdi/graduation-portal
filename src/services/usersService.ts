@@ -5,6 +5,7 @@ import type {
   RolesListParams,
   RolesListResponse,
   ProvinceEntity,
+  SiteEntity,
   EntityTypesListResponse,
 } from '@app-types/Users';
 import api from './api';
@@ -187,6 +188,55 @@ export const getProvincesByEntityType = async (
       message: string;
       status: number;
       result: ProvinceEntity[];
+    }>(endpoint);
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Get sites list by province ID - Dynamic site filter from API
+ * Fetches sites for a specific province using subEntityList endpoint
+ * 
+ * @param provinceId - Province entity ID (e.g., "698087719b5a2800143d8c11")
+ * @param params - Optional pagination parameters
+ * @returns A promise resolving to the sites response from the API
+ */
+export const getSitesByProvince = async (
+  provinceId: string,
+  params?: { page?: number; limit?: number }
+): Promise<{
+  message: string;
+  status: number;
+  result: {
+    data: SiteEntity[];
+    count?: number;
+    total?: number;
+  };
+}> => {
+  try {
+    const { page = 1, limit = 100 } = params || {};
+    
+    const queryParams = new URLSearchParams({
+      type: 'site',
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${provinceId}?${queryParams.toString()}`;
+    
+    // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
+    const response = await api.get<{
+      message: string;
+      status: number;
+      result: {
+        data: SiteEntity[];
+        count?: number;
+        total?: number;
+      };
     }>(endpoint);
 
     return response.data;
