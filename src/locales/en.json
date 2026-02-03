@@ -144,7 +144,9 @@
     "selectedFiles": "Selected Files",
     "untitledFile": "Untitled File",
     "unknownSize": "Unknown size",
-    "enrolledParticiapantSucess": "Participant Enrolled Successfully!"
+    "enrolledParticiapantSucess": "Participant Enrolled Successfully!",
+    "socialProtectionPreviewInfo": "Please review all Social Protection tasks. Tasks requiring evidence are pre-selected. Optional tasks can be added or removed based on participant needs.",
+    "important": "Important"
   },
   "navigation": {
     "menu": "Menu",

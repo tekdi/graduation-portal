@@ -63,6 +63,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const [isAddedToPlan, setIsAddedToPlan] = useState(
     Boolean(!task?.isDeletable),
   );
+  const [isRejected, setIsRejected] = useState(false);
   const participantId = route.params?.id;
   // Modal state management (from Incoming)
   type ModalType = 'edit' | 'delete' | null;
@@ -187,7 +188,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Simple status circle
     const circleSize = 20;
-    const checkSize = 22;
+    const checkSize = 28;
 
     // Status Circle Logic
     const isOptional = task?.isDeletable;
@@ -218,14 +219,30 @@ const TaskCard: React.FC<TaskCardProps> = ({
       }
     } else if (isChildOfProject) {
       if (isOptional) {
-        if (isAddedToPlan) {
-          // Added to Plan: Outlined green circle with green check (like mandatory tasks style)
+        // Preview mode: Show orange circle initially, green with tick when added, red with X when rejected
+        if (isPreview) {
+          if (isAddedToPlan) {
+            circleBorderColor = '$success500';
+            circleBg = '$success500';
+            checkColor = theme.tokens.colors.backgroundPrimary.light;
+            showCheck = true;
+          } else if (isRejected) {
+            // Rejected: Just show red X icon, no circle
+            showCheck = true;
+          } else {
+            // Initial state - orange/warning circle
+            circleBorderColor = '$warning500';
+            circleBg = '$backgroundPrimary.light';
+            showCheck = false;
+          }
+        } else if (isAddedToPlan) {
+          // Edit mode: Added to Plan - green outlined circle with green check
           circleBorderColor = '$success500';
-          circleBg = '$backgroundPrimary.light'; // White/transparent bg
-          checkColor = theme.tokens.colors.success500; // Green check
+          circleBg = '$backgroundPrimary.light';
+          checkColor = theme.tokens.colors.success500;
           showCheck = true;
         } else {
-          circleBorderColor = '$textMuted'; // Empty gray circle
+          circleBorderColor = '$textMuted';
           showCheck = false;
         }
       } else {
@@ -251,14 +268,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
         height={circleSize}
         {...taskCardStyles.statusCircle}
         alignSelf="center"
-        borderColor={circleBorderColor}
-        bg={circleBg}
+        borderColor={isPreview && isRejected ? 'transparent' : circleBorderColor}
+        borderWidth={isPreview && isRejected ? 0 : taskCardStyles.statusCircle.borderWidth}
+        bg={isPreview && isRejected ? 'transparent' : circleBg}
       >
         {showCheck && (
           <LucideIcon
-            name="Check"
+            name={isPreview && isRejected ? "X" : "Check"}
             size={checkSize}
-            color={checkColor}
+            color={isPreview && isRejected ? theme.tokens.colors.error500 : checkColor}
             strokeWidth={3}
           />
         )}
@@ -282,23 +300,25 @@ const TaskCard: React.FC<TaskCardProps> = ({
     // Task badge rendering (Evidence Required / Optional)
     // In Edit mode, hide Optional badges - only show 'required' type badges
     const isEditModeForBadge = isEdit && !isPreview;
+    // In preview mode, show badge for deletable tasks even if metaInformation is not set
     const shouldShowBadge =
-      task.metaInformation?.badgeText &&
-      (!isEditModeForBadge ||
-        task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED);
+      (task.metaInformation?.badgeText &&
+        (!isEditModeForBadge ||
+          task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED)) ||
+      (isPreview && task?.isDeletable);
 
     const taskBadge = shouldShowBadge ? (
       <Box
         bg={
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
-            : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
+            : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
             ? '$optionalBadgeBg'
             : '$backgroundLight100'
         }
-        paddingHorizontal="$2"
+        paddingHorizontal="$3"
         paddingVertical="$1"
-        borderRadius="$md"
+        borderRadius="$full"
         alignSelf="center"
       >
         <Text
@@ -307,12 +327,12 @@ const TaskCard: React.FC<TaskCardProps> = ({
           color={
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
-              : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL
+              : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
               ? '$optionalBadgeText'
               : '$textMuted'
           }
         >
-          {task.metaInformation?.badgeText}
+          {task.metaInformation?.badgeText || (isPreview && task?.isDeletable ? 'Optional' : '')}
         </Text>
       </Box>
     ) : null;
@@ -448,44 +468,65 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderActionButton = () => {
     if (!uiConfig.showActionButton) return null;
 
-    // In Preview mode only: If task is optional, show "Add to Plan" / "Remove" button
+    // In Preview mode only: If task is optional, show tick/cross buttons
     if (isPreview && task?.isDeletable) {
-      if (isAddedToPlan) {
-        return (
-          <Button
-            variant="solid"
-            size={isWeb ? 'sm' : 'xs'}
-            bg="$error500"
-            borderColor="$error500"
+      return (
+        <HStack space="xs" alignItems="center">
+          <Pressable
             onPress={() => {
-              updateAddToPlan(false);
-            }}
-            sx={{
-              ':hover': { bg: '$error600' },
+              updateAddToPlan(true);
+              setIsRejected(false);
             }}
           >
-            <ButtonText color="$white" fontSize="$xs" fontWeight="$medium">
-              {t('projectPlayer.remove')}
-            </ButtonText>
-          </Button>
-        );
-      }
-      return (
-        <Button
-          variant="outline"
-          size={isWeb ? 'sm' : 'xs'}
-          borderColor="$success500"
-          onPress={() => {
-            updateAddToPlan(true);
-          }}
-          sx={{
-            ':hover': { bg: '$success50' },
-          }}
-        >
-          <ButtonText color="$success500" fontSize="$xs" fontWeight="$medium">
-            {t('projectPlayer.addToPlan')}
-          </ButtonText>
-        </Button>
+            {(state: any) => {
+              const isHovered = state?.hovered || state?.pressed || false;
+              return (
+                <Box
+                  bg={isHovered ? '$success100' : 'transparent'}
+                  padding="$1.5"
+                  borderRadius="$md"
+                  borderWidth={1}
+                  borderColor="$success500"
+                  $web-cursor="pointer"
+                >
+                  <LucideIcon
+                    name="Check"
+                    size={22}
+                    color={theme.tokens.colors.success500}
+                    strokeWidth={3}
+                  />
+                </Box>
+              );
+            }}
+          </Pressable>
+          <Pressable
+            onPress={() => {
+              updateAddToPlan(false);
+              setIsRejected(true);
+            }}
+          >
+            {(state: any) => {
+              const isHovered = state?.hovered || state?.pressed || false;
+              return (
+                <Box
+                  bg={isHovered ? '$error100' : 'transparent'}
+                  padding="$1.5"
+                  borderRadius="$md"
+                  borderWidth={1}
+                  borderColor="$error500"
+                  $web-cursor="pointer"
+                >
+                  <LucideIcon
+                    name="X"
+                    size={22}
+                    color={theme.tokens.colors.error500}
+                    strokeWidth={3}
+                  />
+                </Box>
+              );
+            }}
+          </Pressable>
+        </HStack>
       );
     }
 
@@ -715,16 +756,24 @@ const TaskCard: React.FC<TaskCardProps> = ({
         bg={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBg'
-            : isPreview && isAddedToPlan
-            ? '$addedToPlanBg'
-            : taskCardStyles.childCard?.bg
+            : isPreview && task?.isDeletable
+              ? isAddedToPlan
+                ? '$addedToPlanBg'
+                : isRejected
+                  ? '$error50'
+                  : '$warning50'
+              : taskCardStyles.childCard?.bg
         }
         borderColor={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBorder'
-            : isPreview && isAddedToPlan
-            ? '$addedToPlanBorder'
-            : taskCardStyles.childCard?.borderColor
+            : isPreview && task?.isDeletable
+              ? isAddedToPlan
+                ? '$addedToPlanBorder'
+                : isRejected
+                  ? '$error200'
+                  : '$warning200'
+              : taskCardStyles.childCard?.borderColor
         }
       >
         <Box
@@ -737,26 +786,24 @@ const TaskCard: React.FC<TaskCardProps> = ({
             flexDirection={isMobile ? 'column' : 'row'}
           >
             {isMobile ? (
-              <VStack space="xs" width="100%">
-                {/* Row 1: Checkbox + Title + Edit/Delete icons */}
-                <HStack alignItems="flex-start" space="xs">
-                  <Box flexShrink={0} mt="$1">
-                    {renderStatusIndicator()}
-                  </Box>
-                  <Box flex={1}>
-                    {renderTaskInfo()}
-                  </Box>
-                  {renderCustomTaskActions({
-                    isCustomTask: task.isCustomTask || false,
-                    onEdit: openEditModal,
-                    onDelete: openDeleteModal,
-                  })}
-                </HStack>
-                {/* Row 2: Upload button full width */}
-                <Box width="100%">
-                  {renderActionButton()}
+              <HStack alignItems="flex-start" space="xs" width="100%">
+                <Box flexShrink={0} mt="$1">
+                  {renderStatusIndicator()}
                 </Box>
-              </VStack>
+                <Box flex={1}>
+                  {renderTaskInfo()}
+                </Box>
+                <Box flexShrink={0}>
+                  <HStack space="xs" alignItems="center">
+                    {renderActionButton()}
+                    {renderCustomTaskActions({
+                      isCustomTask: task.isCustomTask || false,
+                      onEdit: openEditModal,
+                      onDelete: openDeleteModal,
+                    })}
+                  </HStack>
+                </Box>
+              </HStack>
             ) : (
               <>
                 <Box flexShrink={0} mt="$1">
@@ -787,9 +834,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
       <HStack
         {...taskCardStyles.previewInlineContainer}
         padding={isWeb ? '$4' : '$0'}
-        bg={isAddedToPlan ? '$addedToPlanBg' : 'transparent'}
-        borderColor={isAddedToPlan ? '$addedToPlanBorder' : 'transparent'}
-        borderWidth={isAddedToPlan ? 1 : 0}
+        bg={
+          isAddedToPlan
+            ? '$addedToPlanBg'
+            : isRejected
+              ? '$error50'
+              : '$warning50'
+        }
+        borderColor={
+          isAddedToPlan
+            ? '$addedToPlanBorder'
+            : isRejected
+              ? '$error200'
+              : '$warning200'
+        }
+        borderWidth={1}
         borderRadius="$lg"
         marginBottom="$2"
         alignItems="flex-start"
