@@ -137,7 +137,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         return;
       }
       const solutionDetails = await getSolutionDetails(projectTemplateId, task._id);
-
+      
       if(solutionDetails.data._id) {
         // @ts-ignore Navigate to observation screen - task will be marked as completed on return
         navigation.navigate('observation', {
@@ -278,11 +278,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-          | 'line-through'
-          | 'none',
-        opacity: isCompleted ? 0.6 : 1,
-      }
+          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+            | 'line-through'
+            | 'none',
+          opacity: isCompleted ? 0.6 : 1,
+        }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -303,8 +303,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-              ? '$optionalBadgeBg'
-              : '$backgroundLight100'
+            ? '$optionalBadgeBg'
+            : '$backgroundLight100'
         }
         paddingHorizontal="$3"
         paddingVertical="$1"
@@ -318,8 +318,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-                ? '$optionalBadgeText'
-                : '$textMuted'
+              ? '$optionalBadgeText'
+              : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText || (isPreview && task?.isDeletable ? 'Optional' : '')}

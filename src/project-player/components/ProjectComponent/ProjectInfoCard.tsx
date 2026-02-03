@@ -22,27 +22,30 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const totalTasks = project.tasks?.length || 0;
 
   // Check if any task is a project type (has children)
-const hasChildren =
-  !!project?.children?.length ||
-  project?.tasks?.some(task => task?.children?.length);
+  const hasChildren =
+    !!project?.children?.length ||
+    project?.tasks?.some(task => task?.children?.length);
   // Count total pillars (project type tasks)
   const totalPillars = project?.children?.length || 0;
 
   // Count total child tasks across all pillars
   const totalChildTasks =
-    project.tasks?.reduce((acc, task) => {
-      if (task.type === 'project' && task.children) {
-        return acc + task.children.length;
-      }
-      return acc;
+    project?.children?.reduce((acc, pillar) => {
+      return acc + (pillar.children?.length || pillar.tasks?.length || 0);
     }, 0) || 0;
 
   const isPreview = mode === PLAYER_MODE.PREVIEW;
 
   return (
-    <Box {...projectInfoCardStyles.container}>
-      <HStack {...projectInfoCardStyles.header} flexDirection={isMobile ? 'column' : 'row'}
-        alignItems={isMobile ? 'flex-start' : 'center'}
+    <Box
+      {...projectInfoCardStyles.container}
+      borderWidth={hasChildren && isPreview ? 1 : 0}
+      borderColor={hasChildren && isPreview ? '$primary500' : 'transparent'}
+      borderRadius={hasChildren && isPreview ? '$2xl' : 0}
+      marginBottom={hasChildren && isPreview ? '$4' : 0}
+    >
+      <HStack {...projectInfoCardStyles.header}
+        alignItems="flex-start"
         justifyContent="space-between"
         gap="$3">
 
@@ -51,8 +54,7 @@ const hasChildren =
         {/* ✅ Title + Description Section */}
         <VStack
           {...projectInfoCardStyles.leftSection}
-          width="100%"
-          order={isMobile ? 2 : 1} // comes below badge on mobile
+          flex={1}
         >
           {!hasChildren &&
             (ONBOARDING_PROJECT_TITLES.includes(project?.title || '') ||
