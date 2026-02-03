@@ -91,6 +91,16 @@ const ProjectComponent: React.FC = () => {
         }>;
       }> = [];
 
+      const excludedTaskIds = Array.from(
+        new Set(
+          getExcludedTaskIds(
+            [
+              ...(projectData.children || []),
+            ],
+            new Set(addedToPlanTaskIds),
+          ),
+        ),
+      );
       // Process children (templates/pillars)
       if (projectData.children && projectData.children.length > 0) {
         projectData.children.forEach((pillar: any) => {
@@ -101,19 +111,27 @@ const ProjectComponent: React.FC = () => {
             .map((task: any) => ({
               name: task.name,
               description: task.description || '',
-              type: 'simple', // Map 'simple' to 'single' as per API requirement
+              type: 'simple', 
             }));
 
           // Determine if this is a task or project based on type
           const isProject = pillar.type === 'project';
+          const isSocialProtectionPillar = pillar.name === 'Social Protection';
 
-          templates.push({
+          const templatePayload: any = {
             templateId: pillar.templateId,
             ...(isProject
               ? { targetProjectName: pillar.name }
               : { targetTaskName: pillar.name }),
             customTasks,
-          });
+          };
+
+          // ONLY attach excludedTaskIds to Social Protection pillar
+          if (isSocialProtectionPillar) {
+            templatePayload.excludedTaskIds = excludedTaskIds;
+          }
+
+          templates.push(templatePayload);
         });
       }
 
@@ -126,23 +144,11 @@ const ProjectComponent: React.FC = () => {
         return;
       }
 
-      const excludedTaskIds = Array.from(
-        new Set(
-          getExcludedTaskIds(
-            [
-              ...(projectData.children || []),
-            ],
-            new Set(addedToPlanTaskIds),
-          ),
-        ),
-      );
-
       const reqBody = {
         templates,
         userId,
         entityId: config.profileInfo?.entityId || userId, // Fallback to userId if entityId not available
         projectConfig: { referenceFrom: process.env.GLOBAL_LC_PROGRAM_ID },
-        excludedTaskIds,
       };
 
       // Call API to submit intervention plan

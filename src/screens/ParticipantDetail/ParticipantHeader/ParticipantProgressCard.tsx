@@ -72,7 +72,7 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
           )}
         </Text>
         <Text {...participantHeaderStyles.progressPercentage}>
-          {updatedProgress !== undefined ? updatedProgress : progress}%
+          {updatedProgress !== progress ? updatedProgress : progress}%
         </Text>
       </HStack>
       {/* Content: Conditionally render based on status */}
@@ -98,9 +98,9 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
             </Progress>
           </Box>
         </VStack>
-        {updatedProgress !== undefined ? (
+        {updatedProgress !== progress ? (
           <Text {...participantHeaderStyles.progressCardTitle}>
-         {t('participantDetail.header.previous')}: {graduationProgress}%
+         {t('participantDetail.header.previous')}: {progress}%
         </Text>
         ): null}
         </>
