@@ -107,7 +107,7 @@ const AssignUsersScreen = () => {
  };
 
 
- // Handler for LC SelectionCard filter changes
+ // Handler for LC UserAvatarCard filter changes
  const handleLcFilterChange = (values: Record<string, any>) => {
    setLcFilterValues(values);
    console.log('LC filter values changed:', values);
