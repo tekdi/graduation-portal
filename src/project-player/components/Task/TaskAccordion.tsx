@@ -117,10 +117,26 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
                   {task.name}
                 </Text>
               </HStack>
-              {/* Pillar progress percentage on right */}
-              <Text {...taskAccordionStyles.progressText}>
-                {progressPercent}%
-              </Text>
+              {/* Pillar progress percentage and bar on right */}
+              <HStack space="md" alignItems="center" minWidth={150}>
+                <Text {...taskAccordionStyles.progressText} minWidth={40}>
+                  {progressPercent}%
+                </Text>
+                <Box
+                  height={8}
+                  flex={1}
+                  bg="$backgroundLight200"
+                  borderRadius="$full"
+                  overflow="hidden"
+                >
+                  <Box
+                    height="$full"
+                    width={`${progressPercent}%`}
+                    bg="$progressBarFillColor"
+                    borderRadius="$full"
+                  />
+                </Box>
+              </HStack>
             </HStack>
           </Box>
 

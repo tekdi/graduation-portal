@@ -137,7 +137,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         return;
       }
       const solutionDetails = await getSolutionDetails(projectTemplateId, task._id);
-      
+
       if(solutionDetails.data._id) {
         // @ts-ignore Navigate to observation screen - task will be marked as completed on return
         navigation.navigate('observation', {
@@ -200,23 +200,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Onboarding: empty circle initially, brown tick only when document uploaded / task completed
     if (isOnboardingTask) {
-      if (isOptional && task?.isDeletable) {
-        // Show tick when files are uploaded (check attachments array)
-        const hasUploadedFiles = task.attachments && task.attachments.length > 0;
-        const showTick = hasUploadedFiles;
-        circleBorderColor = showTick ? '$primary500' : '$textMuted';
-        circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
-        checkColor = theme.tokens.colors.backgroundPrimary.light;
-        showCheck = showTick;
-      } else {
-        // Mandatory onboarding tasks - show tick when files are uploaded
-        const hasUploadedFiles = task.attachments && task.attachments.length > 0;
-        const showTick = hasUploadedFiles;
-        circleBorderColor = showTick ? '$primary500' : '$textMuted';
-        circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
-        checkColor = theme.tokens.colors.backgroundPrimary.light;
-        showCheck = showTick;
-      }
+      // Both optional and mandatory tasks - show tick when files are uploaded
+      const hasUploadedFiles = task.attachments && task.attachments.length > 0;
+      const showTick = hasUploadedFiles;
+      circleBorderColor = showTick ? '$primary500' : '$textMuted';
+      circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
+      checkColor = theme.tokens.colors.backgroundPrimary.light;
+      showCheck = showTick;
     } else if (isChildOfProject) {
       if (isOptional) {
         // Preview mode: Show orange circle initially, green with tick when added, red with X when rejected
@@ -288,11 +278,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-            | 'line-through'
-            | 'none',
-          opacity: isCompleted ? 0.6 : 1,
-        }
+        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+          | 'line-through'
+          | 'none',
+        opacity: isCompleted ? 0.6 : 1,
+      }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -313,8 +303,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-            ? '$optionalBadgeBg'
-            : '$backgroundLight100'
+              ? '$optionalBadgeBg'
+              : '$backgroundLight100'
         }
         paddingHorizontal="$3"
         paddingVertical="$1"
@@ -328,8 +318,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-              ? '$optionalBadgeText'
-              : '$textMuted'
+                ? '$optionalBadgeText'
+                : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText || (isPreview && task?.isDeletable ? 'Optional' : '')}
@@ -859,15 +849,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isAddedToPlan
             ? '$addedToPlanBg'
             : isRejected
-              ? '$error50'
-              : '$warning50'
+            ? '$error50'
+            : '$warning50'
         }
         borderColor={
           isAddedToPlan
             ? '$addedToPlanBorder'
             : isRejected
-              ? '$error200'
-              : '$warning200'
+            ? '$error200'
+            : '$warning200'
         }
         borderWidth={1}
         borderRadius="$lg"
