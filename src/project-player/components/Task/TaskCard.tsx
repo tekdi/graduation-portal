@@ -786,24 +786,45 @@ const TaskCard: React.FC<TaskCardProps> = ({
             flexDirection={isMobile ? 'column' : 'row'}
           >
             {isMobile ? (
-              <HStack alignItems="flex-start" space="xs" width="100%">
-                <Box flexShrink={0} mt="$1">
-                  {renderStatusIndicator()}
-                </Box>
-                <Box flex={1}>
-                  {renderTaskInfo()}
-                </Box>
-                <Box flexShrink={0}>
-                  <HStack space="xs" alignItems="center">
-                    {renderActionButton()}
+              isPreview ? (
+                <HStack alignItems="flex-start" space="xs" width="100%">
+                  <Box flexShrink={0} mt="$1">
+                    {renderStatusIndicator()}
+                  </Box>
+                  <Box flex={1}>
+                    {renderTaskInfo()}
+                  </Box>
+                  <Box flexShrink={0}>
+                    <HStack space="xs" alignItems="center">
+                      {renderActionButton()}
+                      {renderCustomTaskActions({
+                        isCustomTask: task.isCustomTask || false,
+                        onEdit: openEditModal,
+                        onDelete: openDeleteModal,
+                      })}
+                    </HStack>
+                  </Box>
+                </HStack>
+              ) : (
+                <VStack space="xs" width="100%">
+                  <HStack alignItems="flex-start" space="xs">
+                    <Box flexShrink={0} mt="$1">
+                      {renderStatusIndicator()}
+                    </Box>
+                    <Box flex={1}>
+                      {renderTaskInfo()}
+                    </Box>
                     {renderCustomTaskActions({
                       isCustomTask: task.isCustomTask || false,
                       onEdit: openEditModal,
                       onDelete: openDeleteModal,
                     })}
                   </HStack>
-                </Box>
-              </HStack>
+                  <Box width="100%">
+                    {renderActionButton()}
+                  </Box>
+                </VStack>
+              )
             ) : (
               <>
                 <Box flexShrink={0} mt="$1">
