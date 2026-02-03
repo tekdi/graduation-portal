@@ -131,6 +131,7 @@ export interface ProjectPlayerData {
   categoryIds?: string[]; // Array of category IDs (pillar IDs without categories + selected subcategory IDs)
   selectedPathway?: string;
   pillarCategoryRelation?: any;
+  province?:string;
 }
 
 export interface ProjectPlayerProps {
