@@ -12,9 +12,9 @@ import {
  selectedLCList,
  participantFilterOptions,
  participantList,
-} from '@constants/USER_MANAGEMENT_FILTERS';
-import { supervisorFilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
-import SelectionCard from '@components/SelectionCard';
+ useSupervisorFilterOptions,
+} from '@constants/ASSIGN_USERS_FILTERS';
+import UserAvatarCard from '@components/UserAvatarCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
 
@@ -27,10 +27,33 @@ const AssignUsersScreen = () => {
 
  const [activeTab, setActiveTab] = useState<AssignTab>('LC_TO_SUPERVISOR');
  const [selectedLc, setSelectedLc] = useState<any>(null);
- // State to store filter values for each SelectionCard
+ // State to store filter values for each UserAvatarCard
  const [supervisorFilterValues, setSupervisorFilterValues] = useState<
    Record<string, any>
  >({});
+ 
+ // Get dynamic supervisor filter options (supervisor disabled until province is selected)
+ const { filters: supervisorFilterOptions, supervisors: supervisorsData } = useSupervisorFilterOptions(supervisorFilterValues);
+ 
+ // Find the selected supervisor object from supervisorsData
+ // Match by id (number) or _id (string) or email, converting to string for comparison
+ const selectedSupervisor = supervisorsData.find(
+   (supervisor: any) => {
+     const supervisorId = String(supervisor.id || supervisor._id || supervisor.email || '');
+     const selectedId = String(supervisorFilterValues.selectSupervisor || '');
+     return supervisorId === selectedId;
+   }
+ );
+ 
+ // Get province name from selected province ID for location display
+ const provinceFilter = supervisorFilterOptions.find((filter: any) => filter.attr === 'filterByProvince');
+ const selectedProvinceOption = provinceFilter?.data?.find((option: any) => {
+   const optionValue = typeof option === 'string' ? option : option.value;
+   return optionValue === supervisorFilterValues.filterByProvince;
+ });
+ const selectedProvinceName = typeof selectedProvinceOption === 'string' 
+   ? selectedProvinceOption 
+   : selectedProvinceOption?.label || '';
  const [lcFilterValues, setLcFilterValues] = useState<Record<string, any>>({});
  // State to track assigned LCs
  const [assignedLCs, setAssignedLCs] = useState<any[]>([]);
@@ -43,6 +66,14 @@ const AssignUsersScreen = () => {
 
  // Handler for supervisor and LC filter changes (combined in Step 1)
  const handleSupervisorFilterChange = (values: Record<string, any>) => {
+   // Clear supervisor selection when province changes
+   if (values.filterByProvince !== supervisorFilterValues.filterByProvince) {
+     values.selectSupervisor = undefined;
+     setAssignedLCs([]);
+     setAssignedParticipants([]);
+     setSelectedLc(null);
+   }
+   
    // Reset assigned LCs when supervisor changes
    if (values.selectSupervisor !== supervisorFilterValues.selectSupervisor) {
      setAssignedLCs([]);
@@ -73,7 +104,6 @@ const AssignUsersScreen = () => {
    }
    
    setSupervisorFilterValues(values);
-   console.log('Supervisor filter values changed:', values);
  };
 
 
@@ -163,7 +193,6 @@ const AssignUsersScreen = () => {
  // Use filter values to perform actions when filters change
  useEffect(() => {
    if (Object.keys(supervisorFilterValues).length > 0) {
-     console.log('Current supervisor filter values:', supervisorFilterValues);
      // Add your filtering/fetching logic here for supervisors
    }
  }, [supervisorFilterValues]);
@@ -219,12 +248,16 @@ const AssignUsersScreen = () => {
 
      {activeTab === 'LC_TO_SUPERVISOR' && (
        <>
-         <SelectionCard
+         <UserAvatarCard
            title="admin.assignUsers.step1SelectSupervisor"
            description="admin.assignUsers.filterByProvince"
            filterOptions={supervisorFilterOptions}
            onChange={handleSupervisorFilterChange}
-           selectedValues={supervisorFilterValues}
+           selectedValues={{
+             ...supervisorFilterValues,
+             selectedSupervisorData: selectedSupervisor, // Pass full supervisor object
+             selectedProvinceName: selectedProvinceName, // Pass province name for location
+           }}
            showSelectedCard={!!supervisorFilterValues.selectSupervisor}
            showLcList={false}
          />
@@ -232,7 +265,7 @@ const AssignUsersScreen = () => {
 
         {supervisorFilterValues.selectSupervisor && (
           <>
-            <SelectionCard
+            <UserAvatarCard
               title="admin.assignUsers.step2AssignLinkageChampions"
               description="admin.assignUsers.filterByGeography"
               filterOptions={AssignLCFilterOptions}
@@ -384,7 +417,7 @@ const AssignUsersScreen = () => {
 
      {activeTab === 'PARTICIPANT_TO_LC' && (
        <>
-         <SelectionCard
+         <UserAvatarCard
            title="admin.assignUsers.step1SelectSupervisorAndLC"
            description="admin.assignUsers.chooseSupervisor"
            filterOptions={participantLCFilterOptions.map(filter => {
@@ -416,7 +449,7 @@ const AssignUsersScreen = () => {
 
          {selectedLc && (
            <>
-             <SelectionCard
+             <UserAvatarCard
                title="admin.assignUsers.step2AssignParticipants"
                description="admin.assignUsers.filterAndSelectParticipants"
                filterOptions={AssignParticipantFilterOptions}

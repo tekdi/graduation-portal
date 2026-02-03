@@ -5,6 +5,7 @@ import type {
   RolesListParams,
   RolesListResponse,
   ProvinceEntity,
+  SiteEntity,
   EntityTypesListResponse,
 } from '@app-types/Users';
 import api from './api';
@@ -54,21 +55,26 @@ export const getUsersList = async (params: UserSearchParams): Promise<UserSearch
       queryParams.append('search', search);
     }
 
-    // Add optional filter parameters
+    // Add optional filter parameters (except province - it goes in body)
     if (role) {
       queryParams.append('role', role);
     }
     if (status) {
       queryParams.append('status', status);
     }
-    if (province) {
-      queryParams.append('province', province);
-    }
     if (site) {
       queryParams.append('site', site);
     }
 
     const endpoint = `${API_ENDPOINTS.USERS_LIST}?${queryParams.toString()}`;
+    
+    // Build request body - province goes in meta.province
+    const requestBody: any = {};
+    if (province) {
+      requestBody.meta = {
+        province: province, // Province ID (e.g., "6952163ae83c1c00147132a8")
+      };
+    }
     
     // Log the complete API URL with query parameters (for debugging)
     console.log('API URL:', endpoint);
@@ -77,9 +83,10 @@ export const getUsersList = async (params: UserSearchParams): Promise<UserSearch
       paramsObj[key] = value;
     });
     console.log('Query Parameters:', paramsObj);
+    console.log('Request Body:', requestBody);
     
     // POST request to fetch users
-    const response = await api.post<UserSearchResponse>(endpoint, {});
+    const response = await api.post<UserSearchResponse>(endpoint, requestBody);
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor
@@ -189,3 +196,87 @@ export const getProvincesByEntityType = async (
     throw error;
   }
 };
+
+/**
+ * Get provinces list - Helper function that handles entity type fetching and caching
+ * Fetches provinces by first getting entity types (from cache or API), then fetching provinces
+ * This encapsulates the common pattern used across the application
+ * 
+ * @returns A promise resolving to an array of ProvinceEntity, or empty array on error
+ */
+export const getProvincesList = async (): Promise<ProvinceEntity[]> => {
+  try {
+    // First, check if entity types are in storage
+    let entityTypes = await getEntityTypesFromStorage();
+    
+    // If not in storage, fetch entity types from API
+    if (!entityTypes || !entityTypes['province']) {
+      await getEntityTypesList();
+      entityTypes = await getEntityTypesFromStorage();
+    }
+
+    // Get province entity type ID
+    const provinceEntityTypeId = entityTypes?.['province'];
+    
+    if (!provinceEntityTypeId) {
+      return [];
+    }
+
+    // Fetch provinces using the entity type ID
+    const provincesResponse = await getProvincesByEntityType(provinceEntityTypeId);
+    return provincesResponse.result || [];
+  } catch (error) {
+    console.error('Error fetching provinces:', error);
+    return [];
+  }
+};
+
+/**
+ * Get sites list by province ID - Dynamic site filter from API
+ * Fetches sites for a specific province using subEntityList endpoint
+ * 
+ * @param provinceId - Province entity ID (e.g., "698087719b5a2800143d8c11")
+ * @param params - Optional pagination parameters
+ * @returns A promise resolving to the sites response from the API
+ */
+export const getSitesByProvince = async (
+  provinceId: string,
+  params?: { page?: number; limit?: number }
+): Promise<{
+  message: string;
+  status: number;
+  result: {
+    data: SiteEntity[];
+    count?: number;
+    total?: number;
+  };
+}> => {
+  try {
+    const { page = 1, limit = 100 } = params || {};
+    
+    const queryParams = new URLSearchParams({
+      type: 'site',
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${provinceId}?${queryParams.toString()}`;
+    
+    // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
+    const response = await api.get<{
+      message: string;
+      status: number;
+      result: {
+        data: SiteEntity[];
+        count?: number;
+        total?: number;
+      };
+    }>(endpoint);
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+

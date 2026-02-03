@@ -1,10 +1,11 @@
-import React from "react";
-import { VStack, HStack, Text, Image, Input, InputField, Pressable } from "@ui";
+import React, { useCallback, useMemo } from "react";
+import { VStack, HStack, Text, Image, Input, InputField, Pressable, Box } from "@ui";
 import Select from "../ui/Inputs/Select";
 import DatePicker from "../ui/Inputs/DatePicker";
 import { filterStyles } from "./Styles";
 import filterIcon from "../../assets/images/FilterIcon.png";
 import { useLanguage } from "@contexts/LanguageContext";
+import SearchBar from "@components/SearchBar";
 
 interface FilterButtonProps {
   data: any[];
@@ -25,6 +26,42 @@ export default function FilterButton({
   const { t } = useLanguage();
   const [value, setValue] = React.useState<any>({});
   const [openDatePicker, setOpenDatePicker] = React.useState<string | null>(null);
+  const [searchKey, setSearchKey] = React.useState('');
+  const isInitialSearchRef = React.useRef(true);
+
+  // Find search field item
+  const searchItem = useMemo(() => {
+    return data.find((item: any) => item.type === 'search');
+  }, [data]);
+
+  // Handle search changes - same pattern as ParticipantsList
+  const handleSearch = useCallback((text: string) => {
+    // Search functionality can be implemented here when needed
+    setSearchKey(text);
+    // Skip initial empty search call to prevent duplicate API call on page load
+    if (isInitialSearchRef.current && (!text || text.trim() === "")) {
+      isInitialSearchRef.current = false;
+      return;
+    }
+    isInitialSearchRef.current = false;
+    
+    // Update value state to include search for filter system (only if text is not empty)
+    if (searchItem) {
+      if (!text || text.trim() === "") {
+        setValue((prev: any) => {
+          // Only update if the key actually exists to avoid unnecessary object recreation
+          if (prev[searchItem.attr] !== undefined) {
+            const updated = { ...prev };
+            delete updated[searchItem.attr];
+            return updated;
+          }
+          return prev;
+        });
+      } else {
+        setValue((prev: any) => ({ ...prev, [searchItem.attr]: text.trim() }));
+      }
+    }
+  }, [searchItem]);
 
   // Notify parent when filters change
   React.useEffect(() => {
@@ -54,7 +91,7 @@ export default function FilterButton({
     }
     
     // Default behavior: auto-select first item if no placeholder
-    if (item.type !== 'search' && item.data && item.data.length > 0) {
+    if (item.data && item.data.length > 0) {
       const firstItem = item.data[0];
       // Extract the actual value string from the first item
       if (typeof firstItem === 'string') {
@@ -72,9 +109,20 @@ export default function FilterButton({
     return '';
   };
 
+  // Track clear count to force SearchBar remount when filters are cleared
+  const [clearCount, setClearCount] = React.useState(0);
+
   const handleClearFilters = () => {
     const clearedValue = {};
     setValue(clearedValue);
+    // Clear search key
+    setSearchKey('');
+    // Reset initial search ref so that clearing and then typing works correctly
+    isInitialSearchRef.current = true;
+    // Increment clear count to force SearchBar remount with empty value
+    if (searchItem) {
+      setClearCount(prev => prev + 1);
+    }
     // Notify parent component when filters are cleared
     // onchange?.(clearedValue);
   };
@@ -102,9 +150,7 @@ export default function FilterButton({
 
   // Render a single filter item
   const renderFilterItem = (item: any) => {
-    const useSearchContainer = item.type === 'search';
-    
-    // Handle value change for input fields (text, date, search)
+    // Handle value change for input fields (text, date)
     const handleInputChange = (text: string) => {
       if (!text || text.trim() === "") {
         setValue((prev: any) => {
@@ -144,12 +190,6 @@ export default function FilterButton({
       if (item.placeholder) {
         return item.placeholder;
       }
-      if (item.type === 'search' && item.nameKey) {
-        return `${t('common.search')} ${t(item.nameKey).toLowerCase()}...`;
-      }
-      if (item.type === 'search' && item.name) {
-        return `Search ${item.name.toLowerCase()}...`;
-      }
       return '';
     };
 
@@ -178,20 +218,6 @@ export default function FilterButton({
           <Input {...filterStyles.input}>
             <InputField
               type="text"
-              placeholder={getPlaceholder()}
-              value={value?.[item.attr] || ""}
-              onChangeText={handleInputChange}
-            />
-          </Input>
-        );
-      }
-
-      // Search type field
-      if (item.type === 'search') {
-        return (
-          <Input {...filterStyles.input}>
-            <InputField
-              {...({ type: 'search' } as any)}
               placeholder={getPlaceholder()}
               value={value?.[item.attr] || ""}
               onChangeText={handleInputChange}
@@ -232,9 +258,7 @@ export default function FilterButton({
     return (
       <VStack 
         key={item.attr}
-        {...(useSearchContainer 
-          ? filterStyles.searchContainer 
-          : filterStyles.roleContainer)}
+        {...filterStyles.roleContainer}
         width="$full"
         $md-width="auto"
       >
@@ -264,9 +288,22 @@ export default function FilterButton({
         {renderRightContent()}
       </HStack>
 
-      {/* Filters Row */}
+      {/* Filters Row - Includes search bar if present */}
       <HStack {...filterStyles.filterFieldsContainer}>
-        {data.map((item: any, index: number) => renderFilterItem(item, index))}
+        {/* Search Bar - Only show if there's a search field in data, placed first */}
+        {searchItem && (
+          <Box width="$full" $md-width="20%" flex={1} $md-flex={2}>
+            <SearchBar
+              key={`search-${clearCount}`}
+              placeholder={t('admin.filters.searchPlaceholder')}
+              onSearch={handleSearch}
+              debounceMs={500}
+              defaultValue={searchKey}
+            />
+          </Box>
+        )}
+        {/* Render filter items, excluding the search item */}
+        {data.filter((item: any) => item.type !== 'search').map((item: any) => renderFilterItem(item))}
       </HStack>
     </VStack>
   );
