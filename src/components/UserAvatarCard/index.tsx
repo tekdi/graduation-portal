@@ -102,15 +102,29 @@ const SelectionCard = ({
                              '';
        
        // Extract initials from supervisor name (first letter of first name + first letter of last name)
+       // Example: "Amol Patil" -> "AP"
        const getInitials = (name: string): string => {
-         if (!name) return '';
-         const nameParts = name.trim().split(/\s+/).filter(part => part.length > 0);
-         if (nameParts.length >= 2) {
-           // First letter of first name + first letter of last name
-           return (nameParts[0][0] + nameParts[nameParts.length - 1][0]).toUpperCase();
-         } else if (nameParts.length === 1) {
+         if (!name || typeof name !== 'string') return '';
+         
+         // Split by space, get first character of each part, join and uppercase
+         // This handles names with any number of parts (e.g., "Amol Patil" -> "AP", "John Doe Smith" -> "JS")
+         const initials = name
+           .trim()
+           .split(/\s+/)
+           .filter(part => part && part.length > 0)
+           .map(part => part[0])
+           .join('')
+           .toUpperCase();
+         
+         // If we have at least 2 initials, return first and last
+         // Otherwise, return first 2 characters of the name
+         if (initials.length >= 2) {
+           return initials.length === 2 
+             ? initials 
+             : initials[0] + initials[initials.length - 1];
+         } else if (initials.length === 1) {
            // Single name - use first 2 letters
-           return nameParts[0].substring(0, 2).toUpperCase();
+           return name.trim().substring(0, 2).toUpperCase();
          }
          return '';
        };

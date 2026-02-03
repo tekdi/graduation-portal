@@ -14,7 +14,7 @@ import {
  participantList,
  useSupervisorFilterOptions,
 } from '@constants/ASSIGN_USERS_FILTERS';
-import SelectionCard from '@components/SelectionCard';
+import UserAvatarCard from '@components/UserAvatarCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
 
@@ -27,7 +27,7 @@ const AssignUsersScreen = () => {
 
  const [activeTab, setActiveTab] = useState<AssignTab>('LC_TO_SUPERVISOR');
  const [selectedLc, setSelectedLc] = useState<any>(null);
- // State to store filter values for each SelectionCard
+ // State to store filter values for each UserAvatarCard
  const [supervisorFilterValues, setSupervisorFilterValues] = useState<
    Record<string, any>
  >({});
@@ -248,7 +248,7 @@ const AssignUsersScreen = () => {
 
      {activeTab === 'LC_TO_SUPERVISOR' && (
        <>
-         <SelectionCard
+         <UserAvatarCard
            title="admin.assignUsers.step1SelectSupervisor"
            description="admin.assignUsers.filterByProvince"
            filterOptions={supervisorFilterOptions}
@@ -265,7 +265,7 @@ const AssignUsersScreen = () => {
 
         {supervisorFilterValues.selectSupervisor && (
           <>
-            <SelectionCard
+            <UserAvatarCard
               title="admin.assignUsers.step2AssignLinkageChampions"
               description="admin.assignUsers.filterByGeography"
               filterOptions={AssignLCFilterOptions}
@@ -417,7 +417,7 @@ const AssignUsersScreen = () => {
 
      {activeTab === 'PARTICIPANT_TO_LC' && (
        <>
-         <SelectionCard
+         <UserAvatarCard
            title="admin.assignUsers.step1SelectSupervisorAndLC"
            description="admin.assignUsers.chooseSupervisor"
            filterOptions={participantLCFilterOptions.map(filter => {
@@ -449,7 +449,7 @@ const AssignUsersScreen = () => {
 
          {selectedLc && (
            <>
-             <SelectionCard
+             <UserAvatarCard
                title="admin.assignUsers.step2AssignParticipants"
                description="admin.assignUsers.filterAndSelectParticipants"
                filterOptions={AssignParticipantFilterOptions}
