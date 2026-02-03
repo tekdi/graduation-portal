@@ -102,7 +102,6 @@ const SelectionCard = ({
                              '';
        
        // Extract initials from supervisor name (first letter of first name + first letter of last name)
-       // Example: "Amol Patil" -> "AP"
        const getInitials = (name: string): string => {
          if (!name) return '';
          const nameParts = name.trim().split(/\s+/).filter(part => part.length > 0);
