@@ -29,7 +29,7 @@ export const useProjectLoader = (
 
         // config.mode = "edit" and data contains  projectId.
         if (config.mode === 'edit') {
-          const { entityId, projectId } = data;
+          const { entityId, province, projectId } = data;
 
           try {
             let projectData;
@@ -39,7 +39,7 @@ export const useProjectLoader = (
               projectData = res.data;
             } else {
               try {
-              projectData = await createProjectForEntity(entityId);
+              projectData = await createProjectForEntity(entityId, province);
 
               if (projectData?._id) {
                 await updateEntityDetails({

@@ -141,6 +141,7 @@ export default function ParticipantDetail() {
         : participant?.onBoardedProjectId,
     entityId: participant?.entityId,
     userStatus: participant?.status,
+    province:participant?.province?.value
   };
 
   const handleSaveAddress = async () => {

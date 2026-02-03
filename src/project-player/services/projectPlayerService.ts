@@ -78,10 +78,12 @@ export const getProjectTemplatesList = async (): Promise<ApiResponse<any>> => {
 
 export const createProjectForEntity = async (
   entityId: string,
+  province:string
 ): Promise<ApiResponse<any>> => {
   try {
     const response = await apiClient.post(API_ENDPOINTS.CREATE_PROJECT, {
       entityId,
+      province
     });
 
     return  response.data.result ;
