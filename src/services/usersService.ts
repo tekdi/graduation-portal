@@ -198,6 +198,40 @@ export const getProvincesByEntityType = async (
 };
 
 /**
+ * Get provinces list - Helper function that handles entity type fetching and caching
+ * Fetches provinces by first getting entity types (from cache or API), then fetching provinces
+ * This encapsulates the common pattern used across the application
+ * 
+ * @returns A promise resolving to an array of ProvinceEntity, or empty array on error
+ */
+export const getProvincesList = async (): Promise<ProvinceEntity[]> => {
+  try {
+    // First, check if entity types are in storage
+    let entityTypes = await getEntityTypesFromStorage();
+    
+    // If not in storage, fetch entity types from API
+    if (!entityTypes || !entityTypes['province']) {
+      await getEntityTypesList();
+      entityTypes = await getEntityTypesFromStorage();
+    }
+
+    // Get province entity type ID
+    const provinceEntityTypeId = entityTypes?.['province'];
+    
+    if (!provinceEntityTypeId) {
+      return [];
+    }
+
+    // Fetch provinces using the entity type ID
+    const provincesResponse = await getProvincesByEntityType(provinceEntityTypeId);
+    return provincesResponse.result || [];
+  } catch (error) {
+    console.error('Error fetching provinces:', error);
+    return [];
+  }
+};
+
+/**
  * Get sites list by province ID - Dynamic site filter from API
  * Fetches sites for a specific province using subEntityList endpoint
  * 
@@ -245,3 +279,4 @@ export const getSitesByProvince = async (
     throw error;
   }
 };
+
