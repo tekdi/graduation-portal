@@ -21,7 +21,7 @@ import FilterButton from '@components/Filter';
 import { AssignUsersStyles } from './Styles';
 import type { TextProps, ViewProps } from 'react-native';
 import { useLanguage } from '@contexts/LanguageContext';
-import { selectedLCList } from '@constants/USER_MANAGEMENT_FILTERS';
+import { selectedLCList } from '@constants/ASSIGN_USERS_FILTERS';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
@@ -91,28 +91,72 @@ const SelectionCard = ({
         />
       )}
      {/* Display selected values if showSelectedCard is true and values exist */}
-     {showSelectedCard && selectedValues && (
-       <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>
-         <Avatar {...(AssignUsersStyles.avatarBgStyles as any)}>
-           <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)}>
-             {selectedValues.selectSupervisor ||
-               selectedValues.selectedValue ||
-               selectedValues.labelKey ||
-               ''}
-           </AvatarFallbackText>
-         </Avatar>
-         <View>
-           <Text {...(AssignUsersStyles.supervisorName as TextProps)}>
-             {selectedValues.selectSupervisor ||
-               selectedValues.selectedValue ||
-               ''}
-           </Text>
-           <Text {...(AssignUsersStyles.provinceName as TextProps)}>
-             {selectedValues.filterByProvince || selectedValues.province || 'eThekwini, KwaZulu-Natal'}
-           </Text>
-         </View>
-       </Card>
-     )}
+     {showSelectedCard && selectedValues && (() => {
+       // Get supervisor data - prefer full object, fallback to filter values
+       const supervisorData = selectedValues.selectedSupervisorData;
+       
+       // Get supervisor name from API response (name field) or fallback to filter value
+       const supervisorName = supervisorData?.name || 
+                             selectedValues.selectSupervisor ||
+                             selectedValues.selectedValue ||
+                             '';
+       
+       // Extract initials from supervisor name (first letter of first name + first letter of last name)
+       // Example: "Amol Patil" -> "AP"
+       const getInitials = (name: string): string => {
+         if (!name || typeof name !== 'string') return '';
+         
+         // Split by space, get first character of each part, join and uppercase
+         // This handles names with any number of parts (e.g., "Amol Patil" -> "AP", "John Doe Smith" -> "JS")
+         const initials = name
+           .trim()
+           .split(/\s+/)
+           .filter(part => part && part.length > 0)
+           .map(part => part[0])
+           .join('')
+           .toUpperCase();
+         
+         // If we have at least 2 initials, return first and last
+         // Otherwise, return first 2 characters of the name
+         if (initials.length >= 2) {
+           return initials.length === 2 
+             ? initials 
+             : initials[0] + initials[initials.length - 1];
+         } else if (initials.length === 1) {
+           // Single name - use first 2 letters
+           return name.trim().substring(0, 2).toUpperCase();
+         }
+         return '';
+       };
+       
+       // Get location from selected province name (API response has location: null)
+       // Use the province name from the filter selection as the location
+       const supervisorLocation = selectedValues.selectedProvinceName || 
+                                  supervisorData?.meta?.province ||
+                                  '';
+       
+       return (
+         <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>
+           <HStack space="md" alignItems="center">
+             <Avatar {...(AssignUsersStyles.avatarBgStyles as any)}>
+               <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)}>
+                 {getInitials(supervisorName)}
+               </AvatarFallbackText>
+             </Avatar>
+             <View flex={1}>
+               <Text {...(AssignUsersStyles.supervisorName as TextProps)}>
+                 {supervisorName}
+               </Text>
+               {supervisorLocation && (
+                 <Text {...(AssignUsersStyles.provinceName as TextProps)}>
+                   {supervisorLocation}
+                 </Text>
+               )}
+             </View>
+           </HStack>
+         </Card>
+       );
+     })()}
      {showLcList && (
        <VStack marginTop={'$3'}>
          <Text {...(AssignUsersStyles.provinceName as TextProps)} color="$textForeground">
