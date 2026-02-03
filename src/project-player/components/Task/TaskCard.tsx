@@ -849,15 +849,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isAddedToPlan
             ? '$addedToPlanBg'
             : isRejected
-            ? '$error50'
-            : '$warning50'
+              ? '$error50'
+              : '$warning50'
         }
         borderColor={
           isAddedToPlan
             ? '$addedToPlanBorder'
             : isRejected
-            ? '$error200'
-            : '$warning200'
+              ? '$error200'
+              : '$warning200'
         }
         borderWidth={1}
         borderRadius="$lg"
