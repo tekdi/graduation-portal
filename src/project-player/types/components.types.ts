@@ -138,6 +138,7 @@ export interface ProjectPlayerProps {
   projectData?: any; // as per mock data json
   onTaskUpdate?: (task: Task) => void;
   onTaskCompletionChange?: (areAllCompleted: boolean) => void; // Callback when task completion status changes
+  onProgressChange?: (progress: number) => void; // Callback for progress updates
 }
 
 // ============================================

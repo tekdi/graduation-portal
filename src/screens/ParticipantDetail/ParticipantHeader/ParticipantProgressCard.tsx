@@ -6,24 +6,13 @@ import type { ParticipantStatus } from '@app-types/participant';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
 import { STATUS } from '@constants/app.constant';
+import { ParticipantProgressCardProps } from '@app-types/screens';
 
-interface ParticipantProgressCardProps {
-  status?: ParticipantStatus;
-  graduationProgress?: number;
-  graduationDate?: string;
-}
-
-/**
- * ParticipantProgressCard Component
- * Unified component that displays status-specific content based on participant status:
- * - In Progress: Shows graduation readiness progress
- * - Completed: Shows graduation completion status with date
- * - Dropout: Shows dropout warning message
- */
 const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
   status,
   graduationProgress,
   graduationDate,
+  updatedProgress
 }) => {
   const { t } = useLanguage();
 
@@ -83,11 +72,12 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
           )}
         </Text>
         <Text {...participantHeaderStyles.progressPercentage}>
-          {progress}%
+          {updatedProgress !== undefined ? updatedProgress : progress}%
         </Text>
       </HStack>
       {/* Content: Conditionally render based on status */}
       {status === STATUS.IN_PROGRESS ? (
+        <>
         <VStack
           {...participantHeaderStyles.progressCardContent}
           $md-flexDirection="row"
@@ -101,13 +91,19 @@ const ParticipantProgressCard: React.FC<ParticipantProgressCardProps> = ({
             $md-width="auto"
           >
             <Progress
-              value={progress}
+              value={updatedProgress !== undefined ? updatedProgress : progress}
               {...participantHeaderStyles.progressBarBackground}
             >
               <ProgressFilledTrack {...participantHeaderStyles.progressBarFill} />
             </Progress>
           </Box>
         </VStack>
+        {updatedProgress !== undefined ? (
+          <Text {...participantHeaderStyles.progressCardTitle}>
+         {t('participantDetail.header.previous')}: {graduationProgress}%
+        </Text>
+        ): null}
+        </>
       ) : (
         <HStack {...participantHeaderStyles.completedCardContent}>
           <VStack flex={1} space="xs">
