@@ -10,8 +10,9 @@ import {
   getEntityTypesList,
   getEntityTypesFromStorage,
   getProvincesByEntityType,
+  getSitesByProvince,
 } from '../services/usersService';
-import type { Role, ProvinceEntity } from '@app-types/Users';
+import type { Role, ProvinceEntity, SiteEntity } from '@app-types/Users';
 
 // Type definition for filter configuration
 export type FilterConfig = {
@@ -62,12 +63,13 @@ export const mapStatusLabelToAPI = (statusLabel: string): string => {
 
 /**
  * Custom hook to manage user management filters with API integration
- * Fetches roles, provinces, and districts from API and builds filter options dynamically
+ * Fetches roles and provinces from API and builds filter options dynamically
  */
 export const useUserManagementFilters = (filters: Record<string, any>) => {
   // State for API data
   const [roles, setRoles] = useState<Role[]>([]);
   const [provinces, setProvinces] = useState<ProvinceEntity[]>([]);
+  const [sites, setSites] = useState<SiteEntity[]>([]);
 
   // Fetch roles and provinces from API on component mount
   useEffect(() => {
@@ -114,6 +116,34 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
     fetchInitialData();
   }, []);
 
+  // Fetch sites when province filter changes
+  useEffect(() => {
+    const fetchSites = async () => {
+      const selectedProvince = filters.province;
+      
+      // Only fetch sites if a specific province is selected (not "all-provinces")
+      if (!selectedProvince || selectedProvince === 'all-provinces') {
+        setSites([]);
+        return;
+      }
+
+      try {
+        // Fetch sites for the selected province
+        const sitesResponse = await getSitesByProvince(selectedProvince, {
+          page: 1,
+          limit: 100,
+        });
+        const sitesData = sitesResponse.result?.data || [];
+        setSites(sitesData);
+      } catch (error) {
+        console.error('Error fetching sites:', error);
+        setSites([]);
+      }
+    };
+
+    fetchSites();
+  }, [filters.province]); // Re-fetch when province filter changes
+
   // Build dynamic filter options with API data
   const filterOptions = useMemo(() => {
     // Build role filter from API roles
@@ -131,6 +161,21 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
       ...provinces.map((province: ProvinceEntity) => ({
         label: province.name,
         value: province._id,
+      })),
+    ];
+
+    // Determine if site filter should be disabled
+    const selectedProvince = filters.province;
+    const isProvinceSelected = selectedProvince &&
+                               selectedProvince !== 'all-provinces';
+    const shouldDisableSiteFilter = !isProvinceSelected; // Disable until a province is selected
+
+    // Build site filter from API sites
+    const siteFilterOptions = [
+      { labelKey: 'admin.filters.allSites', value: 'all-sites' },
+      ...sites.map((site: SiteEntity) => ({
+        label: site.name,
+        value: site._id, // Use _id as value for filtering
       })),
     ];
 
@@ -168,17 +213,17 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
         nameKey: 'admin.filters.site',
         attr: 'site',
         type: 'select' as const,
-        data: [
-          { labelKey: 'admin.filters.allSites', value: 'all-sites' },
-        ],
+        data: siteFilterOptions,
+        disabled: shouldDisableSiteFilter, // Disable until province is selected
       },
     ];
-  }, [roles, provinces]);
+  }, [roles, provinces, sites, filters.province]);
 
   return {
     filters: filterOptions,
     roles,
     provinces,
+    sites,
   };
 };
 

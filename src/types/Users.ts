@@ -29,6 +29,17 @@ export interface ProvinceEntity {
 }
 
 /**
+ * Site Entity Interface
+ * Structure for site entities from API
+ */
+export interface SiteEntity {
+  _id: string;
+  externalId?: string;
+  name: string;
+  locationId?: string;
+}
+
+/**
  * Entity Types List Response
  * Response structure from the entity types API
  */
