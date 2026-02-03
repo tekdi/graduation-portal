@@ -21,34 +21,43 @@ const TitleHeader: React.FC<TitleHeaderProps> = ({
   const { isMobile } = usePlatform();
 
   return (
-    <HStack
-      justifyContent={isMobile ? 'flex-start' : 'space-between'}
-      alignItems={isMobile ? 'flex-start' : 'center'}
-      flexWrap="wrap"
-      width="100%"
-    >
-      <VStack {...titleHeaderStyles.textContainer} flex={1}>
-        <Text {...titleHeaderStyles.titleText}>{t(title)}</Text>
-        <Text {...titleHeaderStyles.descriptionText}>{t(description)}</Text>
-        {bottom && <VStack marginTop={'$3'}>{bottom}</VStack>}
-      </VStack>
+    <VStack width="100%" space="md">
+      <HStack
+        justifyContent={isMobile ? 'flex-start' : 'space-between'}
+        alignItems={isMobile ? 'flex-start' : 'center'}
+        flexWrap="wrap"
+        width="100%"
+        flexDirection={isMobile ? 'column' : 'row'}
+      >
+        <VStack {...titleHeaderStyles.textContainer} flex={1}>
+          <Text {...titleHeaderStyles.titleText}>{t(title)}</Text>
+          <Text {...titleHeaderStyles.descriptionText}>{t(description)}</Text>
+          {bottom && <VStack marginTop={'$3'}>{bottom}</VStack>}
+        </VStack>
 
-      {/* 
-        Conditionally render right-side content (action buttons, icons, etc.)
-        - Only renders if 'right' prop is provided (not null/undefined)
-        - On mobile: wraps in VStack to stack buttons vertically
-        - On desktop: wraps in VStack with flex-end alignment to position content on the right
-        - This allows screens to optionally include action buttons without breaking layout
-      */}
-      {right && (
-        <VStack
-          alignItems={isMobile ? 'stretch' : 'flex-end'}
-          width={isMobile ? '$full' : undefined}
-        >
+        {/* 
+          Conditionally render right-side content (action buttons, icons, etc.)
+          - Only renders if 'right' prop is provided (not null/undefined)
+          - On mobile: appears below title/description, buttons stack vertically
+          - On desktop: appears on the right side with flex-end alignment
+          - This allows screens to optionally include action buttons without breaking layout
+        */}
+        {right && !isMobile && (
+          <VStack
+            alignItems="flex-end"
+          >
+            {right}
+          </VStack>
+        )}
+      </HStack>
+
+      {/* Mobile: Render buttons below title */}
+      {right && isMobile && (
+        <VStack width="$full" space="sm">
           {right}
         </VStack>
       )}
-    </HStack>
+    </VStack>
   );
 };
 

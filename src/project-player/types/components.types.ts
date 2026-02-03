@@ -9,6 +9,7 @@ export interface TaskCardProps {
   level?: number;
   isLastTask?: boolean;
   isChildOfProject?: boolean;
+  isOnboardingTask?: boolean;
 }
 
 export interface TaskStatusProps {
@@ -26,7 +27,8 @@ export interface TaskComponentProps {
   task: Task;
   level?: number;
   isLastTask?: boolean;
-  isChildOfProject?: boolean; // New prop
+  isChildOfProject?: boolean;
+  isOnboardingTask?: boolean;
 }
 
 export interface UploadComponentProps {
@@ -68,6 +70,10 @@ export interface ProjectContextValue {
   deleteTask: (taskId: string) => void;
   saveLocal: () => void;
   syncToServer: () => Promise<void>;
+  addedToPlanTaskIds: string[];
+  setTaskAddedToPlan: (taskId: string, added: boolean) => void;
+  taskPlanActionPerformedIds: string[];
+  setTaskPlanActionPerformed: (taskId: string) => void;
   onTaskUpdate?: (task: Task) => void;
 }
 
@@ -98,6 +104,7 @@ export interface ProjectPlayerConfig {
   showAddCustomTaskButton?: boolean; // Config to show/hide AddCustomTask button
   showSubmitButton?: boolean; // Config to show/hide Submit Intervention Plan button
   onSubmitInterventionPlan?: (projectId?: string) => void; // Callback for Submit Intervention Plan button
+  onChangePathway?: () => void; // Callback for Change Pathway button
   isSubmitDisabled?: boolean; // Disable submit button until conditions are met
   submitWarningMessage?: string; // Warning message to show when submit is disabled
   profileInfo?: {

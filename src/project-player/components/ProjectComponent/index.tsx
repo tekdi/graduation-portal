@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Box,
   VStack,
@@ -9,14 +9,10 @@ import {
   HStack,
   Text,
   Pressable,
-  useToast,
-  Toast,
-  ToastTitle,
 } from '@gluestack-ui/themed';
 import { useProjectContext } from '../../context/ProjectContext';
 import ProjectInfoCard from './ProjectInfoCard';
 import TaskComponent from './TaskComponent';
-import AddCustomTask from '../Task/AddCustomTask';
 import AddCustomTaskModal from '../Task/AddCustomTaskModal';
 import { projectComponentStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -24,19 +20,23 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import Container from '@ui/Container';
 import { LucideIcon, useAlert } from '@ui';
 import { theme } from '@config/theme';
-import { TASK_STATUS } from '@constants/app.constant';
 import { submitInterventionPlan } from '../../services/projectPlayerService';
 import { addCustomTaskStyles } from '../Task/Styles';
 
 const ProjectComponent: React.FC = () => {
-  const { projectData, mode, config } = useProjectContext();
+  const {
+    projectData,
+    mode,
+    config,
+    addedToPlanTaskIds,
+    taskPlanActionPerformedIds,
+  } =
+    useProjectContext();
   const { t } = useLanguage();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [previousPercent, setPreviousPercent] = useState(0);
-  const toast = useToast();
   const { showAlert } = useAlert();
 
-  const hasChildren = !!projectData?.children?.length || projectData?.tasks?.some(task => !!task.children?.length);;
+  const hasChildren = !!projectData?.children?.length || projectData?.tasks?.some(task => !!task.children?.length);
 
   const isEditMode =
     mode === 'edit' && config.showAddCustomTaskButton !== false;
@@ -45,6 +45,35 @@ const ProjectComponent: React.FC = () => {
   const showPillarFeatures = isEditMode && hasChildren;
 
   const shouldShowSubmitButton = config.showSubmitButton && mode === 'preview';
+
+  const getExcludedTaskIds = (
+    tasks: any[] = [],
+    addedToPlanSet: Set<string>,
+  ): string[] => {
+    return tasks.flatMap(task => {
+      const nested = [
+        ...(task.name === 'Social Protection' && task.tasks
+          ? getExcludedTaskIds(task.tasks, addedToPlanSet)
+          : []),
+      ];
+      const isOptional = task?.isDeletable === true;
+      const isAddedToPlan = addedToPlanSet.has(task._id);
+      const excluded = isOptional && !isAddedToPlan ? [task._id] : [];
+      return [...excluded, ...nested];
+    });
+  };
+
+  const getDeletableTaskIds = (tasks: any[] = []): string[] => {
+    return tasks.flatMap(task => {
+      const nested = [
+        ...(task.name === 'Social Protection' && task.tasks
+          ? getDeletableTaskIds(task.tasks)
+          : []),
+      ];
+      const isDeletable = task?.isDeletable === true;
+      return [...(isDeletable ? [task._id] : []), ...nested];
+    });
+  };
 
   const onSubmitInterventionPlan = async () => {
     if (!projectData) return;
@@ -97,11 +126,23 @@ const ProjectComponent: React.FC = () => {
         return;
       }
 
+      const excludedTaskIds = Array.from(
+        new Set(
+          getExcludedTaskIds(
+            [
+              ...(projectData.children || []),
+            ],
+            new Set(addedToPlanTaskIds),
+          ),
+        ),
+      );
+
       const reqBody = {
         templates,
         userId,
         entityId: config.profileInfo?.entityId || userId, // Fallback to userId if entityId not available
         projectConfig: { referenceFrom: process.env.GLOBAL_LC_PROGRAM_ID },
+        excludedTaskIds,
       };
 
       // Call API to submit intervention plan
@@ -132,65 +173,6 @@ const ProjectComponent: React.FC = () => {
       });
     }
   };
-  // Handle Save Progress button click
-  const handleSaveProgress = (currentPercent: number) => {
-    // Save current percentage as previous
-    setPreviousPercent(currentPercent);
-
-    toast.show({
-      placement: 'bottom right',
-      render: ({ id }) => (
-        <Toast
-          nativeID={id}
-          action="success"
-          variant="solid"
-          {...projectComponentStyles.toast}
-        >
-          <HStack {...projectComponentStyles.toastContent}>
-            <LucideIcon
-              name="CheckCircle"
-              size={18}
-              color={theme.tokens.colors.success600}
-            />
-            <ToastTitle
-              color="$textPrimary"
-              {...TYPOGRAPHY.bodySmall}
-              fontWeight="$medium"
-            >
-              {t('projectPlayer.progressSaved')}
-            </ToastTitle>
-          </HStack>
-        </Toast>
-      ),
-    });
-  };
-
-  // Calculate total progress for Edit mode - each completed task = +3%
-  const progressData = useMemo(() => {
-    if (!isEditMode || !projectData)
-      return { percent: 0, completedCount: 0, totalCount: 0 };
-
-    let completedCount = 0;
-    let totalCount = 0;
-
-    projectData?.tasks?.forEach(pillar => {
-      pillar.children?.forEach(task => {
-        totalCount++;
-        if (task.status === TASK_STATUS.COMPLETED) {
-          completedCount++;
-        }
-      });
-    });
-
-    // Each tick = +3%, capped at 100%
-    const percent = Math.min(completedCount * 3, 100);
-    return { percent, completedCount, totalCount };
-  }, [projectData, isEditMode]);
-
-  // Calculate tasks updated count
-  const tasksUpdatedCount = Math.round(
-    Math.abs(progressData.percent - previousPercent) / 3,
-  );
 
   if (!projectData) {
     return null;
@@ -200,37 +182,45 @@ const ProjectComponent: React.FC = () => {
     <Container {...projectComponentStyles.container}>
       <VStack flex={1}>
         <ScrollView {...projectComponentStyles.scrollView}>
-          <Card {...projectComponentStyles.card}>
+          <Card
+            {...projectComponentStyles.card}
+            {...(hasChildren ? {} : projectComponentStyles.onboardingCard)}
+          >
             <VStack>
               <ProjectInfoCard project={projectData} />
 
               {hasChildren
                 ? projectData?.children?.length
                   ? projectData?.children.map(task => (
+                    <TaskComponent
+                      key={task?._id}
+                      task={task}
+                      isChildOfProject={true}
+                    />
+                  ))
+                  : projectData?.tasks
+                    ?.filter(task => task.children?.length)
+                    ?.map(task => (
                       <TaskComponent
-                        key={task?._id}
+                        key={task._id}
                         task={task}
                         isChildOfProject={true}
                       />
                     ))
-                  : projectData?.tasks
-                      ?.filter(task => task.children?.length)
-                      ?.map(task => (
-                        <TaskComponent
-                          key={task._id}
-                          task={task}
-                          isChildOfProject={true}
-                        />
-                      ))
-                : projectData?.tasks?.map((task, index) => (
-                    <TaskComponent
-                      key={task._id}
-                      task={task}
-                      isLastTask={
-                        index === (projectData.tasks?.length || 0) - 1
-                      }
-                    />
-                  ))}
+                : (
+                  <Box paddingHorizontal="$5" paddingTop="$2" paddingBottom="$4">
+                    {projectData?.tasks?.map((task, index) => (
+                      <TaskComponent
+                        key={task._id}
+                        task={task}
+                        isLastTask={
+                          index === (projectData.tasks?.length || 0) - 1
+                        }
+                        isOnboardingTask={true}
+                      />
+                    ))}
+                  </Box>
+                )}
 
               {/* Pillar features only: +Add Custom Task button (for Intervention Plan, not Onboarding) */}
               {showPillarFeatures && (
@@ -290,8 +280,20 @@ const ProjectComponent: React.FC = () => {
             borderTopColor="$borderLight300"
             bg="$backgroundPrimary.light"
           >
+            {(() => {
+              const deletableTaskIds = getDeletableTaskIds(
+                projectData.children || [],
+              );
+              const allActionsCompleted = deletableTaskIds.every(id =>
+                taskPlanActionPerformedIds.includes(id),
+              );
+              const isSubmitDisabled =
+                config.isSubmitDisabled || !allActionsCompleted;
+
+              return (
+                <>
             {/* Warning Banner - Show when Submit is disabled */}
-            {config.isSubmitDisabled && config.submitWarningMessage && (
+            {isSubmitDisabled && config.submitWarningMessage && (
               <Box
                 bg="$warning50"
                 borderWidth={1}
@@ -318,7 +320,10 @@ const ProjectComponent: React.FC = () => {
                 paddingHorizontal="$4"
                 paddingVertical="$2"
                 onPress={() => {
-                  // TODO: Implement change pathway functionality
+                  if (config.onChangePathway) {
+                    config.onChangePathway();
+                    return;
+                  }
                 }}
                 $hover-borderColor="$primary500"
                 $hover-bg="$error50"
@@ -340,8 +345,8 @@ const ProjectComponent: React.FC = () => {
                 paddingHorizontal="$6"
                 paddingVertical="$2"
                 onPress={onSubmitInterventionPlan}
-                isDisabled={config.isSubmitDisabled}
-                opacity={config.isSubmitDisabled ? 0.5 : 1}
+                isDisabled={isSubmitDisabled}
+                opacity={isSubmitDisabled ? 0.5 : 1}
                 $hover-bg="$primary600"
                 $web-cursor="pointer"
                 {...projectComponentStyles.submitButton}
@@ -357,6 +362,9 @@ const ProjectComponent: React.FC = () => {
                 </ButtonText>
               </Button>
             </Box>
+                </>
+              );
+            })()}
           </VStack>
         )}
       </VStack>

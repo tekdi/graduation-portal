@@ -31,8 +31,8 @@ const UserManagementScreen = () => {
   const [users, setUsers] = useState<AdminUserManagementData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
-  // Note: currentPage and pageSize are managed by DataTable component for client-side pagination
-  // API pageSize is set to 100 to fetch all users at once
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   // File upload state
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -80,25 +80,37 @@ const UserManagementScreen = () => {
           apiType = allRoleTitles.length > 0 ? allRoleTitles.join(',') : 'all';
         }
 
+        // Build API params with proper status mapping
         const apiParams: UserSearchParams = {
           tenant_code: 'brac',
           type: apiType,
-          page: 1, // Always fetch from page 1, DataTable handles client-side pagination
-          limit: 100, // Fetch all users at once for client-side pagination
+          page: currentPage,
+          limit: pageSize,
         };
 
+        // Add search parameter if present
         if (filters.search) {
           apiParams.search = filters.search;
         }
+
+        // Add status parameter if present - map to API format (Active -> ACTIVE, Deactivated -> INACTIVE)
         if (filters.status && filters.status !== 'all-status') {
-          // Map status filter value to API format (e.g., "Active" → "ACTIVE")
-          const mappedStatus = mapStatusLabelToAPI(filters.status);
-          apiParams.status = mappedStatus;
+          apiParams.status = mapStatusLabelToAPI(filters.status);
         }
+
+        // Add role parameter if present
+        if (filters.role && filters.role !== 'all-roles') {
+          apiParams.role = filters.role;
+        }
+
+        // Add province parameter if present
         if (filters.province && filters.province !== 'all-provinces') {
-          // Since we're using province.name as both label and value, use it directly
-          // The API expects the province name (e.g., "Eastern Cape")
           apiParams.province = filters.province;
+        }
+
+        // Add site parameter if present
+        if (filters.site && filters.site !== 'all-sites') {
+          apiParams.site = filters.site;
         }
 
         const response = await getUsersList(apiParams);
@@ -107,20 +119,10 @@ const UserManagementScreen = () => {
         let usersData = response.result?.data || [];
 
         // Get total count from API response (if available), otherwise use data length
-        const apiTotalCount = response.result?.count ?? usersData.length;
-
-        // Apply client-side status filtering if status filter is set (fallback if API doesn't filter)
-        // This ensures status filter works even if API doesn't support status parameter
-        if (filters.status && filters.status !== 'all-status') {
-          const mappedStatus = mapStatusLabelToAPI(filters.status);
-          usersData = usersData.filter((user: any) => {
-            const userStatus = user.status?.toUpperCase();
-            return userStatus === mappedStatus;
-          });
-        }
+        const apiTotalCount = response.result?.count ?? response.result?.total ?? usersData.length;
 
         setUsers(usersData);
-        // Use API total count, not the length of returned data
+        // Use API total count
         setTotalCount(apiTotalCount);
       } catch (error) {
         setUsers([]);
@@ -132,12 +134,23 @@ const UserManagementScreen = () => {
 
     fetchUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters, roles.length]); // Depend on filters and roles.length to trigger when roles first load
+  }, [filters, roles.length, currentPage, pageSize]); // Depend on filters, roles, currentPage, and pageSize
 
   // Handle filter changes
   const handleFilterChange = useCallback((newFilters: Record<string, any>) => {
     setFilters(newFilters);
-    // DataTable will reset to page 1 automatically when data changes
+    setCurrentPage(1); // Reset to first page when filters change
+  }, []);
+
+  // Handle page change
+  const handlePageChange = useCallback((page: number) => {
+    setCurrentPage(page);
+  }, []);
+
+  // Handle page size change
+  const handlePageSizeChange = useCallback((size: number) => {
+    setPageSize(size);
+    setCurrentPage(1); // Reset to first page when page size changes
   }, []);
 
   // Handle CSV upload: closes options modal and triggers native file picker
@@ -276,23 +289,24 @@ const UserManagementScreen = () => {
           </HStack>
         </HStack>
 
-        {/* DataTable with raw API data */}
+        {/* DataTable with server-side pagination */}
         <DataTable
-          key={`users-table-${JSON.stringify(filters)}`} // Force remount when filters change to reset pagination
           data={users}
           columns={columns}
           getRowKey={(user) => user.id}
           isLoading={isLoading}
           pagination={{
             enabled: true,
-            pageSize: 10, // Display 10 users per page
-            showPageSizeSelector: false,
-            pageSizeOptions: [10, 25, 50, 100],
+            pageSize: pageSize,
+            showPageSizeSelector: true,
+            pageSizeOptions: [5, 10, 25, 50],
+            serverSide: {
+              count: currentPage,
+              total: totalCount,
+            },
           }}
-          onPageChange={(newPage) => {
-            // Note: This is for client-side pagination only
-            // The DataTable handles pagination internally
-          }}
+          onPageChange={handlePageChange}
+          onPageSizeChange={handlePageSizeChange}
           emptyMessage="admin.users.noUsersFound"
           loadingMessage="admin.users.loadingUsers"
         />

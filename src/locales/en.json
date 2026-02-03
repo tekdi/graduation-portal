@@ -46,12 +46,15 @@
     "serverError500": "A server error occurred (500). Please try again later."
   },
   "projectPlayer": {
+    "onboarding": "Onboarding the",
+    "participant": "Participant",
     "status": "Status",
     "progress": "Progress",
     "pillar": "Pillar",
     "pillars": "pillars",
     "complete": "complete",
     "stepsComplete": "Steps Complete",
+    "onboardingDescription": "Complete all required steps before enrolling the participant",
     "statusTypes": {
       "to-do": "To Do",
       "completed": "Completed"
@@ -142,7 +145,9 @@
     "selectedFiles": "Selected Files",
     "untitledFile": "Untitled File",
     "unknownSize": "Unknown size",
-    "enrolledParticiapantSucess": "Participant Enrolled Successfully!"
+    "enrolledParticiapantSucess": "Participant Enrolled Successfully!",
+    "socialProtectionPreviewInfo": "Please review all Social Protection tasks. Tasks requiring evidence are pre-selected. Optional tasks can be added or removed based on participant needs.",
+    "important": "Important"
   },
   "navigation": {
     "menu": "Menu",
@@ -376,6 +381,7 @@
     },
     "users": {
       "allUsers": "All Users",
+      "id": "ID",
       "name": "Name",
       "email": "Email",
       "role": "Role",
@@ -668,7 +674,6 @@
         "selfServiceOnly": "Self-Service Only:"
       }
     }
-   
   },
   "observation": {
     "noParticipantFound": "No entity found observation solution attached to this participant",
@@ -836,7 +841,8 @@
     "graduated": "Ready to Graduate",
     "active": "Active",
     "inactive": "Inactive",
-    "groupCheckIns": "Group Check-ins"
+    "groupCheckIns": "Group Check-ins",
+    "selectStatus":"Select Status"
   },
   "table": {
     "showing": "Showing {{start}} to {{end}} of {{total}} entries",

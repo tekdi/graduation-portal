@@ -3,7 +3,8 @@ const templateId = process.env.PROJECT_TEMPLATE_ID;
 
 export const API_ENDPOINTS = {
   PROJECT_TEMPLATES_LIST: `${prefix}/project/v1/project/templates/list`,
-  CREATE_PROJECT: `${prefix}/project/v1/userProjects/importFromLibrary/${templateId}?isATargetedSolution=false`,
+  // CREATE_PROJECT: `${prefix}/project/v1/userProjects/importFromLibrary/${templateId}?isATargetedSolution=false`,
+  CREATE_PROJECT: `${prefix}/project/v1/userProjects/details?${templateId}`,
   PROJECT_DETAILS: (id: string) =>
     `${prefix}/project/v1/userProjects/details/${id}`,
   GET_CATEGORY_LIST: (id: string) =>
@@ -14,4 +15,6 @@ export const API_ENDPOINTS = {
     `${prefix}/project/v1/project/templates/list?categoryIds=${ids}&groupByCategory=true&taskDetails=true`,
   UPDATE_TASK: (id: string) => `${prefix}/project/v1/userProjects/update/${id}`,
   SUBMIT_INTERVENTION_PLAN: `${prefix}/project/v1/userProjects/createProjectPlan`,
+  GET_SOLUTION_DETAILS: (solutionId: string, taskId: string) =>
+    `${prefix}/project/v1/userProjects/solutionDetails/${solutionId}?taskId=${taskId}`,
 } as const;

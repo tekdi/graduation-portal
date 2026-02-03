@@ -214,6 +214,20 @@ const ActionsColumn: React.FC<{ user: AdminUserManagementData }> = ({ user }) =>
  */
 export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
   {
+    key: 'id',
+    label: 'admin.users.id',
+    flex: 1.5,
+    render: (user) => (
+      <Text {...TYPOGRAPHY.paragraph} {...styles.nameText}>
+        {user.id}
+      </Text>
+    ),
+    mobileConfig: {
+      leftRank: 1,
+      showLabel: false,
+    },
+  },
+  {
     key: 'name',
     label: 'admin.users.name',
     flex: 1.5,
@@ -223,7 +237,7 @@ export const getUsersColumns = (): ColumnDef<AdminUserManagementData>[] => [
       </Text>
     ),
     mobileConfig: {
-      leftRank: 1,
+      rightRank: 1,
       showLabel: false,
     },
   },
