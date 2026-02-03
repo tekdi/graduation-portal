@@ -137,8 +137,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
         return;
       }
       const solutionDetails = await getSolutionDetails(projectTemplateId, task._id);
-      
-      if(solutionDetails.data._id) {
+
+      if (solutionDetails.data._id) {
         // @ts-ignore Navigate to observation screen - task will be marked as completed on return
         navigation.navigate('observation', {
           id: participantId,
@@ -288,11 +288,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-            | 'line-through'
-            | 'none',
-          opacity: isCompleted ? 0.6 : 1,
-        }
+        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+          | 'line-through'
+          | 'none',
+        opacity: isCompleted ? 0.6 : 1,
+      }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -313,8 +313,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-            ? '$optionalBadgeBg'
-            : '$backgroundLight100'
+              ? '$optionalBadgeBg'
+              : '$backgroundLight100'
         }
         paddingHorizontal="$3"
         paddingVertical="$1"
@@ -328,8 +328,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-              ? '$optionalBadgeText'
-              : '$textMuted'
+                ? '$optionalBadgeText'
+                : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText || (isPreview && task?.isDeletable ? 'Optional' : '')}
@@ -786,24 +786,45 @@ const TaskCard: React.FC<TaskCardProps> = ({
             flexDirection={isMobile ? 'column' : 'row'}
           >
             {isMobile ? (
-              <HStack alignItems="flex-start" space="xs" width="100%">
-                <Box flexShrink={0} mt="$1">
-                  {renderStatusIndicator()}
-                </Box>
-                <Box flex={1}>
-                  {renderTaskInfo()}
-                </Box>
-                <Box flexShrink={0}>
-                  <HStack space="xs" alignItems="center">
-                    {renderActionButton()}
+              isPreview ? (
+                <HStack alignItems="flex-start" space="xs" width="100%">
+                  <Box flexShrink={0} mt="$1">
+                    {renderStatusIndicator()}
+                  </Box>
+                  <Box flex={1}>
+                    {renderTaskInfo()}
+                  </Box>
+                  <Box flexShrink={0}>
+                    <HStack space="xs" alignItems="center">
+                      {renderActionButton()}
+                      {renderCustomTaskActions({
+                        isCustomTask: task.isCustomTask || false,
+                        onEdit: openEditModal,
+                        onDelete: openDeleteModal,
+                      })}
+                    </HStack>
+                  </Box>
+                </HStack>
+              ) : (
+                <VStack space="xs" width="100%">
+                  <HStack alignItems="flex-start" space="xs">
+                    <Box flexShrink={0} mt="$1">
+                      {renderStatusIndicator()}
+                    </Box>
+                    <Box flex={1}>
+                      {renderTaskInfo()}
+                    </Box>
                     {renderCustomTaskActions({
                       isCustomTask: task.isCustomTask || false,
                       onEdit: openEditModal,
                       onDelete: openDeleteModal,
                     })}
                   </HStack>
-                </Box>
-              </HStack>
+                  <Box width="100%">
+                    {renderActionButton()}
+                  </Box>
+                </VStack>
+              )
             ) : (
               <>
                 <Box flexShrink={0} mt="$1">
