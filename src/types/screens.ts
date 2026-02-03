@@ -52,6 +52,7 @@ export interface InterventionPlanProps {
     participantName?: string;
     participantProfile?:any;
     onIdpCreation?: (projectId?: string) => void;
+    onProgressChange?: (progress: number) => void;
 }
 
 export interface TemplateData {
@@ -76,6 +77,7 @@ export interface ParticipantHeaderProps {
   status?: ParticipantStatus;
   pathway?: PathwayType;
   graduationProgress?: number;
+  updatedProgress?: number;
   graduationDate?: string;
   onViewProfile?: () => void;
   areAllTasksCompleted?: boolean; 
@@ -105,3 +107,10 @@ export type PillarSelection = {
   categoryName?:string;
   subCategoryName?:string;
 };
+
+export interface ParticipantProgressCardProps {
+  status?: ParticipantStatus;
+  graduationProgress?: number;
+  updatedProgress?: number;
+  graduationDate?: string;
+}

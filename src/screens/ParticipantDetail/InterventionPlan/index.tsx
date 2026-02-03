@@ -17,6 +17,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   participantId,
   participantProfile,
   onIdpCreation,
+  onProgressChange,
 }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
@@ -175,6 +176,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
           config={config}
           data={projectPlayerData}
           onTaskUpdate={handleTaskUpdate}
+          onProgressChange={onProgressChange}
         />
       </Box>
     );
@@ -187,6 +189,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
         config={config}
         data={projectPlayerData}
         onTaskUpdate={handleTaskUpdate}
+        onProgressChange={onProgressChange}
       />
     </Box>
   );
