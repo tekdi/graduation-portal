@@ -55,7 +55,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
           bg="$white"
           height="$9"
           pl="$10px"
-          lineHeight="$6"
+          lineHeight="$md"
         />
       </Input>
     </Box>

@@ -16,6 +16,7 @@ import {
  Divider,
  Button,
  Pressable,
+ Box,
 } from '@ui';
 import FilterButton from '@components/Filter';
 import { AssignUsersStyles } from './Styles';
@@ -27,7 +28,7 @@ import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
 
 
-interface SelectionCardProps {
+interface UserAvatarCardProps {
  title: string;
  description: string;
  filterOptions?: any;
@@ -43,7 +44,7 @@ interface SelectionCardProps {
 }
 
 
-const SelectionCard = ({
+const UserAvatarCard = ({
   title,
   description,
   filterOptions,
@@ -56,7 +57,7 @@ const SelectionCard = ({
   onAssign,
   lcList,
   isParticipantList = false,
-}: SelectionCardProps) => {
+}: UserAvatarCardProps) => {
   const { t } = useLanguage();
 
   const [selectedLc, setSelectedLc] = useState<any>(null);
@@ -92,44 +93,45 @@ const SelectionCard = ({
       )}
      {/* Display selected values if showSelectedCard is true and values exist */}
      {showSelectedCard && selectedValues && (() => {
-       // Get supervisor data - prefer full object, fallback to filter values
+       
        const supervisorData = selectedValues.selectedSupervisorData;
-       
-       // Get supervisor name from API response (name field) or fallback to filter value
-       const supervisorName = supervisorData?.name || 
-                             selectedValues.selectSupervisor ||
-                             selectedValues.selectedValue ||
-                             '';
-       
-       // Extract initials from supervisor name (first letter of first name + first letter of last name)
-       // Example: "Amol Patil" -> "AP"
-       const getInitials = (name: string): string => {
-         if (!name || typeof name !== 'string') return '';
-         
-         // Split by space, get first character of each part, join and uppercase
-         // This handles names with any number of parts (e.g., "Amol Patil" -> "AP", "John Doe Smith" -> "JS")
-         const initials = name
-           .trim()
-           .split(/\s+/)
-           .filter(part => part && part.length > 0)
-           .map(part => part[0])
-           .join('')
-           .toUpperCase();
-         
-         // If we have at least 2 initials, return first and last
-         // Otherwise, return first 2 characters of the name
-         if (initials.length >= 2) {
-           return initials.length === 2 
-             ? initials 
-             : initials[0] + initials[initials.length - 1];
-         } else if (initials.length === 1) {
-           // Single name - use first 2 letters
-           return name.trim().substring(0, 2).toUpperCase();
-         }
-         return '';
-       };
-       
-       // Get location from selected province name (API response has location: null)
+
+        // Get supervisor name from API response (name field) or fallback to filter value
+        const supervisorName =
+        supervisorData?.name ||
+        selectedValues.selectSupervisor ||
+        selectedValues.selectedValue ||
+        '';
+
+        // Extract initials from supervisor name
+        // Rules:
+        // - Multiple words → first letter of first name + first letter of last name
+        //   Example: "Amol Patil" -> "AP", "John Doe Smith" -> "JS"
+        // - Single word → first letter only
+        //   Example: "Amol" -> "A"
+        const getInitials = (name: string): string => {
+        if (!name || typeof name !== 'string') return '';
+
+        const parts = name
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+        // Single name → first letter only
+        if (parts.length === 1) {
+            return parts[0][0].toUpperCase();
+        }
+
+        // First letter of first name + first letter of last name
+        const firstInitial = parts[0][0];
+        const lastInitial = parts[parts.length - 1][0];
+
+        return (firstInitial + lastInitial).toUpperCase();
+        };
+
+        // Usage
+        const supervisorInitials = getInitials(supervisorName);
+// Get location from selected province name (API response has location: null)
        // Use the province name from the filter selection as the location
        const supervisorLocation = selectedValues.selectedProvinceName || 
                                   supervisorData?.meta?.province ||
@@ -138,11 +140,9 @@ const SelectionCard = ({
        return (
          <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>
            <HStack space="md" alignItems="center">
-             <Avatar {...(AssignUsersStyles.avatarBgStyles as any)}>
-               <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)}>
-                 {getInitials(supervisorName)}
-               </AvatarFallbackText>
-             </Avatar>
+              <Box {...(AssignUsersStyles.avatarBoxStyles as ViewProps)}>
+                 <Text {...(AssignUsersStyles.avatarTextStyles as TextProps)}>{supervisorInitials}</Text>
+              </Box>
              <View flex={1}>
                <Text {...(AssignUsersStyles.supervisorName as TextProps)}>
                  {supervisorName}
@@ -309,4 +309,4 @@ const SelectionCard = ({
 };
 
 
-export default SelectionCard;
+export default UserAvatarCard;

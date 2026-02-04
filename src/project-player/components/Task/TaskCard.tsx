@@ -200,13 +200,21 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Onboarding: empty circle initially, brown tick only when document uploaded / task completed
     if (isOnboardingTask) {
-      // Both optional and mandatory tasks - show tick when files are uploaded
-      const hasUploadedFiles = task.attachments && task.attachments.length > 0;
-      const showTick = hasUploadedFiles;
-      circleBorderColor = showTick ? '$primary500' : '$textMuted';
-      circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
-      checkColor = theme.tokens.colors.backgroundPrimary.light;
-      showCheck = showTick;
+      if (isOptional && task?.isDeletable) {
+        // Show tick when files are uploaded (check attachments array)
+        const hasUploadedFiles = task.attachments && task.attachments.length > 0;
+        const showTick = hasUploadedFiles;
+        circleBorderColor = showTick ? '$primary500' : '$textMuted';
+        circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
+        checkColor = theme.tokens.colors.backgroundPrimary.light;
+        showCheck = showTick;
+      } else {
+        // Mandatory onboarding tasks - show tick when files are uploaded
+        showCheck = isCompleted;
+        circleBorderColor = showCheck ? '$primary500' : '$textMuted';
+        circleBg = showCheck ? '$primary500' : '$backgroundPrimary.light';
+        checkColor = theme.tokens.colors.backgroundPrimary.light;
+      }
     } else if (isChildOfProject) {
       if (isOptional) {
         // Preview mode: Show orange circle initially, green with tick when added, red with X when rejected
