@@ -139,7 +139,6 @@ export interface createProjectPlanPayload{
     entityId: string;
     programName: string;
     isPrivateProgram: boolean;
-    excludedTaskIds?: string[];
     projectConfig: {
       name: string;
       description: string;
