@@ -16,7 +16,8 @@ import {
 import UserAvatarCard from '@components/UserAvatarCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
-import { getLinkageChampions, assignLCsToSupervisor } from '../../services/assignUsersService';
+import { getLinkageChampions, assignLCsToSupervisor, getMappedLCsForSupervisor } from '../../services/assignUsersService';
+import { getInitials } from '@utils/helper';
 
 // Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
 declare const process:
@@ -72,8 +73,9 @@ const AssignUsersScreen = () => {
    ? selectedProvinceOption 
    : selectedProvinceOption?.label || '';
  const [lcFilterValues, setLcFilterValues] = useState<Record<string, any>>({});
- // State to track assigned LCs
- const [assignedLCs, setAssignedLCs] = useState<any[]>([]);
+ // State for mapped LCs from API
+ const [mappedLCs, setMappedLCs] = useState<any[]>([]);
+ const [isLoadingMappedLCs, setIsLoadingMappedLCs] = useState(false);
  // State for participant filters and selected participants
  const [participantFilterValues, setParticipantFilterValues] = useState<Record<string, any>>({});
  const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(new Set());
@@ -86,7 +88,6 @@ const AssignUsersScreen = () => {
    // Clear supervisor selection when province changes
    if (values.filterByProvince !== supervisorFilterValues.filterByProvince) {
      values.selectSupervisor = undefined;
-     setAssignedLCs([]);
      setAssignedParticipants([]);
      setSelectedLc(null);
      // Clear site filter in Step 2 when province changes
@@ -95,11 +96,6 @@ const AssignUsersScreen = () => {
        delete updated.site;
        return updated;
      });
-   }
-   
-   // Reset assigned LCs when supervisor changes
-   if (values.selectSupervisor !== supervisorFilterValues.selectSupervisor) {
-     setAssignedLCs([]);
    }
    // Reset assigned participants and selected LC when supervisor changes (for Participant to LC tab)
    if (values.selectSupervisor !== supervisorFilterValues.selectSupervisor) {
@@ -133,9 +129,6 @@ const AssignUsersScreen = () => {
  // Handler for LC UserAvatarCard filter changes
  const handleLcFilterChange = (values: Record<string, any>) => {
    setLcFilterValues(values);
-   console.log('LC filter values changed:', values);
-   // Add your logic here to handle LC filter changes
-   // Example: fetchFilteredLCs(values);
  };
 
  // Handler for when LCs are assigned to supervisor
@@ -179,41 +172,47 @@ const AssignUsersScreen = () => {
        assignedUsersStatus: 'ACTIVE',
      });
 
-     // Generate additional data for assigned LCs (email, LC ID, site)
-     const lcsWithFullData = selectedLCs.map((lc, index) => {
-       // Generate email from name (simple conversion)
-       const nameParts = lc.labelKey.toLowerCase().split(' ');
-       const email = nameParts.length > 1
-         ? `${nameParts[0]}.${nameParts[1]}@gbl.co.za`
-         : `${nameParts[0]}@gbl.co.za`;
-       
-       // Generate LC ID (increment from existing)
-       const lcId = `LC-${String(assignedLCs.length + 2 + index).padStart(3, '0')}`;
-       
-       // Extract site from location or use default
-       const site = lc.location?.includes('eThekwini') ? 'Site B' : 
-                    lc.location?.includes('Johannesburg') ? 'Site A' : 'Site C';
+     // Refresh mapped LCs from API after assignment
+     const mappedResponse = await getMappedLCsForSupervisor({
+       userId: supervisorId,
+       programId: programId,
+       type: 'org_admin',
+       page: 1,
+       limit: 100,
+       search: '',
+     });
+
+     // Transform API response to match expected format
+     const lcs = (mappedResponse.result?.data || []).map((lc: any) => {
+       const name = lc.name || '';
+       const userId = lc.userId || '';
+       const email = lc.userDetails?.email || '';
+       const location = lc.userDetails?.location || '';
+       const lcId = `LC-${String(userId).padStart(3, '0')}`;
        
        return {
-         ...lc,
-         email,
-         lcId,
-         site,
+         labelKey: name,
+         value: String(userId),
+         location: location,
+         status: 'assigned',
+         email: email,
+         site: '',
+         lcId: lcId,
+         id: userId,
        };
      });
      
-     // Add to assigned LCs list
-     setAssignedLCs((prev) => [...prev, ...lcsWithFullData]);
+     setMappedLCs(lcs);
    } catch (error) {
      console.error('Error assigning LCs to supervisor:', error);
      // TODO: Show error message to user
    }
  };
 
- // Filter out assigned LCs from the available list
+ // Filter out mapped LCs from the available list
  const getAvailableLCs = () => {
-   const assignedLCValues = new Set(assignedLCs.map(lc => lc.value));
-   return linkageChampions.filter((lc: any) => !assignedLCValues.has(lc.value));
+   const mappedLCValues = new Set(mappedLCs.map(lc => lc.value));
+   return linkageChampions.filter((lc: any) => !mappedLCValues.has(lc.value));
  };
 
  // Handler for when participants are assigned to LC
@@ -311,20 +310,73 @@ const AssignUsersScreen = () => {
    fetchLinkageChampions();
  }, [supervisorFilterValues.filterByProvince, lcFilterValues.site]);
 
- // Use filter values to perform actions when filters change
+ // Fetch mapped LCs when supervisor is selected
  useEffect(() => {
-   if (Object.keys(supervisorFilterValues).length > 0) {
-     // Add your filtering/fetching logic here for supervisors
-   }
- }, [supervisorFilterValues]);
+   const fetchMappedLCs = async () => {
+     if (!selectedSupervisor || !supervisorFilterValues.selectSupervisor) {
+       setMappedLCs([]);
+       return;
+     }
 
+     try {
+       setIsLoadingMappedLCs(true);
+       // Get programId from environment variable
+       // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+       const programId = process.env.GLOBAL_LC_PROGRAM_ID;
+       
+       if (!programId) {
+         console.error('GLOBAL_LC_PROGRAM_ID is not defined in environment variables');
+         setMappedLCs([]);
+         return;
+       }
 
- useEffect(() => {
-   if (Object.keys(lcFilterValues).length > 0) {
-     console.log('Current LC filter values:', lcFilterValues);
-     // Add your filtering/fetching logic here for LCs
-   }
- }, [lcFilterValues]);
+       const supervisorId = String((selectedSupervisor as any).id || (selectedSupervisor as any)._id || '');
+       if (!supervisorId) {
+         console.error('Supervisor ID not found');
+         setMappedLCs([]);
+         return;
+       }
+
+       const response = await getMappedLCsForSupervisor({
+         userId: supervisorId,
+         programId: programId,
+         type: 'org_admin',
+         page: 1,
+         limit: 100,
+         search: '',
+       });
+
+       // Transform API response to match expected format
+       const lcs = (response.result?.data || []).map((lc: any) => {
+         const name = lc.name || '';
+         const userId = lc.userId || '';
+         const email = lc.userDetails?.email || '';
+         const location = lc.userDetails?.location || '';
+         const lcId = `LC-${String(userId).padStart(3, '0')}`;
+         
+         return {
+           labelKey: name,
+           value: String(userId),
+           location: location,
+           status: 'assigned',
+           email: email,
+           site: '',
+           lcId: lcId,
+           id: userId,
+         };
+       });
+       
+       setMappedLCs(lcs);
+     } catch (error) {
+       console.error('Error fetching mapped LCs:', error);
+       setMappedLCs([]);
+     } finally {
+       setIsLoadingMappedLCs(false);
+     }
+   };
+
+   fetchMappedLCs();
+ }, [selectedSupervisor, supervisorFilterValues.selectSupervisor]);
  return (
    <VStack space="md" width="100%">
      <TitleHeader
@@ -397,7 +449,7 @@ const AssignUsersScreen = () => {
               lcList={getAvailableLCs()}
             />
 
-            {/* Hardcoded List of LCs Mapped to Supervisor - TODO: Replace with API data */}
+            {/* List of LCs Mapped to Supervisor from API */}
             <Card {...(AssignUsersStyles.tableCardStyles as ViewProps)}>
               <VStack width="100%">
                 <VStack space="xs">
@@ -436,98 +488,69 @@ const AssignUsersScreen = () => {
                   </Box>
                 </HStack>
 
-                {/* Table Rows - Hardcoded + Dynamically Assigned */}
-                <VStack space="xs">
-                  {/* Hardcoded Row: Nomsa Dlamini */}
-                  <HStack {...(AssignUsersStyles.tableRowHStack as ViewProps)}>
-                    <Box flex={2}>
-                      <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                        <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                          <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>ND</AvatarFallbackText>
-                        </Avatar>
-                        <VStack space="xs">
-                          <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                            Nomsa Dlamini
-                          </Text>
-                          <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                            LC-002
-                          </Text>
-                        </VStack>
-                      </HStack>
-                    </Box>
-                    <Box flex={2}>
-                      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                        nomsa.dlamini@gbl.co.za
-                      </Text>
-                    </Box>
-                    <Box flex={2}>
-                      <HStack {...(AssignUsersStyles.locationHStack as ViewProps)}>
-                        <LucideIcon name="MapPin" size={12} color={theme.tokens.colors.textMutedForeground} />
-                        <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                          eThekwini, KwaZulu-Natal
-                        </Text>
-                      </HStack>
-                    </Box>
-                    <Box flex={1}>
-                      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                        Site B
-                      </Text>
-                    </Box>
-                  </HStack>
+                {/* Table Rows - From API */}
+                {isLoadingMappedLCs ? (
+                  <VStack space="xs" p="$4" alignItems="center">
+                    <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+                      {t('common.loading')}
+                    </Text>
+                  </VStack>
+                ) : mappedLCs.length === 0 ? (
+                  <VStack space="xs" p="$4" alignItems="center">
+                    <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+                      {t('common.noDataFound')}
+                    </Text>
+                  </VStack>
+                ) : (
+                  <VStack space="xs" backgroundColor="$white">
+                    {mappedLCs.map((lc, index) => {
+                      // Get initials from name using common utility function
+                      const initials = getInitials(lc.labelKey);
 
-                  {/* Dynamically Assigned LCs */}
-                  {assignedLCs.map((lc, index) => {
-                    // Get initials from name
-                    const nameParts = lc.labelKey.split(' ');
-                    const initials = nameParts.length > 1
-                      ? `${nameParts[0][0]}${nameParts[1][0]}`
-                      : nameParts[0].substring(0, 2).toUpperCase();
-
-                    return (
-                      <HStack
-                        key={`${lc.value}-${index}`}
-                        {...(AssignUsersStyles.tableRowHStack as ViewProps)}
-                        borderBottomWidth={index === assignedLCs.length - 1 ? 0 : 1}
-                      >
-                        <Box flex={2}>
-                          <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                            <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                              <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>{initials}</AvatarFallbackText>
-                            </Avatar>
-                            <VStack space="xs">
-                              <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                                {lc.labelKey}
-                              </Text>
-                              <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                                {lc.lcId}
-                              </Text>
-                            </VStack>
-                          </HStack>
-                        </Box>
-                        <Box flex={2}>
-                          <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                            {lc.email}
-                          </Text>
-                        </Box>
-                        <Box flex={2}>
-                          <HStack {...(AssignUsersStyles.locationHStack as ViewProps)}>
+                      return (
+                        <HStack
+                          key={`${lc.value}-${index}`}
+                          {...(AssignUsersStyles.tableRowHStack as ViewProps)}
+                          borderBottomWidth={index === mappedLCs.length - 1 ? 0 : 1}
+                        >
+                          <Box flex={2}>
+                            <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
+                              <Box {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
+                                <Text {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>{initials}</Text>
+                              </Box>
+                              <VStack space="xs">
+                                <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
+                                  {lc.labelKey}
+                                </Text>
+                                <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
+                                  {lc.lcId}
+                                </Text>
+                              </VStack>
+                            </HStack>
+                          </Box>
+                          <Box flex={2}>
                             <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                              📍
+                              {lc.email}
                             </Text>
+                          </Box>
+                          <Box flex={2}>
+                            <HStack {...(AssignUsersStyles.locationHStack as ViewProps)}>
+                              <LucideIcon name="MapPin" size={12} color={theme.tokens.colors.textMutedForeground} />
+                              <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+                                {lc.location}
+                              </Text>
+                            </HStack>
+                          </Box>
+                          <Box flex={1}>
                             <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                              {lc.location}
+                              {lc.site}
                             </Text>
-                          </HStack>
-                        </Box>
-                        <Box flex={1}>
-                          <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                            {lc.site}
-                          </Text>
-                        </Box>
-                      </HStack>
-                    );
-                  })}
-                </VStack>
+                          </Box>
+                        </HStack>
+                      );
+                    })}
+                  </VStack>
+                )}
               </VStack>
             </Card>
           </>

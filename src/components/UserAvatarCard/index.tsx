@@ -25,6 +25,7 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
+import { getInitials } from '@utils/helper';
 
 
 interface UserAvatarCardProps {
@@ -102,33 +103,7 @@ const UserAvatarCard = ({
         selectedValues.selectedValue ||
         '';
 
-        // Extract initials from supervisor name
-        // Rules:
-        // - Multiple words → first letter of first name + first letter of last name
-        //   Example: "Amol Patil" -> "AP", "John Doe Smith" -> "JS"
-        // - Single word → first letter only
-        //   Example: "Amol" -> "A"
-        const getInitials = (name: string): string => {
-        if (!name || typeof name !== 'string') return '';
-
-        const parts = name
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean);
-
-        // Single name → first letter only
-        if (parts.length === 1) {
-            return parts[0][0].toUpperCase();
-        }
-
-        // First letter of first name + first letter of last name
-        const firstInitial = parts[0][0];
-        const lastInitial = parts[parts.length - 1][0];
-
-        return (firstInitial + lastInitial).toUpperCase();
-        };
-
-        // Usage
+        // Get initials from supervisor name using common utility function
         const supervisorInitials = getInitials(supervisorName);
 // Get location from selected province name (API response has location: null)
        // Use the province name from the filter selection as the location

@@ -103,6 +103,45 @@ export const getLinkageChampions = async (
 };
 
 /**
+ * Get mapped LCs for a supervisor
+ * Fetches the list of Linkage Champions assigned to a specific supervisor
+ * 
+ * @param params - Query parameters
+ * @returns A promise resolving to the mapped LCs response from the API
+ */
+export const getMappedLCsForSupervisor = async (params: {
+  userId: string; // Supervisor's user ID
+  programId: string; // Program ID
+  type?: string; // Entity type (default: "org_admin")
+  page?: number; // Page number (default: 1)
+  limit?: number; // Limit per page (default: 5)
+  search?: string; // Search query (default: "")
+}): Promise<any> => {
+  try {
+    const { userId, programId, type = 'org_admin', page = 1, limit = 5, search = '' } = params;
+    
+    // Build query string
+    const queryParams = new URLSearchParams({
+      userId: userId,
+      type: type,
+      page: page.toString(),
+      limit: limit.toString(),
+      search: search,
+      programId: programId,
+    });
+
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
+    
+    // GET request to fetch mapped LCs
+    const response = await api.get<any>(endpoint);
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
  * Assign LCs to Supervisor
  * Creates or updates program user assignments
  * 
