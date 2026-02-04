@@ -8,7 +8,7 @@ export const templateStyles = {
   },
   pressableCard: {
     mb: '$4',
-    mt: '$6',
+    mt: '$2',
     p: '$3',
     bg: '$white',
     borderWidth: 1,
@@ -61,7 +61,7 @@ export const templateStyles = {
   },
   mainContent: {
     flex: 1,
-    px: '$2',
+    px: '$3',
     py: '$2',
   },
   modalFooter: {

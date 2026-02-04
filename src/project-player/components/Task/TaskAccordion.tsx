@@ -233,7 +233,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
           {/* Accordion Content - Collapsible in preview mode */}
           <AccordionContent
             {...taskAccordionStyles.accordionContent}
-            paddingHorizontal={isWeb ? '$5' : '$1'}
+            paddingHorizontal={isWeb ? '$5' : '$2'}
           >
             {/* Info Banner - Always show for Social Protection in Preview Mode */}
             {isSocialProtection && (
