@@ -42,7 +42,8 @@
     "noDataFound": "No data found",
     "optional": "(Optional)",
     "participant": "Participant",
-    "complete": "Complete"
+    "complete": "Complete",
+    "serverError500": "A server error occurred (500). Please try again later."
   },
   "projectPlayer": {
     "onboarding": "Onboarding the",

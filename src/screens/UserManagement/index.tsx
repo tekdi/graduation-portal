@@ -80,8 +80,7 @@ const UserManagementScreen = () => {
           apiType = allRoleTitles.length > 0 ? allRoleTitles.join(',') : 'all';
         }
 
-        // Build API params with proper status mapping
-        const apiParams: UserSearchParams = {
+        const apiParams: any = {
           tenant_code: 'brac',
           type: apiType,
           page: currentPage,

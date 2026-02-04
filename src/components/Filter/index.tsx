@@ -232,6 +232,7 @@ export default function FilterButton({
           key={`select-${item.attr}-${item.data?.length || 0}`} // Force re-render when options change
           value={value?.[item.attr] || getDefaultDisplayValue(item)}
           onChange={handleSelectChange}
+          placeholder={getPlaceholder()}
           options={
             item?.data?.map((option: any) => {
               // If it's a string, return as-is (backward compatibility)
