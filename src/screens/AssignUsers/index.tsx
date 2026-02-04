@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ViewProps, TextProps } from 'react-native';
 import {
- lcFilterOptions,
  participantLCFilterOptions,
  SearchFilter,
  ParticipantSearchFilter,

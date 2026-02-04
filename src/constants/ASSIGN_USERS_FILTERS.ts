@@ -205,37 +205,6 @@ export const useSiteFilterOptions = (selectedProvinceId?: string): {
   }, [sites, selectedProvinceId]);
 };
 
-// Legacy static filter options - kept for backward compatibility
-// Use useSiteFilterOptions hook instead for dynamic site filtering
-export const lcFilterOptions: ReadonlyArray<FilterConfig> = [
-  {
-    nameKey: 'admin.filters.site',
-    attr: 'site',
-    type: 'select',
-    data: [
-      { labelKey: 'admin.filters.allSites', value: 'all-sites' },
-      { label: 'KwaMashu', value: 'KwaMashu' },
-      { label: 'KwaMashu2', value: 'KwaMashu2' },
-      { label: 'KwaMashu3', value: 'KwaMashu3' },
-      { label: 'KwaMashu4', value: 'KwaMashu4' },
-      { label: 'Mthwalume', value: 'Mthwalume' },
-      { label: 'Mthwalume2', value: 'Mthwalume2' },
-      { label: 'Mthwalume3', value: 'Mthwalume3' },
-      { label: 'Madadeni', value: 'Madadeni' },
-      { label: 'Madadeni2', value: 'Madadeni2' },
-      { label: 'Madadeni3', value: 'Madadeni3' },
-      { label: 'Madadeni4', value: 'Madadeni4' },
-      { label: 'Oppermans', value: 'Oppermans' },
-      { label: 'Oppermans2', value: 'Oppermans2' },
-      { label: 'Meloding', value: 'Meloding' },
-      { label: 'Meloding2', value: 'Meloding2' },
-      { label: 'Randfontein', value: 'Randfontein' },
-      { label: 'Randfontein2', value: 'Randfontein2' },
-      { label: 'Sebokeng', value: 'Sebokeng' },
-    ],
-  },
-];
-
 export const selectedLCList = [
   {
     labelKey: 'Busisiwe Ngcobo',
