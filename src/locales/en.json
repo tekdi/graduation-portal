@@ -444,6 +444,7 @@
       "filterAndSelectParticipants": "Filter and select participants to assign to {{lc}}",
       "selectParticipants": "Select Participants ({{count}} selected)",
       "assignParticipantsToLc": "Assign {{count}} Participants to LC",
+      "assignLCsToSupervisor": "Assign {{count}} LCs to Supervisor",
       "listOfParticipantsMappedToLc": "List of Participants Mapped to LC",
       "currentParticipantAssignmentsFor": "Current participant assignments for {{lc}}",
       "participant": "Participant",

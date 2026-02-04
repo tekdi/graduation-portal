@@ -101,3 +101,63 @@ export const getLinkageChampions = async (
     throw error;
   }
 };
+
+/**
+ * Assign LCs to Supervisor
+ * Creates or updates program user assignments
+ * 
+ * @param params - Assignment parameters
+ * @returns A promise resolving to the API response
+ */
+export const assignLCsToSupervisor = async (params: {
+  userId: string; // Supervisor's user ID
+  programId: string; // Program ID
+  assignedUserIds: string[]; // Array of LC user IDs
+  assignedUsersStatus?: string; // Status for assigned users (default: "ACTIVE")
+  userRolesToEntityTypeMap?: Record<string, string>; // Role to entity type mapping
+}): Promise<any> => {
+  try {
+    const {
+      userId,
+      programId,
+      assignedUserIds,
+      assignedUsersStatus = 'ACTIVE',
+      userRolesToEntityTypeMap = {
+        org_admin: 'linkageChampion',
+        tenant_admin: 'supervisor',
+        user: 'participant',
+      },
+    } = params;
+
+    const endpoint = API_ENDPOINTS.UPDATE_ENTITY_DETAILS;
+    
+    const requestBody = {
+      userId,
+      programId,
+      assignedUserIds,
+      assignedUsersStatus,
+      userRolesToEntityTypeMap,
+    };
+    
+    // Additional headers (static for now)
+    const adminAccessToken = '9F3bEr6jEABY0juEmqStkH1Mkt7WAHUxJYQeFge5ONN';
+    const internalAccessToken = '9yG*tM*y(7)';
+    const tenantId = 'brac';
+    const orgId = 'brac_gbl';
+
+    const response = await api.post<any>(endpoint, requestBody, {
+      headers: {
+        'Content-Type': 'application/json',
+        'internal-access-token': internalAccessToken,
+        'admin-access-token': adminAccessToken,
+        'tenantId': tenantId,
+        'orgId': orgId,
+      },
+    });
+    
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};

@@ -16,7 +16,7 @@ import {
 import UserAvatarCard from '@components/UserAvatarCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
-import { getLinkageChampions } from '../../services/assignUsersService';
+import { getLinkageChampions, assignLCsToSupervisor } from '../../services/assignUsersService';
 
 // Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
 declare const process:
@@ -139,33 +139,75 @@ const AssignUsersScreen = () => {
  };
 
  // Handler for when LCs are assigned to supervisor
- const handleAssignLCs = (selectedLCs: any[]) => {
-   // Generate additional data for assigned LCs (email, LC ID, site)
-   const lcsWithFullData = selectedLCs.map((lc, index) => {
-     // Generate email from name (simple conversion)
-     const nameParts = lc.labelKey.toLowerCase().split(' ');
-     const email = nameParts.length > 1
-       ? `${nameParts[0]}.${nameParts[1]}@gbl.co.za`
-       : `${nameParts[0]}@gbl.co.za`;
+ const handleAssignLCs = async (selectedLCs: any[]) => {
+   try {
+     // Get supervisor ID from selected supervisor
+     if (!selectedSupervisor) {
+       console.error('No supervisor selected');
+       return;
+     }
+
+     const supervisorId = String((selectedSupervisor as any).id || (selectedSupervisor as any)._id || '');
+     if (!supervisorId) {
+       console.error('Supervisor ID not found');
+       return;
+     }
+
+     // Get programId from environment variable
+     // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+     const programId = process.env.GLOBAL_LC_PROGRAM_ID;
+     if (!programId) {
+       console.error('GLOBAL_LC_PROGRAM_ID is not defined in environment variables');
+       return;
+     }
+
+     // Extract LC user IDs from selected LCs
+     const assignedUserIds = selectedLCs
+       .map((lc) => String(lc.id || lc._id || ''))
+       .filter((id) => id !== '');
+
+     if (assignedUserIds.length === 0) {
+       console.error('No valid LC IDs found');
+       return;
+     }
+
+     // Call API to assign LCs to supervisor
+     await assignLCsToSupervisor({
+       userId: supervisorId,
+       programId: programId,
+       assignedUserIds: assignedUserIds,
+       assignedUsersStatus: 'ACTIVE',
+     });
+
+     // Generate additional data for assigned LCs (email, LC ID, site)
+     const lcsWithFullData = selectedLCs.map((lc, index) => {
+       // Generate email from name (simple conversion)
+       const nameParts = lc.labelKey.toLowerCase().split(' ');
+       const email = nameParts.length > 1
+         ? `${nameParts[0]}.${nameParts[1]}@gbl.co.za`
+         : `${nameParts[0]}@gbl.co.za`;
+       
+       // Generate LC ID (increment from existing)
+       const lcId = `LC-${String(assignedLCs.length + 2 + index).padStart(3, '0')}`;
+       
+       // Extract site from location or use default
+       const site = lc.location?.includes('eThekwini') ? 'Site B' : 
+                    lc.location?.includes('Johannesburg') ? 'Site A' : 'Site C';
+       
+       return {
+         ...lc,
+         email,
+         lcId,
+         site,
+       };
+     });
      
-     // Generate LC ID (increment from existing)
-     const lcId = `LC-${String(assignedLCs.length + 2 + index).padStart(3, '0')}`;
-     
-     // Extract site from location or use default
-     const site = lc.location?.includes('eThekwini') ? 'Site B' : 
-                  lc.location?.includes('Johannesburg') ? 'Site A' : 'Site C';
-     
-     return {
-       ...lc,
-       email,
-       lcId,
-       site,
-     };
-   });
-   
-   // Add to assigned LCs list
-   setAssignedLCs((prev) => [...prev, ...lcsWithFullData]);
-   console.log('LCs assigned:', lcsWithFullData);
+     // Add to assigned LCs list
+     setAssignedLCs((prev) => [...prev, ...lcsWithFullData]);
+   } catch (error) {
+     console.error('Error assigning LCs to supervisor:', error);
+     // TODO: Show error message to user
+   }
  };
 
  // Filter out assigned LCs from the available list

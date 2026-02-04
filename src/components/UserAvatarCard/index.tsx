@@ -241,26 +241,36 @@ const UserAvatarCard = ({
         <Button
           {...titleHeaderStyles.solidButton}
           mt={'$3'}
-          onPress={() => {
+          onPress={async () => {
             // Handle assign LCs to supervisor
             const selectedLCValues = Array.from(selectedLCs);
             const selectedLCObjects = displayLCList.filter((lc: any) =>
               selectedLCValues.includes(lc.value)
             );
-            console.log('Assigning LCs:', selectedLCObjects);
-            // Call parent's onAssign callback if provided
-            onAssign?.(selectedLCObjects);
-            // Clear selection after assignment
-            setSelectedLCs(new Set());
-            // TODO: Implement API call to assign LCs
+            // Call parent's onAssign callback if provided (await if it's async)
+            if (onAssign) {
+              try {
+                await onAssign(selectedLCObjects);
+                // Clear selection only after successful assignment
+                setSelectedLCs(new Set());
+              } catch (error) {
+                console.error('Error in onAssign callback:', error);
+                // Don't clear selection on error
+              }
+            }
           }}
           isDisabled={selectedLCs.size === 0}
         >
           <HStack space="sm" alignItems="center">
+            <LucideIcon 
+              name="CircleCheck" 
+              size={20} 
+              color={theme.tokens.colors.white || '#FFFFFF'} 
+            />
             <Text {...titleHeaderStyles.solidButtonText}>
               {isParticipantList
                 ? t('admin.assignUsers.assignParticipantsToLc').replace('{{count}}', String(selectedLCs.size))
-                : t('admin.actions.assignLCsToSupervisor')}
+                : t('admin.assignUsers.assignLCsToSupervisor').replace('{{count}}', String(selectedLCs.size))}
             </Text>
           </HStack>
         </Button>
