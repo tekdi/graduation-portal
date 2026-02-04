@@ -62,5 +62,16 @@ export const AssignUsersStyles = {
       fontWeight: '$normal',
       // AvatarFallbackText style - customize as needed
     },
+    avatarBoxStyles: {
+      width: '$10',
+      height: '$10',
+      backgroundColor: '$bgPrimary/10',
+      borderRadius: '$full',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    avatarTextStyles: {
+      color: '$primary500',
+    },
 };
    
