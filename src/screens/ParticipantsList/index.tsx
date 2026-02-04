@@ -12,6 +12,7 @@ import {
   Button,
   ButtonIcon,
   ButtonText,
+  useAlert,
 } from '@ui';
 import { useNavigation } from '@react-navigation/native';
 import SearchBar from '@components/SearchBar';
@@ -27,6 +28,8 @@ import { styles } from './Styles';
 import { useAuth } from '@contexts/AuthContext';
 import logger from '@utils/logger';
 import { PageHeader } from '@components/PageHeader';
+import { getTargetedSolutions } from '../../services/solutionService';
+import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
 
 // Status key type (keys of STATUS object)
 type StatusKey = keyof typeof STATUS;
@@ -230,10 +233,7 @@ const ParticipantsList: React.FC = () => {
                 />
               </Box>
               <Box {...styles.buttonContainer}>
-                <Button variant="solid" size="sm">
-                  <ButtonIcon as={LucideIcon} name="Users" />
-                  <ButtonText>{t('participants.groupCheckIns')}</ButtonText>
-                </Button>
+                <GroupCheckInsButton />
               </Box>
             </HStack>
 
@@ -320,3 +320,48 @@ const ParticipantsList: React.FC = () => {
 };
 
 export default ParticipantsList;
+
+// Helper hook/component for Group Check-Ins
+const GroupCheckInsButton: React.FC = () => {
+  const navigation = useNavigation();
+  const { user } = useAuth();
+  const { t } = useLanguage();
+  const { showAlert } = useAlert();
+  const handleGroupCheckIns = async () => {
+    try {
+      // Call the API with keyword filter (e.g. "checkin") and send userId for auth context
+      const response = await getTargetedSolutions({
+        type: 'observation',
+        // @ts-ignore - filter[keywords] is a valid parameter
+        "filter[keywords]": FILTER_KEYWORDS.GROUP_CHECK_IN.join(',')
+      });;
+      // Assume the API returns an array of solutions, pick the first one
+      const solution = response?.[0];
+      if (solution?.solutionId) {
+        // Navigate to the group check-in details page or solution details
+        // @ts-ignore
+        navigation.navigate('observation', {
+          id: user?.id as string,
+          solutionId: solution.solutionId,
+        });
+      } else {
+        // Optionally show error (toast/snackbar)
+        showAlert('error', 'No group check-in solutions found: '+solution.solutionId);
+      }
+    } catch (err: any) {
+      const errorMessage = err?.response?.data?.message || err?.message || 'Failed to fetch targeted solutions';
+      logger.error('Error fetching targeted solutions:', errorMessage, err);
+      // Handle error (log or UI feedback)
+      showAlert('error', 'Failed to fetch targeted solutions: '+errorMessage);
+    }
+  };
+
+  return (
+    <Button variant="solid" size="sm" onPress={handleGroupCheckIns}>
+      <ButtonIcon as={LucideIcon} name="Users" />
+      <ButtonText>{t('participants.groupCheckIns')}</ButtonText>
+    </Button>
+  );
+};
+
+export { GroupCheckInsButton };
