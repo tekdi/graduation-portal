@@ -232,6 +232,7 @@ export default function FilterButton({
           key={`select-${item.attr}-${item.data?.length || 0}`} // Force re-render when options change
           value={value?.[item.attr] || getDefaultDisplayValue(item)}
           onChange={handleSelectChange}
+          placeholder={getPlaceholder()}
           options={
             item?.data?.map((option: any) => {
               // If it's a string, return as-is (backward compatibility)
@@ -292,7 +293,7 @@ export default function FilterButton({
       <HStack {...filterStyles.filterFieldsContainer}>
         {/* Search Bar - Only show if there's a search field in data, placed first */}
         {searchItem && (
-          <Box width="$full" $md-width="20%" flex={2}>
+          <Box width="$full" $md-width="20%" flex={1} $md-flex={2}>
             <SearchBar
               key={`search-${clearCount}`}
               placeholder={t('admin.filters.searchPlaceholder')}

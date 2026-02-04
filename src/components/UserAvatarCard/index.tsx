@@ -16,18 +16,18 @@ import {
  Divider,
  Button,
  Pressable,
+ Box,
 } from '@ui';
 import FilterButton from '@components/Filter';
 import { AssignUsersStyles } from './Styles';
 import type { TextProps, ViewProps } from 'react-native';
 import { useLanguage } from '@contexts/LanguageContext';
-import { selectedLCList } from '@constants/USER_MANAGEMENT_FILTERS';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
 
 
-interface SelectionCardProps {
+interface UserAvatarCardProps {
  title: string;
  description: string;
  filterOptions?: any;
@@ -43,7 +43,7 @@ interface SelectionCardProps {
 }
 
 
-const SelectionCard = ({
+const UserAvatarCard = ({
   title,
   description,
   filterOptions,
@@ -56,14 +56,14 @@ const SelectionCard = ({
   onAssign,
   lcList,
   isParticipantList = false,
-}: SelectionCardProps) => {
+}: UserAvatarCardProps) => {
   const { t } = useLanguage();
 
   const [selectedLc, setSelectedLc] = useState<any>(null);
   const [selectedLCs, setSelectedLCs] = useState<Set<string>>(new Set());
   
-  // Use provided lcList or fall back to default selectedLCList
-  const displayLCList = lcList || selectedLCList;
+  // Use provided lcList or fall back to empty array
+  const displayLCList = lcList || [];
  // Handler to receive filter changes from FilterButton and pass to parent
  const handleFilterChange = (values: Record<string, any>) => {
    // Call parent's onChange handler if provided
@@ -91,28 +91,71 @@ const SelectionCard = ({
         />
       )}
      {/* Display selected values if showSelectedCard is true and values exist */}
-     {showSelectedCard && selectedValues && (
-       <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>
-         <Avatar {...(AssignUsersStyles.avatarBgStyles as any)}>
-           <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)}>
-             {selectedValues.selectSupervisor ||
-               selectedValues.selectedValue ||
-               selectedValues.labelKey ||
-               ''}
-           </AvatarFallbackText>
-         </Avatar>
-         <View>
-           <Text {...(AssignUsersStyles.supervisorName as TextProps)}>
-             {selectedValues.selectSupervisor ||
-               selectedValues.selectedValue ||
-               ''}
-           </Text>
-           <Text {...(AssignUsersStyles.provinceName as TextProps)}>
-             {selectedValues.filterByProvince || selectedValues.province || 'eThekwini, KwaZulu-Natal'}
-           </Text>
-         </View>
-       </Card>
-     )}
+     {showSelectedCard && selectedValues && (() => {
+       
+       const supervisorData = selectedValues.selectedSupervisorData;
+
+        // Get supervisor name from API response (name field) or fallback to filter value
+        const supervisorName =
+        supervisorData?.name ||
+        selectedValues.selectSupervisor ||
+        selectedValues.selectedValue ||
+        '';
+
+        // Extract initials from supervisor name
+        // Rules:
+        // - Multiple words → first letter of first name + first letter of last name
+        //   Example: "Amol Patil" -> "AP", "John Doe Smith" -> "JS"
+        // - Single word → first letter only
+        //   Example: "Amol" -> "A"
+        const getInitials = (name: string): string => {
+        if (!name || typeof name !== 'string') return '';
+
+        const parts = name
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+        // Single name → first letter only
+        if (parts.length === 1) {
+            return parts[0][0].toUpperCase();
+        }
+
+        // First letter of first name + first letter of last name
+        const firstInitial = parts[0][0];
+        const lastInitial = parts[parts.length - 1][0];
+
+        return (firstInitial + lastInitial).toUpperCase();
+        };
+
+        // Usage
+        const supervisorInitials = getInitials(supervisorName);
+// Get location from selected province name (API response has location: null)
+       // Use the province name from the filter selection as the location
+       const supervisorLocation = selectedValues.selectedProvinceName || 
+                                  supervisorData?.meta?.province ||
+                                  '';
+       
+       return (
+         <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>
+           <HStack space="md" alignItems="center">
+              <Box {...(AssignUsersStyles.avatarBoxStyles as ViewProps)}>
+                 <Text {...(AssignUsersStyles.avatarTextStyles as TextProps)}>{supervisorInitials}</Text>
+              </Box>
+             <View flex={1}>
+               <Text {...(AssignUsersStyles.supervisorName as TextProps)}>
+                 {supervisorName}
+               </Text>
+               {supervisorLocation && (
+                 <Text {...(AssignUsersStyles.provinceName as TextProps)}>
+                   {supervisorLocation}
+                 </Text>
+               )}
+             </View>
+           </HStack>
+         </Card>
+       );
+     })()}
      {showLcList && (
        <VStack marginTop={'$3'}>
          <Text {...(AssignUsersStyles.provinceName as TextProps)} color="$textForeground">
@@ -265,4 +308,4 @@ const SelectionCard = ({
 };
 
 
-export default SelectionCard;
+export default UserAvatarCard;

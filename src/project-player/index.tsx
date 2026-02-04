@@ -9,6 +9,7 @@ import {
   ProjectPlayerData,
 } from './types/components.types';
 import { areAllTasksCompleted } from './utils/taskCompletionUtils';
+import { TASK_STATUS } from '../constants/app.constant';
 
 export type { ProjectPlayerConfig, ProjectPlayerData };
 
@@ -17,15 +18,47 @@ export type { ProjectPlayerConfig, ProjectPlayerData };
  */
 const TaskCompletionTracker: React.FC<{
   onTaskCompletionChange?: (areAllCompleted: boolean) => void;
-}> = ({ onTaskCompletionChange }) => {
+  onProgressChange?: (progress: number) => void;
+}> = ({ onTaskCompletionChange, onProgressChange }) => {
   const { projectData } = useProjectContext();
 
   useEffect(() => {
-    if (projectData?.tasks && onTaskCompletionChange) {
+    if (!projectData) return;
+
+    if (onTaskCompletionChange && projectData?.tasks) {
       const allCompleted = areAllTasksCompleted(projectData.tasks);
       onTaskCompletionChange(allCompleted);
     }
-  }, [projectData?.tasks, onTaskCompletionChange]);
+
+    if (onProgressChange) {
+      const topLevelTasks = projectData.children?.length
+        ? projectData.children
+        : projectData.tasks || [];
+      let totalChildTasks = 0;
+      let completedChildTasks = 0;
+
+      topLevelTasks.forEach(task => {
+        const childTasks = task.children || task.tasks || [];
+        if (!childTasks.length) return;
+
+        const validChildren = childTasks.filter(
+          (childTask: any) => !childTask.isDeleted,
+        );
+
+        totalChildTasks += validChildren.length;
+        completedChildTasks += validChildren.filter(
+          (childTask: any) => childTask.status === TASK_STATUS.COMPLETED,
+        ).length;
+      });
+
+      const progress =
+        totalChildTasks > 0
+          ? Math.round((completedChildTasks / totalChildTasks) * 100)
+          : 0;
+
+      onProgressChange(progress);
+    }
+  }, [projectData, onTaskCompletionChange, onProgressChange]);
 
   return null; // This component doesn't render anything
 };
@@ -35,6 +68,7 @@ const ProjectPlayer: React.FC<ProjectPlayerProps> = ({
   data,
   onTaskUpdate,
   onTaskCompletionChange,
+  onProgressChange,
 }) => {
   const {
     projectData: loadedProject,
@@ -64,7 +98,10 @@ const ProjectPlayer: React.FC<ProjectPlayerProps> = ({
       initialData={loadedProject}
       onTaskUpdate={onTaskUpdate}
     >
-      <TaskCompletionTracker onTaskCompletionChange={onTaskCompletionChange} />
+      <TaskCompletionTracker
+        onTaskCompletionChange={onTaskCompletionChange}
+        onProgressChange={onProgressChange}
+      />
       <ProjectComponent />
     </ProjectProvider>
   );

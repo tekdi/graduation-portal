@@ -82,6 +82,10 @@ export default function ParticipantDetail() {
   });
   const [participant, setParticipant] = useState<User | undefined>();
   const [areAllTasksCompleted, setAreAllTasksCompleted] = useState(false);
+  const [updatedProgress, setUpdatedProgress] = useState<number | undefined>(
+    undefined,
+  );
+  const [hasProgressBaseline, setHasProgressBaseline] = useState(false);
 
   useEffect(() => {
     const fetchEntityDetails = async () => {
@@ -106,6 +110,19 @@ export default function ParticipantDetail() {
   const handleIdpCreated = () => {
     setIdpCreated(true)
   }
+
+  useEffect(() => {
+    setUpdatedProgress(undefined);
+    setHasProgressBaseline(false);
+  }, [participantId]);
+
+  const handleProgressChange = (progress: number) => {
+    if (!hasProgressBaseline) {
+      setHasProgressBaseline(true);
+      return;
+    }
+    setUpdatedProgress(progress);
+  };
 
   if (isLoading) {
     return <Loader fullScreen message="Loading participant details..." />;
@@ -141,6 +158,7 @@ export default function ParticipantDetail() {
         : participant?.onBoardedProjectId,
     entityId: participant?.entityId,
     userStatus: participant?.status,
+    province:participant?.province?.value
   };
 
   const handleSaveAddress = async () => {
@@ -183,6 +201,7 @@ export default function ParticipantDetail() {
         status={participant.status as ParticipantStatus}
         pathway={'employment'}
         graduationDate={''}
+        updatedProgress={updatedProgress}
         onViewProfile={() => setIsProfileModalOpen(true)}
         areAllTasksCompleted={areAllTasksCompleted}
         userEntityId={participant?.entityId}
@@ -197,6 +216,7 @@ export default function ParticipantDetail() {
             config={configData}
             data={ProjectPlayerConfigData}
             onTaskCompletionChange={setAreAllTasksCompleted}
+            onProgressChange={handleProgressChange}
           />
         ) : (
           // ENROLLED, IN_PROGRESS, DROPOUT: Show tabs with ProjectPlayer in InterventionPlan
@@ -236,6 +256,7 @@ export default function ParticipantDetail() {
                         participantId={id}
                         participantProfile={participant}
                         onIdpCreation={handleIdpCreated}
+                        onProgressChange={handleProgressChange}
                       />
                     )}
                   {activeTab ===

@@ -188,7 +188,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Simple status circle
     const circleSize = 20;
-    const checkSize = 28;
+    const checkSize = 15;
 
     // Status Circle Logic
     const isOptional = task?.isDeletable;
@@ -210,12 +210,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
         showCheck = showTick;
       } else {
         // Mandatory onboarding tasks - show tick when files are uploaded
-        const hasUploadedFiles = task.attachments && task.attachments.length > 0;
-        const showTick = hasUploadedFiles;
-        circleBorderColor = showTick ? '$primary500' : '$textMuted';
-        circleBg = showTick ? '$primary500' : '$backgroundPrimary.light';
+        showCheck = isCompleted;
+        circleBorderColor = showCheck ? '$primary500' : '$textMuted';
+        circleBg = showCheck ? '$primary500' : '$backgroundPrimary.light';
         checkColor = theme.tokens.colors.backgroundPrimary.light;
-        showCheck = showTick;
       }
     } else if (isChildOfProject) {
       if (isOptional) {
@@ -786,24 +784,45 @@ const TaskCard: React.FC<TaskCardProps> = ({
             flexDirection={isMobile ? 'column' : 'row'}
           >
             {isMobile ? (
-              <HStack alignItems="flex-start" space="xs" width="100%">
-                <Box flexShrink={0} mt="$1">
-                  {renderStatusIndicator()}
-                </Box>
-                <Box flex={1}>
-                  {renderTaskInfo()}
-                </Box>
-                <Box flexShrink={0}>
-                  <HStack space="xs" alignItems="center">
-                    {renderActionButton()}
+              isPreview ? (
+                <HStack alignItems="flex-start" space="xs" width="100%">
+                  <Box flexShrink={0} mt="$1">
+                    {renderStatusIndicator()}
+                  </Box>
+                  <Box flex={1}>
+                    {renderTaskInfo()}
+                  </Box>
+                  <Box flexShrink={0}>
+                    <HStack space="xs" alignItems="center">
+                      {renderActionButton()}
+                      {renderCustomTaskActions({
+                        isCustomTask: task.isCustomTask || false,
+                        onEdit: openEditModal,
+                        onDelete: openDeleteModal,
+                      })}
+                    </HStack>
+                  </Box>
+                </HStack>
+              ) : (
+                <VStack space="xs" width="100%">
+                  <HStack alignItems="flex-start" space="xs">
+                    <Box flexShrink={0} mt="$1">
+                      {renderStatusIndicator()}
+                    </Box>
+                    <Box flex={1}>
+                      {renderTaskInfo()}
+                    </Box>
                     {renderCustomTaskActions({
                       isCustomTask: task.isCustomTask || false,
                       onEdit: openEditModal,
                       onDelete: openDeleteModal,
                     })}
                   </HStack>
-                </Box>
-              </HStack>
+                  <Box width="100%">
+                    {renderActionButton()}
+                  </Box>
+                </VStack>
+              )
             ) : (
               <>
                 <Box flexShrink={0} mt="$1">

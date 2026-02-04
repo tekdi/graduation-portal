@@ -89,5 +89,19 @@ export const AssignUsersStyles = {
       mb: '$3',
       color: '$textLight900',
     },
+    cardStyles: {
+      padding: '$4',
+      backgroundColor: '$backgroundLight0',
+      borderWidth: 1,
+      borderColor: '$primary200',
+      borderRadius: '$lg',
+      marginTop: '$4',
+    },
+    coverCardStyles: {
+      padding: '$4',
+      backgroundColor: '$white',
+      borderRadius: '$lg',
+      marginBottom: '$4',
+    },
    };
    

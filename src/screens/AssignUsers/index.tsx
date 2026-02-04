@@ -5,32 +5,72 @@ import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ViewProps, TextProps } from 'react-native';
 import {
- lcFilterOptions,
  participantLCFilterOptions,
  SearchFilter,
  ParticipantSearchFilter,
- selectedLCList,
  participantFilterOptions,
  participantList,
-} from '@constants/USER_MANAGEMENT_FILTERS';
-import { supervisorFilterOptions } from '@constants/USER_MANAGEMENT_FILTERS';
-import SelectionCard from '@components/SelectionCard';
+ useSupervisorFilterOptions,
+ useSiteFilterOptions,
+} from '@constants/ASSIGN_USERS_FILTERS';
+import UserAvatarCard from '@components/UserAvatarCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
+import { getLinkageChampions } from '../../services/assignUsersService';
+
+// Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
+declare const process:
+  | {
+      env: {
+        [key: string]: string | undefined;
+      };
+    }
+  | undefined;
 
 const AssignUsersScreen = () => {
  const { t } = useLanguage();
- const AssignLCFilterOptions = [SearchFilter, ...lcFilterOptions];
  const AssignParticipantFilterOptions = [ParticipantSearchFilter, ...participantFilterOptions];
  type AssignTab = 'LC_TO_SUPERVISOR' | 'PARTICIPANT_TO_LC';
 
 
  const [activeTab, setActiveTab] = useState<AssignTab>('LC_TO_SUPERVISOR');
  const [selectedLc, setSelectedLc] = useState<any>(null);
- // State to store filter values for each SelectionCard
+ // State to store filter values for each UserAvatarCard
  const [supervisorFilterValues, setSupervisorFilterValues] = useState<
    Record<string, any>
  >({});
+ // State for linkage champions fetched from API
+ const [linkageChampions, setLinkageChampions] = useState<any[]>([]);
+ const [isLoadingLCs, setIsLoadingLCs] = useState(false);
+ 
+ // Get dynamic supervisor filter options (supervisor disabled until province is selected)
+ const { filters: supervisorFilterOptions, supervisors: supervisorsData } = useSupervisorFilterOptions(supervisorFilterValues);
+ 
+ // Get dynamic site filter options based on province selected in Step 1
+ const { filters: siteFilterOptions } = useSiteFilterOptions(supervisorFilterValues.filterByProvince);
+ 
+ // Combine search filter with dynamic site filter for Step 2
+ const AssignLCFilterOptions = [SearchFilter, ...siteFilterOptions];
+ 
+ // Find the selected supervisor object from supervisorsData
+ // Match by id (number) or _id (string) or email, converting to string for comparison
+ const selectedSupervisor = supervisorsData.find(
+   (supervisor: any) => {
+     const supervisorId = String(supervisor.id || supervisor._id || supervisor.email || '');
+     const selectedId = String(supervisorFilterValues.selectSupervisor || '');
+     return supervisorId === selectedId;
+   }
+ );
+ 
+ // Get province name from selected province ID for location display
+ const provinceFilter = supervisorFilterOptions.find((filter: any) => filter.attr === 'filterByProvince');
+ const selectedProvinceOption = provinceFilter?.data?.find((option: any) => {
+   const optionValue = typeof option === 'string' ? option : option.value;
+   return optionValue === supervisorFilterValues.filterByProvince;
+ });
+ const selectedProvinceName = typeof selectedProvinceOption === 'string' 
+   ? selectedProvinceOption 
+   : selectedProvinceOption?.label || '';
  const [lcFilterValues, setLcFilterValues] = useState<Record<string, any>>({});
  // State to track assigned LCs
  const [assignedLCs, setAssignedLCs] = useState<any[]>([]);
@@ -43,6 +83,20 @@ const AssignUsersScreen = () => {
 
  // Handler for supervisor and LC filter changes (combined in Step 1)
  const handleSupervisorFilterChange = (values: Record<string, any>) => {
+   // Clear supervisor selection when province changes
+   if (values.filterByProvince !== supervisorFilterValues.filterByProvince) {
+     values.selectSupervisor = undefined;
+     setAssignedLCs([]);
+     setAssignedParticipants([]);
+     setSelectedLc(null);
+     // Clear site filter in Step 2 when province changes
+     setLcFilterValues((prev) => {
+       const updated = { ...prev };
+       delete updated.site;
+       return updated;
+     });
+   }
+   
    // Reset assigned LCs when supervisor changes
    if (values.selectSupervisor !== supervisorFilterValues.selectSupervisor) {
      setAssignedLCs([]);
@@ -57,8 +111,8 @@ const AssignUsersScreen = () => {
    
    // Handle LC selection from filter
    if (values.selectLC && values.selectLC !== supervisorFilterValues.selectLC) {
-     // Find the LC object from selectedLCList
-     const lc = selectedLCList.find((lc: any) => lc.value === values.selectLC);
+     // Find the LC object from linkageChampions
+     const lc = linkageChampions.find((lc: any) => lc.value === values.selectLC);
      if (lc) {
        // Reset assigned participants when LC changes
        if (lc.value !== selectedLc?.value) {
@@ -73,11 +127,10 @@ const AssignUsersScreen = () => {
    }
    
    setSupervisorFilterValues(values);
-   console.log('Supervisor filter values changed:', values);
  };
 
 
- // Handler for LC SelectionCard filter changes
+ // Handler for LC UserAvatarCard filter changes
  const handleLcFilterChange = (values: Record<string, any>) => {
    setLcFilterValues(values);
    console.log('LC filter values changed:', values);
@@ -118,7 +171,7 @@ const AssignUsersScreen = () => {
  // Filter out assigned LCs from the available list
  const getAvailableLCs = () => {
    const assignedLCValues = new Set(assignedLCs.map(lc => lc.value));
-   return selectedLCList.filter((lc: any) => !assignedLCValues.has(lc.value));
+   return linkageChampions.filter((lc: any) => !assignedLCValues.has(lc.value));
  };
 
  // Handler for when participants are assigned to LC
@@ -160,10 +213,65 @@ const AssignUsersScreen = () => {
  };
 
 
+ // Fetch linkage champions when province or site filters change
+ useEffect(() => {
+   const fetchLinkageChampions = async () => {
+     try {
+       setIsLoadingLCs(true);
+       // Get programId from environment variable
+       // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+       const programId = process.env.GLOBAL_LC_PROGRAM_ID;
+       
+       if (!programId) {
+         console.error('GLOBAL_LC_PROGRAM_ID is not defined in environment variables');
+         setLinkageChampions([]);
+         return;
+       }
+       
+       // Get province from supervisor filter values (Step 1)
+       const province = supervisorFilterValues.filterByProvince;
+       // Get site from LC filter values (Step 2)
+       const site = lcFilterValues.site;
+       
+       const response = await getLinkageChampions(programId, {
+         excludeMapped: true,
+         limit: 100,
+         province: province,
+         site: site,
+       });
+       
+       // Transform API response to match expected format
+       const lcs = (response.result?.data || []).map((lc: any) => {
+         const name = lc.name || lc.full_name || lc.email || 'Unknown';
+         const value = lc.id || lc._id || lc.email || name;
+         // Extract location from meta or use default
+         const location = lc.meta?.location || lc.location || '';
+         
+         return {
+           labelKey: name,
+           value: String(value),
+           location: location,
+           status: 'unassigned',
+           email: lc.email || '',
+           id: value,
+         };
+       });
+       
+       setLinkageChampions(lcs);
+     } catch (error) {
+       console.error('Error fetching linkage champions:', error);
+       setLinkageChampions([]);
+     } finally {
+       setIsLoadingLCs(false);
+     }
+   };
+
+   fetchLinkageChampions();
+ }, [supervisorFilterValues.filterByProvince, lcFilterValues.site]);
+
  // Use filter values to perform actions when filters change
  useEffect(() => {
    if (Object.keys(supervisorFilterValues).length > 0) {
-     console.log('Current supervisor filter values:', supervisorFilterValues);
      // Add your filtering/fetching logic here for supervisors
    }
  }, [supervisorFilterValues]);
@@ -219,12 +327,16 @@ const AssignUsersScreen = () => {
 
      {activeTab === 'LC_TO_SUPERVISOR' && (
        <>
-         <SelectionCard
+         <UserAvatarCard
            title="admin.assignUsers.step1SelectSupervisor"
            description="admin.assignUsers.filterByProvince"
            filterOptions={supervisorFilterOptions}
            onChange={handleSupervisorFilterChange}
-           selectedValues={supervisorFilterValues}
+           selectedValues={{
+             ...supervisorFilterValues,
+             selectedSupervisorData: selectedSupervisor, // Pass full supervisor object
+             selectedProvinceName: selectedProvinceName, // Pass province name for location
+           }}
            showSelectedCard={!!supervisorFilterValues.selectSupervisor}
            showLcList={false}
          />
@@ -232,7 +344,7 @@ const AssignUsersScreen = () => {
 
         {supervisorFilterValues.selectSupervisor && (
           <>
-            <SelectionCard
+            <UserAvatarCard
               title="admin.assignUsers.step2AssignLinkageChampions"
               description="admin.assignUsers.filterByGeography"
               filterOptions={AssignLCFilterOptions}
@@ -384,7 +496,7 @@ const AssignUsersScreen = () => {
 
      {activeTab === 'PARTICIPANT_TO_LC' && (
        <>
-         <SelectionCard
+         <UserAvatarCard
            title="admin.assignUsers.step1SelectSupervisorAndLC"
            description="admin.assignUsers.chooseSupervisor"
            filterOptions={participantLCFilterOptions.map(filter => {
@@ -393,7 +505,7 @@ const AssignUsersScreen = () => {
                if (supervisorFilterValues.selectSupervisor) {
                  return {
                    ...filter,
-                   data: selectedLCList.map((lc: any) => ({
+                   data: linkageChampions.map((lc: any) => ({
                      labelKey: lc.labelKey,
                      value: lc.value,
                    })),
@@ -416,7 +528,7 @@ const AssignUsersScreen = () => {
 
          {selectedLc && (
            <>
-             <SelectionCard
+             <UserAvatarCard
                title="admin.assignUsers.step2AssignParticipants"
                description="admin.assignUsers.filterAndSelectParticipants"
                filterOptions={AssignParticipantFilterOptions}
