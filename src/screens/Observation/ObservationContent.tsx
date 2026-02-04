@@ -161,7 +161,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       );
     }
   };
-console.log('submission', submission);
+  
   const setLoadingOff = () => {
     setTimeout(() => {
       setLoading(false);
@@ -203,7 +203,7 @@ console.log('submission', submission);
               observationId: observationId,
             });
             const entityData = entitiesData.result?.[0]?.data.find(
-              (entity: any) => entity.externalId === id,
+              (entity: any) => entity.externalId == id,
             );
             if (entityData) {
               try {

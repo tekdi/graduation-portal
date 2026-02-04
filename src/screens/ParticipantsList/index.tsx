@@ -343,6 +343,7 @@ const GroupCheckInsButton: React.FC = () => {
         navigation.navigate('observation', {
           id: user?.id as string,
           solutionId: solution.solutionId,
+          redirectUrl: 'participants',
         });
       } else {
         // Optionally show error (toast/snackbar)
