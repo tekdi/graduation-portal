@@ -105,11 +105,23 @@ const UserAvatarCard = ({
 
         // Get initials from supervisor name using common utility function
         const supervisorInitials = getInitials(supervisorName);
-// Get location from selected province name (API response has location: null)
-       // Use the province name from the filter selection as the location
-       const supervisorLocation = selectedValues.selectedProvinceName || 
-                                  supervisorData?.meta?.province ||
-                                  '';
+        
+        // Get province and site from supervisor API response
+        const supervisorProvince = supervisorData?.province?.label || '';
+        const supervisorSite = supervisorData?.local_municipality?.label || 
+                              supervisorData?.site?.label ||
+                              '';
+        
+        // Build location text: show both Province and Site if available
+        const locationParts = [];
+        if (supervisorSite) {
+          locationParts.push(supervisorSite);
+        }
+        if (supervisorProvince) {
+          locationParts.push(supervisorProvince);
+        }
+       
+        const supervisorLocation = locationParts.join(' , ');
        
        return (
          <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>

@@ -63,15 +63,6 @@ const AssignUsersScreen = () => {
    }
  );
  
- // Get province name from selected province ID for location display
- const provinceFilter = supervisorFilterOptions.find((filter: any) => filter.attr === 'filterByProvince');
- const selectedProvinceOption = provinceFilter?.data?.find((option: any) => {
-   const optionValue = typeof option === 'string' ? option : option.value;
-   return optionValue === supervisorFilterValues.filterByProvince;
- });
- const selectedProvinceName = typeof selectedProvinceOption === 'string' 
-   ? selectedProvinceOption 
-   : selectedProvinceOption?.label || '';
  const [lcFilterValues, setLcFilterValues] = useState<Record<string, any>>({});
  // State for mapped LCs from API
  const [mappedLCs, setMappedLCs] = useState<any[]>([]);
@@ -429,7 +420,6 @@ const AssignUsersScreen = () => {
            selectedValues={{
              ...supervisorFilterValues,
              selectedSupervisorData: selectedSupervisor, // Pass full supervisor object
-             selectedProvinceName: selectedProvinceName, // Pass province name for location
            }}
            showSelectedCard={!!supervisorFilterValues.selectSupervisor}
            showLcList={false}
@@ -459,7 +449,7 @@ const AssignUsersScreen = () => {
                   <Text {...(AssignUsersStyles.tableSubtitleText as TextProps)}>
                     {t('admin.assignUsers.currentLcAssignmentsFor').replace(
                       '{{supervisor}}',
-                      supervisorFilterValues.selectSupervisor || 'Supervisor'
+                      (selectedSupervisor as any)?.name || supervisorFilterValues.selectSupervisor || 'Supervisor'
                     )}
                   </Text>
                 </VStack>
