@@ -22,11 +22,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create .env for Docker build
-        run: |
-          echo "${{ secrets.QA_ENV_BRAC }}" > .env
-          ls -ltra .env
-
 
       # =========================
       # AWS Authentication
