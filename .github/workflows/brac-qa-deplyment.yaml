@@ -1,4 +1,4 @@
-name: Tag Build & Deploy User Service (BRAC)
+name: Tag Build & Deploy Frontend Service (BRAC)
 
 on:
   push:
@@ -53,9 +53,10 @@ jobs:
           context: .
           push: true
           tags: |
-            echo "${{ secrets.QA_ENV_BRAC }}" > .env
-            ls -ltra .env
-
+            cat << 'EOF' > .env
+            ${{ secrets.QA_ENV_BRAC }}
+            EOF
+            ls -ltra
             ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.TAG }}
 
       # =========================
