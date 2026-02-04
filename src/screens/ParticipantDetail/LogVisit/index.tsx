@@ -84,13 +84,14 @@ const LogVisit: React.FC = () => {
     }
   };
 
-  // Error State: Missing participant ID or participant not found
-  if (!participant) {
-    return <NotFound message="participantDetail.notFound.title" />;
-  }
 
   if (loading) {
     return <Spinner height={isWeb ? ('$calc(100vh - 68px)' as any) : '$full'} size="large" color="$primary500" />;
+  }
+  
+  // Error State: Missing participant ID or participant not found
+  if (!participant) {
+    return <NotFound message="participantDetail.notFound.title" />;
   }
 
   return (

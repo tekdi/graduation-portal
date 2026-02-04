@@ -134,6 +134,9 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
           evidenceCode:observationSubmissionsLast?.evidencesStatus?.[0]?.code,
         });
         observationSolution = response.result;
+      }
+      
+      if(!observationSubmissionsLast?.status) {
         setSubmission({status:CARD_STATUS.IN_PROGRESS});
       } else {
         setSubmission(observationSubmissionsLast);
@@ -158,7 +161,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       );
     }
   };
-
+console.log('submission', submission);
   const setLoadingOff = () => {
     setTimeout(() => {
       setLoading(false);
@@ -231,6 +234,9 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
                 );
                 setLoadingOff();
               }
+            } else {
+              showAlert('error', t('observation.noParticipantFound'));
+              setLoadingOff();
             }
           }
         } else {
