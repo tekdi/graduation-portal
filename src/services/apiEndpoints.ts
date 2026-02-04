@@ -10,7 +10,7 @@ export const API_ENDPOINTS = {
   OBSERVATION_SOLUTION: `${prefix}/survey/v1/observations/assessment`,
   OBSERVATION_SUBMISSIONS: `${prefix}/survey/v1/observationSubmissions/list`,
   CREATE_OBSERVATION_SUBMISSION: `${prefix}/survey/v1/observationSubmissions/create`,
-  PARTICIPANTS_LIST: `${prefix}/project/v1/programUsers/getEntities`,
+  PARTICIPANTS_LIST: `${prefix}/project/v1/programUsers/entities`,
   PARTICIPANTS_SUB_ENTITY_LIST: `${prefix}/entity-management/v1/entities/subEntityList`,
   ENTITY_DETAILS: `${prefix}/entity-management/v1/entities/details`,
   PROJECT_CATEGORIES_LIST: `/project/v1/library/categories/list?parentId=null&keywords=idp&getChildren=true`,
