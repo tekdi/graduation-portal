@@ -39,6 +39,7 @@ interface CheckInsListContentProps {
   id: string;
   userName?: string;
   onClose?: () => void;
+  onFormSelect?: (submission: any) => void;
   onNavigateToObservation?: (params: {
     id: string;
     solutionId: string;
@@ -56,6 +57,7 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
   userName,
   onNavigateToObservation,
   preSelectedSolution,
+  onFormSelect
 }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [solutions, setSolutions] = useState<AssessmentSurveyCardData[]>([]);
@@ -283,7 +285,7 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
                             onPress={() => handleViewForm(submission.submissionNumber)}
                           >
                             <ButtonIcon as={LucideIcon} name="Eye" size={16} />
-                            <ButtonText {...assessmentSurveyCardStyles.buttonText}>
+                            <ButtonText {...assessmentSurveyCardStyles.buttonText} onPress={() => onFormSelect?.(submission)}>
                               {t('logVisit.viewForm')}
                             </ButtonText>
                           </Button>

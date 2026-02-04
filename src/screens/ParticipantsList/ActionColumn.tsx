@@ -52,7 +52,7 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
   // Log visit modal specific states
   const [selectedSolutionId, setSelectedSolutionId] = useState<string>('');
   const [logVisitLoading, setLogVisitLoading] = useState(false);
-
+  const [selectedSubmissionNumber, setSelectedSubmissionNumber] = useState<number | null>(null);
   const handleViewDetails = () => {
     // @ts-ignore - Navigation type inference
     navigation.navigate('participant-detail', { id: participant.userId });
@@ -65,10 +65,12 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
       case 'view-log':
         setModalType('view-log');
         setSelectedSolutionId('');
+        setSelectedSubmissionNumber(null);
         break;
       case 'log-visit':
         setModalType('log-visit');
         setSelectedSolutionId('');
+        setSelectedSubmissionNumber(null);
         break;
       case 'dropout':
         setModalType('dropout');
@@ -155,6 +157,12 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
       setDropoutLoading(false);
     }
   }, [participant, user?.id, showAlert, t]);
+
+  const handleFormSelect = (submission: any) => {
+    setModalType('log-visit');
+    setSelectedSolutionId(submission.solutionId);
+    setSelectedSubmissionNumber(submission.submissionNumber);
+  };
 
   // Check if participant is Graduated or Dropout - hide menu for these statuses
   const isReadOnlyStatus = participant.status === STATUS.GRADUATED || participant.status === STATUS.DROPOUT;
@@ -271,6 +279,7 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
                 onClose={handleCloseModal}
                 // @ts-ignore - showAlert is a valid prop
                 showAlert={showAlert}
+                submissionNumber={selectedSubmissionNumber || undefined as any}
               />
             ) : selectedSolutionId && modalType === 'view-log' ? (
               <Box flex={1}>
@@ -278,6 +287,7 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
                   id={participant.userId}
                   userName={user?.name}
                   preSelectedSolution={selectedSolutionId}
+                  onFormSelect={handleFormSelect}
                 />
               </Box>
             ) : (
