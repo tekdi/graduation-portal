@@ -18,6 +18,15 @@ import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
 import { getLinkageChampions } from '../../services/assignUsersService';
 
+// Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
+declare const process:
+  | {
+      env: {
+        [key: string]: string | undefined;
+      };
+    }
+  | undefined;
+
 const AssignUsersScreen = () => {
  const { t } = useLanguage();
  const AssignParticipantFilterOptions = [ParticipantSearchFilter, ...participantFilterOptions];
@@ -209,9 +218,15 @@ const AssignUsersScreen = () => {
    const fetchLinkageChampions = async () => {
      try {
        setIsLoadingLCs(true);
-       // Using the programId from the curl command as default
-       // TODO: Make this configurable or get from context/config
-       const programId = '6952469bd9f179bdf8abe717';
+       // Get programId from environment variable
+       // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+       const programId = process.env.GLOBAL_LC_PROGRAM_ID;
+       
+       if (!programId) {
+         console.error('GLOBAL_LC_PROGRAM_ID is not defined in environment variables');
+         setLinkageChampions([]);
+         return;
+       }
        
        // Get province from supervisor filter values (Step 1)
        const province = supervisorFilterValues.filterByProvince;
