@@ -206,7 +206,7 @@ export const ActionColumn: React.FC<ActionColumnProps> = ({ participant }) => {
         confirmButtonText={modalType === 'dropout' ? (dropoutLoading ? (t('common.loading') || 'Loading...') : (t('actions.confirmDropout') || 'Confirm Dropout')) : undefined}
         onCancel={modalType === 'dropout' ? (dropoutLoading ? undefined : handleCloseModal) : undefined}
         onConfirm={modalType === 'dropout' ? (dropoutLoading ? undefined : () => handleDropoutConfirm(dropoutReason)) : undefined}
-        confirmButtonColor={modalType === 'dropout' ? '$error500' : undefined}
+        confirmButtonColor={modalType === 'dropout' ? '$primary500' : undefined}
         bodyProps={modalType !== 'dropout' ? {padding: 0,paddingTop: 0,paddingBottom: 0} : {}}
         headerProps={modalType !== 'dropout' ? {paddingBottom: 0,paddingTop: "$2"} : {}}
       >

@@ -23,6 +23,7 @@ import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
 import { ModalProps } from '@app-types/components';
 import { commonModalContentStyles, commonModalContainerStyles, profileStyles } from './Styles';
+import { usePlatform } from '@utils/platform';
 
 /**
  * Modal Component
@@ -79,7 +80,8 @@ const Modal: React.FC<ModalProps> = ({
   
 }) => {
   const { t } = useLanguage();
-  
+
+  const { isMobile } = usePlatform();
   // Determine if footer should be shown
   const hasFooter = footerContent || cancelButtonText || confirmButtonText;
   
@@ -167,7 +169,7 @@ const Modal: React.FC<ModalProps> = ({
             {footerContent ? (
               footerContent
             ) : (
-              <HStack space="md" width="$full" justifyContent="flex-end">
+              <HStack space="md" width="$full" justifyContent="flex-end" flexDirection={isMobile ? 'column' : 'row'}>
                 {/* Cancel Button */}
                 {cancelButtonText && (
                   <Button
