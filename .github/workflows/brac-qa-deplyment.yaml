@@ -14,14 +14,15 @@ env:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-
     permissions:
       contents: read
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+      - name: Create .env for Docker build
+        run: |
+          echo "${{ secrets.QA_ENV_BRAC }}" > .env
+          ls -ltra
 
       # =========================
       # AWS Authentication
@@ -48,10 +49,6 @@ jobs:
           context: .
           push: true
           tags: |
-            cat << 'EOF' > .env
-            ${{ secrets.QA_ENV_BRAC }}
-            EOF
-            ls -ltra
             ${{ env.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY }}:${{ env.TAG }}
 
       # =========================
