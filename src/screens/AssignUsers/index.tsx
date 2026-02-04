@@ -13,6 +13,7 @@ import {
  participantFilterOptions,
  participantList,
  useSupervisorFilterOptions,
+ useSiteFilterOptions,
 } from '@constants/ASSIGN_USERS_FILTERS';
 import UserAvatarCard from '@components/UserAvatarCard';
 import { AssignUsersStyles } from './Styles';
@@ -20,7 +21,6 @@ import { theme } from '@config/theme';
 
 const AssignUsersScreen = () => {
  const { t } = useLanguage();
- const AssignLCFilterOptions = [SearchFilter, ...lcFilterOptions];
  const AssignParticipantFilterOptions = [ParticipantSearchFilter, ...participantFilterOptions];
  type AssignTab = 'LC_TO_SUPERVISOR' | 'PARTICIPANT_TO_LC';
 
@@ -34,6 +34,12 @@ const AssignUsersScreen = () => {
  
  // Get dynamic supervisor filter options (supervisor disabled until province is selected)
  const { filters: supervisorFilterOptions, supervisors: supervisorsData } = useSupervisorFilterOptions(supervisorFilterValues);
+ 
+ // Get dynamic site filter options based on province selected in Step 1
+ const { filters: siteFilterOptions } = useSiteFilterOptions(supervisorFilterValues.filterByProvince);
+ 
+ // Combine search filter with dynamic site filter for Step 2
+ const AssignLCFilterOptions = [SearchFilter, ...siteFilterOptions];
  
  // Find the selected supervisor object from supervisorsData
  // Match by id (number) or _id (string) or email, converting to string for comparison
@@ -72,6 +78,12 @@ const AssignUsersScreen = () => {
      setAssignedLCs([]);
      setAssignedParticipants([]);
      setSelectedLc(null);
+     // Clear site filter in Step 2 when province changes
+     setLcFilterValues((prev) => {
+       const updated = { ...prev };
+       delete updated.site;
+       return updated;
+     });
    }
    
    // Reset assigned LCs when supervisor changes

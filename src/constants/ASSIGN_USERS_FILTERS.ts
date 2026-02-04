@@ -5,10 +5,10 @@
  */
 
 import { useState, useEffect, useMemo } from 'react';
-import { getProvincesList } from '../services/usersService';
+import { getProvincesList, getSitesByProvince } from '../services/usersService';
 import { getSupervisorsByProvince } from '../services/assignUsersService';
 import type { FilterConfig } from './USER_MANAGEMENT_FILTERS';
-import type { ProvinceEntity, AdminUserManagementData } from '@app-types/Users';
+import type { ProvinceEntity, AdminUserManagementData, SiteEntity } from '@app-types/Users';
 
 // Search filter for LC assignment
 export const SearchFilter: FilterConfig = {
@@ -131,6 +131,82 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
   }, [provinces, supervisors, filters.filterByProvince]);
 };
 
+/**
+ * Hook to get site filter options with dynamic disabled state
+ * Fetches sites from API based on province selected in Step 1
+ * Disables site filter until a province is selected
+ * 
+ * @param selectedProvinceId - Province ID selected in Step 1 (from supervisorFilterValues.filterByProvince)
+ * @returns Object containing site filter configuration
+ */
+export const useSiteFilterOptions = (selectedProvinceId?: string): {
+  filters: ReadonlyArray<FilterConfig>;
+  sites: SiteEntity[];
+} => {
+  // State for API data
+  const [sites, setSites] = useState<SiteEntity[]>([]);
+
+  // Fetch sites when province filter changes
+  useEffect(() => {
+    const fetchSites = async () => {
+      // Only fetch sites if a specific province is selected (not "all-provinces")
+      if (!selectedProvinceId || selectedProvinceId === 'all-provinces' || selectedProvinceId === 'all-Provinces') {
+        setSites([]);
+        return;
+      }
+
+      try {
+        // Fetch sites for the selected province
+        const sitesResponse = await getSitesByProvince(selectedProvinceId, {
+          page: 1,
+          limit: 100,
+        });
+        const sitesData = sitesResponse.result?.data || [];
+        setSites(sitesData);
+      } catch (error) {
+        console.error('Error fetching sites:', error);
+        setSites([]);
+      }
+    };
+
+    fetchSites();
+  }, [selectedProvinceId]); // Re-fetch when province changes
+
+  // Build dynamic filter options with API data
+  return useMemo(() => {
+    // Determine if site filter should be disabled
+    const isProvinceSelected = selectedProvinceId &&
+                               selectedProvinceId !== 'all-provinces' &&
+                               selectedProvinceId !== 'all-Provinces';
+    const shouldDisableSiteFilter = !isProvinceSelected; // Disable until a province is selected
+
+    // Build site filter from API sites
+    const siteFilterOptions = [
+      { labelKey: 'admin.filters.allSites', value: 'all-sites' },
+      ...sites.map((site: SiteEntity) => ({
+        label: site.name,
+        value: site._id, // Use _id as value for filtering
+      })),
+    ];
+
+    return {
+      filters: [
+        {
+          nameKey: 'admin.filters.site',
+          attr: 'site',
+          type: 'select' as const,
+          placeholderKey: 'admin.filters.chooseSite',
+          data: siteFilterOptions,
+          disabled: shouldDisableSiteFilter, // Disable until province is selected
+        },
+      ],
+      sites, // Return sites data for accessing details
+    };
+  }, [sites, selectedProvinceId]);
+};
+
+// Legacy static filter options - kept for backward compatibility
+// Use useSiteFilterOptions hook instead for dynamic site filtering
 export const lcFilterOptions: ReadonlyArray<FilterConfig> = [
   {
     nameKey: 'admin.filters.site',
