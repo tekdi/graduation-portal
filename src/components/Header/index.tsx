@@ -35,6 +35,7 @@ import { theme } from '@config/theme';
 import { profileStyles, LCProfileStyles } from '@components/ui/Modal/Styles';
 import { MenuItemData } from '@components/ui/Menu';
 import { getUserProfile } from '../../services/authenticationService';
+import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 /**
  * Header Component - Enhanced for LC Layout Support
@@ -166,7 +167,7 @@ const Header: React.FC<{
         {/* Title */}
         {title && (
           <Text
-            {...stylesHeader.titleText}
+            {...TYPOGRAPHY.h4}
             color={isDark ? '$textLight100' : '$textDark900'}
           >
             {title}
