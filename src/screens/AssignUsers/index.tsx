@@ -8,7 +8,6 @@ import {
  participantLCFilterOptions,
  SearchFilter,
  ParticipantSearchFilter,
- selectedLCList,
  participantFilterOptions,
  participantList,
  useSupervisorFilterOptions,
@@ -17,6 +16,7 @@ import {
 import UserAvatarCard from '@components/UserAvatarCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
+import { getLinkageChampions } from '../../services/assignUsersService';
 
 const AssignUsersScreen = () => {
  const { t } = useLanguage();
@@ -30,6 +30,9 @@ const AssignUsersScreen = () => {
  const [supervisorFilterValues, setSupervisorFilterValues] = useState<
    Record<string, any>
  >({});
+ // State for linkage champions fetched from API
+ const [linkageChampions, setLinkageChampions] = useState<any[]>([]);
+ const [isLoadingLCs, setIsLoadingLCs] = useState(false);
  
  // Get dynamic supervisor filter options (supervisor disabled until province is selected)
  const { filters: supervisorFilterOptions, supervisors: supervisorsData } = useSupervisorFilterOptions(supervisorFilterValues);
@@ -99,8 +102,8 @@ const AssignUsersScreen = () => {
    
    // Handle LC selection from filter
    if (values.selectLC && values.selectLC !== supervisorFilterValues.selectLC) {
-     // Find the LC object from selectedLCList
-     const lc = selectedLCList.find((lc: any) => lc.value === values.selectLC);
+     // Find the LC object from linkageChampions
+     const lc = linkageChampions.find((lc: any) => lc.value === values.selectLC);
      if (lc) {
        // Reset assigned participants when LC changes
        if (lc.value !== selectedLc?.value) {
@@ -159,7 +162,7 @@ const AssignUsersScreen = () => {
  // Filter out assigned LCs from the available list
  const getAvailableLCs = () => {
    const assignedLCValues = new Set(assignedLCs.map(lc => lc.value));
-   return selectedLCList.filter((lc: any) => !assignedLCValues.has(lc.value));
+   return linkageChampions.filter((lc: any) => !assignedLCValues.has(lc.value));
  };
 
  // Handler for when participants are assigned to LC
@@ -200,6 +203,56 @@ const AssignUsersScreen = () => {
    return participantList.filter((p: any) => !assignedParticipantValues.has(p.value));
  };
 
+
+ // Fetch linkage champions when province or site filters change
+ useEffect(() => {
+   const fetchLinkageChampions = async () => {
+     try {
+       setIsLoadingLCs(true);
+       // Using the programId from the curl command as default
+       // TODO: Make this configurable or get from context/config
+       const programId = '6952469bd9f179bdf8abe717';
+       
+       // Get province from supervisor filter values (Step 1)
+       const province = supervisorFilterValues.filterByProvince;
+       // Get site from LC filter values (Step 2)
+       const site = lcFilterValues.site;
+       
+       const response = await getLinkageChampions(programId, {
+         excludeMapped: true,
+         limit: 100,
+         province: province,
+         site: site,
+       });
+       
+       // Transform API response to match expected format
+       const lcs = (response.result?.data || []).map((lc: any) => {
+         const name = lc.name || lc.full_name || lc.email || 'Unknown';
+         const value = lc.id || lc._id || lc.email || name;
+         // Extract location from meta or use default
+         const location = lc.meta?.location || lc.location || '';
+         
+         return {
+           labelKey: name,
+           value: String(value),
+           location: location,
+           status: 'unassigned',
+           email: lc.email || '',
+           id: value,
+         };
+       });
+       
+       setLinkageChampions(lcs);
+     } catch (error) {
+       console.error('Error fetching linkage champions:', error);
+       setLinkageChampions([]);
+     } finally {
+       setIsLoadingLCs(false);
+     }
+   };
+
+   fetchLinkageChampions();
+ }, [supervisorFilterValues.filterByProvince, lcFilterValues.site]);
 
  // Use filter values to perform actions when filters change
  useEffect(() => {
@@ -437,7 +490,7 @@ const AssignUsersScreen = () => {
                if (supervisorFilterValues.selectSupervisor) {
                  return {
                    ...filter,
-                   data: selectedLCList.map((lc: any) => ({
+                   data: linkageChampions.map((lc: any) => ({
                      labelKey: lc.labelKey,
                      value: lc.value,
                    })),

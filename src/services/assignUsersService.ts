@@ -16,19 +16,17 @@ declare const process: {
 } | undefined;
 
 /**
- * Get supervisors list by province ID - Dynamic supervisor filter from API
- * Fetches supervisors (tenant_admin) for a specific province
+ * Get supervisors list - Dynamic supervisor filter from API
+ * Fetches supervisors (tenant_admin) - all supervisors if no province provided, or filtered by province
  * 
- * @param provinceId - Province entity ID (e.g., "69806d35b0bb2500136cfba5")
- * @param params - Optional pagination parameters
+ * @param params - Optional parameters including province and pagination
  * @returns A promise resolving to the supervisors response from the API
  */
 export const getSupervisorsByProvince = async (
-  provinceId: string,
-  params?: { page?: number; limit?: number }
+  params?: { provinceId?: string; page?: number; limit?: number }
 ): Promise<UserSearchResponse> => {
   try {
-    const { page = 1, limit = 100 } = params || {};
+    const { provinceId, page = 1, limit = 100 } = params || {};
     
     // Build query string
     const queryParams = new URLSearchParams({
@@ -40,14 +38,62 @@ export const getSupervisorsByProvince = async (
 
     const endpoint = `${API_ENDPOINTS.USERS_LIST}?${queryParams.toString()}`;
     
-    // Build request body - province goes in meta.province
-    const requestBody: any = {
-      meta: {
+    // Build request body - province goes in meta.province (only if province is provided)
+    const requestBody: any = {};
+    if (provinceId && provinceId !== 'all-provinces' && provinceId !== 'all-Provinces') {
+      requestBody.meta = {
         province: provinceId,
-      },
-    };
+      };
+    }
     
     // POST request to fetch supervisors
+    const response = await api.post<UserSearchResponse>(endpoint, requestBody);
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Get linkage champions (org_admin) list for a program
+ * Fetches linkage champions that can be assigned to supervisors
+ * 
+ * @param programId - Program ID (e.g., "6952469bd9f179bdf8abe717")
+ * @param params - Optional parameters (excludeMapped, limit, province, site)
+ * @returns A promise resolving to the linkage champions response from the API
+ */
+export const getLinkageChampions = async (
+  programId: string,
+  params?: { excludeMapped?: boolean; limit?: number; province?: string; site?: string }
+): Promise<UserSearchResponse> => {
+  try {
+    const { excludeMapped = true, limit = 100, province, site } = params || {};
+    
+    // Build query string
+    const queryParams = new URLSearchParams({
+      programId: programId,
+      excludeMapped: excludeMapped.toString(),
+      limit: limit.toString(),
+      type: 'org_admin',
+    });
+
+    // Add site as query parameter if provided
+    if (site && site !== 'all-sites') {
+      queryParams.append('site', site);
+    }
+
+    const endpoint = `${API_ENDPOINTS.PROGRAM_USERS_SEARCH}?${queryParams.toString()}`;
+    
+    // Build request body - province goes in meta.province (similar to usersService)
+    const requestBody: any = {};
+    if (province && province !== 'all-provinces' && province !== 'all-Provinces') {
+      requestBody.meta = {
+        province: province, // Province ID (e.g., "6952163ae83c1c00147132a8")
+      };
+    }
+    
+    // POST request to fetch linkage champions
     const response = await api.post<UserSearchResponse>(endpoint, requestBody);
     return response.data;
   } catch (error: any) {

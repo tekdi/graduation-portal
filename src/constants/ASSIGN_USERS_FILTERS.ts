@@ -29,8 +29,8 @@ export const ParticipantSearchFilter: FilterConfig = {
 };
 
 /**
- * Hook to get supervisor filter options with dynamic disabled state
- * Fetches provinces from API and disables supervisor filter until a province is selected
+ * Hook to get supervisor filter options
+ * Fetches provinces from API and supervisors based on selected province
  * 
  * @param filters - Current filter values to check if province is selected
  * @returns Object containing filter configurations and supervisors data
@@ -53,20 +53,17 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
     fetchProvinces();
   }, []);
 
-  // Fetch supervisors when province filter changes
+  // Fetch supervisors - all supervisors initially, filtered by province when selected
   useEffect(() => {
     const fetchSupervisors = async () => {
       const selectedProvince = filters.filterByProvince;
       
-      // Only fetch supervisors if a specific province is selected (not "all-provinces")
-      if (!selectedProvince || selectedProvince === 'all-provinces' || selectedProvince === 'all-Provinces') {
-        setSupervisors([]);
-        return;
-      }
-
       try {
-        // Fetch supervisors for the selected province
-        const supervisorsResponse = await getSupervisorsByProvince(selectedProvince, {
+        // Fetch all supervisors if no province selected, or filtered by province if selected
+        const supervisorsResponse = await getSupervisorsByProvince({
+          provinceId: selectedProvince && selectedProvince !== 'all-provinces' && selectedProvince !== 'all-Provinces' 
+            ? selectedProvince 
+            : undefined,
           page: 1,
           limit: 100,
         });
@@ -92,13 +89,6 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
       })),
     ];
 
-    // Determine if supervisor filter should be disabled
-    const selectedProvince = filters.filterByProvince;
-    const isProvinceSelected = selectedProvince &&
-                               selectedProvince !== 'all-provinces' &&
-                               selectedProvince !== 'all-Provinces';
-    const shouldDisableSupervisorFilter = !isProvinceSelected; // Disable until a province is selected
-
     // Build supervisor filter from API supervisors
     const supervisorFilterOptions = supervisors.map((supervisor: any) => {
       const name = supervisor.name || supervisor.full_name || supervisor.email || 'Unknown';
@@ -123,7 +113,6 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
           type: 'select' as const,
           placeholderKey: 'admin.filters.chooseSupervisor',
           data: supervisorFilterOptions,
-          disabled: shouldDisableSupervisorFilter, // Disable until province is selected
         },
       ],
       supervisors, // Return supervisors data for accessing location and other details
@@ -132,9 +121,8 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
 };
 
 /**
- * Hook to get site filter options with dynamic disabled state
- * Fetches sites from API based on province selected in Step 1
- * Disables site filter until a province is selected
+ * Hook to get site filter options
+ * Fetches all sites initially, filtered by province when selected
  * 
  * @param selectedProvinceId - Province ID selected in Step 1 (from supervisorFilterValues.filterByProvince)
  * @returns Object containing site filter configuration
@@ -146,18 +134,15 @@ export const useSiteFilterOptions = (selectedProvinceId?: string): {
   // State for API data
   const [sites, setSites] = useState<SiteEntity[]>([]);
 
-  // Fetch sites when province filter changes
+  // Fetch sites - all sites initially, filtered by province when selected
   useEffect(() => {
     const fetchSites = async () => {
-      // Only fetch sites if a specific province is selected (not "all-provinces")
-      if (!selectedProvinceId || selectedProvinceId === 'all-provinces' || selectedProvinceId === 'all-Provinces') {
-        setSites([]);
-        return;
-      }
-
       try {
-        // Fetch sites for the selected province
-        const sitesResponse = await getSitesByProvince(selectedProvinceId, {
+        // Fetch all sites if no province selected, or filtered by province if selected
+        const sitesResponse = await getSitesByProvince({
+          provinceId: selectedProvinceId && selectedProvinceId !== 'all-provinces' && selectedProvinceId !== 'all-Provinces' 
+            ? selectedProvinceId 
+            : undefined,
           page: 1,
           limit: 100,
         });
@@ -174,12 +159,6 @@ export const useSiteFilterOptions = (selectedProvinceId?: string): {
 
   // Build dynamic filter options with API data
   return useMemo(() => {
-    // Determine if site filter should be disabled
-    const isProvinceSelected = selectedProvinceId &&
-                               selectedProvinceId !== 'all-provinces' &&
-                               selectedProvinceId !== 'all-Provinces';
-    const shouldDisableSiteFilter = !isProvinceSelected; // Disable until a province is selected
-
     // Build site filter from API sites
     const siteFilterOptions = [
       { labelKey: 'admin.filters.allSites', value: 'all-sites' },
@@ -197,28 +176,12 @@ export const useSiteFilterOptions = (selectedProvinceId?: string): {
           type: 'select' as const,
           placeholderKey: 'admin.filters.chooseSite',
           data: siteFilterOptions,
-          disabled: shouldDisableSiteFilter, // Disable until province is selected
         },
       ],
       sites, // Return sites data for accessing details
     };
   }, [sites, selectedProvinceId]);
 };
-
-export const selectedLCList = [
-  {
-    labelKey: 'Busisiwe Ngcobo',
-    value: 'Busisiwe-Ngcobo',
-    location: 'eThekwini, KwaZulu-Natal',
-    status: 'unassigned',
-  },
-  {
-    labelKey: 'Andile Mkhize',
-    value: 'Andile-Mkhize',
-    location: 'Johannesburg, Gauteng',
-    status: 'unassigned',
-  },
-];
 
 export const participantLCFilterOptions = [
   {

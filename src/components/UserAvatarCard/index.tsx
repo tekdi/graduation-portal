@@ -22,7 +22,6 @@ import FilterButton from '@components/Filter';
 import { AssignUsersStyles } from './Styles';
 import type { TextProps, ViewProps } from 'react-native';
 import { useLanguage } from '@contexts/LanguageContext';
-import { selectedLCList } from '@constants/ASSIGN_USERS_FILTERS';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
@@ -63,8 +62,8 @@ const UserAvatarCard = ({
   const [selectedLc, setSelectedLc] = useState<any>(null);
   const [selectedLCs, setSelectedLCs] = useState<Set<string>>(new Set());
   
-  // Use provided lcList or fall back to default selectedLCList
-  const displayLCList = lcList || selectedLCList;
+  // Use provided lcList or fall back to empty array
+  const displayLCList = lcList || [];
  // Handler to receive filter changes from FilterButton and pass to parent
  const handleFilterChange = (values: Record<string, any>) => {
    // Call parent's onChange handler if provided
