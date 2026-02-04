@@ -95,7 +95,8 @@ export const useUserManagementFilters = (filters: Record<string, any>) => {
 
       try {
         // Fetch sites for the selected province
-        const sitesResponse = await getSitesByProvince(selectedProvince, {
+        const sitesResponse = await getSitesByProvince({
+          provinceId: selectedProvince,
           page: 1,
           limit: 100,
         });
