@@ -29,10 +29,12 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
   // status,
   pathway,
   graduationDate,
+  graduationProgress: graduationProgressProp,
   onViewProfile,
   areAllTasksCompleted = false,
   userEntityId,
   onStatusUpdate,
+  updatedProgress
 }) => {
   const navigation = useNavigation();
   const { t } = useLanguage();
@@ -275,7 +277,8 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
       {/* Participant Status Card/Warning */}
       <ParticipantProgressCard
         status={status as ParticipantStatus}
-        graduationProgress={graduationProgress}
+        graduationProgress={graduationProgressProp ?? graduationProgress}
+        updatedProgress={updatedProgress}
         graduationDate={graduationDate}
       />
     </PageHeader>
