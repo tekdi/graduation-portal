@@ -189,7 +189,6 @@ const ProjectComponent: React.FC = () => {
       <VStack flex={1}>
         <ScrollView
           {...projectComponentStyles.scrollView}
-          paddingTop={mode === 'edit' && hasChildren ? 0 : '$5'}
         >
           {/* Render ProjectInfoCard */}
           <ProjectInfoCard project={projectData} />
