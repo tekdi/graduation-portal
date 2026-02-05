@@ -1,21 +1,23 @@
 import TitleHeader from '@components/TitleHeader';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
-import { VStack, HStack, Button, Text, Card, Avatar, AvatarFallbackText, Box, Divider, LucideIcon, Badge, BadgeText  } from '@ui';
-import React, { useEffect, useState } from 'react';
+import { VStack, HStack, Button, Text, Card, Avatar, AvatarFallbackText, Box, Divider, LucideIcon, Badge, BadgeText, Checkbox, CheckboxIndicator, CheckboxIcon, CheckIcon  } from '@ui';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ViewProps, TextProps } from 'react-native';
+import DataTable from '@components/DataTable';
+import type { ColumnDef } from '@app-types/components';
 import {
- SearchFilter,
- ParticipantSearchFilter,
- participantFilterOptions,
- participantList,
- useSupervisorFilterOptions,
- useSiteFilterOptions,
+  SearchFilter,
+  ParticipantSearchFilter,
+  participantFilterOptions,
+  useSupervisorFilterOptions,
+  useSiteFilterOptions,
+  useParticipantFilterOptions,
 } from '@constants/ASSIGN_USERS_FILTERS';
 import UserAvatarCard from '@components/UserAvatarCard';
 import { AssignUsersStyles } from './Styles';
 import { theme } from '@config/theme';
-import { getLinkageChampions, assignLCsToSupervisor, getMappedLCsForSupervisor } from '../../services/assignUsersService';
+import { getLinkageChampions, assignLCsToSupervisor, getMappedLCsForSupervisor, getParticipants, assignParticipantsToLC, getMappedParticipantsForLC } from '../../services/assignUsersService';
 import { getInitials } from '@utils/helper';
 
 // Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
@@ -29,7 +31,6 @@ declare const process:
 
 const AssignUsersScreen = () => {
  const { t } = useLanguage();
- const AssignParticipantFilterOptions = [ParticipantSearchFilter, ...participantFilterOptions];
  type AssignTab = 'LC_TO_SUPERVISOR' | 'PARTICIPANT_TO_LC';
 
 
@@ -48,7 +49,7 @@ const AssignUsersScreen = () => {
  
  // Get dynamic site filter options based on province selected in Step 1
  const { filters: siteFilterOptions } = useSiteFilterOptions(supervisorFilterValues.filterByProvince);
- 
+
  // Combine search filter with dynamic site filter for Step 2
  const AssignLCFilterOptions = [SearchFilter, ...siteFilterOptions];
  
@@ -71,7 +72,20 @@ const AssignUsersScreen = () => {
  const [selectedParticipants, setSelectedParticipants] = useState<Set<string>>(new Set());
  // State to track assigned participants
  const [assignedParticipants, setAssignedParticipants] = useState<any[]>([]);
+ // State for participants fetched from API
+ const [participants, setParticipants] = useState<any[]>([]);
+ const [isLoadingParticipants, setIsLoadingParticipants] = useState(false);
+ // State for mapped participants from API
+ const [mappedParticipants, setMappedParticipants] = useState<any[]>([]);
+ const [isLoadingMappedParticipants, setIsLoadingMappedParticipants] = useState(false);
+ // Pagination state for mapped participants table
+ const [mappedParticipantsPage, setMappedParticipantsPage] = useState(1);
+ const [mappedParticipantsPageSize, setMappedParticipantsPageSize] = useState(5);
+ const [mappedParticipantsTotal, setMappedParticipantsTotal] = useState(0);
 
+ // Get dynamic participant filter options (Province and Site)
+ const { filters: participantProvinceSiteFilters } = useParticipantFilterOptions(participantFilterValues.filterByProvince);
+ const AssignParticipantFilterOptions = [ParticipantSearchFilter, ...participantProvinceSiteFilters];
 
  // Handler for supervisor and LC filter changes (combined in Step 1)
  const handleSupervisorFilterChange = (values: Record<string, any>) => {
@@ -95,22 +109,23 @@ const AssignUsersScreen = () => {
      values.selectLC = null;
    }
    
-   // Handle LC selection from filter
-   if (values.selectLC && values.selectLC !== supervisorFilterValues.selectLC) {
-     // Find the LC object from linkageChampions
-     const lc = linkageChampions.find((lc: any) => lc.value === values.selectLC);
-     if (lc) {
-       // Reset assigned participants when LC changes
-       if (lc.value !== selectedLc?.value) {
-         setAssignedParticipants([]);
-       }
-       setSelectedLc(lc);
-     }
-   } else if (!values.selectLC && supervisorFilterValues.selectLC) {
-     // LC was cleared
-     setSelectedLc(null);
-     setAssignedParticipants([]);
-   }
+  // Handle LC selection from filter
+  if (values.selectLC && values.selectLC !== supervisorFilterValues.selectLC) {
+    // Find the LC object from mappedLCs (for Participant to LC flow) or linkageChampions (for LC to Supervisor flow)
+    const lc = mappedLCs.find((lc: any) => lc.value === values.selectLC) || 
+               linkageChampions.find((lc: any) => lc.value === values.selectLC);
+    if (lc) {
+      // Reset assigned participants when LC changes
+      if (lc.value !== selectedLc?.value) {
+        setAssignedParticipants([]);
+      }
+      setSelectedLc(lc);
+    }
+  } else if (!values.selectLC && supervisorFilterValues.selectLC) {
+    // LC was cleared
+    setSelectedLc(null);
+    setAssignedParticipants([]);
+  }
    
    setSupervisorFilterValues(values);
  };
@@ -211,42 +226,83 @@ const AssignUsersScreen = () => {
  };
 
  // Handler for when participants are assigned to LC
- const handleAssignParticipants = (selectedParticipants: any[]) => {
-   // Generate additional data for assigned participants (email, participant ID)
-   const participantsWithFullData = selectedParticipants.map((participant, index) => {
-     // Generate email from name (simple conversion)
-     const nameParts = participant.labelKey.toLowerCase().split(' ');
-     const email = nameParts.length > 1
-       ? `${nameParts[0]}.${nameParts[1]}@example.com`
-       : `${nameParts[0]}@example.com`;
+ const handleAssignParticipants = async (selectedParticipants: any[]) => {
+   try {
+     // Get LC's user ID from selectedLc
+     if (!selectedLc) {
+       throw new Error('No LC selected');
+     }
      
-     // Generate Participant ID (increment from existing)
-     const participantId = `PAR-${String(assignedParticipants.length + 1 + index).padStart(3, '0')}`;
+     const lcId = String(selectedLc.id || selectedLc.value || '');
+     if (!lcId) {
+       throw new Error('LC ID is missing');
+     }
      
-     // Extract bio and productivity from location (format: "Bio • Productivity")
-     const locationParts = participant.location?.split(' • ') || [];
-     const bio = locationParts[0] || '';
-     const productivity = locationParts[1] || '';
+     // Get programId from environment variable
+     // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+     const programId = process.env.GLOBAL_LC_PROGRAM_ID;
+     if (!programId) {
+       throw new Error('GLOBAL_LC_PROGRAM_ID is not defined in environment variables');
+     }
      
-     return {
-       ...participant,
-       email,
-       participantId,
-       bio,
-       productivity,
-     };
-   });
-   
-   // Add to assigned participants list
-   setAssignedParticipants((prev) => [...prev, ...participantsWithFullData]);
-   console.log('Participants assigned:', participantsWithFullData);
+     // Extract participant IDs from selectedParticipants
+     const participantIds = selectedParticipants.map((p: any) => String(p.id || p.value || '')).filter((id: string) => id);
+     
+     if (participantIds.length === 0) {
+       throw new Error('No valid participant IDs found');
+     }
+     
+     // Call API to assign participants to LC
+     await assignParticipantsToLC({
+       userId: lcId,
+       programId: programId,
+       assignedUserIds: participantIds,
+       assignedUsersStatus: 'NOT_ONBOARDED',
+     });
+     
+     // Generate additional data for assigned participants (email, participant ID)
+     const participantsWithFullData = selectedParticipants.map((participant, index) => {
+       // Generate email from name (simple conversion)
+       const nameParts = participant.labelKey.toLowerCase().split(' ');
+       const email = nameParts.length > 1
+         ? `${nameParts[0]}.${nameParts[1]}@example.com`
+         : `${nameParts[0]}@example.com`;
+       
+       // Generate Participant ID (increment from existing)
+       const participantId = `PAR-${String(assignedParticipants.length + 1 + index).padStart(3, '0')}`;
+       
+       // Extract bio and productivity from location (format: "Bio • Productivity")
+       const locationParts = participant.location?.split(' • ') || [];
+       const bio = locationParts[0] || '';
+       const productivity = locationParts[1] || '';
+       
+       return {
+         ...participant,
+         email,
+         participantId,
+         bio,
+         productivity,
+       };
+     });
+     
+     // Add to assigned participants list
+     setAssignedParticipants((prev) => [...prev, ...participantsWithFullData]);
+     
+     // Return success indicator
+     return { success: true };
+   } catch (error) {
+     console.error('Error assigning participants to LC:', error);
+     // Re-throw error so it can be caught by the modal handler
+     throw error;
+   }
  };
 
- // Filter out assigned participants from the available list
- const getAvailableParticipants = () => {
-   const assignedParticipantValues = new Set(assignedParticipants.map(p => p.value));
-   return participantList.filter((p: any) => !assignedParticipantValues.has(p.value));
- };
+// Filter out assigned participants from the available list
+const getAvailableParticipants = () => {
+  const assignedParticipantValues = new Set(assignedParticipants.map(p => p.value));
+  // Use API participants data
+  return participants.filter((p: any) => !assignedParticipantValues.has(p.value));
+};
 
 
  // Fetch linkage champions when province or site filters change
@@ -370,9 +426,220 @@ const AssignUsersScreen = () => {
      }
    };
 
-   fetchMappedLCs();
- }, [selectedSupervisor, supervisorFilterValues.selectSupervisor]);
- return (
+  fetchMappedLCs();
+}, [selectedSupervisor, supervisorFilterValues.selectSupervisor]);
+
+// Fetch participants when LC is selected in Participant to LC flow or when filters change
+useEffect(() => {
+  const fetchParticipants = async () => {
+    // Only fetch participants when in Participant to LC flow and LC is selected
+    if (activeTab !== 'PARTICIPANT_TO_LC' || !selectedLc) {
+      setParticipants([]);
+      return;
+    }
+
+    try {
+      setIsLoadingParticipants(true);
+      // Get programId from environment variable
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+      const programId = process.env.GLOBAL_LC_PROGRAM_ID;
+      
+      if (!programId) {
+        console.error('GLOBAL_LC_PROGRAM_ID is not defined in environment variables');
+        setParticipants([]);
+        return;
+      }
+      
+      // Get province and site from participant filter values
+      const province = participantFilterValues.filterByProvince;
+      const site = participantFilterValues.site;
+      const search = participantFilterValues.search;
+      
+      const response = await getParticipants(programId, {
+        excludeMapped: true,
+        limit: 100,
+        province: province && province !== 'all-provinces' && province !== 'all-Provinces' ? province : undefined,
+        site: site && site !== 'all-sites' ? site : undefined,
+        search: search && String(search).trim() ? String(search).trim() : undefined,
+      });
+      
+      // Transform API response to match expected format
+      const participantsData = (response.result?.data || []).map((participant: any) => {
+        const name = participant.name || participant.full_name || participant.email || 'Unknown';
+        const value = String(participant.id || participant._id || participant.email || name);
+        const email = participant.email || participant.userDetails?.email || '';
+        
+        // Extract province and site from userDetails
+        const province = participant.province?.label || participant.userDetails?.province?.label || '';
+        const site = participant.site?.label || participant.userDetails?.site?.label || participant.userDetails?.district?.label || participant.userDetails?.local_municipality?.label || '';
+        
+        // Build location string with province and site
+        const locationParts = [];
+        if (province) locationParts.push(province);
+        if (site) locationParts.push(site);
+        const location = locationParts.length > 0 ? locationParts.join(' • ') : '';
+        
+        return {
+          labelKey: name,
+          value: value,
+          location: location,
+          province: province,
+          site: site,
+          status: 'unassigned',
+          email: email,
+          id: participant.id || participant._id,
+        };
+      });
+      
+      setParticipants(participantsData);
+    } catch (error) {
+      console.error('Error fetching participants:', error);
+      setParticipants([]);
+    } finally {
+      setIsLoadingParticipants(false);
+    }
+  };
+
+  fetchParticipants();
+}, [
+  selectedLc,
+  activeTab,
+  participantFilterValues.filterByProvince,
+  participantFilterValues.site,
+  participantFilterValues.search,
+]);
+
+// Fetch mapped participants when LC is selected in Participant to LC flow
+useEffect(() => {
+  const fetchMappedParticipants = async () => {
+    // Only fetch when in Participant to LC flow and LC is selected
+    if (activeTab !== 'PARTICIPANT_TO_LC' || !selectedLc) {
+      setMappedParticipants([]);
+      return;
+    }
+
+    try {
+      setIsLoadingMappedParticipants(true);
+      // Get programId from environment variable
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+      const programId = process.env.GLOBAL_LC_PROGRAM_ID;
+      
+      if (!programId) {
+        console.error('GLOBAL_LC_PROGRAM_ID is not defined in environment variables');
+        setMappedParticipants([]);
+        return;
+      }
+      
+      const lcId = String(selectedLc.id || selectedLc.value || '');
+      if (!lcId) {
+        setMappedParticipants([]);
+        return;
+      }
+      
+      const response = await getMappedParticipantsForLC({
+        userId: lcId,
+        programId: programId,
+        type: 'user',
+        page: mappedParticipantsPage,
+        limit: mappedParticipantsPageSize,
+        search: '',
+      });
+      
+      // Get total count from API response
+      const totalCount = response.total || response.result?.total || response.result?.count || 0;
+      setMappedParticipantsTotal(totalCount);
+      
+      // Transform API response to match expected format
+      const participantsData = (response.result?.data || []).map((participant: any) => {
+        const name = participant.name || participant.userDetails?.name || participant.email || 'Unknown';
+        const userId = participant.userId || participant.userDetails?.id || '';
+        const email = participant.userDetails?.email || participant.email || '';
+        const province = participant.userDetails?.province?.label || '-';
+        const site = participant.userDetails?.site?.label || participant.userDetails?.district?.label || participant.userDetails?.local_municipality?.label || '-';
+        
+        return {
+          labelKey: name,
+          value: String(userId),
+          email: email,
+          province: province,
+          site: site,
+          id: userId,
+        };
+      });
+      
+      setMappedParticipants(participantsData);
+    } catch (error) {
+      console.error('Error fetching mapped participants:', error);
+      setMappedParticipants([]);
+    } finally {
+      setIsLoadingMappedParticipants(false);
+    }
+  };
+
+  fetchMappedParticipants();
+}, [activeTab, selectedLc, mappedParticipantsPage, mappedParticipantsPageSize]);
+
+// Define columns for mapped participants table (moved outside conditional render to avoid React hooks error)
+const mappedParticipantsColumns: ColumnDef<any>[] = useMemo(() => [
+  {
+    key: 'participant',
+    label: 'admin.assignUsers.participant',
+    align: 'left',
+    flex: 2,
+    render: (item: any) => (
+      <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
+        <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
+          <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>
+            {getInitials(item.labelKey)}
+          </AvatarFallbackText>
+        </Avatar>
+        <VStack space="xs">
+          <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
+            {item.labelKey}
+          </Text>
+          <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
+            PAR-{String(item.id || item.value || '').padStart(3, '0')}
+          </Text>
+        </VStack>
+      </HStack>
+    ),
+  },
+  {
+    key: 'email',
+    label: 'admin.assignUsers.email',
+    align: 'left',
+    flex: 2,
+    render: (item: any) => (
+      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+        {item.email || '-'}
+      </Text>
+    ),
+  },
+  {
+    key: 'province',
+    label: 'admin.users.province',
+    align: 'left',
+    flex: 1.2,
+    render: (item: any) => (
+      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+        {item.province || '-'}
+      </Text>
+    ),
+  },
+  {
+    key: 'site',
+    label: 'admin.users.site',
+    align: 'left',
+    flex: 1.2,
+    render: (item: any) => (
+      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+        {item.site || '-'}
+      </Text>
+    ),
+  },
+], []);
+
+return (
    <VStack space="md" width="100%">
      <TitleHeader
        title="admin.menu.assignUsers"
@@ -608,12 +875,23 @@ const AssignUsersScreen = () => {
                selectedValues={{ ...participantFilterValues, selectedLc }}
                showLcList={true}
                isParticipantList={true}
-               lcList={getAvailableParticipants().map(p => ({
-                 labelKey: p.labelKey,
-                 value: p.value,
-                 location: `${p.bio} • ${p.productivity}`,
-                 status: p.status,
-               }))}
+               isLoading={isLoadingParticipants}
+               lcList={getAvailableParticipants().map((p: any) => {
+                 // Build location string with province and site
+                 const locationParts = [];
+                 if (p.province) locationParts.push(p.province);
+                 if (p.site) locationParts.push(p.site);
+                 const location = locationParts.length > 0 ? locationParts.join(' • ') : '';
+                 
+                 return {
+                   labelKey: p.labelKey,
+                   value: p.value,
+                   location: location,
+                   province: p.province,
+                   site: p.site,
+                   status: p.status,
+                 };
+               })}
                onAssign={handleAssignParticipants}
              />
 
@@ -632,144 +910,32 @@ const AssignUsersScreen = () => {
                    </Text>
                  </VStack>
 
-                 {/* Table Header */}
-                 <HStack {...(AssignUsersStyles.tableHeaderHStack as ViewProps)}>
-                   <Box flex={2}>
-                     <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                       {t('admin.assignUsers.participant')}
-                     </Text>
-                   </Box>
-                   <Box flex={2}>
-                     <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                       {t('admin.assignUsers.email')}
-                     </Text>
-                   </Box>
-                   <Box flex={1.5}>
-                     <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                       {t('admin.filters.bio')}
-                     </Text>
-                   </Box>
-                   <Box flex={1.5}>
-                     <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                       {t('admin.filters.productivity')}
-                     </Text>
-                   </Box>
-                 </HStack>
-
-                 {/* Table Rows - Hardcoded + Dynamically Assigned */}
-                 <VStack space="xs">
-                   {/* Hardcoded Row: Mandla Zwane */}
-                   <HStack {...(AssignUsersStyles.tableRowHStack as ViewProps)}>
-                     <Box flex={2}>
-                       <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                         <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                           <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>MZ</AvatarFallbackText>
-                         </Avatar>
-                         <VStack space="xs">
-                           <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                             Mandla Zwane
-                           </Text>
-                           <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                             PAR-001
-                           </Text>
-                         </VStack>
-                       </HStack>
-                     </Box>
-                     <Box flex={2}>
-                       <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                         mandla.zwane@example.com
-                       </Text>
-                     </Box>
-                     <Box flex={1.5}>
-                       <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                         Youth Development
-                       </Text>
-                     </Box>
-                     <Box flex={1.5}>
-                       <Badge {...(AssignUsersStyles.productivityBadgeButton as ViewProps)} bg="$primary500">
-                         <BadgeText {...(AssignUsersStyles.productivityBadgeText as TextProps)}>
-                           High
-                         </BadgeText>
-                       </Badge>
-                     </Box>
-                   </HStack>
-
-                   {/* Dynamically Assigned Participants */}
-                   {assignedParticipants.map((participant, index) => {
-                     // Get initials from name
-                     const nameParts = participant.labelKey.split(' ');
-                     const initials = nameParts.length > 1
-                       ? `${nameParts[0][0]}${nameParts[1][0]}`
-                       : nameParts[0].substring(0, 2).toUpperCase();
-
-                     // Determine productivity badge color
-                     const productivityColor = 
-                       participant.productivity?.toLowerCase() === 'high' ? '$primary500' :
-                       participant.productivity?.toLowerCase() === 'medium' ? '$textSecondary' :
-                       '$white';
-                    const isOutlineBadge = productivityColor === '$white';
-                    const productivityTextColor =
-                      participant.productivity?.toLowerCase() === 'high'
-                        ? '$primary500'
-                        : participant.productivity?.toLowerCase() === 'medium'
-                          ? '$textSecondary'
-                          : '$textMutedForeground';
-
-                     return (
-                       <HStack
-                         key={`${participant.value}-${index}`}
-                         {...(AssignUsersStyles.tableRowHStack as ViewProps)}
-                         borderBottomWidth={index === assignedParticipants.length - 1 ? 0 : 1}
-                       >
-                         <Box flex={2}>
-                           <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                             <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                               <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>{initials}</AvatarFallbackText>
-                             </Avatar>
-                             <VStack space="xs">
-                               <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                                 {participant.labelKey}
-                               </Text>
-                               <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                                 {participant.participantId}
-                               </Text>
-                             </VStack>
-                           </HStack>
-                         </Box>
-                         <Box flex={2}>
-                           <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                             {participant.email}
-                           </Text>
-                         </Box>
-                         <Box flex={1.5}>
-                           <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                             {participant.bio}
-                           </Text>
-                         </Box>
-                         <Box flex={1.5}>
-                          <HStack justifyContent="flex-end">
-                            <Badge
-                              {...(AssignUsersStyles.productivityBadgeButton as ViewProps)}
-                              variant={isOutlineBadge ? 'outline' : 'solid'}
-                              bg={isOutlineBadge ? '$white' : productivityColor}
-                              borderColor={isOutlineBadge ? '$border300' : productivityColor}
-                              px="$2"
-                              py="$1"
-                              borderRadius="$lg"
-                            >
-                              <BadgeText
-                                {...(AssignUsersStyles.productivityBadgeText as TextProps)}
-                                color={isOutlineBadge ? productivityTextColor : '$white'}
-                              >
-                                {participant.productivity}
-                              </BadgeText>
-                            </Badge>
-                          </HStack>
-                         </Box>
-                       </HStack>
-                     );
-                   })}
-                 </VStack>
+                 <Box marginTop="$1">
+                   <DataTable
+                     data={mappedParticipants || []}
+                     columns={mappedParticipantsColumns}
+                     getRowKey={(item: any) => item.value}
+                     isLoading={isLoadingMappedParticipants}
+                     emptyMessage="common.noDataFound"
+                     responsive={true}
+                     pagination={{
+                       enabled: true,
+                       pageSize: mappedParticipantsPageSize,
+                       maxPageNumbers: 5,
+                       showPageSizeSelector: true,
+                       pageSizeOptions: [5, 10, 25, 50],
+                       serverSide: {
+                         total: mappedParticipantsTotal,
+                         count: mappedParticipantsPage,
+                       },
+                     }}
+                     onPageChange={setMappedParticipantsPage}
+                     onPageSizeChange={(size: number) => {
+                       setMappedParticipantsPageSize(size);
+                       setMappedParticipantsPage(1); // Reset to first page when page size changes
+                     }}
+                   />
+                 </Box>
                </VStack>
              </Card>
            </>

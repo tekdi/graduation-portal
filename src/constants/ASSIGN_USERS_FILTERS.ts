@@ -209,53 +209,93 @@ export const participantLCFilterOptions = [
   },
 ];
 
-// Participant filter options for Step 3
-export const participantFilterOptions: ReadonlyArray<FilterConfig> = [
-  {
-    nameKey: 'admin.filters.bio',
-    attr: 'bio',
-    type: 'select',
-    data: [
-      { labelKey: 'admin.filters.allBio', value: 'all' },
-      { labelKey: 'admin.filters.youthDevelopment', value: 'youth-development' },
-      { labelKey: 'admin.filters.skillsTraining', value: 'skills-training' },
-      { labelKey: 'admin.filters.entrepreneurship', value: 'entrepreneurship' },
-    ],
-  },
-  {
-    nameKey: 'admin.filters.productivity',
-    attr: 'productivity',
-    type: 'select',
-    data: [
-      { labelKey: 'admin.filters.allProductivity', value: 'all' },
-      { labelKey: 'admin.filters.high', value: 'high' },
-      { labelKey: 'admin.filters.medium', value: 'medium' },
-      { labelKey: 'admin.filters.low', value: 'low' },
-    ],
-  },
-];
+/**
+ * Hook to get participant filter options (Province and Site)
+ * Similar to useSiteFilterOptions but for participants
+ * 
+ * @param selectedProvinceId - Province ID selected in filter
+ * @returns Object containing filter configuration
+ */
+export const useParticipantFilterOptions = (selectedProvinceId?: string): {
+  filters: ReadonlyArray<FilterConfig>;
+  sites: SiteEntity[];
+} => {
+  // State for API data
+  const [provinces, setProvinces] = useState<ProvinceEntity[]>([]);
+  const [sites, setSites] = useState<SiteEntity[]>([]);
 
-// Mock participant data for Step 3
-export const participantList = [
-  {
-    labelKey: 'Thandeka Zungu',
-    value: 'thandeka-zungu',
-    bio: 'Youth Development',
-    productivity: 'High',
-    status: 'unassigned',
-  },
-  {
-    labelKey: 'Lebohang Molefe',
-    value: 'lebohang-molefe',
-    bio: 'Entrepreneurship',
-    productivity: 'Low',
-    status: 'unassigned',
-  },
-  {
-    labelKey: 'Zanele Kgotso',
-    value: 'zanele-kgotso',
-    bio: 'Skills Training',
-    productivity: 'Medium',
-    status: 'unassigned',
-  },
-];
+  // Fetch provinces from API on component mount
+  useEffect(() => {
+    const fetchProvinces = async () => {
+      const provincesData = await getProvincesList();
+      setProvinces(provincesData);
+    };
+    fetchProvinces();
+  }, []);
+
+  // Fetch sites - all sites initially, filtered by province when selected
+  useEffect(() => {
+    const fetchSites = async () => {
+      try {
+        // Fetch all sites if no province selected, or filtered by province if selected
+        const sitesResponse = await getSitesByProvince({
+          provinceId: selectedProvinceId && selectedProvinceId !== 'all-provinces' && selectedProvinceId !== 'all-Provinces' 
+            ? selectedProvinceId 
+            : undefined,
+          page: 1,
+          limit: 100,
+        });
+        const sitesData = sitesResponse.result?.data || [];
+        setSites(sitesData);
+      } catch (error) {
+        console.error('Error fetching sites:', error);
+        setSites([]);
+      }
+    };
+
+    fetchSites();
+  }, [selectedProvinceId]); // Re-fetch when province changes
+
+  // Build dynamic filter options with API data
+  return useMemo(() => {
+    // Build province filter from API provinces
+    const provinceFilterOptions = [
+      { labelKey: 'admin.filters.allProvinces', value: 'all-provinces' },
+      ...provinces.map((province: ProvinceEntity) => ({
+        label: province.name,
+        value: province._id,
+      })),
+    ];
+
+    // Build site filter from API sites
+    const siteFilterOptions = [
+      { labelKey: 'admin.filters.allSites', value: 'all-sites' },
+      ...sites.map((site: SiteEntity) => ({
+        label: site.name,
+        value: site._id,
+      })),
+    ];
+
+    return {
+      filters: [
+        {
+          nameKey: 'admin.filters.filterByProvince',
+          attr: 'filterByProvince',
+          type: 'select' as const,
+          data: provinceFilterOptions,
+        },
+        {
+          nameKey: 'admin.filters.site',
+          attr: 'site',
+          type: 'select' as const,
+          placeholderKey: 'admin.filters.chooseSite',
+          data: siteFilterOptions,
+        },
+      ],
+      sites,
+    };
+  }, [provinces, sites, selectedProvinceId]);
+};
+
+// Participant filter options - will be replaced with dynamic options from useParticipantFilterOptions
+export const participantFilterOptions: ReadonlyArray<FilterConfig> = [];

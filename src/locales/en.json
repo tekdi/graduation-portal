@@ -459,9 +459,14 @@
       "supervisor": "Supervisor",
       "confirmLcAssignment": "Confirm LC Assignment",
       "confirmLcAssignmentDescription": "You are about to assign {{count}} Linkage Champion(s) to {{supervisor}}",
+      "confirmParticipantAssignment": "Confirm Participant Assignment",
+      "confirmParticipantAssignmentDescription": "You are about to assign {{count}} participant(s) to {{lc}}",
       "confirmAssignment": "Confirm Assignment",
       "lcsAssignedSuccess": "{{count}} LC(s) assigned to {{supervisor}}",
       "lcsAssignmentError": "Failed to assign LCs. Please try again.",
+      "participantsAssignedSuccess": "{{count}} participant(s) assigned to {{lc}} successfully!",
+      "participantsAssignmentError": "Failed to assign participant(s) to LC. Please try again.",
+      "participants": "Participants",
       "status": {
         "assigned": "Assigned",
         "unassigned": "Unassigned"
