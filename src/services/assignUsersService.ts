@@ -157,12 +157,6 @@ export const getParticipants = async (
       requestBody.meta = meta;
     }
     
-    // Log for debugging
-    console.log('getParticipants - Endpoint:', endpoint);
-    console.log('getParticipants - Province:', province);
-    console.log('getParticipants - Site:', site);
-    console.log('getParticipants - Request Body:', JSON.stringify(requestBody, null, 2));
-    
     // POST request to fetch participants
     const response = await api.post<UserSearchResponse>(endpoint, requestBody);
     return response.data;
@@ -258,8 +252,6 @@ export const assignLCsToSupervisor = async (params: {
       'orgId': process.env.ORG_ID,
     }
     const response = await api.post<any>(endpoint, requestBody, {headers});
-    console.log('response', response.data);
-    
     // Check if HTTP response status is 200 (success)
     if (response.status !== 200) {
       throw new Error(`API request failed with status ${response.status}`);
