@@ -43,7 +43,7 @@ export const getSupervisorsByProvince = async (
     if (provinceId && provinceId !== 'all-provinces' && provinceId !== 'all-Provinces') {
       requestBody.meta = {
         province: provinceId,
-      };
+    };
     }
     
     // POST request to fetch supervisors

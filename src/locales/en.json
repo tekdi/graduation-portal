@@ -452,9 +452,16 @@
       "listOfLcsMappedToSupervisor": "List of LCs Mapped to Supervisor",
       "currentLcAssignmentsFor": "Current LC assignments for {{supervisor}}",
       "linkageChampion": "Linkage Champion",
+      "linkageChampions": "Linkage Champions",
       "email": "Email",
       "location": "Location",
       "site": "Site",
+      "supervisor": "Supervisor",
+      "confirmLcAssignment": "Confirm LC Assignment",
+      "confirmLcAssignmentDescription": "You are about to assign {{count}} Linkage Champion(s) to {{supervisor}}",
+      "confirmAssignment": "Confirm Assignment",
+      "lcsAssignedSuccess": "{{count}} LC(s) assigned to {{supervisor}}",
+      "lcsAssignmentError": "Failed to assign LCs. Please try again.",
       "status": {
         "assigned": "Assigned",
         "unassigned": "Unassigned"

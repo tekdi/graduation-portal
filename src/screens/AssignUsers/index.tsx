@@ -433,7 +433,11 @@ const AssignUsersScreen = () => {
               description="admin.assignUsers.filterByGeography"
               filterOptions={AssignLCFilterOptions}
               onChange={handleLcFilterChange}
-              selectedValues={lcFilterValues}
+              selectedValues={{
+                ...lcFilterValues,
+                selectedSupervisorData: selectedSupervisor, // Pass full supervisor object
+                selectSupervisor: supervisorFilterValues.selectSupervisor, // Pass supervisor ID as fallback
+              }}
               showLcList={true}
               onAssign={handleAssignLCs}
               lcList={getAvailableLCs()}

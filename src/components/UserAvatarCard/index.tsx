@@ -17,6 +17,8 @@ import {
  Button,
  Pressable,
  Box,
+ Modal,
+ useAlert,
 } from '@ui';
 import FilterButton from '@components/Filter';
 import { AssignUsersStyles } from './Styles';
@@ -26,6 +28,7 @@ import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
 import { getInitials } from '@utils/helper';
+import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 
 interface UserAvatarCardProps {
@@ -59,9 +62,15 @@ const UserAvatarCard = ({
   isParticipantList = false,
 }: UserAvatarCardProps) => {
   const { t } = useLanguage();
+  const { showAlert } = useAlert();
 
   const [selectedLc, setSelectedLc] = useState<any>(null);
   const [selectedLCs, setSelectedLCs] = useState<Set<string>>(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingAssignment, setPendingAssignment] = useState<{
+    selectedLCs: any[];
+    supervisorData: any;
+  } | null>(null);
   
   // Use provided lcList or fall back to empty array
   const displayLCList = lcList || [];
@@ -228,23 +237,22 @@ const UserAvatarCard = ({
         <Button
           {...titleHeaderStyles.solidButton}
           mt={'$3'}
-          onPress={async () => {
-            // Handle assign LCs to supervisor
+          onPress={() => {
+            // Handle assign LCs to supervisor - show confirmation modal
             const selectedLCValues = Array.from(selectedLCs);
             const selectedLCObjects = displayLCList.filter((lc: any) =>
               selectedLCValues.includes(lc.value)
             );
-            // Call parent's onAssign callback if provided (await if it's async)
-            if (onAssign) {
-              try {
-                await onAssign(selectedLCObjects);
-                // Clear selection only after successful assignment
-                setSelectedLCs(new Set());
-              } catch (error) {
-                console.error('Error in onAssign callback:', error);
-                // Don't clear selection on error
-              }
-            }
+            
+            // Get supervisor data from selectedValues
+            const supervisorData = selectedValues.selectedSupervisorData;
+            
+            // Store pending assignment and show modal
+            setPendingAssignment({
+              selectedLCs: selectedLCObjects,
+              supervisorData: supervisorData,
+            });
+            setIsModalOpen(true);
           }}
           isDisabled={selectedLCs.size === 0}
         >
@@ -261,6 +269,102 @@ const UserAvatarCard = ({
             </Text>
           </HStack>
         </Button>
+        
+        {/* Confirmation Modal */}
+        {!isParticipantList && pendingAssignment && (
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setPendingAssignment(null);
+            }}
+            headerTitle={t('admin.assignUsers.confirmLcAssignment')}
+            cancelButtonText={t('common.cancel')}
+            confirmButtonText={t('admin.assignUsers.confirmAssignment')}
+            onCancel={() => {
+              setIsModalOpen(false);
+              setPendingAssignment(null);
+            }}
+            onConfirm={async () => {
+              try {
+                // Call parent's onAssign callback if provided (await if it's async)
+                if (onAssign) {
+                  await onAssign(pendingAssignment.selectedLCs);
+                  // Clear selection only after successful assignment
+                  setSelectedLCs(new Set());
+                  
+                  // Show success alert
+                  const supervisorName = pendingAssignment.supervisorData?.name || 
+                                        selectedValues.selectSupervisor || 
+                                        'Supervisor';
+                  const count = pendingAssignment.selectedLCs.length;
+                  const successMessage = t('admin.assignUsers.lcsAssignedSuccess')
+                    .replace('{{count}}', String(count))
+                    .replace('{{supervisor}}', supervisorName);
+                  showAlert(
+                    'success',
+                    successMessage,
+                    { placement: 'bottom', duration: 5000 }
+                  );
+                }
+                
+                // Close modal
+                setIsModalOpen(false);
+                setPendingAssignment(null);
+              } catch (error) {
+                console.error('Error in onAssign callback:', error);
+                // Show error alert
+                showAlert(
+                  'error',
+                  t('admin.assignUsers.lcsAssignmentError'),
+                  { placement: 'bottom', duration: 5000 }
+                );
+                // Don't clear selection on error
+                // Don't close modal on error so user can retry
+              }
+            }}
+            confirmButtonColor={theme.tokens.colors.primary500}
+          >
+            <VStack space="md">
+              <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
+                {t('admin.assignUsers.confirmLcAssignmentDescription')
+                  .replace('{{count}}', String(pendingAssignment.selectedLCs.length))
+                  .replace('{{supervisor}}', pendingAssignment.supervisorData?.name || 
+                           selectedValues.selectSupervisor || 
+                           'Supervisor')}
+              </Text>
+              
+              {/* Supervisor Information */}
+              <HStack space="xs">
+                <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground" fontWeight="$normal">
+                  {t('admin.assignUsers.supervisor')}:
+                </Text>
+                <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">
+                  {pendingAssignment.supervisorData?.name || 
+                   selectedValues.selectSupervisor || 
+                   'Supervisor'}
+                </Text>
+              </HStack>
+              
+              {/* Linkage Champions List */}
+              <VStack space="xs">
+                <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground" fontWeight="$normal">
+                  {t('admin.assignUsers.linkageChampions')}:
+                </Text>
+                <VStack space="xs" marginLeft="$4">
+                  {pendingAssignment.selectedLCs.map((lc: any, index: number) => (
+                    <HStack key={`${lc.value}-${index}`} space="sm" alignItems="center">
+                      <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">
+                        • {lc.labelKey}
+                        {lc.location && ` (${lc.location})`}
+                      </Text>
+                    </HStack>
+                  ))}
+                </VStack>
+              </VStack>
+            </VStack>
+          </Modal>
+        )}
        </VStack>
      )}
 
