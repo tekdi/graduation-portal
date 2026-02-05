@@ -19,6 +19,8 @@ import {
  Box,
  Modal,
  useAlert,
+  Badge,
+  BadgeText,
 } from '@ui';
 import FilterButton from '@components/Filter';
 import { AssignUsersStyles } from './Styles';
@@ -188,43 +190,59 @@ const UserAvatarCard = ({
                  </CheckboxIndicator>
 
 
-                 <CheckboxLabel>
-                   <View {...(AssignUsersStyles.viewstyles as ViewProps)}>
-                     <Avatar {...(AssignUsersStyles.avatarBgStyles as any)} width="$8" height="$8">
-                       <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)} fontSize="$sm">{lc.labelKey}</AvatarFallbackText>
-                     </Avatar>
-
-
-                     <View>
-                       <Text
-                         {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm"
-                       >
-                         {lc.labelKey}
-                       </Text>
-                       <HStack gap="$1">
-                         <LucideIcon
-                           name="MapPin"
-                           size={12}
-                           color={theme.tokens.colors.textMutedForeground}
-                         />
-                         <Text
-                           {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs"
+                <CheckboxLabel style={{ flex: 1 }}>
+                   <HStack
+                     {...(AssignUsersStyles.viewstyles as ViewProps)}
+                     flex={1}
+                     width="100%"
+                     alignItems="center"
+                   >
+                     <HStack space="md" alignItems="center" flex={1}>
+                       <Avatar {...(AssignUsersStyles.avatarBgStyles as any)} width="$8" height="$8">
+                         <AvatarFallbackText
+                           {...(AssignUsersStyles.avatarFallbackTextStyles as any)}
+                           fontSize="$sm"
                          >
-                           {lc.location}
+                           {lc.labelKey}
+                         </AvatarFallbackText>
+                       </Avatar>
+
+                       <VStack space="xs" flexShrink={1}>
+                         <Text {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm">
+                           {lc.labelKey}
                          </Text>
-                       </HStack>
-                     </View>
-                     {/* <Button
-                       {...titleHeaderStyles.outlineButton}
-                       marginLeft="auto"
-                     >
-                       <HStack>
-                         <Text {...titleHeaderStyles.outlineButtonText}>
-                           {t(`admin.assignUsers.status.${lc.status}`) || lc.status}
-                         </Text>
-                       </HStack>
-                     </Button> */}
-                   </View>
+                         <HStack gap="$1" alignItems="center">
+                           <LucideIcon
+                             name="MapPin"
+                             size={12}
+                             color={theme.tokens.colors.textMutedForeground}
+                           />
+                           <Text {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs">
+                             {lc.location}
+                           </Text>
+                         </HStack>
+                       </VStack>
+                     </HStack>
+
+                     {!isParticipantList && (
+                       <Badge
+                         ml="auto"
+                         variant="outline"
+                         bg="$white"
+                         borderColor="$borderColor"
+                         px="$2"
+                         py="$1"
+                         borderRadius="$lg"
+                         mr="$2"
+                       >
+                         <BadgeText color="$textForeground" fontSize="$xs" textTransform="none">
+                           {t(`admin.assignUsers.status.${lc.status || 'unassigned'}`) ||
+                             lc.status ||
+                             t('admin.assignUsers.status.unassigned')}
+                         </BadgeText>
+                       </Badge>
+                     )}
+                   </HStack>
                  </CheckboxLabel>
                </Checkbox>
                <Divider />

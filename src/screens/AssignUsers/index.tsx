@@ -694,6 +694,13 @@ const AssignUsersScreen = () => {
                        participant.productivity?.toLowerCase() === 'high' ? '$primary500' :
                        participant.productivity?.toLowerCase() === 'medium' ? '$textSecondary' :
                        '$white';
+                    const isOutlineBadge = productivityColor === '$white';
+                    const productivityTextColor =
+                      participant.productivity?.toLowerCase() === 'high'
+                        ? '$primary500'
+                        : participant.productivity?.toLowerCase() === 'medium'
+                          ? '$textSecondary'
+                          : '$textMutedForeground';
 
                      return (
                        <HStack
@@ -727,15 +734,24 @@ const AssignUsersScreen = () => {
                            </Text>
                          </Box>
                          <Box flex={1.5}>
-                           <Badge
-                             {...(AssignUsersStyles.productivityBadgeButton as ViewProps)}
-                             bg={productivityColor}
-                           >
-                             <BadgeText {...(AssignUsersStyles.productivityBadgeText as TextProps)}>
-                               {participant.productivity}
-                             </BadgeText>
-                             
-                           </Badge>
+                          <HStack justifyContent="flex-end">
+                            <Badge
+                              {...(AssignUsersStyles.productivityBadgeButton as ViewProps)}
+                              variant={isOutlineBadge ? 'outline' : 'solid'}
+                              bg={isOutlineBadge ? '$white' : productivityColor}
+                              borderColor={isOutlineBadge ? '$border300' : productivityColor}
+                              px="$2"
+                              py="$1"
+                              borderRadius="$lg"
+                            >
+                              <BadgeText
+                                {...(AssignUsersStyles.productivityBadgeText as TextProps)}
+                                color={isOutlineBadge ? productivityTextColor : '$white'}
+                              >
+                                {participant.productivity}
+                              </BadgeText>
+                            </Badge>
+                          </HStack>
                          </Box>
                        </HStack>
                      );

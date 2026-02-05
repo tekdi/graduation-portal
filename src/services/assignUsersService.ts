@@ -179,21 +179,16 @@ export const assignLCsToSupervisor = async (params: {
     };
     
     // Additional headers (static for now)
-    const adminAccessToken = '9F3bEr6jEABY0juEmqStkH1Mkt7WAHUxJYQeFge5ONN';
-    const internalAccessToken = '9yG*tM*y(7)';
-    const tenantId = 'brac';
-    const orgId = 'brac_gbl';
-
-    const response = await api.post<any>(endpoint, requestBody, {
-      headers: {
-        'Content-Type': 'application/json',
-        'internal-access-token': internalAccessToken,
-        'admin-access-token': adminAccessToken,
-        'tenantId': tenantId,
-        'orgId': orgId,
-      },
-    });
-    
+    const headers = {
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+      'admin-access-token': process.env.ADMIN_ACCESS_TOKEN,
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+      'tenantId': process.env.TENANT_CODE_NAME,
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+      'orgId': process.env.ORG_ID,
+    }
+    const response = await api.post<any>(endpoint, requestBody, {headers});
+    console.log('response', response.data);
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor
