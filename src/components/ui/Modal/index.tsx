@@ -59,6 +59,7 @@ const Modal: React.FC<ModalProps> = ({
   headerDescription,
   headerIcon,
   showCloseButton = true,
+  headerAlignment = 'center',
   headerProps,
   // Body props
   children,
@@ -75,22 +76,22 @@ const Modal: React.FC<ModalProps> = ({
   contentProps,
   bodyProps,
   closeOnOverlayClick = true,
-  
+
   ...modalProps // Spread all other Gluestack Modal props
-  
+
 }) => {
   const { t } = useLanguage();
 
   const { isMobile } = usePlatform();
   // Determine if footer should be shown
   const hasFooter = footerContent || cancelButtonText || confirmButtonText;
-  
+
   // Handle cancel - use onCancel if provided, otherwise use onClose
   const handleCancel = onCancel || onClose;
 
   return (
-    <GluestackModal 
-      isOpen={isOpen} 
+    <GluestackModal
+      isOpen={isOpen}
       onClose={onClose}
       size={size}
       closeOnOverlayClick={closeOnOverlayClick}
@@ -106,7 +107,7 @@ const Modal: React.FC<ModalProps> = ({
         {/* Header with Title, Description, and Icon */}
         {(headerTitle || headerDescription || headerIcon || showCloseButton) && (
           <ModalHeader borderBottomWidth={0} padding="$6" paddingBottom="$4" {...headerProps}>
-            <HStack space="md" alignItems="center" flex={1}>
+            <HStack space="md" alignItems={headerAlignment} flex={1}>
               {/* Header Icon Section */}
               {headerIcon && (
                 <Box {...profileStyles.headerIconContainer}>
