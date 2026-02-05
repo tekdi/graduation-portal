@@ -317,76 +317,76 @@ const ProjectComponent: React.FC = () => {
 
               return (
                 <>
-                  {/* Warning Banner - Show when Submit is disabled */}
-                  {isSubmitDisabled && config.submitWarningMessage && (
-                    <Box
-                      bg="$warning50"
-                      borderWidth={1}
-                      borderColor="$warning300"
-                      borderRadius="$md"
-                      padding="$3"
-                    >
-                      <HStack space="sm" alignItems="center">
-                        <LucideIcon name="AlertCircle" size={18} color="#ca8a04" />
-                        <Text fontSize="$sm" color="$warning700">
-                          {config.submitWarningMessage}
-                        </Text>
-                      </HStack>
-                    </Box>
+            {/* Warning Banner - Show when Submit is disabled */}
+            {isSubmitDisabled && config.submitWarningMessage && (
+              <Box
+                bg="$warning50"
+                borderWidth={1}
+                borderColor="$warning300"
+                borderRadius="$md"
+                padding="$3"
+              >
+                <HStack space="sm" alignItems="center">
+                  <LucideIcon name="AlertCircle" size={18} color="#ca8a04" />
+                  <Text fontSize="$sm" color="$warning700">
+                    {config.submitWarningMessage}
+                  </Text>
+                </HStack>
+              </Box>
+            )}
+
+            {/* Responsive Button Container - stacks on mobile, row on web */}
+            <Box {...projectComponentStyles.footerButtonContainer}>
+              {/* Change Pathway Button */}
+              <Button
+                variant="outline"
+                borderColor="$borderLight300"
+                borderRadius="$md"
+                paddingHorizontal="$4"
+                paddingVertical="$2"
+                onPress={() => {
+                  if (config.onChangePathway) {
+                    config.onChangePathway();
+                    return;
+                  }
+                }}
+                $hover-borderColor="$primary500"
+                $hover-bg="$error50"
+                {...projectComponentStyles.changePathwayButton}
+              >
+                <ButtonText
+                  color="$textPrimary"
+                  {...TYPOGRAPHY.button}
+                  fontWeight="$medium"
+                >
+                  {t('participantDetail.interventionPlan.changePathway')}
+                </ButtonText>
+              </Button>
+
+              {/* Submit Intervention Plan Button */}
+              <Button
+                bg="$primary500"
+                borderRadius="$md"
+                paddingHorizontal="$6"
+                paddingVertical="$2"
+                onPress={onSubmitInterventionPlan}
+                isDisabled={isSubmitDisabled}
+                opacity={isSubmitDisabled ? 0.5 : 1}
+                $hover-bg="$primary600"
+                $web-cursor="pointer"
+                {...projectComponentStyles.submitButton}
+              >
+                <ButtonText
+                  color="$backgroundPrimary.light"
+                  {...TYPOGRAPHY.button}
+                  fontWeight="$semibold"
+                >
+                  {t(
+                    'participantDetail.interventionPlan.submitInterventionPlan',
                   )}
-
-                  {/* Responsive Button Container - stacks on mobile, row on web */}
-                  <Box {...projectComponentStyles.footerButtonContainer}>
-                    {/* Change Pathway Button */}
-                    <Button
-                      variant="outline"
-                      borderColor="$borderLight300"
-                      borderRadius="$md"
-                      paddingHorizontal="$4"
-                      paddingVertical="$2"
-                      onPress={() => {
-                        if (config.onChangePathway) {
-                          config.onChangePathway();
-                          return;
-                        }
-                      }}
-                      $hover-borderColor="$primary500"
-                      $hover-bg="$error50"
-                      {...projectComponentStyles.changePathwayButton}
-                    >
-                      <ButtonText
-                        color="$textPrimary"
-                        {...TYPOGRAPHY.button}
-                        fontWeight="$medium"
-                      >
-                        {t('participantDetail.interventionPlan.changePathway')}
-                      </ButtonText>
-                    </Button>
-
-                    {/* Submit Intervention Plan Button */}
-                    <Button
-                      bg="$primary500"
-                      borderRadius="$md"
-                      paddingHorizontal="$6"
-                      paddingVertical="$2"
-                      onPress={onSubmitInterventionPlan}
-                      isDisabled={isSubmitDisabled}
-                      opacity={isSubmitDisabled ? 0.5 : 1}
-                      $hover-bg="$primary600"
-                      $web-cursor="pointer"
-                      {...projectComponentStyles.submitButton}
-                    >
-                      <ButtonText
-                        color="$backgroundPrimary.light"
-                        {...TYPOGRAPHY.button}
-                        fontWeight="$semibold"
-                      >
-                        {t(
-                          'participantDetail.interventionPlan.submitInterventionPlan',
-                        )}
-                      </ButtonText>
-                    </Button>
-                  </Box>
+                </ButtonText>
+              </Button>
+            </Box>
                 </>
               );
             })()}
