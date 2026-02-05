@@ -49,7 +49,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const route = useRoute();
   const navigation = useNavigation();
   // Retrieve updateTask from context
-  const { mode, config, updateTask, addedToPlanTaskIds } =
+  const { mode, config, addedToPlanTaskIds } =
     useProjectContext();
   const { deleteTask } = useProjectContext();
   // handleOpenForm
@@ -151,10 +151,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   // Checkbox change handler
-  const handleCheckboxChange = (checked: boolean) => {
+  const handleCheckboxChange = async (checked: boolean) => {
     if (!isEdit) return;
     const newStatus = checked ? TASK_STATUS.COMPLETED : TASK_STATUS.TO_DO;
-    handleStatusChange(task._id, newStatus);
+    await handleStatusChange(task._id, newStatus);
   };
 
   // Custom Renderers (From HEAD to preserve styling)
@@ -641,13 +641,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
       onUpload={method => {
         console.log('Upload method selected:', method);
       }}
-      onConfirm={files => {
-        handleStatusChange(task._id, TASK_STATUS.COMPLETED);
-        // If files were passed, update the task with them
-        if (files) {
-          console.log(files);
-          updateTask(task._id, { attachments: files });
-        }
+      onConfirm={async (files) => {
+        await handleStatusChange(task._id, TASK_STATUS.COMPLETED, files);
         setShowUploadModal(false);
         // Show success toast with task-specific message
         showSuccess(t('projectPlayer.evidenceUploaded'));

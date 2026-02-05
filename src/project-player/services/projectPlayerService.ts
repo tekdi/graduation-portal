@@ -192,3 +192,62 @@ export const getSolutionDetails = async (
     return handleApiError(error);
   }
 };
+
+/**
+ * Generates pre-signed URLs for file uploads via Cloud Services.
+ * 
+ * @param payload - Object representing files to get pre-signed URLs for, e.g.,
+ *   {
+ *     [entityId]: {
+ *       files: [ 'filename.jpg', ... ]
+ *     }
+ *   }
+ * @returns ApiResponse<any> - Resolves with presigned URLs or error response.
+ */
+export const preSignedUrls = async (
+  payload: Record<string, { files: string[] }>
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.PRE_SIGNED_URLS,
+      { request: payload }
+    );
+    return { data: response.data.result || response.data };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+
+export const uploadFiles = async (
+  id: string,
+  files: File[]
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await preSignedUrls({
+      [id]: {
+        files: files.map(file => file.name)
+      }
+    });
+    if (response?.data?.[id]) {
+      const responceData = await Promise.all(files.map(file => {
+        const presignedUrl = response.data[id].files.find(f => f.file === file.name);
+          fetch(presignedUrl?.url, {
+          method: 'PUT',
+          body: file
+        });
+        return {
+          name: file.name,
+          sourcePath: presignedUrl?.payload?.sourcePath,
+          type: file?.type,
+          url: presignedUrl?.url ? presignedUrl.url.split('?')[0] : undefined
+        }
+      }));
+      
+      return { data: responceData };
+    }
+    return { data: [] };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
