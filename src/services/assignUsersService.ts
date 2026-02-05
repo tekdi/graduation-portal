@@ -43,7 +43,7 @@ export const getSupervisorsByProvince = async (
     if (provinceId && provinceId !== 'all-provinces' && provinceId !== 'all-Provinces') {
       requestBody.meta = {
         province: provinceId,
-      };
+    };
     }
     
     // POST request to fetch supervisors
@@ -95,6 +95,100 @@ export const getLinkageChampions = async (
     
     // POST request to fetch linkage champions
     const response = await api.post<UserSearchResponse>(endpoint, requestBody);
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Get mapped LCs for a supervisor
+ * Fetches the list of Linkage Champions assigned to a specific supervisor
+ * 
+ * @param params - Query parameters
+ * @returns A promise resolving to the mapped LCs response from the API
+ */
+export const getMappedLCsForSupervisor = async (params: {
+  userId: string; // Supervisor's user ID
+  programId: string; // Program ID
+  type?: string; // Entity type (default: "org_admin")
+  page?: number; // Page number (default: 1)
+  limit?: number; // Limit per page (default: 5)
+  search?: string; // Search query (default: "")
+}): Promise<any> => {
+  try {
+    const { userId, programId, type = 'org_admin', page = 1, limit = 5, search = '' } = params;
+    
+    // Build query string
+    const queryParams = new URLSearchParams({
+      userId: userId,
+      type: type,
+      page: page.toString(),
+      limit: limit.toString(),
+      search: search,
+      programId: programId,
+    });
+
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
+    
+    // GET request to fetch mapped LCs
+    const response = await api.get<any>(endpoint);
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Assign LCs to Supervisor
+ * Creates or updates program user assignments
+ * 
+ * @param params - Assignment parameters
+ * @returns A promise resolving to the API response
+ */
+export const assignLCsToSupervisor = async (params: {
+  userId: string; // Supervisor's user ID
+  programId: string; // Program ID
+  assignedUserIds: string[]; // Array of LC user IDs
+  assignedUsersStatus?: string; // Status for assigned users (default: "ACTIVE")
+  userRolesToEntityTypeMap?: Record<string, string>; // Role to entity type mapping
+}): Promise<any> => {
+  try {
+    const {
+      userId,
+      programId,
+      assignedUserIds,
+      assignedUsersStatus = 'ACTIVE',
+      userRolesToEntityTypeMap = {
+        org_admin: 'linkageChampion',
+        tenant_admin: 'supervisor',
+        user: 'participant',
+      },
+    } = params;
+
+    const endpoint = API_ENDPOINTS.UPDATE_ENTITY_DETAILS;
+    
+    const requestBody = {
+      userId,
+      programId,
+      assignedUserIds,
+      assignedUsersStatus,
+      userRolesToEntityTypeMap,
+    };
+    
+    // Additional headers (static for now)
+    const headers = {
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+      'admin-access-token': process.env.ADMIN_ACCESS_TOKEN,
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+      'tenantId': process.env.TENANT_CODE_NAME,
+      // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+      'orgId': process.env.ORG_ID,
+    }
+    const response = await api.post<any>(endpoint, requestBody, {headers});
+    console.log('response', response.data);
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor

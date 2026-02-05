@@ -17,6 +17,10 @@ import {
  Button,
  Pressable,
  Box,
+ Modal,
+ useAlert,
+  Badge,
+  BadgeText,
 } from '@ui';
 import FilterButton from '@components/Filter';
 import { AssignUsersStyles } from './Styles';
@@ -25,6 +29,8 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import { LucideIcon } from '@ui';
 import { theme } from '@config/theme';
+import { getInitials } from '@utils/helper';
+import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 
 interface UserAvatarCardProps {
@@ -58,9 +64,15 @@ const UserAvatarCard = ({
   isParticipantList = false,
 }: UserAvatarCardProps) => {
   const { t } = useLanguage();
+  const { showAlert } = useAlert();
 
   const [selectedLc, setSelectedLc] = useState<any>(null);
   const [selectedLCs, setSelectedLCs] = useState<Set<string>>(new Set());
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [pendingAssignment, setPendingAssignment] = useState<{
+    selectedLCs: any[];
+    supervisorData: any;
+  } | null>(null);
   
   // Use provided lcList or fall back to empty array
   const displayLCList = lcList || [];
@@ -102,39 +114,25 @@ const UserAvatarCard = ({
         selectedValues.selectedValue ||
         '';
 
-        // Extract initials from supervisor name
-        // Rules:
-        // - Multiple words → first letter of first name + first letter of last name
-        //   Example: "Amol Patil" -> "AP", "John Doe Smith" -> "JS"
-        // - Single word → first letter only
-        //   Example: "Amol" -> "A"
-        const getInitials = (name: string): string => {
-        if (!name || typeof name !== 'string') return '';
-
-        const parts = name
-            .trim()
-            .split(/\s+/)
-            .filter(Boolean);
-
-        // Single name → first letter only
-        if (parts.length === 1) {
-            return parts[0][0].toUpperCase();
-        }
-
-        // First letter of first name + first letter of last name
-        const firstInitial = parts[0][0];
-        const lastInitial = parts[parts.length - 1][0];
-
-        return (firstInitial + lastInitial).toUpperCase();
-        };
-
-        // Usage
+        // Get initials from supervisor name using common utility function
         const supervisorInitials = getInitials(supervisorName);
-// Get location from selected province name (API response has location: null)
-       // Use the province name from the filter selection as the location
-       const supervisorLocation = selectedValues.selectedProvinceName || 
-                                  supervisorData?.meta?.province ||
-                                  '';
+        
+        // Get province and site from supervisor API response
+        const supervisorProvince = supervisorData?.province?.label || '';
+        const supervisorSite = supervisorData?.local_municipality?.label || 
+                              supervisorData?.site?.label ||
+                              '';
+        
+        // Build location text: show both Province and Site if available
+        const locationParts = [];
+        if (supervisorSite) {
+          locationParts.push(supervisorSite);
+        }
+        if (supervisorProvince) {
+          locationParts.push(supervisorProvince);
+        }
+       
+        const supervisorLocation = locationParts.join(' , ');
        
        return (
          <Card {...(AssignUsersStyles.cardStyles as ViewProps)}>
@@ -192,43 +190,59 @@ const UserAvatarCard = ({
                  </CheckboxIndicator>
 
 
-                 <CheckboxLabel>
-                   <View {...(AssignUsersStyles.viewstyles as ViewProps)}>
-                     <Avatar {...(AssignUsersStyles.avatarBgStyles as any)} width="$8" height="$8">
-                       <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)} fontSize="$sm">{lc.labelKey}</AvatarFallbackText>
-                     </Avatar>
-
-
-                     <View>
-                       <Text
-                         {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm"
-                       >
-                         {lc.labelKey}
-                       </Text>
-                       <HStack gap="$1">
-                         <LucideIcon
-                           name="MapPin"
-                           size={12}
-                           color={theme.tokens.colors.textMutedForeground}
-                         />
-                         <Text
-                           {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs"
+                <CheckboxLabel style={{ flex: 1 }}>
+                   <HStack
+                     {...(AssignUsersStyles.viewstyles as ViewProps)}
+                     flex={1}
+                     width="100%"
+                     alignItems="center"
+                   >
+                     <HStack space="md" alignItems="center" flex={1}>
+                       <Avatar {...(AssignUsersStyles.avatarBgStyles as any)} width="$8" height="$8">
+                         <AvatarFallbackText
+                           {...(AssignUsersStyles.avatarFallbackTextStyles as any)}
+                           fontSize="$sm"
                          >
-                           {lc.location}
+                           {lc.labelKey}
+                         </AvatarFallbackText>
+                       </Avatar>
+
+                       <VStack space="xs" flexShrink={1}>
+                         <Text {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm">
+                           {lc.labelKey}
                          </Text>
-                       </HStack>
-                     </View>
-                     {/* <Button
-                       {...titleHeaderStyles.outlineButton}
-                       marginLeft="auto"
-                     >
-                       <HStack>
-                         <Text {...titleHeaderStyles.outlineButtonText}>
-                           {t(`admin.assignUsers.status.${lc.status}`) || lc.status}
-                         </Text>
-                       </HStack>
-                     </Button> */}
-                   </View>
+                         <HStack gap="$1" alignItems="center">
+                           <LucideIcon
+                             name="MapPin"
+                             size={12}
+                             color={theme.tokens.colors.textMutedForeground}
+                           />
+                           <Text {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs">
+                             {lc.location}
+                           </Text>
+                         </HStack>
+                       </VStack>
+                     </HStack>
+
+                     {!isParticipantList && (
+                       <Badge
+                         ml="auto"
+                         variant="outline"
+                         bg="$white"
+                         borderColor="$borderColor"
+                         px="$2"
+                         py="$1"
+                         borderRadius="$lg"
+                         mr="$2"
+                       >
+                         <BadgeText color="$textForeground" fontSize="$xs" textTransform="none">
+                           {t(`admin.assignUsers.status.${lc.status || 'unassigned'}`) ||
+                             lc.status ||
+                             t('admin.assignUsers.status.unassigned')}
+                         </BadgeText>
+                       </Badge>
+                     )}
+                   </HStack>
                  </CheckboxLabel>
                </Checkbox>
                <Divider />
@@ -242,28 +256,133 @@ const UserAvatarCard = ({
           {...titleHeaderStyles.solidButton}
           mt={'$3'}
           onPress={() => {
-            // Handle assign LCs to supervisor
+            // Handle assign LCs to supervisor - show confirmation modal
             const selectedLCValues = Array.from(selectedLCs);
             const selectedLCObjects = displayLCList.filter((lc: any) =>
               selectedLCValues.includes(lc.value)
             );
-            console.log('Assigning LCs:', selectedLCObjects);
-            // Call parent's onAssign callback if provided
-            onAssign?.(selectedLCObjects);
-            // Clear selection after assignment
-            setSelectedLCs(new Set());
-            // TODO: Implement API call to assign LCs
+            
+            // Get supervisor data from selectedValues
+            const supervisorData = selectedValues.selectedSupervisorData;
+            
+            // Store pending assignment and show modal
+            setPendingAssignment({
+              selectedLCs: selectedLCObjects,
+              supervisorData: supervisorData,
+            });
+            setIsModalOpen(true);
           }}
           isDisabled={selectedLCs.size === 0}
         >
           <HStack space="sm" alignItems="center">
+            <LucideIcon 
+              name="CircleCheck" 
+              size={20} 
+              color={theme.tokens.colors.white || '#FFFFFF'} 
+            />
             <Text {...titleHeaderStyles.solidButtonText}>
               {isParticipantList
                 ? t('admin.assignUsers.assignParticipantsToLc').replace('{{count}}', String(selectedLCs.size))
-                : t('admin.actions.assignLCsToSupervisor')}
+                : t('admin.assignUsers.assignLCsToSupervisor').replace('{{count}}', String(selectedLCs.size))}
             </Text>
           </HStack>
         </Button>
+        
+        {/* Confirmation Modal */}
+        {!isParticipantList && pendingAssignment && (
+          <Modal
+            isOpen={isModalOpen}
+            onClose={() => {
+              setIsModalOpen(false);
+              setPendingAssignment(null);
+            }}
+            headerTitle={t('admin.assignUsers.confirmLcAssignment')}
+            cancelButtonText={t('common.cancel')}
+            confirmButtonText={t('admin.assignUsers.confirmAssignment')}
+            onCancel={() => {
+              setIsModalOpen(false);
+              setPendingAssignment(null);
+            }}
+            onConfirm={async () => {
+              try {
+                // Call parent's onAssign callback if provided (await if it's async)
+                if (onAssign) {
+                  await onAssign(pendingAssignment.selectedLCs);
+                  // Clear selection only after successful assignment
+                  setSelectedLCs(new Set());
+                  
+                  // Show success alert
+                  const supervisorName = pendingAssignment.supervisorData?.name || 
+                                        selectedValues.selectSupervisor || 
+                                        'Supervisor';
+                  const count = pendingAssignment.selectedLCs.length;
+                  const successMessage = t('admin.assignUsers.lcsAssignedSuccess')
+                    .replace('{{count}}', String(count))
+                    .replace('{{supervisor}}', supervisorName);
+                  showAlert(
+                    'success',
+                    successMessage,
+                    { placement: 'bottom', duration: 5000 }
+                  );
+                }
+                
+                // Close modal
+                setIsModalOpen(false);
+                setPendingAssignment(null);
+              } catch (error) {
+                console.error('Error in onAssign callback:', error);
+                // Show error alert
+                showAlert(
+                  'error',
+                  t('admin.assignUsers.lcsAssignmentError'),
+                  { placement: 'bottom', duration: 5000 }
+                );
+                // Don't clear selection on error
+                // Don't close modal on error so user can retry
+              }
+            }}
+            confirmButtonColor={theme.tokens.colors.primary500}
+          >
+            <VStack space="md">
+              <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
+                {t('admin.assignUsers.confirmLcAssignmentDescription')
+                  .replace('{{count}}', String(pendingAssignment.selectedLCs.length))
+                  .replace('{{supervisor}}', pendingAssignment.supervisorData?.name || 
+                           selectedValues.selectSupervisor || 
+                           'Supervisor')}
+              </Text>
+              
+              {/* Supervisor Information */}
+              <HStack space="xs">
+                <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground" fontWeight="$normal">
+                  {t('admin.assignUsers.supervisor')}:
+                </Text>
+                <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">
+                  {pendingAssignment.supervisorData?.name || 
+                   selectedValues.selectSupervisor || 
+                   'Supervisor'}
+                </Text>
+              </HStack>
+              
+              {/* Linkage Champions List */}
+              <VStack space="xs">
+                <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground" fontWeight="$normal">
+                  {t('admin.assignUsers.linkageChampions')}:
+                </Text>
+                <VStack space="xs" marginLeft="$4">
+                  {pendingAssignment.selectedLCs.map((lc: any, index: number) => (
+                    <HStack key={`${lc.value}-${index}`} space="sm" alignItems="center">
+                      <Text {...TYPOGRAPHY.bodySmall} color="$textForeground" fontWeight="$medium">
+                        • {lc.labelKey}
+                        {lc.location && ` (${lc.location})`}
+                      </Text>
+                    </HStack>
+                  ))}
+                </VStack>
+              </VStack>
+            </VStack>
+          </Modal>
+        )}
        </VStack>
      )}
 
