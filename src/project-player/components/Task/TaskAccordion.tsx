@@ -115,13 +115,13 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
                     {task.name}
                   </Text>
                 </HStack>
-                <HStack space="md" alignItems="center">
+                <HStack space="md" alignItems="center" maxWidth={150}>
                   <Text {...taskAccordionStyles.progressText} minWidth={40}>
                     {progressPercent}%
                   </Text>
                   <Box
                     height={8}
-                    flex={1}
+                    width={100}
                     bg="$backgroundLight200"
                     borderRadius="$full"
                     overflow="hidden"

@@ -22,9 +22,9 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const totalTasks = project.tasks?.length || 0;
 
   // Check if any task is a project type (has children)
-const hasChildren =
-  !!project?.children?.length ||
-  project?.tasks?.some(task => task?.children?.length);
+  const hasChildren =
+    !!project?.children?.length ||
+    project?.tasks?.some(task => task?.children?.length);
   // Count total pillars (project type tasks)
   const totalPillars = project?.children?.length || 0;
 
@@ -49,8 +49,6 @@ const hasChildren =
         justifyContent="space-between"
         gap="$3">
 
-
-
         {/* ✅ Title + Description Section */}
         <VStack
           {...projectInfoCardStyles.leftSection}
@@ -60,46 +58,60 @@ const hasChildren =
             (ONBOARDING_PROJECT_TITLES.includes(project?.title || '') ||
               ONBOARDING_PROJECT_TITLES.includes(project?.name || '')) ? (
             isMobile ? (
-              <VStack>
-                <Text {...TYPOGRAPHY.h3} color="$textPrimary" lineHeight="$xs">
-                  {t('projectPlayer.onboarding')}
-                </Text>
-                <HStack
-                  alignItems="center"
-                  justifyContent="space-between"
-                  width="100%"
-                  space="md"
-                  flexWrap="wrap"
-                >
-                  <Text {...TYPOGRAPHY.h3} color="$textPrimary" lineHeight="$xs">
-                    {t('projectPlayer.participant')}
-                  </Text>
-                  <Box
-                    {...projectInfoCardStyles.stepsCompleteBadge}
-                    marginLeft="$0"
-                  >
-                    <HStack {...projectInfoCardStyles.stepsCompleteText}>
-                      <Text
-                        {...TYPOGRAPHY.caption}
-                        color="$modalBackground"
-                        fontWeight="$semibold"
-                      >
-                        {completedTasks} of {totalTasks}{' '}
-                        {t('projectPlayer.stepsComplete')}
-                      </Text>
-                    </HStack>
-                  </Box>
-                </HStack>
-              </VStack>
-            ) : (
-              <HStack
-                alignItems="center"
-                justifyContent="space-between"
-                width="100%"
-              >
+              // Mobile: Vertical layout with badge at bottom right
+              <VStack space="sm" flex={1}>
+                {/* Title */}
                 <Text {...TYPOGRAPHY.h3} color="$textPrimary">
                   {t('projectPlayer.onboarding')} {t('projectPlayer.participant')}
                 </Text>
+
+                {/* Description */}
+                <Text
+                  {...TYPOGRAPHY.paragraph}
+                  color="$textSecondary"
+                  lineHeight="$lg"
+                >
+                  {t('projectPlayer.onboardingDescription')}
+                </Text>
+
+                {/* Badge - positioned on right side */}
+                <Box
+                  {...projectInfoCardStyles.stepsCompleteBadge}
+                  marginLeft="$0"
+                  alignSelf="flex-end"
+                >
+                  <HStack {...projectInfoCardStyles.stepsCompleteText}>
+                    <Text
+                      {...TYPOGRAPHY.caption}
+                      color="$modalBackground"
+                      fontWeight="$semibold"
+                    >
+                      {completedTasks} of {totalTasks}{' '}
+                      {t('projectPlayer.stepsComplete')}
+                    </Text>
+                  </HStack>
+                </Box>
+              </VStack>
+            ) : (
+              // Web: Horizontal layout with title/description on left, badge on right
+              <HStack space="md" flex={1} justifyContent="space-between" alignItems="flex-start">
+                <VStack space="sm" flex={1}>
+                  {/* Title */}
+                  <Text {...TYPOGRAPHY.h3} color="$textPrimary">
+                    {t('projectPlayer.onboarding')} {t('projectPlayer.participant')}
+                  </Text>
+
+                  {/* Description */}
+                  <Text
+                    {...TYPOGRAPHY.paragraph}
+                    color="$textSecondary"
+                    lineHeight="$lg"
+                  >
+                    {t('projectPlayer.onboardingDescription')}
+                  </Text>
+                </VStack>
+
+                {/* Badge - on the right side */}
                 <Box
                   {...projectInfoCardStyles.stepsCompleteBadge}
                   marginLeft="$4"
@@ -127,16 +139,7 @@ const hasChildren =
             )
           )}
 
-          {!hasChildren ? (
-            <Text
-              {...TYPOGRAPHY.paragraph}
-              color="$textSecondary"
-              lineHeight="$lg"
-              mt="$1"
-            >
-              {t('projectPlayer.onboardingDescription')}
-            </Text>
-          ) : (
+          {!hasChildren ? null : (
             // Only show description in preview mode when there are children/pillars
             isPreview && project?.description && (
               <Text
@@ -152,11 +155,10 @@ const hasChildren =
         </VStack>
 
         {/* ✅ Steps Complete Badge - only for non-onboarding projects now */}
-        {!hasChildren && !(project?.title === 'Onboarding Participants' || project?.name === 'Onboarding Participants') && (
+        {!hasChildren && !(ONBOARDING_PROJECT_TITLES.includes(project?.title || '') || ONBOARDING_PROJECT_TITLES.includes(project?.name || '')) && (
           <Box
             {...projectInfoCardStyles.stepsCompleteBadge}
-            alignSelf={isMobile ? 'flex-end' : 'auto'} // moves to right on mobile
-            order={isMobile ? 1 : 2} // shows first on mobile
+            alignSelf={isMobile ? 'flex-end' : 'auto'}
           >
             <HStack {...projectInfoCardStyles.stepsCompleteText}>
               <Text
