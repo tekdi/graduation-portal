@@ -22,9 +22,9 @@ const ProjectInfoCard: React.FC<ProjectInfoCardProps> = ({ project }) => {
   const totalTasks = project.tasks?.length || 0;
 
   // Check if any task is a project type (has children)
-const hasChildren =
-  !!project?.children?.length ||
-  project?.tasks?.some(task => task?.children?.length);
+  const hasChildren =
+    !!project?.children?.length ||
+    project?.tasks?.some(task => task?.children?.length);
   // Count total pillars (project type tasks)
   const totalPillars = project?.children?.length || 0;
 
@@ -118,9 +118,12 @@ const hasChildren =
               </HStack>
             )
           ) : (
-            <Text {...TYPOGRAPHY.h3} color="$textPrimary">
-              {project?.title || project?.name}
-            </Text>
+            // Only show title in preview mode when there are children/pillars
+            isPreview && (
+              <Text {...TYPOGRAPHY.h3} color="$textPrimary">
+                {project?.title || project?.name}
+              </Text>
+            )
           )}
 
           {!hasChildren ? (
@@ -133,7 +136,8 @@ const hasChildren =
               {t('projectPlayer.onboardingDescription')}
             </Text>
           ) : (
-            project?.description && (
+            // Only show description in preview mode when there are children/pillars
+            isPreview && project?.description && (
               <Text
                 {...TYPOGRAPHY.paragraph}
                 color="$textSecondary"
