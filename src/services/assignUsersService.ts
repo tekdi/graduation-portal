@@ -103,6 +103,76 @@ export const getLinkageChampions = async (
 };
 
 /**
+ * Get participants (user type) list for a program
+ * Fetches participants that can be assigned to LCs
+ * 
+ * @param programId - Program ID (e.g., "6952469bd9f179bdf8abe717")
+ * @param params - Optional parameters (excludeMapped, limit, province, site)
+ * @returns A promise resolving to the participants response from the API
+ */
+export const getParticipants = async (
+  programId: string,
+  params?: {
+    excludeMapped?: boolean;
+    limit?: number;
+    province?: string;
+    site?: string;
+    page?: number;
+    search?: string;
+  }
+): Promise<UserSearchResponse> => {
+  try {
+    const { excludeMapped = true, limit = 100, province, site, page = 1, search } = params || {};
+    
+    // Build query string
+    const queryParams = new URLSearchParams({
+      programId: programId,
+      excludeMapped: excludeMapped.toString(),
+      limit: limit.toString(),
+      type: 'user', // Participants are type 'user'
+      page: page.toString(),
+    });
+
+    // Add optional search parameter (name/email)
+    if (search && search.trim()) {
+      queryParams.append('search', search.trim());
+    }
+
+    const endpoint = `${API_ENDPOINTS.PROGRAM_USERS_SEARCH}?${queryParams.toString()}`;
+    
+    // Build request body - province and site go in meta (similar to UserManagement)
+    const requestBody: any = {};
+    const meta: any = {};
+    
+    if (province && province !== 'all-provinces' && province !== 'all-Provinces') {
+      meta.province = province; // Province ID (e.g., "69806d35b0bb2500136cfba5")
+    }
+    
+    if (site && site !== 'all-sites') {
+      meta.site = site; // Site ID
+    }
+    
+    // Add meta to requestBody if it has at least one property
+    if (Object.keys(meta).length > 0) {
+      requestBody.meta = meta;
+    }
+    
+    // Log for debugging
+    console.log('getParticipants - Endpoint:', endpoint);
+    console.log('getParticipants - Province:', province);
+    console.log('getParticipants - Site:', site);
+    console.log('getParticipants - Request Body:', JSON.stringify(requestBody, null, 2));
+    
+    // POST request to fetch participants
+    const response = await api.post<UserSearchResponse>(endpoint, requestBody);
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
  * Get mapped LCs for a supervisor
  * Fetches the list of Linkage Champions assigned to a specific supervisor
  * 
@@ -207,6 +277,127 @@ export const assignLCsToSupervisor = async (params: {
       }
     }
     
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Assign Participants to LC
+ * Creates or updates program user assignments for participants to Linkage Champions
+ * 
+ * @param params - Assignment parameters
+ * @returns A promise resolving to the API response
+ */
+export const assignParticipantsToLC = async (params: {
+  userId: string; // LC's user ID
+  programId: string; // Program ID
+  assignedUserIds: string[]; // Array of participant user IDs
+  assignedUsersStatus?: string; // Status for assigned users (default: "NOT_ONBOARDED")
+  userRolesToEntityTypeMap?: Record<string, string>; // Role to entity type mapping
+}): Promise<any> => {
+  try {
+    const {
+      userId,
+      programId,
+      assignedUserIds,
+      assignedUsersStatus = 'NOT_ONBOARDED',
+      userRolesToEntityTypeMap = {
+        org_admin: 'linkageChampion',
+        tenant_admin: 'supervisor',
+        user: 'participant',
+      },
+    } = params;
+
+    const endpoint = API_ENDPOINTS.UPDATE_ENTITY_DETAILS;
+    
+    const requestBody = {
+      userId,
+      programId,
+      assignedUserIds,
+      assignedUsersStatus,
+      userRolesToEntityTypeMap,
+    };
+    
+    // Additional headers (static values as fallback if env vars are not set)
+    // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+    const adminAccessToken = process.env.ADMIN_ACCESS_TOKEN || '9F3bEr6jEABY0juEmqStkH1Mkt7WAHUxJYQeFge5ONN';
+    // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+    const tenantId = process.env.TENANT_ID || 'brac';
+    // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
+    const orgId = process.env.ORG_ID || 'brac_gbl';
+
+    const response = await api.post<any>(endpoint, requestBody, {
+      headers: {
+        'admin-access-token': adminAccessToken,
+        'tenantId': tenantId,
+        'orgId': orgId,
+      },
+    });
+    
+    // Check if HTTP response status is 200 (success)
+    if (response.status !== 200) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    
+    // Check response data status - if it contains an error status, throw error
+    const responseData = response.data;
+    if (responseData?.status) {
+      // Check for error status codes in response body
+      if (responseData.status !== 200 && 
+          responseData.status !== 'OK' && 
+          responseData.status !== 'SUCCESS' &&
+          responseData.status.toString().startsWith('ERR_')) {
+        throw new Error(responseData?.message || 'Failed to assign participants to LC.');
+      }
+    }
+    
+    // Also check for responseCode if status is not present
+    if (responseData?.responseCode && responseData.responseCode !== 'OK') {
+      throw new Error(responseData?.message || 'Failed to assign participants to LC.');
+    }
+    
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Get mapped participants for an LC
+ * Fetches the list of participants assigned to a specific Linkage Champion
+ * 
+ * @param params - Query parameters
+ * @returns A promise resolving to the mapped participants response from the API
+ */
+export const getMappedParticipantsForLC = async (params: {
+  userId: string; // LC's user ID
+  programId: string; // Program ID
+  type?: string; // Entity type (default: "user")
+  page?: number; // Page number (default: 1)
+  limit?: number; // Limit per page (default: 100)
+  search?: string; // Search query (default: "")
+}): Promise<any> => {
+  try {
+    const { userId, programId, type = 'user', page = 1, limit = 100, search = '' } = params;
+    
+    // Build query string
+    const queryParams = new URLSearchParams({
+      userId: userId,
+      type: type,
+      page: page.toString(),
+      limit: limit.toString(),
+      search: search,
+      programId: programId,
+    });
+
+    const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
+    
+    // GET request to fetch mapped participants
+    const response = await api.get<any>(endpoint);
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor
