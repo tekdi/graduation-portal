@@ -323,11 +323,11 @@ export const assignParticipantsToLC = async (params: {
     
     // Additional headers (static values as fallback if env vars are not set)
     // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
-    const adminAccessToken = process.env.ADMIN_ACCESS_TOKEN || '9F3bEr6jEABY0juEmqStkH1Mkt7WAHUxJYQeFge5ONN';
+    const adminAccessToken = process.env.ADMIN_ACCESS_TOKEN;
     // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
-    const tenantId = process.env.TENANT_ID || 'brac';
+    const tenantId = process.env.TENANT_CODE_NAME;
     // @ts-ignore - process.env is injected by webpack DefinePlugin on web, available in React Native
-    const orgId = process.env.ORG_ID || 'brac_gbl';
+    const orgId = process.env.ORG_ID;
 
     const response = await api.post<any>(endpoint, requestBody, {
       headers: {
