@@ -189,6 +189,24 @@ export const assignLCsToSupervisor = async (params: {
     }
     const response = await api.post<any>(endpoint, requestBody, {headers});
     console.log('response', response.data);
+    
+    // Check if HTTP response status is 200 (success)
+    if (response.status !== 200) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+    
+    // Check response data status - if it contains an error status, throw error
+    const responseData = response.data;
+    if (responseData?.status) {
+      // Check for error status codes in response body
+      if (responseData.status !== 200 && 
+          responseData.status !== 'OK' && 
+          responseData.status !== 'SUCCESS' &&
+          responseData.status.toString().startsWith('ERR_')) {
+        throw new Error(responseData?.message || 'API request failed');
+      }
+    }
+    
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor

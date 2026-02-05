@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ViewProps, TextProps } from 'react-native';
 import {
- participantLCFilterOptions,
  SearchFilter,
  ParticipantSearchFilter,
  participantFilterOptions,
@@ -155,49 +154,54 @@ const AssignUsersScreen = () => {
        return;
      }
 
-     // Call API to assign LCs to supervisor
-     await assignLCsToSupervisor({
-       userId: supervisorId,
-       programId: programId,
-       assignedUserIds: assignedUserIds,
-       assignedUsersStatus: 'ACTIVE',
-     });
+    // Call API to assign LCs to supervisor
+    // Service function will throw error if status is not 200 or if response contains error
+    await assignLCsToSupervisor({
+      userId: supervisorId,
+      programId: programId,
+      assignedUserIds: assignedUserIds,
+      assignedUsersStatus: 'ACTIVE',
+    });
 
-     // Refresh mapped LCs from API after assignment
-     const mappedResponse = await getMappedLCsForSupervisor({
-       userId: supervisorId,
-       programId: programId,
-       type: 'org_admin',
-       page: 1,
-       limit: 100,
-       search: '',
-     });
+    // Refresh mapped LCs from API after assignment
+    const mappedResponse = await getMappedLCsForSupervisor({
+      userId: supervisorId,
+      programId: programId,
+      type: 'org_admin',
+      page: 1,
+      limit: 100,
+      search: '',
+    });
 
-     // Transform API response to match expected format
-     const lcs = (mappedResponse.result?.data || []).map((lc: any) => {
-       const name = lc.name || '';
-       const userId = lc.userId || '';
-       const email = lc.userDetails?.email || '';
-       const location = lc.userDetails?.location || '';
-       const lcId = `LC-${String(userId).padStart(3, '0')}`;
-       
-       return {
-         labelKey: name,
-         value: String(userId),
-         location: location,
-         status: 'assigned',
-         email: email,
-         site: '',
-         lcId: lcId,
-         id: userId,
-       };
-     });
-     
-     setMappedLCs(lcs);
-   } catch (error) {
-     console.error('Error assigning LCs to supervisor:', error);
-     // TODO: Show error message to user
-   }
+    // Transform API response to match expected format
+    const lcs = (mappedResponse.result?.data || []).map((lc: any) => {
+      const name = lc.name || '';
+      const userId = lc.userId || '';
+      const email = lc.userDetails?.email || '';
+      const location = lc.userDetails?.location || '';
+      const lcId = `LC-${String(userId).padStart(3, '0')}`;
+      
+      return {
+        labelKey: name,
+        value: String(userId),
+        location: location,
+        status: 'assigned',
+        email: email,
+        site: '',
+        lcId: lcId,
+        id: userId,
+      };
+    });
+    
+    setMappedLCs(lcs);
+    
+    // Return success indicator
+    return { success: true };
+  } catch (error) {
+    console.error('Error assigning LCs to supervisor:', error);
+    // Re-throw error so it can be caught by the modal handler
+    throw error;
+  }
  };
 
  // Filter out mapped LCs from the available list
@@ -558,27 +562,36 @@ const AssignUsersScreen = () => {
          <UserAvatarCard
            title="admin.assignUsers.step1SelectSupervisorAndLC"
            description="admin.assignUsers.chooseSupervisor"
-           filterOptions={participantLCFilterOptions.map(filter => {
-             // Populate LC filter data when supervisor is selected
-             if (filter.attr === 'selectLC') {
-               if (supervisorFilterValues.selectSupervisor) {
+           filterOptions={[
+             // Supervisor filter - use dynamic data from API
+             {
+               nameKey: 'admin.filters.selectSupervisor',
+               attr: 'selectSupervisor',
+               type: 'select',
+               placeholderKey: 'admin.filters.chooseSupervisor',
+               data: supervisorsData.map((supervisor: any) => {
+                 const name = supervisor.name || supervisor.full_name || supervisor.email || 'Unknown';
+                 const value = String(supervisor.id || supervisor._id || supervisor.email || name);
                  return {
-                   ...filter,
-                   data: linkageChampions.map((lc: any) => ({
+                   label: name,
+                   value: value,
+                 };
+               }),
+             },
+             // LC filter - populated dynamically based on selected supervisor (use mapped LCs)
+             {
+               nameKey: 'admin.filters.selectLC',
+               attr: 'selectLC',
+               type: 'select',
+               placeholderKey: 'admin.filters.chooseLC',
+               data: supervisorFilterValues.selectSupervisor && mappedLCs.length > 0
+                 ? mappedLCs.map((lc: any) => ({
                      labelKey: lc.labelKey,
                      value: lc.value,
-                   })),
-                 };
-               } else {
-                 // Show LC filter but with empty data (will show placeholder)
-                 return {
-                   ...filter,
-                   data: [],
-                 };
-               }
-             }
-             return filter;
-           })}
+                   }))
+                 : [],
+             },
+           ]}
            onChange={handleSupervisorFilterChange}
            selectedValues={{ ...supervisorFilterValues, selectLC: selectedLc?.value }}
            showSelectedCard={false}
