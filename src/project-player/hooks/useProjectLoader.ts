@@ -39,7 +39,8 @@ export const useProjectLoader = (
               projectData = res.data;
             } else {
               try {
-              projectData = await createProjectForEntity(entityId, province);
+              const participant = entityId;
+              projectData = await createProjectForEntity(entityId, province, participant);
 
               if (projectData?._id) {
                 await updateEntityDetails({

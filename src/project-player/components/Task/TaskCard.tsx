@@ -37,7 +37,7 @@ import { isTaskCompleted } from './helpers';
 import { renderCustomTaskActions, renderModals } from './renderHelpers';
 import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
-import { getSolutionDetails } from '../../services/projectPlayerService';
+import { getSolutionDetails, taskStatus } from '../../services/projectPlayerService';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
@@ -80,6 +80,25 @@ const TaskCard: React.FC<TaskCardProps> = ({
   // Use mixed logic for completion: check status or use helper
   const isCompleted = isTaskCompleted(task?.status);
 
+  useEffect(()=>{
+    if(task.type === TASK_TYPE.OBSERVATION && isEdit && projectData?._id){
+    const fetchTaskStatus = async()=>{
+      const reqbody = {
+        taskIds: [task?._id]
+      }
+      const res = await taskStatus(projectData?._id, reqbody)
+      const submissionStatus = res?.data?.result[0].submissionStatus
+      const status = res?.data?.result[0].status
+      if(submissionStatus === TASK_STATUS.COMPLETED && status !== TASK_STATUS.COMPLETED ){
+        updateTask(res.data.result[0]._id, {
+        status: TASK_STATUS.COMPLETED,
+        _id: res.data.result[0]._id,
+      });
+      }
+    }
+    fetchTaskStatus();
+  }
+  },[projectData?._id, isEdit, task.type,task?._id, updateTask ])
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 
