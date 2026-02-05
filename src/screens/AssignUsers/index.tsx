@@ -192,16 +192,25 @@ const AssignUsersScreen = () => {
       const name = lc.name || '';
       const userId = lc.userId || '';
       const email = lc.userDetails?.email || '';
-      const location = lc.userDetails?.location || '';
+      const province =
+        lc.userDetails?.province?.label ||
+        lc.province?.label ||
+        '';
+      const site =
+        lc.userDetails?.site?.label ||
+        lc.userDetails?.district?.label ||
+        lc.userDetails?.local_municipality?.label ||
+        lc.site?.label ||
+        '';
       const lcId = `LC-${String(userId).padStart(3, '0')}`;
       
       return {
         labelKey: name,
         value: String(userId),
-        location: location,
+        province,
+        site,
         status: 'assigned',
         email: email,
-        site: '',
         lcId: lcId,
         id: userId,
       };
@@ -258,34 +267,87 @@ const AssignUsersScreen = () => {
        assignedUserIds: participantIds,
        assignedUsersStatus: 'NOT_ONBOARDED',
      });
-     
-     // Generate additional data for assigned participants (email, participant ID)
-     const participantsWithFullData = selectedParticipants.map((participant, index) => {
-       // Generate email from name (simple conversion)
-       const nameParts = participant.labelKey.toLowerCase().split(' ');
-       const email = nameParts.length > 1
-         ? `${nameParts[0]}.${nameParts[1]}@example.com`
-         : `${nameParts[0]}@example.com`;
-       
-       // Generate Participant ID (increment from existing)
-       const participantId = `PAR-${String(assignedParticipants.length + 1 + index).padStart(3, '0')}`;
-       
-       // Extract bio and productivity from location (format: "Bio • Productivity")
-       const locationParts = participant.location?.split(' • ') || [];
-       const bio = locationParts[0] || '';
-       const productivity = locationParts[1] || '';
-       
+
+     // Refresh mapped participants list (below table) after successful assignment
+     const mappedResponse = await getMappedParticipantsForLC({
+       userId: lcId,
+       programId: programId,
+       type: 'user',
+       page: mappedParticipantsPage,
+       limit: mappedParticipantsPageSize,
+       search: '',
+     });
+
+     const totalCount = mappedResponse.total || mappedResponse.result?.total || mappedResponse.result?.count || 0;
+     setMappedParticipantsTotal(totalCount);
+
+     const mappedData = (mappedResponse.result?.data || []).map((participant: any) => {
+       const name = participant.name || participant.userDetails?.name || participant.email || 'Unknown';
+       const userId = participant.userId || participant.userDetails?.id || '';
+       const email = participant.userDetails?.email || participant.email || '';
+       const province = participant.userDetails?.province?.label || '-';
+       const site =
+         participant.userDetails?.site?.label ||
+         participant.userDetails?.district?.label ||
+         participant.userDetails?.local_municipality?.label ||
+         '-';
+
        return {
-         ...participant,
+         labelKey: name,
+         value: String(userId),
          email,
-         participantId,
-         bio,
-         productivity,
+         province,
+         site,
+         id: userId,
        };
      });
-     
-     // Add to assigned participants list
-     setAssignedParticipants((prev) => [...prev, ...participantsWithFullData]);
+
+     setMappedParticipants(mappedData);
+
+     // Refresh available participants list (top table) so newly-mapped users disappear
+     const province = participantFilterValues.filterByProvince;
+     const site = participantFilterValues.site;
+     const search = participantFilterValues.search;
+
+     const participantsResponse = await getParticipants(programId, {
+       excludeMapped: true,
+       limit: 100,
+       province: province && province !== 'all-provinces' && province !== 'all-Provinces' ? province : undefined,
+       site: site && site !== 'all-sites' ? site : undefined,
+       search: search && String(search).trim() ? String(search).trim() : undefined,
+     });
+
+     const refreshedParticipants = (participantsResponse.result?.data || []).map((p: any) => {
+       const name = p.name || p.full_name || p.email || 'Unknown';
+       const value = String(p.id || p._id || p.email || name);
+       const email = p.email || p.userDetails?.email || '';
+       const province = p.province?.label || p.userDetails?.province?.label || '';
+       const site =
+         p.site?.label ||
+         p.userDetails?.site?.label ||
+         p.userDetails?.district?.label ||
+         p.userDetails?.local_municipality?.label ||
+         '';
+
+       const locationParts = [];
+       if (province) locationParts.push(province);
+       if (site) locationParts.push(site);
+       const location = locationParts.length > 0 ? locationParts.join(' • ') : '';
+
+       return {
+         labelKey: name,
+         value,
+         location,
+         province,
+         site,
+         status: 'unassigned',
+         email,
+         id: p.id || p._id,
+       };
+     });
+
+     setParticipants(refreshedParticipants);
+     setAssignedParticipants([]); // reset local assigned tracker; API is source of truth now
      
      // Return success indicator
      return { success: true };
