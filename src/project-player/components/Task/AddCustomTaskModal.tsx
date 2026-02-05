@@ -133,7 +133,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
   const handleSubmit = useCallback(() => {
     const { taskName, instructions, serviceProvider, selectedPillar } =
       formData;
-    const pillarIdToUse = propPillarId || selectedPillar;
+     const pillarIdToUse = propPillarId || selectedPillar;
 
     if (isEditMode && task) {
       // Update existing task
@@ -264,9 +264,9 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
                 formData.selectedPillar ??
                 (parentPillarName
                   ? {
-                    label: parentPillarName,
-                    value: propPillarId,
-                  }
+                      label: parentPillarName,
+                      value: propPillarId,
+                    }
                   : undefined)
               }
               onChange={value => updateFormField('selectedPillar', value)}
