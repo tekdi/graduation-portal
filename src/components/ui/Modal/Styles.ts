@@ -77,7 +77,7 @@ export const profileStyles = {
     paddingHorizontal: '$6' as const,
     paddingTop: '$4' as const,
     paddingBottom: '$6' as const,
-    
+
   },
   headerIconContainer: {
     width: 48,
