@@ -221,8 +221,9 @@ export const taskAccordionStyles = {
     borderColor: '$mutedBorder',
   },
   cardHeader: {
-    padding: '$1',
-    paddingTop: '$4',
+    padding: '$3',
+    paddingTop:'$1',
+    paddingVertical: '$2',
     borderBottomWidth: 1,
     borderBottomColor: '$mutedBorder',
   },
@@ -231,11 +232,11 @@ export const taskAccordionStyles = {
     alignItems: 'center' as const,
   },
   cardContent: {
-    padding: '$5',
+    padding: '$2',
   },
   cardContentStack: {
     space: 'md' as const,
-    paddingTop: '$3',
+    paddingTop: '$1',
   },
   taskBadge: {
     bg: '$primary100',

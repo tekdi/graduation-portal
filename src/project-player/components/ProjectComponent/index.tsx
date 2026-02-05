@@ -190,8 +190,6 @@ const ProjectComponent: React.FC = () => {
         <ScrollView
           {...projectComponentStyles.scrollView}
         >
-          {/* Render ProjectInfoCard */}
-          <ProjectInfoCard project={projectData} />
 
           {/* Shared content logic - pillars or onboarding tasks */}
           {(() => {
@@ -285,13 +283,21 @@ const ProjectComponent: React.FC = () => {
                   {...projectComponentStyles.card}
                   {...(hasChildren ? {} : projectComponentStyles.onboardingCard)}
                 >
-                  <VStack>{pillarContent}</VStack>
+                  <VStack>
+                   {/* Render ProjectInfoCard inside the card for onboarding */}
+                   {!hasChildren && <ProjectInfoCard project={projectData} />}
+                   {pillarContent}
+                 </VStack>
                 </Card>
               );
             }
 
-            // Edit mode with children: render directly without Card wrapper
-            return pillarContent;
+            return (
+             <>
+               <ProjectInfoCard project={projectData} />
+               {pillarContent}
+             </>
+           );
           })()}
         </ScrollView>
 
