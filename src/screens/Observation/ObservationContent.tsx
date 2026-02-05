@@ -161,7 +161,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       );
     }
   };
-console.log('submission', submission);
+  
   const setLoadingOff = () => {
     setTimeout(() => {
       setLoading(false);
@@ -195,7 +195,13 @@ console.log('submission', submission);
             // Set participant info
             setParticipantInfo({
               name: newData.name || '',
-              date: new Date().toISOString().split('T')[0],
+              date: (() => {
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, '0');
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const year = now.getFullYear();
+                return `${day}/${month}/${year}`;
+              })(),
             });
             setLoadingOff();
           } else {
@@ -203,7 +209,7 @@ console.log('submission', submission);
               observationId: observationId,
             });
             const entityData = entitiesData.result?.[0]?.data.find(
-              (entity: any) => entity.externalId === id,
+              (entity: any) => entity.externalId == id,
             );
             if (entityData) {
               try {

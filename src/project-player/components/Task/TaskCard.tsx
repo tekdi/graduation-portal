@@ -188,7 +188,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Simple status circle
     const circleSize = 20;
-    const checkSize = 28;
+    const checkSize = 15;
 
     // Status Circle Logic
     const isOptional = task?.isDeletable;

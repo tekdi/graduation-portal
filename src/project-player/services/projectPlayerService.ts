@@ -83,7 +83,8 @@ export const createProjectForEntity = async (
   try {
     const response = await apiClient.post(API_ENDPOINTS.CREATE_PROJECT, {
       entityId,
-      province
+      province,
+      participant:entityId
     });
 
     return  response.data.result ;
