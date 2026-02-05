@@ -43,12 +43,12 @@ interface StatusFilterItem {
 
 // Mapping between API overview keys and STATUS constants
 const overviewToStatusMap = {
-  notonboarded: { key: 'NOT_ONBOARDED' as StatusKey, label: 'participants.notEnrolled' },
-  onboarded: { key: 'ONBOARDED' as StatusKey, label: 'participants.enrolled' },
-  inprogress: { key: 'IN_PROGRESS' as StatusKey, label: 'participants.inProgress' },
-  completed: { key: 'COMPLETED' as StatusKey, label: 'participants.completed' },
-  droppedout: { key: 'DROPOUT' as StatusKey, label: 'participants.droppedOut' },
-  graduated: { key: 'GRADUATED' as StatusKey, label: 'participants.graduatedStatus' },
+  notonboarded: { key: STATUS.NOT_ONBOARDED as StatusKey, label: 'participants.notEnrolled' },
+  onboarded: { key: STATUS.ONBOARDED as StatusKey, label: 'participants.enrolled' },
+  inprogress: { key: STATUS.IN_PROGRESS as StatusKey, label: 'participants.inProgress' },
+  completed: { key: STATUS.COMPLETED as StatusKey, label: 'participants.completed' },
+  droppedout: { key: STATUS.DROPOUT as StatusKey, label: 'participants.droppedOut' },
+  graduated: { key: STATUS.GRADUATED as StatusKey, label: 'participants.graduatedStatus' },
 } as const;
 
 /**
@@ -95,16 +95,16 @@ const ParticipantsList: React.FC = () => {
     // Active
     if (activeFilter === 'active') {
       return allStatusItems.filter((item: StatusFilterItem) => 
-        item.key === 'NOT_ONBOARDED' ||
-        item.key === 'ONBOARDED' || 
-        item.key === 'IN_PROGRESS' ||
-        item.key === 'COMPLETED' 
+        item.key === STATUS.NOT_ONBOARDED ||
+        item.key === STATUS.ONBOARDED || 
+        item.key === STATUS.IN_PROGRESS ||
+        item.key === STATUS.COMPLETED 
       );
     } else {
       // inactive
       return allStatusItems.filter((item: StatusFilterItem) => 
-        item.key === 'DROPOUT' ||
-        item.key === 'GRADUATED'
+        item.key === STATUS.DROPOUT ||
+        item.key === STATUS.GRADUATED
       );
     }
   }, [allStatusItems, activeFilter]);
@@ -113,17 +113,17 @@ const ParticipantsList: React.FC = () => {
   const activeInactiveCounts = useMemo(() => {
     const activeCount = allStatusItems
       .filter((item: StatusFilterItem) => 
-        item.key === 'NOT_ONBOARDED' ||
-        item.key === 'ONBOARDED' || 
-        item.key === 'IN_PROGRESS' ||
-        item.key === 'COMPLETED'
+        item.key === STATUS.NOT_ONBOARDED ||
+        item.key === STATUS.ONBOARDED || 
+        item.key === STATUS.IN_PROGRESS ||
+        item.key === STATUS.COMPLETED
       )
       .reduce((sum: number, item: StatusFilterItem) => sum + item.count, 0);
     
     const inactiveCount = allStatusItems
       .filter((item: StatusFilterItem) => 
-        item.key === 'DROPOUT' ||
-        item.key === 'GRADUATED'
+        item.key === STATUS.DROPOUT ||
+        item.key === STATUS.GRADUATED
       )
       .reduce((sum: number, item: StatusFilterItem) => sum + item.count, 0);
     
