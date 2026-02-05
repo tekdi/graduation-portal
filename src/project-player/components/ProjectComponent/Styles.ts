@@ -152,14 +152,14 @@ export const projectInfoCardStyles = {
   stepsCompleteBadge: {
     bg: '$mutedForeground',
     borderRadius: '$full',
-    paddingHorizontal: '$4',
-    paddingVertical: '$2',
+    paddingHorizontal: '$3',
+    paddingVertical: '$1',
     shadowColor: '$backgroundLight900',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    marginLeft: '$4',
+    marginLeft: '$8',
   },
   stepsCompleteText: {
     space: 'xs' as const,
