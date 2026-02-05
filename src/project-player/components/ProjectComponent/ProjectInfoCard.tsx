@@ -118,9 +118,12 @@ const hasChildren =
               </HStack>
             )
           ) : (
-            <Text {...TYPOGRAPHY.h3} color="$textPrimary">
-              {project?.title || project?.name}
-            </Text>
+            // Only show title in preview mode when there are children/pillars
+            isPreview && (
+              <Text {...TYPOGRAPHY.h3} color="$textPrimary">
+                {project?.title || project?.name}
+              </Text>
+            )
           )}
 
           {!hasChildren ? (
@@ -133,7 +136,8 @@ const hasChildren =
               {t('projectPlayer.onboardingDescription')}
             </Text>
           ) : (
-            project?.description && (
+            // Only show description in preview mode when there are children/pillars
+            isPreview && project?.description && (
               <Text
                 {...TYPOGRAPHY.paragraph}
                 color="$textSecondary"

@@ -122,7 +122,7 @@ export const taskCardStyles = {
   },
   successToastIconSize: 14,
   successToastTitle: {
-    color: '$textPrimary', 
+    color: '$textPrimary',
     fontSize: '$sm',
     fontWeight: '$medium',
   },
@@ -210,16 +210,19 @@ export const taskCardStyles = {
 
 export const taskAccordionStyles = {
   container: {
-    marginBottom: '$3',
+    marginBottom: '$4',
   },
   card: {
     size: 'md' as const,
     variant: 'elevated' as const,
     bg: '$backgroundPrimary.light',
     borderRadius: '$lg',
+    borderWidth: 1,
+    borderColor: '$mutedBorder',
   },
   cardHeader: {
-    padding: '$5',
+    padding: '$1',
+    paddingTop: '$4',
     borderBottomWidth: 1,
     borderBottomColor: '$mutedBorder',
   },

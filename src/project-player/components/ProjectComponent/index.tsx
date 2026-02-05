@@ -111,7 +111,7 @@ const ProjectComponent: React.FC = () => {
             .map((task: any) => ({
               name: task.name,
               description: task.description || '',
-              type: 'simple', 
+              type: 'simple',
             }));
 
           // Determine if this is a task or project based on type
@@ -187,16 +187,18 @@ const ProjectComponent: React.FC = () => {
   return (
     <Container {...projectComponentStyles.container}>
       <VStack flex={1}>
-        <ScrollView {...projectComponentStyles.scrollView}>
-          <Card
-            {...projectComponentStyles.card}
-            {...(hasChildren ? {} : projectComponentStyles.onboardingCard)}
-          >
-            <VStack>
-              <ProjectInfoCard project={projectData} />
+        <ScrollView
+          {...projectComponentStyles.scrollView}
+        >
+          {/* Render ProjectInfoCard */}
+          <ProjectInfoCard project={projectData} />
 
-              {hasChildren
-                ? projectData?.children?.length
+          {/* Shared content logic - pillars or onboarding tasks */}
+          {(() => {
+            const pillarContent = hasChildren ? (
+              // Render pillars
+              <>
+                {projectData?.children?.length
                   ? projectData?.children.map(task => (
                     <TaskComponent
                       key={task?._id}
@@ -212,69 +214,85 @@ const ProjectComponent: React.FC = () => {
                         task={task}
                         isChildOfProject={true}
                       />
-                    ))
-                : (
-                  <Box paddingHorizontal="$5" paddingTop="$2" paddingBottom="$4">
-                    {projectData?.tasks?.map((task, index) => (
-                      <TaskComponent
-                        key={task._id}
-                        task={task}
-                        isLastTask={
-                          index === (projectData.tasks?.length || 0) - 1
-                        }
-                        isOnboardingTask={true}
-                      />
                     ))}
+
+                {/* Pillar features only: +Add Custom Task button */}
+                {showPillarFeatures && (
+                  <Box {...projectComponentStyles.addCustomTaskContainer}>
+                    <Pressable onPress={() => setIsModalOpen(true)}>
+                      {(state: any) => {
+                        const isHovered =
+                          state?.hovered || state?.pressed || false;
+                        return (
+                          <Box
+                            {...addCustomTaskStyles.buttonBox}
+                            bg={isHovered ? '$primary100' : '$accent100'}
+                            borderColor={
+                              isHovered ? '$primary500' : '$mutedBorder'
+                            }
+                          >
+                            <HStack {...addCustomTaskStyles.buttonContent}>
+                              <LucideIcon
+                                name="Plus"
+                                size={18}
+                                color={
+                                  isHovered
+                                    ? theme.tokens.colors.primary700
+                                    : theme.tokens.colors.primary500
+                                }
+                                strokeWidth={2.5}
+                              />
+                              <Text
+                                {...TYPOGRAPHY.button}
+                                color={isHovered ? '$primary700' : '$primary500'}
+                                fontWeight="$semibold"
+                              >
+                                {t('projectPlayer.addTaskToPillar')}
+                              </Text>
+                            </HStack>
+                          </Box>
+                        );
+                      }}
+                    </Pressable>
+                    <AddCustomTaskModal
+                      isOpen={isModalOpen}
+                      onClose={() => setIsModalOpen(false)}
+                      mode="add"
+                    />
                   </Box>
                 )}
-
-              {/* Pillar features only: +Add Custom Task button (for Intervention Plan, not Onboarding) */}
-              {showPillarFeatures && (
-                <Box {...projectComponentStyles.addCustomTaskContainer}>
-                  <Pressable onPress={() => setIsModalOpen(true)}>
-                    {(state: any) => {
-                      const isHovered =
-                        state?.hovered || state?.pressed || false;
-                      return (
-                        <Box
-                          {...addCustomTaskStyles.buttonBox}
-                          bg={isHovered ? '$primary100' : '$accent100'}
-                          borderColor={
-                            isHovered ? '$primary500' : '$mutedBorder'
-                          }
-                        >
-                          <HStack {...addCustomTaskStyles.buttonContent}>
-                            <LucideIcon
-                              name="Plus"
-                              size={18}
-                              color={
-                                isHovered
-                                  ? theme.tokens.colors.primary700
-                                  : theme.tokens.colors.primary500
-                              }
-                              strokeWidth={2.5}
-                            />
-                            <Text
-                              {...TYPOGRAPHY.button}
-                              color={isHovered ? '$primary700' : '$primary500'}
-                              fontWeight="$semibold"
-                            >
-                              {t('projectPlayer.addTaskToPillar')}
-                            </Text>
-                          </HStack>
-                        </Box>
-                      );
-                    }}
-                  </Pressable>
-                  <AddCustomTaskModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    mode="add"
+              </>
+            ) : (
+              // Render onboarding tasks
+              <Box paddingHorizontal="$5" paddingTop="$2" paddingBottom="$4">
+                {projectData?.tasks?.map((task, index) => (
+                  <TaskComponent
+                    key={task._id}
+                    task={task}
+                    isLastTask={
+                      index === (projectData.tasks?.length || 0) - 1
+                    }
+                    isOnboardingTask={true}
                   />
-                </Box>
-              )}
-            </VStack>
-          </Card>
+                ))}
+              </Box>
+            );
+
+            // Wrap in Card for preview mode or onboarding tasks (no children)
+            if (mode !== 'edit' || !hasChildren) {
+              return (
+                <Card
+                  {...projectComponentStyles.card}
+                  {...(hasChildren ? {} : projectComponentStyles.onboardingCard)}
+                >
+                  <VStack>{pillarContent}</VStack>
+                </Card>
+              );
+            }
+
+            // Edit mode with children: render directly without Card wrapper
+            return pillarContent;
+          })()}
         </ScrollView>
 
         {/* Footer with Change Pathway and Submit Intervention Plan Buttons */}
