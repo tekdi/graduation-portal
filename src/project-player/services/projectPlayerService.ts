@@ -78,12 +78,14 @@ export const getProjectTemplatesList = async (): Promise<ApiResponse<any>> => {
 
 export const createProjectForEntity = async (
   entityId: string,
-  province:string
+  province:string,
+  participant:string
 ): Promise<ApiResponse<any>> => {
   try {
     const response = await apiClient.post(API_ENDPOINTS.CREATE_PROJECT, {
       entityId,
-      province
+      province,
+      participant
     });
 
     return  response.data.result ;
@@ -117,6 +119,22 @@ export const updateTask = async (
     );
 
     return { data: response };
+  } catch (error) {
+    return handleApiError(error);
+  }
+};
+
+export const taskStatus = async (
+  projectId: string,
+  requestBody: any,
+): Promise<ApiResponse<any>> => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.TASK_STATUS(projectId),
+      requestBody,
+    );
+
+    return { data: response.data };
   } catch (error) {
     return handleApiError(error);
   }
