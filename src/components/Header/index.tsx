@@ -93,6 +93,13 @@ const Header: React.FC<{
   };
   // Wrapper for hamburger menu selection - handles myProfile in Header, passes others to parent
   const handleHamburgerMenuSelect = async (key: string | undefined) => {
+    // Check if the selected menu item is coming soon
+    const selectedItem = hamburgerMenuItems?.find(item => item.key === key);
+    if (selectedItem?.isComingSoon) {
+      // Don't proceed if item is coming soon
+      return;
+    }
+
     if (key === 'myProfile') {
       const userProfile = await getUserProfile();
       setAuthUser(userProfile);
