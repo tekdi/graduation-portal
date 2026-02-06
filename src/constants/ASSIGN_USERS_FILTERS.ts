@@ -174,7 +174,7 @@ export const useSiteFilterOptions = (selectedProvinceId?: string): {
           nameKey: 'admin.filters.site',
           attr: 'site',
           type: 'select' as const,
-          placeholderKey: 'admin.filters.chooseSite',
+          placeholderKey: '',
           data: siteFilterOptions,
         },
       ],
@@ -182,32 +182,6 @@ export const useSiteFilterOptions = (selectedProvinceId?: string): {
     };
   }, [sites, selectedProvinceId]);
 };
-
-export const participantLCFilterOptions = [
-  {
-    nameKey: 'admin.filters.selectSupervisor',
-    attr: 'selectSupervisor',
-    type: 'select',
-    placeholderKey: 'admin.filters.chooseSupervisor',
-    data: [
-      {
-        labelKey: 'Dr. Lerato Mokoena Johannesburg',
-        value: 'Dr. Lerato Mokoena Johannesburg ',
-      },
-      {
-        labelKey: 'Zanele Ndabae Thekwini',
-        value: 'Zanele Ndabae Thekwini',
-      },
-    ],
-  },
-  {
-    nameKey: 'admin.filters.selectLC',
-    attr: 'selectLC',
-    type: 'select',
-    placeholderKey: 'admin.filters.chooseLC',
-    data: [], // Will be populated dynamically based on selected supervisor
-  },
-];
 
 /**
  * Hook to get participant filter options (Province and Site)
@@ -288,7 +262,7 @@ export const useParticipantFilterOptions = (selectedProvinceId?: string): {
           nameKey: 'admin.filters.site',
           attr: 'site',
           type: 'select' as const,
-          placeholderKey: 'admin.filters.chooseSite',
+          placeholderKey: '',
           data: siteFilterOptions,
         },
       ],
@@ -297,5 +271,4 @@ export const useParticipantFilterOptions = (selectedProvinceId?: string): {
   }, [provinces, sites, selectedProvinceId]);
 };
 
-// Participant filter options - will be replaced with dynamic options from useParticipantFilterOptions
-export const participantFilterOptions: ReadonlyArray<FilterConfig> = [];
+// NOTE: Participant filters are now provided by `useParticipantFilterOptions`.

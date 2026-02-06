@@ -102,14 +102,7 @@ const Modal: React.FC<ModalProps> = ({
       <ModalContent
         {...commonModalContentStyles}
         {...(maxWidth && { maxWidth: `${maxWidth}px` })}
-        maxHeight="80vh"
-        sx={{
-          '@md': {
-            maxWidth: '500px',
-            minWidth: '400px',
-          },
-        }}
-        {...contentProps}
+        {...contentProps} maxHeight="90%"
       >
         {/* Header with Title, Description, and Icon */}
         {(headerTitle || headerDescription || headerIcon || showCloseButton) && (
@@ -168,7 +161,7 @@ const Modal: React.FC<ModalProps> = ({
 
         {/* Flexible Body Content */}
         <ModalBody padding="$6" paddingTop={headerTitle || headerDescription || headerIcon ? "$2" : "$6"} paddingBottom={hasFooter ? "$4" : "$6"} {...bodyProps}>
-          <ScrollView showsVerticalScrollIndicator={true} contentContainerStyle={{ flexGrow: 1 }}>{children}</ScrollView>
+            <ScrollView showsVerticalScrollIndicator={true} contentContainerStyle={{ flexGrow: 1 }}>{children}</ScrollView>
         </ModalBody>
 
         {/* Optional Footer - Shows if footerContent or button texts are provided */}

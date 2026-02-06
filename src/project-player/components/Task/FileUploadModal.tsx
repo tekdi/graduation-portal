@@ -268,7 +268,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
         <Modal
             isOpen={isOpen}
             onClose={handleCancel}
-            size="md"
+            size="lg"
             headerTitle={t('projectPlayer.chooseUploadMethod')}
             headerDescription={t('projectPlayer.uploadDocumentationFor', { name: displayName })}
             showCloseButton={true}

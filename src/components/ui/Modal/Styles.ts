@@ -43,8 +43,8 @@ export const commonModalContentStyles = {
   marginHorizontal: '$6' as const,  // Increased from $4 to $6 for better mobile spacing
   marginVertical: 'auto' as const,
   alignSelf: 'center' as const,
-  width: '90%' as const,  // Limit width to 90% of screen on mobile
-  maxWidth: '90%' as const,  // Prevent modal from stretching too wide
+  // width: '90%' as const,  // Limit width to 90% of screen on mobile
+  // maxWidth: '90%' as const,  // Prevent modal from stretching too wide
   ...commonModalWebStyles,
 } as const;
 
