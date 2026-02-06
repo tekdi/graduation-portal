@@ -248,7 +248,7 @@ export const taskAccordionStyles = {
   },
   cardHeader: {
     padding: '$3',
-    paddingTop: '$1',
+    paddingTop:'$1',
     paddingVertical: '$2',
     borderBottomWidth: 1,
     borderBottomColor: '$mutedBorder',
