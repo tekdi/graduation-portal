@@ -9,6 +9,7 @@ export interface FeatureCardData {
   navigationUrl?: string;
   isDisabled?: boolean;
   pressableActionText?: string;
+  isComingSoon?: boolean;
 }
 
 export interface FeatureCardProps {
