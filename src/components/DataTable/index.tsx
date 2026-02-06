@@ -422,11 +422,12 @@ const DataTable = <T,>({
   onPageChange,
   onPageSizeChange,
   responsive = true,
+  minWidth,
 }: DataTableProps<T>) => {
   // ========================================================================
   // HOOKS & INITIAL STATE
   // ========================================================================
-  const { isMobile } = usePlatform();
+  const { isMobile, isWeb } = usePlatform();
   const { t } = useLanguage();
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -548,7 +549,7 @@ const DataTable = <T,>({
   // VIEW CONFIGURATION
   // ========================================================================
 
-  const minTableWidth = isMobile && !responsive ? 800 : undefined;
+  const minTableWidth = isMobile && !responsive ? 800 : minWidth;
   const shouldShowCardView = responsive && isMobile;
 
   // ========================================================================
@@ -605,7 +606,7 @@ const DataTable = <T,>({
         bg={theme.tokens.colors.backgroundPrimary.light}
         {...styles.tableWrapper}
         {...(!isMobile ? styles.tableWrapperWeb : {})}
-        overflow={shouldShowCardView ? 'hidden' : isMobile ? 'hidden' : 'visible'}
+        overflow={shouldShowCardView ? 'hidden' : isMobile ? 'hidden' : 'hidden'}
       >
         {shouldShowCardView ? (
           // Mobile: Show card view when responsive is enabled
@@ -615,9 +616,19 @@ const DataTable = <T,>({
           <ScrollView horizontal showsHorizontalScrollIndicator>
             {tableContent}
           </ScrollView>
+        ) : isWeb ? (
+          // Desktop Web: Use Box with overflow-x for better web scrolling
+          <Box {...styles.desktopScrollContainer}>
+            {tableContent}
+          </Box>
         ) : (
-          // Desktop: Show table view
-          tableContent
+          // Desktop Native: Use ScrollView for native platforms
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator
+          >
+            {tableContent}
+          </ScrollView>
         )}
       </Box>
       {paginationConfig.isEnabled && paginationConfig.totalPages > 1 && pagination && (
