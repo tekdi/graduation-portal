@@ -76,22 +76,22 @@ const Modal: React.FC<ModalProps> = ({
   contentProps,
   bodyProps,
   closeOnOverlayClick = true,
-  
+
   ...modalProps // Spread all other Gluestack Modal props
-  
+
 }) => {
   const { t } = useLanguage();
 
   const { isMobile } = usePlatform();
   // Determine if footer should be shown
   const hasFooter = footerContent || cancelButtonText || confirmButtonText;
-  
+
   // Handle cancel - use onCancel if provided, otherwise use onClose
   const handleCancel = onCancel || onClose;
 
   return (
-    <GluestackModal 
-      isOpen={isOpen} 
+    <GluestackModal
+      isOpen={isOpen}
       onClose={onClose}
       size={size}
       closeOnOverlayClick={closeOnOverlayClick}
@@ -102,7 +102,14 @@ const Modal: React.FC<ModalProps> = ({
       <ModalContent
         {...commonModalContentStyles}
         {...(maxWidth && { maxWidth: `${maxWidth}px` })}
-        {...contentProps} maxHeight="100%"
+        maxHeight="80vh"
+        sx={{
+          '@md': {
+            maxWidth: '500px',
+            minWidth: '400px',
+          },
+        }}
+        {...contentProps}
       >
         {/* Header with Title, Description, and Icon */}
         {(headerTitle || headerDescription || headerIcon || showCloseButton) && (

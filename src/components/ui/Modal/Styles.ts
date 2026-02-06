@@ -44,7 +44,7 @@ export const commonModalContentStyles = {
   marginVertical: 'auto' as const,
   alignSelf: 'center' as const,
   width: '90%' as const,  // Limit width to 90% of screen on mobile
-  maxWidth: '95%' as const,  // Prevent modal from stretching too wide
+  maxWidth: '90%' as const,  // Prevent modal from stretching too wide
   ...commonModalWebStyles,
 } as const;
 
