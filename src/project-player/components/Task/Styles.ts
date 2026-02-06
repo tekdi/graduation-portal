@@ -65,13 +65,14 @@ export const taskCardStyles = {
 
   // Action button styles
   actionButton: {
-    size: 'sm' as const,
+    size: 'xs' as const,
     variant: 'outline' as const,
     bg: '$backgroundPrimary.light',
     ml: '$3',
+    height: 32,
   },
   actionButtonCard: {
-    borderColor: '$textSecondary',
+    borderColor: '$mutedBorder',
     hoverBg: '$primary100' as const,
   },
   actionButtonInline: {

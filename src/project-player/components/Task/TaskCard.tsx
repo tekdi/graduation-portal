@@ -137,8 +137,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
         return;
       }
       const solutionDetails = await getSolutionDetails(projectTemplateId, task._id);
-      
-      if(solutionDetails.data._id) {
+
+      if (solutionDetails.data._id) {
         // @ts-ignore Navigate to observation screen - task will be marked as completed on return
         navigation.navigate('observation', {
           id: participantId,
@@ -286,11 +286,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-            | 'line-through'
-            | 'none',
-          opacity: isCompleted ? 0.6 : 1,
-        }
+        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+          | 'line-through'
+          | 'none',
+        opacity: isCompleted ? 0.6 : 1,
+      }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -311,8 +311,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-            ? '$optionalBadgeBg'
-            : '$backgroundLight100'
+              ? '$optionalBadgeBg'
+              : '$backgroundLight100'
         }
         paddingHorizontal="$3"
         paddingVertical="$1"
@@ -326,8 +326,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-              ? '$optionalBadgeText'
-              : '$textMuted'
+                ? '$optionalBadgeText'
+                : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText || (isPreview && task?.isDeletable ? 'Optional' : '')}
@@ -341,13 +341,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
     const statusBadge =
       isEditModeOnly && uiConfig.showAsCard ? (
         <Box
-          bg={isCompleted ? '$textMuted' : '$primary500'}
-          paddingHorizontal="$2"
-          paddingVertical="$1"
-          borderRadius="$md"
+          bg={isCompleted ? '$accent200' : '$textSecondary'}
+          paddingHorizontal="$3"
+          paddingVertical="$0.5"
+          borderRadius="$full"
           alignSelf="flex-start"
         >
-          <Text fontSize="$xs" fontWeight="$semibold" color="$white">
+          <Text fontSize="$xs" fontWeight="$semibold" color={isCompleted ? '$textPrimary' : '$white'}>
             {isCompleted ? t('projectPlayer.done') : t('projectPlayer.toDo')}
           </Text>
         </Box>
@@ -546,10 +546,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
     return (
       <Button
         {...taskCardStyles.actionButton}
+        variant={isInterventionPlanEditMode ? 'outline' : 'solid'}
         onPress={handleTaskClick}
         ml="$0"
         isDisabled={isReadOnly}
-        size={isWeb ? (uiConfig.showAsCard || isOnboardingTask ? 'sm' : 'md') : 'xs'}
+        size={isWeb ? (uiConfig.showAsCard || isOnboardingTask ? 'xs' : 'md') : 'xs'}
         borderRadius="$lg"
         bg={isOnboardingTask ? (buttonStyles as any).bg : undefined}
         borderColor={(buttonStyles as any).borderColor}
