@@ -290,7 +290,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             | 'line-through'
             | 'none',
           opacity: isCompleted ? 0.6 : 1,
-        }
+          }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -669,7 +669,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       <Box
         {...taskCardStyles.onboardingStepCard}
         padding={isMobile ? taskCardStyles.onboardingCardPaddingMobile : taskCardStyles.onboardingCardPaddingDesktop}
-        marginBottom={isMobile ? taskCardStyles.onboardingCardMarginBottomMobile : taskCardStyles.onboardingCardMarginBottomDesktop}
+        marginBottom={isLastTask ? 0 : (isMobile ? taskCardStyles.onboardingCardMarginBottomMobile : taskCardStyles.onboardingCardMarginBottomDesktop)}
       >
         {isMobile ? (
           <VStack {...taskCardStyles.onboardingMobileContainer}>
