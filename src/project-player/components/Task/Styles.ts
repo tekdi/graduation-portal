@@ -41,11 +41,20 @@ export const taskCardStyles = {
 
   // Status circle
   statusCircle: {
+    width: '$4',
+    height: '$4',
     borderRadius: '$full',
-    borderWidth: 2,
+    borderWidth: 1,
+    borderStyle: 'solid' as const,
+    borderColor: '$borderColor',
+    bg: '$white',
     justifyContent: 'center' as const,
     alignItems: 'center' as const,
-    padding: '$1',
+    shadowColor: '$shadowColor',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 1,
+    shadowRadius: 3,
+    elevation: 1,
   },
 
   // Divider
@@ -133,35 +142,49 @@ export const taskCardStyles = {
     whiteSpace: 'normal',
   } as const,
 
-  // Onboarding step card - very light grey box (almost white)
+  // Onboarding step card - very light grey box with gradient
   onboardingStepCard: {
     bg: '$gray50',
-    borderRadius: '$lg',
+    backgroundImage: 'linear-gradient(to right bottom, oklch(0.984 0.003 247.858) 0%, oklab(0.984 -0.00113071 -0.00277876 / 0.5) 100%)',
+    borderRadius: '$xl',
     borderWidth: 1,
-    borderColor: '$borderLight300',
+    borderStyle: 'solid' as const,
+    borderColor: '$gray300',
     padding: '$4',
-    marginBottom: '$3',
+    marginBottom: '$2',
+    marginTop: 0,
+    marginLeft: 0,
+    marginRight: 0,
+    gap: '$3',
   },
   // First onboarding task (Capture Consent) - simple outline button
   onboardingPrimaryButton: {
-    bg: '$backgroundPrimary.light',
-    borderColor: '$borderLight300',
+    bg: '$accent100',
+    borderColor: '$borderColor',
+    borderRadius: '$lg',
+    borderWidth: 1,
+    height: '$8',
+    paddingHorizontal: '$3',
     hoverBg: '$hoverPink',
     hoverBorderColor: '$primary500',
-    textColor: '$textPrimary',
+    textColor: '$textForegroundColor',
   },
   // Other onboarding tasks - simple outline button
   onboardingActionButton: {
-    bg: '$backgroundPrimary.light',
-    borderColor: '$borderLight300',
+    bg: '$accent100',
+    borderColor: '$borderColor',
+    borderRadius: '$lg',
+    borderWidth: 1,
+    height: '$8',
+    paddingHorizontal: '$3',
     hoverBg: '$hoverPink',
     hoverBorderColor: '$primary500',
-    textColor: '$textPrimary',
+    textColor: '$textForegroundColor',
   },
   // Onboarding card responsive padding
-  onboardingCardPaddingMobile: '$3',
+  onboardingCardPaddingMobile: '$4',
   onboardingCardPaddingDesktop: '$4',
-  onboardingCardMarginBottomMobile: '$4',
+  onboardingCardMarginBottomMobile: '$3',
   onboardingCardMarginBottomDesktop: '$3',
   // Onboarding mobile layout
   onboardingMobileContainer: {
@@ -200,10 +223,13 @@ export const taskCardStyles = {
   // Onboarding text styles
   onboardingTitleText: {
     color: '$textPrimary',
-    fontWeight: '$semibold' as const,
+    fontWeight: '$medium' as const,
+    fontSize: '$md',
   },
   onboardingDescriptionText: {
     color: '$textSecondary',
+    fontWeight: '$normal' as const,
+    fontSize: '$sm',
     lineHeight: '$lg',
   },
 } as const;
@@ -222,7 +248,7 @@ export const taskAccordionStyles = {
   },
   cardHeader: {
     padding: '$3',
-    paddingTop:'$1',
+    paddingTop: '$1',
     paddingVertical: '$2',
     borderBottomWidth: 1,
     borderBottomColor: '$mutedBorder',
