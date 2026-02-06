@@ -137,7 +137,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         return;
       }
       const solutionDetails = await getSolutionDetails(projectTemplateId, task._id);
-      
+
       if(solutionDetails.data._id) {
         // @ts-ignore Navigate to observation screen - task will be marked as completed on return
         navigation.navigate('observation', {
@@ -286,11 +286,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-            | 'line-through'
-            | 'none',
-          opacity: isCompleted ? 0.6 : 1,
-          }
+        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+          | 'line-through'
+          | 'none',
+        opacity: isCompleted ? 0.6 : 1,
+      }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -311,8 +311,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
             ? '$warning100'
             : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-            ? '$optionalBadgeBg'
-            : '$backgroundLight100'
+              ? '$optionalBadgeBg'
+              : '$backgroundLight100'
         }
         paddingHorizontal="$3"
         paddingVertical="$1"
@@ -326,8 +326,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
             task.metaInformation?.badgeType === BADGE_TYPES.REQUIRED
               ? '$warning900'
               : task.metaInformation?.badgeType === BADGE_TYPES.OPTIONAL || (isPreview && task?.isDeletable)
-              ? '$optionalBadgeText'
-              : '$textMuted'
+                ? '$optionalBadgeText'
+                : '$textMuted'
           }
         >
           {task.metaInformation?.badgeText || (isPreview && task?.isDeletable ? 'Optional' : '')}
@@ -387,6 +387,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 (!isWeb && !uiConfig.showAsCard
                   ? '$sm'
                   : (titleTypography as any).fontSize) as any
+              }
+              fontWeight={
+                (titleTypography as any).fontWeight
               }
               style={isWeb ? (taskCardStyles.webTextWrap as any) : undefined}
             >
@@ -549,7 +552,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         size={isWeb ? (uiConfig.showAsCard || isOnboardingTask ? 'sm' : 'md') : 'xs'}
         borderRadius="$lg"
         bg={isOnboardingTask ? (buttonStyles as any).bg : undefined}
-        borderColor={buttonStyles.borderColor}
+        borderColor={(buttonStyles as any).borderColor}
         opacity={isReadOnly ? 0.5 : 1}
         $hover-bg={
           isEdit ? ((buttonStyles as any).hoverBg ?? '$primary100') : 'transparent'
@@ -558,8 +561,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isEdit && (buttonStyles as any).hoverBorderColor
             ? (buttonStyles as any).hoverBorderColor
             : isEdit
-              ? '$primary500'
-              : 'transparent'
+            ? '$primary500'
+            : 'transparent'
         }
         $web-cursor={isEdit ? 'pointer' : undefined}
         sx={
@@ -755,8 +758,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 : isRejected
                   ? '$error50'
                   : '$warning50'
-              : taskCardStyles.childCard?.bg
+              : isInterventionPlanEditMode
+                ? '#F9FAFD'
+                : taskCardStyles.childCard?.bg
         }
+        borderRadius={taskCardStyles.childCard?.borderRadius as any}
         borderColor={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBorder'
@@ -852,15 +858,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
           isAddedToPlan
             ? '$addedToPlanBg'
             : isRejected
-              ? '$error50'
-              : '$warning50'
+            ? '$error50'
+            : '$warning50'
         }
         borderColor={
           isAddedToPlan
             ? '$addedToPlanBorder'
             : isRejected
-              ? '$error200'
-              : '$warning200'
+            ? '$error200'
+            : '$warning200'
         }
         borderWidth={1}
         borderRadius="$lg"

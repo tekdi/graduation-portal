@@ -9,7 +9,7 @@ export const taskCardStyles = {
     size: 'md' as const,
     variant: 'elevated' as const,
     bg: '#F6F7FB',
-    borderRadius: '$md',
+    borderRadius: '$xl',
     marginBottom: '$0.5',
     borderWidth: 1,
     borderColor: '$borderLight300',
@@ -30,7 +30,7 @@ export const taskCardStyles = {
   // Default inline style for regular tasks
   regularTaskContainer: {
     bg: '$backgroundPrimary.light',
-    padding: '$5',
+    padding: '$2',
   },
   statusIndicatorContainer: {
     width: 40,
@@ -236,29 +236,34 @@ export const taskCardStyles = {
 
 export const taskAccordionStyles = {
   container: {
-    marginBottom: '$4',
+    marginBottom: '$6',
   },
   card: {
     size: 'md' as const,
     variant: 'elevated' as const,
     bg: '$backgroundPrimary.light',
-    borderRadius: '$lg',
+    borderRadius: '$2xl',
     borderWidth: 1,
     borderColor: '$mutedBorder',
   },
   cardHeader: {
-    padding: '$3',
-    paddingTop:'$1',
-    paddingVertical: '$2',
+    padding: 0,
     borderBottomWidth: 1,
     borderBottomColor: '$mutedBorder',
+    borderTopWidth: 0,
+    borderLeftWidth: 0,
+    borderRightWidth: 0,
+  },
+  cardHeaderInner: {
+    padding: '$4',
   },
   cardHeaderContent: {
     justifyContent: 'space-between' as const,
     alignItems: 'center' as const,
   },
   cardContent: {
-    padding: '$2',
+    paddingHorizontal: '$5',
+    paddingVertical: '$4',
   },
   cardContentStack: {
     space: 'md' as const,
