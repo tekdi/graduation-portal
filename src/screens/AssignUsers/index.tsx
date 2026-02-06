@@ -1,6 +1,6 @@
 import TitleHeader from '@components/TitleHeader';
 import { titleHeaderStyles } from '@components/TitleHeader/Styles';
-import { VStack, HStack, Button, Text, Card, Avatar, AvatarFallbackText, Box, Divider, LucideIcon, Badge, BadgeText, Checkbox, CheckboxIndicator, CheckboxIcon, CheckIcon  } from '@ui';
+import { VStack, HStack, Button, Text, Card, Box, Divider, LucideIcon, Badge, BadgeText, Checkbox, CheckboxIndicator, CheckboxIcon, CheckIcon  } from '@ui';
 import React, { useEffect, useState, useMemo } from 'react';
 import { useLanguage } from '@contexts/LanguageContext';
 import type { ViewProps, TextProps } from 'react-native';
@@ -9,7 +9,6 @@ import type { ColumnDef } from '@app-types/components';
 import {
   SearchFilter,
   ParticipantSearchFilter,
-  participantFilterOptions,
   useSupervisorFilterOptions,
   useSiteFilterOptions,
   useParticipantFilterOptions,
@@ -193,16 +192,25 @@ const AssignUsersScreen = () => {
       const name = lc.name || '';
       const userId = lc.userId || '';
       const email = lc.userDetails?.email || '';
-      const location = lc.userDetails?.location || '';
+      const province =
+        lc.userDetails?.province?.label ||
+        lc.province?.label ||
+        '';
+      const site =
+        lc.userDetails?.site?.label ||
+        lc.userDetails?.district?.label ||
+        lc.userDetails?.local_municipality?.label ||
+        lc.site?.label ||
+        '';
       const lcId = `LC-${String(userId).padStart(3, '0')}`;
       
       return {
         labelKey: name,
         value: String(userId),
-        location: location,
+        province,
+        site,
         status: 'assigned',
         email: email,
-        site: '',
         lcId: lcId,
         id: userId,
       };
@@ -259,34 +267,87 @@ const AssignUsersScreen = () => {
        assignedUserIds: participantIds,
        assignedUsersStatus: 'NOT_ONBOARDED',
      });
-     
-     // Generate additional data for assigned participants (email, participant ID)
-     const participantsWithFullData = selectedParticipants.map((participant, index) => {
-       // Generate email from name (simple conversion)
-       const nameParts = participant.labelKey.toLowerCase().split(' ');
-       const email = nameParts.length > 1
-         ? `${nameParts[0]}.${nameParts[1]}@example.com`
-         : `${nameParts[0]}@example.com`;
-       
-       // Generate Participant ID (increment from existing)
-       const participantId = `PAR-${String(assignedParticipants.length + 1 + index).padStart(3, '0')}`;
-       
-       // Extract bio and productivity from location (format: "Bio • Productivity")
-       const locationParts = participant.location?.split(' • ') || [];
-       const bio = locationParts[0] || '';
-       const productivity = locationParts[1] || '';
-       
+
+     // Refresh mapped participants list (below table) after successful assignment
+     const mappedResponse = await getMappedParticipantsForLC({
+       userId: lcId,
+       programId: programId,
+       type: 'user',
+       page: mappedParticipantsPage,
+       limit: mappedParticipantsPageSize,
+       search: '',
+     });
+
+     const totalCount = mappedResponse.total || mappedResponse.result?.total || mappedResponse.result?.count || 0;
+     setMappedParticipantsTotal(totalCount);
+
+     const mappedData = (mappedResponse.result?.data || []).map((participant: any) => {
+       const name = participant.name || participant.userDetails?.name || participant.email || 'Unknown';
+       const userId = participant.userId || participant.userDetails?.id || '';
+       const email = participant.userDetails?.email || participant.email || '';
+       const province = participant.userDetails?.province?.label || '-';
+       const site =
+         participant.userDetails?.site?.label ||
+         participant.userDetails?.district?.label ||
+         participant.userDetails?.local_municipality?.label ||
+         '-';
+
        return {
-         ...participant,
+         labelKey: name,
+         value: String(userId),
          email,
-         participantId,
-         bio,
-         productivity,
+         province,
+         site,
+         id: userId,
        };
      });
-     
-     // Add to assigned participants list
-     setAssignedParticipants((prev) => [...prev, ...participantsWithFullData]);
+
+     setMappedParticipants(mappedData);
+
+     // Refresh available participants list (top table) so newly-mapped users disappear
+     const province = participantFilterValues.filterByProvince;
+     const site = participantFilterValues.site;
+     const search = participantFilterValues.search;
+
+     const participantsResponse = await getParticipants(programId, {
+       excludeMapped: true,
+       limit: 100,
+       province: province && province !== 'all-provinces' && province !== 'all-Provinces' ? province : undefined,
+       site: site && site !== 'all-sites' ? site : undefined,
+       search: search && String(search).trim() ? String(search).trim() : undefined,
+     });
+
+     const refreshedParticipants = (participantsResponse.result?.data || []).map((p: any) => {
+       const name = p.name || p.full_name || p.email || 'Unknown';
+       const value = String(p.id || p._id || p.email || name);
+       const email = p.email || p.userDetails?.email || '';
+       const province = p.province?.label || p.userDetails?.province?.label || '';
+       const site =
+         p.site?.label ||
+         p.userDetails?.site?.label ||
+         p.userDetails?.district?.label ||
+         p.userDetails?.local_municipality?.label ||
+         '';
+
+       const locationParts = [];
+       if (province) locationParts.push(province);
+       if (site) locationParts.push(site);
+       const location = locationParts.length > 0 ? locationParts.join(' • ') : '';
+
+       return {
+         labelKey: name,
+         value,
+         location,
+         province,
+         site,
+         status: 'unassigned',
+         email,
+         id: p.id || p._id,
+       };
+     });
+
+     setParticipants(refreshedParticipants);
+     setAssignedParticipants([]); // reset local assigned tracker; API is source of truth now
      
      // Return success indicator
      return { success: true };
@@ -402,16 +463,26 @@ const getAvailableParticipants = () => {
          const name = lc.name || '';
          const userId = lc.userId || '';
          const email = lc.userDetails?.email || '';
-         const location = lc.userDetails?.location || '';
+        // Extract province/site similar to UserManagement table
+        const province =
+          lc.userDetails?.province?.label ||
+          lc.province?.label ||
+          '';
+        const site =
+          lc.userDetails?.site?.label ||
+          lc.userDetails?.district?.label ||
+          lc.userDetails?.local_municipality?.label ||
+          lc.site?.label ||
+          '';
          const lcId = `LC-${String(userId).padStart(3, '0')}`;
          
          return {
            labelKey: name,
            value: String(userId),
-           location: location,
+          province,
+          site,
            status: 'assigned',
            email: email,
-           site: '',
            lcId: lcId,
            id: userId,
          };
@@ -429,14 +500,11 @@ const getAvailableParticipants = () => {
   fetchMappedLCs();
 }, [selectedSupervisor, supervisorFilterValues.selectSupervisor]);
 
-// Fetch participants when LC is selected in Participant to LC flow or when filters change
+// Fetch participants when participant filters change (do NOT refetch on Supervisor/LC dropdown changes)
 useEffect(() => {
   const fetchParticipants = async () => {
-    // Only fetch participants when in Participant to LC flow and LC is selected
-    if (activeTab !== 'PARTICIPANT_TO_LC' || !selectedLc) {
-      setParticipants([]);
-      return;
-    }
+    // Only fetch participants when in Participant to LC flow
+    if (activeTab !== 'PARTICIPANT_TO_LC') return;
 
     try {
       setIsLoadingParticipants(true);
@@ -502,7 +570,6 @@ useEffect(() => {
 
   fetchParticipants();
 }, [
-  selectedLc,
   activeTab,
   participantFilterValues.filterByProvince,
   participantFilterValues.site,
@@ -577,7 +644,12 @@ useEffect(() => {
   };
 
   fetchMappedParticipants();
-}, [activeTab, selectedLc, mappedParticipantsPage, mappedParticipantsPageSize]);
+}, [
+  activeTab,
+  selectedLc?.value, // stable dependency: only refetch when LC id changes
+  mappedParticipantsPage,
+  mappedParticipantsPageSize,
+]);
 
 // Define columns for mapped participants table (moved outside conditional render to avoid React hooks error)
 const mappedParticipantsColumns: ColumnDef<any>[] = useMemo(() => [
@@ -588,11 +660,11 @@ const mappedParticipantsColumns: ColumnDef<any>[] = useMemo(() => [
     flex: 2,
     render: (item: any) => (
       <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-        <Avatar {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-          <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>
+        <Box {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
+          <Text {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>
             {getInitials(item.labelKey)}
-          </AvatarFallbackText>
-        </Avatar>
+          </Text>
+        </Box>
         <VStack space="xs">
           <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
             {item.labelKey}
@@ -634,6 +706,75 @@ const mappedParticipantsColumns: ColumnDef<any>[] = useMemo(() => [
     render: (item: any) => (
       <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
         {item.site || '-'}
+      </Text>
+    ),
+  },
+], []);
+
+// Columns for mapped linkage champions table (LCs mapped to a supervisor)
+const mappedLCsColumns: ColumnDef<any>[] = useMemo(() => [
+  {
+    key: 'linkageChampion',
+    label: 'admin.assignUsers.linkageChampion',
+    align: 'left',
+    flex: 2,
+    render: (lc: any) => (
+      <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
+        <Box {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
+          <Text {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>
+            {getInitials(lc.labelKey)}
+          </Text>
+        </Box>
+        <VStack space="xs">
+          <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
+            {lc.labelKey}
+          </Text>
+          <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
+            {lc.lcId}
+          </Text>
+        </VStack>
+      </HStack>
+    ),
+  },
+  {
+    key: 'email',
+    label: 'admin.assignUsers.email',
+    align: 'left',
+    flex: 2,
+    render: (lc: any) => (
+      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+        {lc.email || '-'}
+      </Text>
+    ),
+  },
+  {
+    key: 'province',
+    label: 'admin.users.province',
+    align: 'left',
+    flex: 2,
+    render: (lc: any) => (
+      lc.province ? (
+        <HStack {...(AssignUsersStyles.locationHStack as ViewProps)}>
+          <LucideIcon name="MapPin" size={12} color={theme.tokens.colors.textMutedForeground} />
+          <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+            {lc.province}
+          </Text>
+        </HStack>
+      ) : (
+        <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+          -
+        </Text>
+      )
+    ),
+  },
+  {
+    key: 'site',
+    label: 'admin.assignUsers.site',
+    align: 'left',
+    flex: 1,
+    render: (lc: any) => (
+      <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
+        {lc.site || '-'}
       </Text>
     ),
   },
@@ -729,93 +870,23 @@ return (
                   </Text>
                 </VStack>
 
-                {/* Table Header */}
-                <HStack {...(AssignUsersStyles.tableHeaderHStack as ViewProps)}>
-                  <Box flex={2}>
-                    <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                      {t('admin.assignUsers.linkageChampion')}
-                    </Text>
-                  </Box>
-                  <Box flex={2}>
-                    <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                      {t('admin.assignUsers.email')}
-                    </Text>
-                  </Box>
-                  <Box flex={2}>
-                    <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                      {t('admin.assignUsers.location')}
-                    </Text>
-                  </Box>
-                  <Box flex={1}>
-                    <Text {...(AssignUsersStyles.tableHeaderText as TextProps)}>
-                      {t('admin.assignUsers.site')}
-                    </Text>
-                  </Box>
-                </HStack>
-
-                {/* Table Rows - From API */}
-                {isLoadingMappedLCs ? (
-                  <VStack space="xs" p="$4" alignItems="center">
-                    <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                      {t('common.loading')}
-                    </Text>
-                  </VStack>
-                ) : mappedLCs.length === 0 ? (
-                  <VStack space="xs" p="$4" alignItems="center">
-                    <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                      {t('common.noDataFound')}
-                    </Text>
-                  </VStack>
-                ) : (
-                  <VStack space="xs" backgroundColor="$white">
-                    {mappedLCs.map((lc, index) => {
-                      // Get initials from name using common utility function
-                      const initials = getInitials(lc.labelKey);
-
-                      return (
-                        <HStack
-                          key={`${lc.value}-${index}`}
-                          {...(AssignUsersStyles.tableRowHStack as ViewProps)}
-                          borderBottomWidth={index === mappedLCs.length - 1 ? 0 : 1}
-                        >
-                          <Box flex={2}>
-                            <HStack {...(AssignUsersStyles.avatarHStack as ViewProps)}>
-                              <Box {...(AssignUsersStyles.avatarBgStyles as ViewProps)}>
-                                <Text {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)}>{initials}</Text>
-                              </Box>
-                              <VStack space="xs">
-                                <Text {...(AssignUsersStyles.tableRowNameText as TextProps)}>
-                                  {lc.labelKey}
-                                </Text>
-                                <Text {...(AssignUsersStyles.tableRowIdText as TextProps)}>
-                                  {lc.lcId}
-                                </Text>
-                              </VStack>
-                            </HStack>
-                          </Box>
-                          <Box flex={2}>
-                            <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                              {lc.email}
-                            </Text>
-                          </Box>
-                          <Box flex={2}>
-                            <HStack {...(AssignUsersStyles.locationHStack as ViewProps)}>
-                              <LucideIcon name="MapPin" size={12} color={theme.tokens.colors.textMutedForeground} />
-                              <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                                {lc.location}
-                              </Text>
-                            </HStack>
-                          </Box>
-                          <Box flex={1}>
-                            <Text {...(AssignUsersStyles.tableRowDataText as TextProps)}>
-                              {lc.site}
-                            </Text>
-                          </Box>
-                        </HStack>
-                      );
-                    })}
-                  </VStack>
-                )}
+                <Box marginTop="$6">
+                  <DataTable
+                    data={mappedLCs || []}
+                    columns={mappedLCsColumns}
+                    getRowKey={(item: any) => item.value}
+                    isLoading={isLoadingMappedLCs}
+                    emptyMessage="common.noDataFound"
+                    responsive={true}
+                    pagination={{
+                      enabled: true,
+                      pageSize: 5,
+                      maxPageNumbers: 5,
+                      showPageSizeSelector: true,
+                      pageSizeOptions: [5, 10, 25, 50],
+                    }}
+                  />
+                </Box>
               </VStack>
             </Card>
           </>
@@ -910,7 +981,7 @@ return (
                    </Text>
                  </VStack>
 
-                 <Box marginTop="$1">
+                 <Box marginTop="$6">
                    <DataTable
                      data={mappedParticipants || []}
                      columns={mappedParticipantsColumns}

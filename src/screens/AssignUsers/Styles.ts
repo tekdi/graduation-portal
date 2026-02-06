@@ -3,6 +3,7 @@ export const AssignUsersStyles = {
       size: 'md',
       variant: 'outline',
       mt: '$6',
+      borderRadius: '$2xl',
     },
     tableTitleText: {
       fontSize: '$md',
