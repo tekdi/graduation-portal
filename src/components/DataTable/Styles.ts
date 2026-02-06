@@ -172,6 +172,17 @@ export const styles = {
     width: '$full' as const,
   },
 
+  // Desktop Scroll Container
+  desktopScrollContainer: {
+    width: '$full' as const,
+    overflow: 'scroll' as const,
+    $web: {
+      overflowX: 'auto' as const,
+      overflowY: 'hidden' as const,
+      WebkitOverflowScrolling: 'touch' as const,
+    },
+  },
+
   // Pagination Controls
   paginationContainer: {
     space: 'md' as const,

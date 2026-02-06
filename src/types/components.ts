@@ -94,6 +94,7 @@ export interface DataTableProps<T> {
   onPageSizeChange?: (size: number) => void;  // Optional callback when page size changes
   // Responsive props
   responsive?: boolean;  // Enable responsive card view on mobile (default: true)
+  minWidth?: number;  // Minimum width of the table
 }
 
 export interface PaginationControlsProps {

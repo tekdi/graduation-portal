@@ -290,6 +290,7 @@ const UserManagementScreen = () => {
 
         {/* DataTable with server-side pagination */}
         <DataTable
+          minWidth={1000}
           data={users}
           columns={columns}
           getRowKey={(user) => user.id}
