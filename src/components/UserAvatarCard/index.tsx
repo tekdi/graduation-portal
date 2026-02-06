@@ -3,8 +3,6 @@ import {
  Text,
  Card,
  Heading,
- Avatar,
- AvatarFallbackText,
  View,
  Checkbox,
  CheckboxIndicator,
@@ -85,6 +83,178 @@ const UserAvatarCard = ({
   
   // Use provided lcList or fall back to empty array
   const displayLCList = lcList || [];
+
+  const participantColumns: ColumnDef<any>[] = useMemo(() => [
+    {
+      key: 'checkbox',
+      label: '',
+      align: 'left',
+      render: (item: any) => {
+        const isChecked = selectedLCs.has(item.value);
+        return (
+          <Checkbox
+            value={item.value}
+            isChecked={isChecked}
+            onChange={(checked: boolean) => {
+              setSelectedLCs((prev) => {
+                const newSet = new Set(prev);
+                if (checked) newSet.add(item.value);
+                else newSet.delete(item.value);
+                return newSet;
+              });
+            }}
+          >
+            <CheckboxIndicator borderWidth={1} borderColor="$textForeground">
+              <CheckboxIcon as={CheckIcon} color="$modalBackground" />
+            </CheckboxIndicator>
+          </Checkbox>
+        );
+      },
+      desktopConfig: { showColumn: true, showLabel: false },
+      mobileConfig: { showColumn: true, showLabel: false, leftRank: 0 },
+    },
+    {
+      key: 'avatar',
+      label: '',
+      align: 'left',
+      render: (item: any) => (
+        <Box
+          {...(AssignUsersStyles.initialsBoxSmStyles as ViewProps)}
+        >
+          <Text {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)} fontSize="$sm">
+            {getInitials(item.labelKey)}
+          </Text>
+        </Box>
+      ),
+      desktopConfig: { showColumn: true, showLabel: false },
+      mobileConfig: { showColumn: true, showLabel: false, leftRank: 1 },
+    },
+    {
+      key: 'name',
+      label: 'admin.assignUsers.participant',
+      align: 'left',
+      flex: 1,
+      render: (item: any) => (
+        <VStack space="xs">
+          <Text {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm">
+            {item.labelKey}
+          </Text>
+          {item.location && (
+            <HStack gap="$1" alignItems="center">
+              <LucideIcon
+                name="MapPin"
+                size={12}
+                color={theme.tokens.colors.textMutedForeground}
+              />
+              <Text {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs">
+                {item.location}
+              </Text>
+            </HStack>
+          )}
+        </VStack>
+      ),
+      desktopConfig: { showColumn: true, showLabel: false },
+      mobileConfig: { showColumn: true, showLabel: false, fullWidthRank: 0 },
+    },
+  ], [selectedLCs]);
+
+  const linkageChampionColumns: ColumnDef<any>[] = useMemo(() => [
+    {
+      key: 'checkbox',
+      label: '',
+      align: 'left',
+      render: (lc: any) => {
+        const isChecked = selectedLCs.has(lc.value);
+        return (
+          <Checkbox
+            value={lc.value}
+            isChecked={isChecked}
+            onChange={(checked: boolean) => {
+              setSelectedLCs((prev) => {
+                const newSet = new Set(prev);
+                if (checked) newSet.add(lc.value);
+                else newSet.delete(lc.value);
+                return newSet;
+              });
+            }}
+          >
+            <CheckboxIndicator borderWidth={1} borderColor="$textForeground">
+              <CheckboxIcon as={CheckIcon} color="$modalBackground" />
+            </CheckboxIndicator>
+          </Checkbox>
+        );
+      },
+      desktopConfig: { showColumn: true, showLabel: false },
+      mobileConfig: { showColumn: true, showLabel: false, leftRank: 0 },
+    },
+    {
+      key: 'avatar',
+      label: '',
+      align: 'left',
+      render: (lc: any) => (
+        <Box
+          {...(AssignUsersStyles.initialsBoxSmStyles as ViewProps)}
+        >
+          <Text {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)} fontSize="$sm">
+            {getInitials(lc.labelKey)}
+          </Text>
+        </Box>
+      ),
+      desktopConfig: { showColumn: true, showLabel: false },
+      mobileConfig: { showColumn: true, showLabel: false, leftRank: 1 },
+    },
+    {
+      key: 'lcInfo',
+      label: 'admin.assignUsers.linkageChampion',
+      align: 'left',
+      flex: 1,
+      render: (lc: any) => (
+        <HStack
+          {...(AssignUsersStyles.viewstyles as ViewProps)}
+          flex={1}
+          width="100%"
+          alignItems="center"
+        >
+          <VStack space="xs" flexShrink={1}>
+            <Text {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm">
+              {lc.labelKey}
+            </Text>
+            {lc.location && (
+              <HStack gap="$1" alignItems="center">
+                <LucideIcon
+                  name="MapPin"
+                  size={12}
+                  color={theme.tokens.colors.textMutedForeground}
+                />
+                <Text {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs">
+                  {lc.location}
+                </Text>
+              </HStack>
+            )}
+          </VStack>
+
+          <Badge
+            ml="auto"
+            variant="outline"
+            bg="$white"
+            borderColor="$borderColor"
+            px="$2"
+            py="$1"
+            borderRadius="$lg"
+            mr="$2"
+          >
+            <BadgeText color="$textForeground" fontSize="$xs" textTransform="none">
+              {t(`admin.assignUsers.status.${lc.status || 'unassigned'}`) ||
+                lc.status ||
+                t('admin.assignUsers.status.unassigned')}
+            </BadgeText>
+          </Badge>
+        </HStack>
+      ),
+      desktopConfig: { showColumn: true, showLabel: false },
+      mobileConfig: { showColumn: true, showLabel: false, fullWidthRank: 0 },
+    },
+  ], [selectedLCs, t]);
  // Handler to receive filter changes from FilterButton and pass to parent
  const handleFilterChange = (values: Record<string, any>) => {
    // Call parent's onChange handler if provided
@@ -185,85 +355,8 @@ const UserAvatarCard = ({
           <Box marginTop="$1">
             <DataTable
               data={displayLCList || []}
-              columns={useMemo(() => {
-                const columns: ColumnDef<any>[] = [
-                  {
-                    key: 'checkbox',
-                    label: '',
-                    align: 'left',
-                    render: (item: any) => {
-                      const isChecked = selectedLCs.has(item.value);
-                      return (
-                        <Checkbox
-                          value={item.value}
-                          isChecked={isChecked}
-                          onChange={(checked: boolean) => {
-                            setSelectedLCs((prev) => {
-                              const newSet = new Set(prev);
-                              if (checked) {
-                                newSet.add(item.value);
-                              } else {
-                                newSet.delete(item.value);
-                              }
-                              return newSet;
-                            });
-                          }}
-                        >
-                          <CheckboxIndicator borderWidth={1} borderColor="$textForeground">
-                            <CheckboxIcon as={CheckIcon} color="$modalBackground" />
-                          </CheckboxIndicator>
-                        </Checkbox>
-                      );
-                    },
-                    desktopConfig: { showColumn: true, showLabel: false },
-                    mobileConfig: { showColumn: true, showLabel: false, leftRank: 0 },
-                  },
-                  {
-                    key: 'avatar',
-                    label: '',
-                    align: 'left',
-                    render: (item: any) => (
-                      <Avatar {...(AssignUsersStyles.avatarBgStyles as any)} width="$8" height="$8">
-                        <AvatarFallbackText
-                          {...(AssignUsersStyles.avatarFallbackTextStyles as any)}
-                          fontSize="$sm"
-                        >
-                          {getInitials(item.labelKey)}
-                        </AvatarFallbackText>
-                      </Avatar>
-                    ),
-                    desktopConfig: { showColumn: true, showLabel: false },
-                    mobileConfig: { showColumn: true, showLabel: false, leftRank: 1 },
-                  },
-                  {
-                    key: 'name',
-                    label: 'admin.assignUsers.participant',
-                    align: 'left',
-                    render: (item: any) => (
-                      <VStack space="xs">
-                        <Text {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm">
-                          {item.labelKey}
-                        </Text>
-                        {item.location && (
-                          <HStack gap="$1" alignItems="center">
-                            <LucideIcon
-                              name="MapPin"
-                              size={12}
-                              color={theme.tokens.colors.textMutedForeground}
-                            />
-                            <Text {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs">
-                              {item.location}
-                            </Text>
-                          </HStack>
-                        )}
-                      </VStack>
-                    ),
-                    desktopConfig: { showColumn: true, showLabel: false },
-                    mobileConfig: { showColumn: true, showLabel: false, fullWidthRank: 0 },
-                  },
-                ];
-                return columns;
-              }, [selectedLCs])}
+              showHeader={false}
+              columns={participantColumns}
               getRowKey={(item: any) => item.value}
               isLoading={isLoading}
               emptyMessage="common.noDataFound"
@@ -297,93 +390,40 @@ const UserAvatarCard = ({
             />
           </Box>
         ) : (
-          // Keep existing Card/Checkbox list for LCs
-          <Card variant="outline" padding="$0" marginTop="$1">
-            {displayLCList?.map((lc: any) => {
-               const isChecked = selectedLCs.has(lc.value);
-               return (
-                 <React.Fragment key={lc.value}>
-                   <Checkbox
-                     isDisabled={false}
-                     isInvalid={false}
-                     size="sm"
-                     padding="$3"
-                     value={lc.value}
-                     isChecked={isChecked}
-                     onChange={(checked: boolean) => {
-                       setSelectedLCs((prev) => {
-                         const newSet = new Set(prev);
-                         if (checked) {
-                           newSet.add(lc.value);
-                         } else {
-                           newSet.delete(lc.value);
-                         }
-                         return newSet;
-                       });
-                     }}
-                   >
-                   <CheckboxIndicator borderWidth={1} borderColor="$textForeground">
-                     <CheckboxIcon as={CheckIcon} color="$modalBackground" />
-                   </CheckboxIndicator>
-
-                   <CheckboxLabel style={{ flex: 1 }}>
-                      <HStack
-                        {...(AssignUsersStyles.viewstyles as ViewProps)}
-                        flex={1}
-                        width="100%"
-                        alignItems="center"
-                      >
-                        <HStack space="md" alignItems="center" flex={1}>
-                          <Avatar {...(AssignUsersStyles.avatarBgStyles as any)} width="$8" height="$8">
-                            <AvatarFallbackText
-                              {...(AssignUsersStyles.avatarFallbackTextStyles as any)}
-                              fontSize="$sm"
-                            >
-                              {lc.labelKey}
-                            </AvatarFallbackText>
-                          </Avatar>
-
-                          <VStack space="xs" flexShrink={1}>
-                            <Text {...(AssignUsersStyles.supervisorName as TextProps)} fontSize="$sm">
-                              {lc.labelKey}
-                            </Text>
-                            <HStack gap="$1" alignItems="center">
-                              <LucideIcon
-                                name="MapPin"
-                                size={12}
-                                color={theme.tokens.colors.textMutedForeground}
-                              />
-                              <Text {...(AssignUsersStyles.provinceName as TextProps)} fontSize="$xs">
-                                {lc.location}
-                              </Text>
-                            </HStack>
-                          </VStack>
-                        </HStack>
-
-                        <Badge
-                          ml="auto"
-                          variant="outline"
-                          bg="$white"
-                          borderColor="$borderColor"
-                          px="$2"
-                          py="$1"
-                          borderRadius="$lg"
-                          mr="$2"
-                        >
-                          <BadgeText color="$textForeground" fontSize="$xs" textTransform="none">
-                            {t(`admin.assignUsers.status.${lc.status || 'unassigned'}`) ||
-                              lc.status ||
-                              t('admin.assignUsers.status.unassigned')}
-                          </BadgeText>
-                        </Badge>
-                      </HStack>
-                    </CheckboxLabel>
-                  </Checkbox>
-                  <Divider />
-                </React.Fragment>
-              );
-            })}
-          </Card>
+          <Box marginTop="$1">
+            <DataTable
+              data={displayLCList || []}
+              showHeader={false}
+              columns={linkageChampionColumns}
+              getRowKey={(item: any) => item.value}
+              isLoading={isLoading}
+              emptyMessage="common.noDataFound"
+              responsive={true}
+              onRowClick={(item: any) => {
+                // Toggle checkbox selection on row click
+                setSelectedLCs((prev) => {
+                  const newSet = new Set(prev);
+                  if (newSet.has(item.value)) newSet.delete(item.value);
+                  else newSet.add(item.value);
+                  return newSet;
+                });
+              }}
+              pagination={{
+                enabled: true,
+                pageSize: pageSize,
+                maxPageNumbers: 5,
+                showPageSizeSelector: true,
+                pageSizeOptions: [5, 10, 25, 50],
+              }}
+              onPageChange={(page: number) => {
+                setCurrentPage(page);
+              }}
+              onPageSizeChange={(size: number) => {
+                setPageSize(size);
+                setCurrentPage(1);
+              }}
+            />
+          </Box>
         )}
 
 
@@ -639,15 +679,19 @@ const UserAvatarCard = ({
                setSelectedLc(lc); // local highlight
                onLcSelect?.(lc); // notify parent
              }}
-           >
-             <Card
+            >
+              <Card
                {...(isSelected
                  ? (AssignUsersStyles.cardStyles as ViewProps)
                  : (AssignUsersStyles.selectedCardStyles as ViewProps))}
              >
-               <Avatar {...(AssignUsersStyles.avatarBgStyles as any)}>
-                 <AvatarFallbackText {...(AssignUsersStyles.avatarFallbackTextStyles as any)}>{lc.labelKey || ''}</AvatarFallbackText>
-               </Avatar>
+                <Box
+                  {...(AssignUsersStyles.initialsBoxSmStyles as ViewProps)}
+                >
+                  <Text {...(AssignUsersStyles.avatarFallbackTextStyles as TextProps)} fontSize="$sm">
+                    {getInitials(lc.labelKey || '')}
+                  </Text>
+                </Box>
 
 
                <View>

@@ -84,6 +84,7 @@ export interface DataTableProps<T> {
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
   isLoading?: boolean;
+  showHeader?: boolean; // Default: true. Set to false to hide table header row (desktop/table view)
   emptyMessage?: string;
   loadingMessage?: string;
   getRowKey: (item: T) => string;

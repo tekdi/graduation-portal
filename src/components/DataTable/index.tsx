@@ -415,6 +415,7 @@ const DataTable = <T,>({
   columns,
   onRowClick,
   isLoading = false,
+  showHeader = true,
   emptyMessage,
   loadingMessage,
   getRowKey,
@@ -570,7 +571,9 @@ const DataTable = <T,>({
   // Table content for desktop or when responsive is disabled
   const tableContent = (
     <VStack {...styles.tableContentContainer} minWidth={minTableWidth}>
-      <TableHeader columns={visibleDesktopColumns} minWidth={minTableWidth} />
+      {showHeader && (
+        <TableHeader columns={visibleDesktopColumns} minWidth={minTableWidth} />
+      )}
       <Box>
         {renderDataContent((item, index) => (
           <TableRow
