@@ -137,8 +137,8 @@ const TaskCard: React.FC<TaskCardProps> = ({
         return;
       }
       const solutionDetails = await getSolutionDetails(projectTemplateId, task._id);
-
-      if (solutionDetails.data._id) {
+      
+      if(solutionDetails.data._id) {
         // @ts-ignore Navigate to observation screen - task will be marked as completed on return
         navigation.navigate('observation', {
           id: participantId,
@@ -286,11 +286,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const renderTaskInfo = () => {
     const textStyle = uiConfig.showCheckbox
       ? {
-        textDecorationLine: (isCompleted ? 'line-through' : 'none') as
-          | 'line-through'
-          | 'none',
-        opacity: isCompleted ? 0.6 : 1,
-      }
+          textDecorationLine: (isCompleted ? 'line-through' : 'none') as
+            | 'line-through'
+            | 'none',
+          opacity: isCompleted ? 0.6 : 1,
+        }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
