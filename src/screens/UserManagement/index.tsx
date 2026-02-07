@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { VStack, HStack, Button, Text, Box, Pressable, Card, Modal, useAlert, ButtonIcon, ButtonText } from '@ui';
-import { useRoute, useFocusEffect } from '@react-navigation/native';
 import { Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -26,7 +25,6 @@ const UserManagementScreen = () => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
   const { showAlert } = useAlert();
-  const route = useRoute<any>();
 
   // API state management
   const [filters, setFilters] = useState<Record<string, any>>({});
@@ -40,15 +38,6 @@ const UserManagementScreen = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // If navigated via Quick Action ("Upload Users"), auto-open the same bulk upload modal
-  useFocusEffect(
-    useCallback(() => {
-      if (route?.name === 'UploadUsers') {
-        setIsUploadModalOpen(true);
-      }
-    }, [route?.name]),
-  );
 
   const columns = useMemo(() => getUsersColumns(), []);
 
