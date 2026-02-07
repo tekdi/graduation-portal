@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { VStack, HStack, Button, Text, Box, Pressable, Card, Modal, useAlert, ButtonIcon, ButtonText } from '@ui';
+import { useRoute, useFocusEffect } from '@react-navigation/native';
 import { Platform } from 'react-native';
 import { LucideIcon } from '@ui/index';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -25,6 +26,7 @@ const UserManagementScreen = () => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
   const { showAlert } = useAlert();
+  const route = useRoute<any>();
 
   // API state management
   const [filters, setFilters] = useState<Record<string, any>>({});
@@ -38,6 +40,15 @@ const UserManagementScreen = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // If navigated via Quick Action ("Upload Users"), auto-open the same bulk upload modal
+  useFocusEffect(
+    useCallback(() => {
+      if (route?.name === 'UploadUsers') {
+        setIsUploadModalOpen(true);
+      }
+    }, [route?.name]),
+  );
 
   const columns = useMemo(() => getUsersColumns(), []);
 
@@ -236,7 +247,7 @@ const UserManagementScreen = () => {
               <ButtonIcon as={LucideIcon} name="Upload" size={16} />
               <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.actions.bulkUploadCSV')}</ButtonText>
             </Button>
-            <Button variant={"solid" as any}
+            {/* <Button variant={"solid" as any}
               onPress={() => {
                 // Handle create user
               }}
@@ -244,7 +255,7 @@ const UserManagementScreen = () => {
             >
               <ButtonIcon as={LucideIcon} name="SquarePen" size={16} />
               <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.actions.createUser')}</ButtonText>
-            </Button>
+            </Button> */}
           </HStack>
         }
       />
@@ -269,7 +280,7 @@ const UserManagementScreen = () => {
                 })}
               </Text>
             )}
-            <Button
+            {/* <Button
               {...titleHeaderStyles.outlineButton}
               onPress={() => {
                 // Handle Export CSV
@@ -284,7 +295,7 @@ const UserManagementScreen = () => {
                   {t('admin.actions.exportCSV')}
                 </Text>
               </HStack>
-            </Button>
+            </Button> */}
           </HStack>
         </HStack>
 
