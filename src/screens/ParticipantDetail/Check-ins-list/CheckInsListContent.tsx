@@ -31,7 +31,9 @@ import { ENTITY_TYPE } from '@constants/ROLES';
 import { StatusBadge } from '@components/ObservationCards';
 import { CARD_STATUS } from '@constants/app.constant';
 import { ICONS } from '@constants/LOG_VISIT_CARDS';
-import { useAuth } from '@contexts/AuthContext';
+import offlineStorage from '../../../services/offlineStorage';
+import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
+import type { User } from '@contexts/AuthContext';
 
 /**
  * CheckInsListContent Component Props
@@ -61,31 +63,76 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
   preSelectedSolution,
   onFormSelect
 }) => {
+  type IconMeta = {
+    color?: string;
+    icon?: string;
+    iconColor?: string;
+  } | null;
+
   const [loading, setLoading] = useState<boolean>(true);
   const [solutions, setSolutions] = useState<AssessmentSurveyCardData[]>([]);
   const [selectedSolution, setSelectedSolution] = useState<string>('');
   const [solutionName, setSolutionName] = useState<string>('');
   const [submissions, setSubmissions] = useState<any[]>([]);
   const [submissionsLoading, setSubmissionsLoading] = useState<boolean>(false);
-  const [iconMeta, setIconMeta] = useState(null);
-  const { user } = useAuth();
+  const [iconMeta, setIconMeta] = useState<IconMeta>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isUserLoaded, setIsUserLoaded] = useState(false);
   const [participant, setParticipant] = useState<
     ParticipantData | undefined
   >(undefined);
   const { t } = useLanguage();
   const { showAlert } = useAlert();
+
+  /**
+   * Load user from offline storage (so this component can work outside AuthProvider).
+   */
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadUser = async () => {
+      try {
+        const storedUser = await offlineStorage.read<User>(STORAGE_KEYS.AUTH_USER);
+        const isValidUser =
+          storedUser &&
+          typeof storedUser === 'object' &&
+          Object.keys(storedUser).length > 0 &&
+          ((storedUser as any).id || (storedUser as any).email);
+
+        if (isMounted) {
+          setUser(isValidUser ? storedUser : null);
+        }
+      } catch (error) {
+        logger.error('Error loading user from storage:', error);
+        if (isMounted) setUser(null);
+      } finally {
+        if (isMounted) setIsUserLoaded(true);
+      }
+    };
+
+    loadUser();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
   /**
    * Fetch targeted solutions from API
    */
   useEffect(() => {
+    if (!isUserLoaded) return;
+
     const fetchSolutions = async () => {
       try {
         const data = await getTargetedSolutions({
           type: 'observation',
         });
         setSolutions(data);
-        if (id) {
-          const response = await getParticipantsList({ entityId: id, userId: user?.id as string })
+        if (id && user?.id) {
+          const response = await getParticipantsList({
+            entityId: id,
+            userId: user.id,
+          });
           setParticipant(response?.result?.data?.[0] as ParticipantData);
         }
         if (preSelectedSolution) {
@@ -100,7 +147,7 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
     };
 
     fetchSolutions();
-  }, [id, preSelectedSolution, user?.id]);
+  }, [id, preSelectedSolution, user?.id, isUserLoaded]);
 
   /**
    * Fetch submissions when a solution is selected
@@ -187,6 +234,10 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
 
   const handleViewForm = (submissionNumber: number) => {
     if (onNavigateToObservation && participant?.userId && selectedSolution) {
+      if (solutionName == "Group Check-Ins" && !user?.id) {
+        showAlert('error', 'User not found');
+        return;
+      }
       onNavigateToObservation({
         id: solutionName == "Group Check-Ins" ? user?.id : participant.userId,
         solutionId: selectedSolution,
