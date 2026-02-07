@@ -837,7 +837,7 @@
   "participants": {
     "myParticipants": "My Participants",
     "dashboard": "Dashboard",
-    "searchByNameOrId": "Search by name or ID...",
+    "searchByNameOrId": "Search by name",
     "notEnrolled": "Not Onboarded",
     "enrolled": "Onboarded",
     "inProgress": "In Progress",

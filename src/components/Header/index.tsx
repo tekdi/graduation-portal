@@ -81,6 +81,11 @@ const Header: React.FC<{
   const { t, currentLanguage, changeLanguage } = useLanguage();
   const [authUser, setAuthUser] = useState<User | null>(null);
 
+  const languageCodes =
+    Array.isArray(authUser?.languages) && authUser.languages.filter(Boolean).length > 0
+      ? (authUser.languages.filter(Boolean) as string[])
+      : (['en'] as string[]);
+
   const handleMenuSelect = async (key: string | undefined) => {
     // Handle menu item selection
     logger.log('Menu selected:', key);
@@ -391,7 +396,7 @@ const Header: React.FC<{
                 <Text {...profileStyles.fieldValue}>{t('lcProfile.languagePreference')}</Text>
               </HStack>
               <HStack space="sm">
-                {authUser?.languages?.map((langCode) => {
+                {languageCodes.map((langCode) => {
                   const isActive = currentLanguage === langCode;
                   return (
                     <Pressable key={langCode} onPress={() => changeLanguage(langCode)}>

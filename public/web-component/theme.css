@@ -331,6 +331,14 @@ lib-checkbox-input .mat-mdc-checkbox-checked .mdc-checkbox__background {
   color:  white !important;
 }
 
+/* Mobile: add spacing between stacked footer buttons (Save Progress / Submit) */
+@media (max-width: 768px) {
+  .sticky-footer .btn-draft + .btn-primary,
+  .btn-draft + .btn-primary {
+    margin-top: 12px !important;
+  }
+}
+
 .btn-draft:hover, .btn-outline-primary:hover {
   background-color: var(--colors-primary100) !important;
   color: var(--primary-color) !important;

@@ -62,17 +62,17 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     showDividerAfter: false,
     // route: 'myProfile', // Add route when myProfile screen is implemented
   },
-  {
-    key: 'serviceProviders',
-    label: 'lc.menu.serviceProviders',
-    textValue: 'serviceProviders',
-    iconName: 'Building2',
-    iconSizeValue: 16,
-    iconColor: theme.tokens.colors.textForegroundColor,
-    showDividerAfter: true, // Divider after Service Providers (separates actions from logout)
-    // route: 'serviceProviders', // Add route when serviceProviders screen is implemented
-    isComingSoon: true,
-  },
+  // {
+  //   key: 'serviceProviders',
+  //   label: 'lc.menu.serviceProviders',
+  //   textValue: 'serviceProviders',
+  //   iconName: 'Building2',
+  //   iconSizeValue: 16,
+  //   iconColor: theme.tokens.colors.textForegroundColor,
+  //   showDividerAfter: true, // Divider after Service Providers (separates actions from logout)
+  //   // route: 'serviceProviders', // Add route when serviceProviders screen is implemented
+  //   isComingSoon: true,
+  // },
   {
     key: 'logout',
     label: 'common.logout',
