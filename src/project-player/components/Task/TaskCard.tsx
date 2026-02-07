@@ -290,7 +290,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             | 'line-through'
             | 'none',
           opacity: isCompleted ? 0.6 : 1,
-          }
+        }
       : {};
 
     const titleTypography = uiConfig.showAsCard ? TYPOGRAPHY.bodySmall : TYPOGRAPHY.h3;
@@ -341,13 +341,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
     const statusBadge =
       isEditModeOnly && uiConfig.showAsCard ? (
         <Box
-          bg={isCompleted ? '$textMuted' : '$primary500'}
-          paddingHorizontal="$2"
-          paddingVertical="$1"
-          borderRadius="$md"
+          bg={isCompleted ? '$accent200' : '$textSecondary'}
+          paddingHorizontal="$3"
+          paddingVertical="$0.5"
+          borderRadius="$full"
           alignSelf="flex-start"
         >
-          <Text fontSize="$xs" fontWeight="$semibold" color="$white">
+          <Text fontSize="$xs" fontWeight="$semibold" color={isCompleted ? '$textPrimary' : '$white'}>
             {isCompleted ? t('projectPlayer.done') : t('projectPlayer.toDo')}
           </Text>
         </Box>
@@ -387,6 +387,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 (!isWeb && !uiConfig.showAsCard
                   ? '$sm'
                   : (titleTypography as any).fontSize) as any
+              }
+              fontWeight={
+                (titleTypography as any).fontWeight
               }
               style={isWeb ? (taskCardStyles.webTextWrap as any) : undefined}
             >
@@ -543,13 +546,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
     return (
       <Button
         {...taskCardStyles.actionButton}
+        variant={(isInterventionPlanEditMode || isOnboardingTask) ? 'outline' : 'solid'}
         onPress={handleTaskClick}
         ml="$0"
         isDisabled={isReadOnly}
-        size={isWeb ? (uiConfig.showAsCard || isOnboardingTask ? 'sm' : 'md') : 'xs'}
+        size={isWeb ? (uiConfig.showAsCard || isOnboardingTask ? 'xs' : 'md') : 'xs'}
         borderRadius="$lg"
         bg={isOnboardingTask ? (buttonStyles as any).bg : undefined}
-        borderColor={buttonStyles.borderColor}
+        borderColor={(buttonStyles as any).borderColor}
         opacity={isReadOnly ? 0.5 : 1}
         $hover-bg={
           isEdit ? ((buttonStyles as any).hoverBg ?? '$primary100') : 'transparent'
@@ -755,8 +759,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 : isRejected
                   ? '$error50'
                   : '$warning50'
-              : taskCardStyles.childCard?.bg
+              : isInterventionPlanEditMode
+                ? '#F9FAFD'
+                : taskCardStyles.childCard?.bg
         }
+        borderRadius={taskCardStyles.childCard?.borderRadius as any}
         borderColor={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBorder'
