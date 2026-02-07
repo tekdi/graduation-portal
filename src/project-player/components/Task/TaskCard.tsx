@@ -611,7 +611,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 color={textColor}
               >
                 {' '}
-                {task.metaInformation?.buttonLabel || 'Upload Evidence'}
+                {task.metaInformation?.buttonLabel || 'Upload'}
               </ButtonText>
             </HStack>
           );
