@@ -212,7 +212,7 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
 
   return (
     <Box flex={1} bg="$accent100">
-      <Container>
+      <Container px="$4" py="$6" $md-px="$6">
         {/* Submissions List */}
         {selectedSolution ? (
           <VStack {...logVisitStyles.cardsContainer}>
@@ -277,14 +277,14 @@ const CheckInsListContent: React.FC<CheckInsListContentProps> = ({
                                 </Text>
                               </HStack>
                             )}
-                            <LucideIcon
+                            {/* <LucideIcon
                               name="Dot"
                               size={20}
                               color="$textMutedForeground"
                             />
                             <Text {...assessmentSurveyCardStyles.description}>
                               {t('logVisit.by')} {userName || ''}
-                            </Text>
+                            </Text> */}
                           </HStack>
                           <Button
                             $md-width="fit-content"
