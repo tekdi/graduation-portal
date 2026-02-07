@@ -309,6 +309,26 @@ const UserManagementScreen = () => {
           onPageSizeChange={handlePageSizeChange}
           emptyMessage="admin.users.noUsersFound"
           loadingMessage="admin.users.loadingUsers"
+          _css={{
+            _table:{
+              borderRadius: '$md',
+              borderWidth: 0,
+            },
+            _header:{
+              _tableHeader:{
+              borderBottomWidth: 1,
+                borderBottomColor: '$borderLight300' as const,
+                bg: '#fff' as const,
+                borderTopLeftRadius: '$md' as const,
+                borderTopRightRadius: '$md' as const,
+              },
+              _thText:{
+                fontWeight: '$medium',
+              
+              },
+            
+            }
+          }}
         />
       </Box>
 
