@@ -236,7 +236,7 @@ const UserManagementScreen = () => {
               <ButtonIcon as={LucideIcon} name="Upload" size={16} />
               <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.actions.bulkUploadCSV')}</ButtonText>
             </Button>
-            <Button variant={"solid" as any}
+            {/* <Button variant={"solid" as any}
               onPress={() => {
                 // Handle create user
               }}
@@ -244,7 +244,7 @@ const UserManagementScreen = () => {
             >
               <ButtonIcon as={LucideIcon} name="SquarePen" size={16} />
               <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.actions.createUser')}</ButtonText>
-            </Button>
+            </Button> */}
           </HStack>
         }
       />
@@ -269,7 +269,7 @@ const UserManagementScreen = () => {
                 })}
               </Text>
             )}
-            <Button
+            {/* <Button
               {...titleHeaderStyles.outlineButton}
               onPress={() => {
                 // Handle Export CSV
@@ -284,7 +284,7 @@ const UserManagementScreen = () => {
                   {t('admin.actions.exportCSV')}
                 </Text>
               </HStack>
-            </Button>
+            </Button> */}
           </HStack>
         </HStack>
 
