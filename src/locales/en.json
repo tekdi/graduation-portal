@@ -331,7 +331,7 @@
       "dropoutMessage": "Mark {{name}} as dropout from the program",
       "dropoutReasonLabel": "Reason for Dropout",
       "dropoutReasonPlaceholder": "Enter reason for dropout...",
-      "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history.",
+      "dropoutHint": "This will change the participant's status to \"Dropped Out\" and log the action in their history.",
       "dropoutSuccess": "Participant marked as dropout",
       "dropoutError": "Failed to mark participant as dropout",
       "observationLogs": "Observation Logs",
@@ -874,7 +874,7 @@
     "dropoutMessage": "Mark {{name}} as dropout from the program",
     "dropoutReasonLabel": "Reason for Dropout",
     "dropoutReasonPlaceholder": "Enter reason for dropout...",
-    "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history.",
+    "dropoutHint": "This will change the participant's status to \"Dropped Out\" and log the action in their history.",
     "dropoutSuccess": "Participant marked as dropout",
     "dropoutError": "Failed to mark participant as dropout",
     "observationLogs": "Observation Logs"

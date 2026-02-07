@@ -507,7 +507,7 @@ const UserAvatarCard = ({
                   showAlert(
                     'success',
                     successMessage,
-                    { placement: 'bottom', duration: 5000 }
+                    { placement: 'top', duration: 5000 }
                   );
                 }
                 
@@ -520,7 +520,7 @@ const UserAvatarCard = ({
                 showAlert(
                   'error',
                   t('admin.assignUsers.lcsAssignmentError'),
-                  { placement: 'bottom', duration: 5000 }
+                  { placement: 'top', duration: 5000 }
                 );
                 // Don't clear selection on error
                 // Don't close modal on error so user can retry
@@ -603,7 +603,7 @@ const UserAvatarCard = ({
                   showAlert(
                     'success',
                     successMessage,
-                    { placement: 'bottom', duration: 5000 }
+                    { placement: 'top', duration: 5000 }
                   );
                 }
                 
@@ -616,7 +616,7 @@ const UserAvatarCard = ({
                 showAlert(
                   'error',
                   t('admin.assignUsers.participantsAssignmentError'),
-                  { placement: 'bottom', duration: 5000 }
+                  { placement: 'top', duration: 5000 }
                 );
                 // Don't clear selection on error
                 // Don't close modal on error so user can retry

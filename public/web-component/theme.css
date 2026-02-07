@@ -22,7 +22,7 @@
 }
 .wc-primary-color {
   color: var(--text-color) !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
   font-size: 0.875rem !important;
   padding: 0 !important;
 }
@@ -281,6 +281,8 @@ lib-checkbox-input .mat-mdc-checkbox-checked .mdc-checkbox__background {
 }
 .mat-mdc-radio-button .mdc-form-field .mdc-label {
   padding-left: 0.5rem !important;
+  font-weight: 500 !important;
+  color: var(--text-color) !important;
 }
 .mdc-radio,
 .mat-mdc-radio-touch-target,
@@ -398,3 +400,12 @@ mat-select {
   opacity: 0.5 !important;
 }
 /* end submited field styles */
+
+.questionnaire-player-container .page-group-container{
+  margin-bottom: 16px !important;
+}
+.mat-mdc-checkbox .mdc-form-field{
+  font-weight: 500 !important;
+  color: var(--text-color) !important;
+  font-size: 14px !important;
+}

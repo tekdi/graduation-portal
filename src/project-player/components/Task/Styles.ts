@@ -670,9 +670,9 @@ export const fileUploadModalStyles = {
   fileItemCard: {
     padding: '$3',
     borderRadius: '$md',
-    bg: '$badgeSuccessBg',
+    bg: '$accent200',
     borderWidth: 1,
-    borderColor: '$badgeSuccessBg',
+    borderColor: '$accent200',
   },
   fileItemContent: {
     space: 'md' as const,

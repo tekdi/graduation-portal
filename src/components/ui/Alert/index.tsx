@@ -56,7 +56,7 @@ export const useAlert = () => {
   ) => {
     const {
       variant = 'solid',
-      placement = 'bottom',
+      placement = 'top',
       duration = 5000,
     } = options;
 
