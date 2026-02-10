@@ -36,7 +36,7 @@ import { isTaskCompleted } from './helpers';
 import { renderCustomTaskActions, renderModals } from './renderHelpers';
 import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
-import { getSolutionDetails, taskStatus } from '../../services/projectPlayerService';
+import { getSolutionDetails, taskStatus, updateTask } from '../../services/projectPlayerService';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
@@ -96,7 +96,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     }
     fetchTaskStatus();
   }
-  },[projectData?._id, isEdit, task.type,task?._id, updateTask ])
+  },[projectData?._id, isEdit, task.type,task?._id ])
   // Common Logic Variables
   const isInterventionPlanEditMode = isEdit && !isPreview && isChildOfProject;
 

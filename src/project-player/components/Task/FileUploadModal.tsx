@@ -228,7 +228,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                                         }}>
                                             <GluestackIcon as={CloseIcon} size="sm" color="$textLight400" />
                                         </Pressable>
-                                    )}
+                                     )} 
                                 </HStack>
                             </Box>
                         ))}
@@ -308,7 +308,7 @@ const FileUploadModal: React.FC<FileUploadModalProps> = ({
                 {renderFileList(selectedFiles, t('projectPlayer.selectedFiles'), true)}
 
                 {/* Previously Uploaded Files Section */}
-                {renderFileList(existingAttachments, t('projectPlayer.previouslyUploadedFiles'), false)}
+                {renderFileList(existingAttachments, t('projectPlayer.previouslyUploadedFiles'), true)}
 
                 {/* Note Box - Blue Theme */}
                 <Box {...fileUploadModalStyles.noteBox}>
