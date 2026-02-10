@@ -3,6 +3,7 @@ export const AssignUsersStyles = {
       size: 'md',
       variant: 'outline',
       mt: '$6',
+      borderRadius: '$2xl',
     },
     tableTitleText: {
       fontSize: '$md',
@@ -57,10 +58,14 @@ export const AssignUsersStyles = {
       backgroundColor: '$bgPrimary/10',
       width: '$8',
       height: '$8',
+      borderRadius: '$full',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     avatarFallbackTextStyles: {
       color: '$primary500',
-      fontWeight: '$normal',
+      fontWeight: '$medium',
+      fontSize: '$xs',
     },
     locationHStack: {
       space: 'xs',

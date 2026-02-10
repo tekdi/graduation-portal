@@ -30,6 +30,7 @@ import logger from '@utils/logger';
 import { PageHeader } from '@components/PageHeader';
 import { getTargetedSolutions } from '../../services/solutionService';
 import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Status key type (keys of STATUS object)
 type StatusKey = keyof typeof STATUS;
@@ -43,12 +44,12 @@ interface StatusFilterItem {
 
 // Mapping between API overview keys and STATUS constants
 const overviewToStatusMap = {
-  notonboarded: { key: 'NOT_ONBOARDED' as StatusKey, label: 'participants.notEnrolled' },
-  onboarded: { key: 'ONBOARDED' as StatusKey, label: 'participants.enrolled' },
-  inprogress: { key: 'IN_PROGRESS' as StatusKey, label: 'participants.inProgress' },
-  completed: { key: 'COMPLETED' as StatusKey, label: 'participants.completed' },
-  droppedout: { key: 'DROPOUT' as StatusKey, label: 'participants.droppedOut' },
-  graduated: { key: 'GRADUATED' as StatusKey, label: 'participants.graduatedStatus' },
+  notonboarded: { key: STATUS.NOT_ONBOARDED as StatusKey, label: 'participants.notEnrolled' },
+  onboarded: { key: STATUS.ONBOARDED as StatusKey, label: 'participants.enrolled' },
+  inprogress: { key: STATUS.IN_PROGRESS as StatusKey, label: 'participants.inProgress' },
+  completed: { key: STATUS.COMPLETED as StatusKey, label: 'participants.completed' },
+  droppedout: { key: STATUS.DROPOUT as StatusKey, label: 'participants.droppedOut' },
+  graduated: { key: STATUS.GRADUATED as StatusKey, label: 'participants.graduatedStatus' },
 } as const;
 
 /**
@@ -95,16 +96,16 @@ const ParticipantsList: React.FC = () => {
     // Active
     if (activeFilter === 'active') {
       return allStatusItems.filter((item: StatusFilterItem) => 
-        item.key === 'NOT_ONBOARDED' ||
-        item.key === 'ONBOARDED' || 
-        item.key === 'IN_PROGRESS' ||
-        item.key === 'COMPLETED' 
+        item.key === STATUS.NOT_ONBOARDED ||
+        item.key === STATUS.ONBOARDED || 
+        item.key === STATUS.IN_PROGRESS ||
+        item.key === STATUS.COMPLETED 
       );
     } else {
       // inactive
       return allStatusItems.filter((item: StatusFilterItem) => 
-        item.key === 'DROPOUT' ||
-        item.key === 'GRADUATED'
+        item.key === STATUS.DROPOUT ||
+        item.key === STATUS.GRADUATED
       );
     }
   }, [allStatusItems, activeFilter]);
@@ -113,17 +114,17 @@ const ParticipantsList: React.FC = () => {
   const activeInactiveCounts = useMemo(() => {
     const activeCount = allStatusItems
       .filter((item: StatusFilterItem) => 
-        item.key === 'NOT_ONBOARDED' ||
-        item.key === 'ONBOARDED' || 
-        item.key === 'IN_PROGRESS' ||
-        item.key === 'COMPLETED'
+        item.key === STATUS.NOT_ONBOARDED ||
+        item.key === STATUS.ONBOARDED || 
+        item.key === STATUS.IN_PROGRESS ||
+        item.key === STATUS.COMPLETED
       )
       .reduce((sum: number, item: StatusFilterItem) => sum + item.count, 0);
     
     const inactiveCount = allStatusItems
       .filter((item: StatusFilterItem) => 
-        item.key === 'DROPOUT' ||
-        item.key === 'GRADUATED'
+        item.key === STATUS.DROPOUT ||
+        item.key === STATUS.GRADUATED
       )
       .reduce((sum: number, item: StatusFilterItem) => sum + item.count, 0);
     
@@ -151,6 +152,11 @@ const ParticipantsList: React.FC = () => {
         if (response.total !== undefined) {
           setTotalItems(response.total);
         }
+
+        // if (response.result.data && response.result.data.length > 0) {
+        //   await AsyncStorage.setItem('my_program_user_ref', response.result?.details._id);
+        // }
+        
       } catch (err: any) {
         const errorMessage = err?.response?.data?.message || err?.message || 'Failed to fetch participants';
         logger.error('Error fetching participants:', errorMessage, err);
@@ -343,6 +349,7 @@ const GroupCheckInsButton: React.FC = () => {
         navigation.navigate('observation', {
           id: user?.id as string,
           solutionId: solution.solutionId,
+          redirectUrl: 'participants',
         });
       } else {
         // Optionally show error (toast/snackbar)

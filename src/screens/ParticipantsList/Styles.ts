@@ -199,7 +199,7 @@ export const styles = {
     fontWeight: '$medium' as const,
     numberOfLines: 1 as const,
     textTransform: 'none' as const,
-    lineHeight: '1rem' as const,
+    lineHeight: 16 as const,
   },
 } as const;
 

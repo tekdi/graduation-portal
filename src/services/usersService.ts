@@ -232,16 +232,86 @@ export const getProvincesList = async (): Promise<ProvinceEntity[]> => {
 };
 
 /**
- * Get sites list by province ID - Dynamic site filter from API
- * Fetches sites for a specific province using subEntityList endpoint
+ * Get sites list by entity type ID - Fetches all sites
+ * Uses the site entity type ID to fetch all sites
+ */
+export const getSitesByEntityType = async (
+  siteEntityTypeId: string,
+  params?: { page?: number; limit?: number }
+): Promise<{
+  message: string;
+  status: number;
+  result: SiteEntity[];
+}> => {
+  try {
+    const { page = 1, limit = 100 } = params || {};
+    
+    const queryParams = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+    });
+
+    const endpoint = `${API_ENDPOINTS.ENTITIES_BY_TYPE}/${siteEntityTypeId}?${queryParams.toString()}`;
+    
+    // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
+    const response = await api.get<{
+      message: string;
+      status: number;
+      result: SiteEntity[];
+    }>(endpoint);
+
+    return response.data;
+  } catch (error: any) {
+    // Error is already handled by axios interceptor
+    throw error;
+  }
+};
+
+/**
+ * Get all sites list - Helper function that handles entity type fetching and caching
+ * Fetches all sites by first getting entity types (from cache or API), then fetching sites
  * 
- * @param provinceId - Province entity ID (e.g., "698087719b5a2800143d8c11")
- * @param params - Optional pagination parameters
+ * @returns A promise resolving to an array of SiteEntity, or empty array on error
+ */
+export const getAllSites = async (): Promise<SiteEntity[]> => {
+  try {
+    // First, check if entity types are in storage
+    let entityTypes = await getEntityTypesFromStorage();
+    
+    // If not in storage, fetch entity types from API
+    if (!entityTypes || !entityTypes['site']) {
+      await getEntityTypesList();
+      entityTypes = await getEntityTypesFromStorage();
+    }
+
+    // Get site entity type ID
+    const siteEntityTypeId = entityTypes?.['site'];
+    
+    if (!siteEntityTypeId) {
+      return [];
+    }
+
+    // Fetch all sites using the entity type ID
+    const sitesResponse = await getSitesByEntityType(siteEntityTypeId, {
+      page: 1,
+      limit: 100,
+    });
+    return sitesResponse.result || [];
+  } catch (error) {
+    console.error('Error fetching all sites:', error);
+    return [];
+  }
+};
+
+/**
+ * Get sites list by province ID - Dynamic site filter from API
+ * Fetches sites for a specific province using subEntityList endpoint, or all sites if no province provided
+ * 
+ * @param params - Optional parameters including provinceId and pagination
  * @returns A promise resolving to the sites response from the API
  */
 export const getSitesByProvince = async (
-  provinceId: string,
-  params?: { page?: number; limit?: number }
+  params?: { provinceId?: string; page?: number; limit?: number }
 ): Promise<{
   message: string;
   status: number;
@@ -252,7 +322,21 @@ export const getSitesByProvince = async (
   };
 }> => {
   try {
-    const { page = 1, limit = 100 } = params || {};
+    const { provinceId, page = 1, limit = 100 } = params || {};
+    
+    // If no province provided, fetch all sites
+    if (!provinceId || provinceId === 'all-provinces' || provinceId === 'all-Provinces') {
+      const allSites = await getAllSites();
+      return {
+        message: 'Success',
+        status: 200,
+        result: {
+          data: allSites,
+          count: allSites.length,
+          total: allSites.length,
+        },
+      };
+    }
     
     const queryParams = new URLSearchParams({
       type: 'site',

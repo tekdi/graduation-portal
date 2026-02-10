@@ -236,7 +236,7 @@ const UserManagementScreen = () => {
               <ButtonIcon as={LucideIcon} name="Upload" size={16} />
               <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.actions.bulkUploadCSV')}</ButtonText>
             </Button>
-            <Button variant={"solid" as any}
+            {/* <Button variant={"solid" as any}
               onPress={() => {
                 // Handle create user
               }}
@@ -244,7 +244,7 @@ const UserManagementScreen = () => {
             >
               <ButtonIcon as={LucideIcon} name="SquarePen" size={16} />
               <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.actions.createUser')}</ButtonText>
-            </Button>
+            </Button> */}
           </HStack>
         }
       />
@@ -269,7 +269,7 @@ const UserManagementScreen = () => {
                 })}
               </Text>
             )}
-            <Button
+            {/* <Button
               {...titleHeaderStyles.outlineButton}
               onPress={() => {
                 // Handle Export CSV
@@ -284,12 +284,13 @@ const UserManagementScreen = () => {
                   {t('admin.actions.exportCSV')}
                 </Text>
               </HStack>
-            </Button>
+            </Button> */}
           </HStack>
         </HStack>
 
         {/* DataTable with server-side pagination */}
         <DataTable
+          minWidth={1000}
           data={users}
           columns={columns}
           getRowKey={(user) => user.id}
@@ -308,6 +309,26 @@ const UserManagementScreen = () => {
           onPageSizeChange={handlePageSizeChange}
           emptyMessage="admin.users.noUsersFound"
           loadingMessage="admin.users.loadingUsers"
+          _css={{
+            _table:{
+              borderRadius: '$md',
+              borderWidth: 0,
+            },
+            _header:{
+              _tableHeader:{
+              borderBottomWidth: 1,
+                borderBottomColor: '$borderLight300' as const,
+                bg: '#fff' as const,
+                borderTopLeftRadius: '$md' as const,
+                borderTopRightRadius: '$md' as const,
+              },
+              _thText:{
+                fontWeight: '$medium',
+              
+              },
+            
+            }
+          }}
         />
       </Box>
 
@@ -317,7 +338,7 @@ const UserManagementScreen = () => {
         onClose={() => setIsUploadModalOpen(false)}
         headerTitle={t('admin.actions.uploadUsers')}
         headerDescription={t('admin.actions.uploadUsersDescription')}
-        size="md"
+        size="lg"
         borderRadius="$lg"
       >
         <VStack space="md" width="100%">

@@ -97,38 +97,85 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
 
     return (
       <Box {...taskAccordionStyles.container}>
-        <Card {...taskAccordionStyles.card}>
-          {/* Card Header with Progress on right */}
-          <Box
-            {...taskAccordionStyles.cardHeader}
-            padding={isMobile ? '0' : 'auto'}
-          >
-            <HStack
-              {...taskAccordionStyles.cardHeaderContent}
-              justifyContent="space-between"
-            >
-              <HStack {...taskAccordionStyles.pillarHeaderRow}>
-                <LucideIcon
-                  name={pillarIconData.icon}
-                  size={20}
-                  color={pillarIconData.color}
-                />
-                <Text {...TYPOGRAPHY.h4} color="$textPrimary">
-                  {task.name}
-                </Text>
+       <Card {...taskAccordionStyles.card} p={0} overflow="hidden">
+         {/* Card Header with Progress on right */}
+         <Box {...taskAccordionStyles.cardHeader}>
+           <Box {...taskAccordionStyles.cardHeaderInner}>
+            {isMobile ? (
+              <VStack space="sm">
+                <HStack {...taskAccordionStyles.pillarHeaderRow}>
+                  <LucideIcon
+                    name={pillarIconData.icon}
+                    size={15}
+                    color={pillarIconData.color}
+                  />
+                  <Text {...TYPOGRAPHY.h4} color="$textPrimary">
+                    {task.name}
+                  </Text>
+                </HStack>
+                <HStack space="md" alignItems="center" maxWidth={150}>
+                  <Text {...taskAccordionStyles.progressText} minWidth={40}>
+                    {progressPercent}%
+                  </Text>
+                  <Box
+                    height={8}
+                    width={100}
+                    bg="$backgroundLight200"
+                    borderRadius="$full"
+                    overflow="hidden"
+                  >
+                    <Box
+                      height="$full"
+                      width={`${progressPercent}%`}
+                      bg="$progressBarFillColor"
+                      borderRadius="$full"
+                    />
+                  </Box>
+                </HStack>
+              </VStack>
+            ) : (
+              <HStack
+                {...taskAccordionStyles.cardHeaderContent}
+                justifyContent="space-between"
+              >
+                <HStack {...taskAccordionStyles.pillarHeaderRow}>
+                  <LucideIcon
+                    name={pillarIconData.icon}
+                    size={20}
+                    color={pillarIconData.color}
+                  />
+                  <Text {...TYPOGRAPHY.h4} color="$textPrimary">
+                    {task.name}
+                  </Text>
+                </HStack>
+                {/* Pillar progress percentage and bar on right */}
+                <HStack space="md" alignItems="center" minWidth={150}>
+                  <Text {...taskAccordionStyles.progressText} minWidth={40}>
+                    {progressPercent}%
+                  </Text>
+                  <Box
+                    height={8}
+                    flex={1}
+                    bg="$backgroundLight200"
+                    borderRadius="$full"
+                    overflow="hidden"
+                  >
+                    <Box
+                      height="$full"
+                      width={`${progressPercent}%`}
+                      bg="$progressBarFillColor"
+                      borderRadius="$full"
+                    />
+                  </Box>
+                </HStack>
               </HStack>
-              {/* Pillar progress percentage on right */}
-              <Text {...taskAccordionStyles.progressText}>
-                {progressPercent}%
-              </Text>
-            </HStack>
+            )}
+            </Box>
           </Box>
 
           {/* Card Content - Always visible (no accordion) */}
           <Box
             {...taskAccordionStyles.cardContent}
-            // paddingHorizontal={isWeb ? '$5' : '$2'}
-            px={isMobile ? '0' : 'auto'}
           >
             <VStack {...taskAccordionStyles.cardContentStack}>
               {(task?.children?.length ? task.children : task.tasks)?.map(
@@ -233,7 +280,7 @@ const TaskAccordion: React.FC<TaskAccordionProps> = ({ task }) => {
           {/* Accordion Content - Collapsible in preview mode */}
           <AccordionContent
             {...taskAccordionStyles.accordionContent}
-            paddingHorizontal={isWeb ? '$5' : '$1'}
+            paddingHorizontal={isWeb ? '$5' : '$2'}
           >
             {/* Info Banner - Always show for Social Protection in Preview Mode */}
             {isSocialProtection && (

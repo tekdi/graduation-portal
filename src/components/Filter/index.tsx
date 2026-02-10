@@ -1,9 +1,8 @@
 import React, { useCallback, useMemo } from "react";
-import { VStack, HStack, Text, Image, Input, InputField, Pressable, Box } from "@ui";
+import { VStack, HStack, Text, Image, Input, InputField, Pressable, Box, LucideIcon } from "@ui";
 import Select from "../ui/Inputs/Select";
 import DatePicker from "../ui/Inputs/DatePicker";
 import { filterStyles } from "./Styles";
-import filterIcon from "../../assets/images/FilterIcon.png";
 import { useLanguage } from "@contexts/LanguageContext";
 import SearchBar from "@components/SearchBar";
 
@@ -277,11 +276,7 @@ export default function FilterButton({
       <HStack {...filterStyles.titleContainer}>
         {/* Left: Filter Icon + Title */}
         <HStack alignItems="center">
-          <Image
-            source={filterIcon}
-            style={{ width: 16, height: 16 }}
-            alt="Filter icon"
-          />
+          <LucideIcon name="Filter" size={16} color="$mutedForeground" />
           <Text {...filterStyles.titleText}>{t('common.filters')}</Text>
         </HStack>
 

@@ -82,7 +82,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
         observationId,
         entityId,
       });
-      if(!observationSubmissions.result || observationSubmissions.result.length === 0) { 
+      if(!observationSubmissions.result || observationSubmissions.result.length === 0) {
         await createObservationSubmission({
           observationId: observationId,
           entityId: entityId,
@@ -95,7 +95,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       let observationSubmissionsLast;
       let observationSolution: any = null;
       if(submissionNumberInput) {
-        observationSubmissionsLast = observationSubmissions.result.find((submissionItem: any) => submissionItem.submissionNumber === submissionNumberInput);
+        observationSubmissionsLast = observationSubmissions.result.find((submissionItem: any) => submissionItem.submissionNumber == submissionNumberInput);
         if(!observationSubmissionsLast && submissionNumberInput !== 1) {
           showAlert( 'error', `${t('logVisit.thisFormNotFound')} ${submissionNumberInput}`,
             {duration: 10000},
@@ -135,7 +135,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
         });
         observationSolution = response.result;
       }
-      
+
       if(!observationSubmissionsLast?.status) {
         setSubmission({status:CARD_STATUS.IN_PROGRESS});
       } else {
@@ -161,7 +161,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       );
     }
   };
-console.log('submission', submission);
+  
   const setLoadingOff = () => {
     setTimeout(() => {
       setLoading(false);
@@ -195,7 +195,13 @@ console.log('submission', submission);
             // Set participant info
             setParticipantInfo({
               name: newData.name || '',
-              date: new Date().toISOString().split('T')[0],
+              date: (() => {
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, '0');
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const year = now.getFullYear();
+                return `${day}/${month}/${year}`;
+              })(),
             });
             setLoadingOff();
           } else {
@@ -203,7 +209,7 @@ console.log('submission', submission);
               observationId: observationId,
             });
             const entityData = entitiesData.result?.[0]?.data.find(
-              (entity: any) => entity.externalId === id,
+              (entity: any) => entity.externalId == id,
             );
             if (entityData) {
               try {
@@ -295,7 +301,7 @@ console.log('submission', submission);
     },
     [],
   );
-  
+
   // Memoize playerConfig to prevent WebComponentPlayer rerenders
   const playerConfigMemoized = React.useMemo(
     () => ({
@@ -319,12 +325,12 @@ console.log('submission', submission);
     }),
     [token, observation?.observationId, observation?.entityId, mockData, submissionNumber, defaultValuesLocal],
   );
-  
+
   const handleAfterSubmit = (event?: any) => {
     logger.info('event', event);
     handleBackPress();
   };
-  
+
   return (
     <>
       <VStack
@@ -394,13 +400,13 @@ const buildDefaultValuesFromObservation = (
           for (const pageQuestion of question.pageQuestions) {
             const keyFound = userDataKeys.find(key => pageQuestion.question.includes(key));
             if (keyFound !== undefined) {
-              defaultValues[pageQuestion._id] = { value: userData[keyFound], readonly: true };
+              defaultValues[pageQuestion._id] = { value: typeof userData[keyFound] === "string" ? userData[keyFound] : userData[keyFound]?.value, readonly: userData[keyFound]?.readonly === false ? false : true };
             }
           }
         } else {
           const keyFound = userDataKeys.find(key => question.question.includes(key));
           if (keyFound !== undefined && question.externalId) {
-            defaultValues[question.externalId] = { value: userData[keyFound], readonly: true };
+            defaultValues[question.externalId] = { value: typeof userData[keyFound] === "string" ? userData[keyFound] : userData[keyFound]?.value, readonly: userData[keyFound]?.readonly === false ? false : true };
           }
         }
       }

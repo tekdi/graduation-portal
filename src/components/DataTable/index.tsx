@@ -21,6 +21,9 @@ import { styles } from './Styles';
 interface TableHeaderProps<T> {
   columns: ColumnDef<T>[];
   minWidth?: number;
+  _tableHeader?: any;
+  _th?: any;
+  _thText?: any;
 }
 
 interface TableRowProps<T> {
@@ -170,18 +173,20 @@ function prepareCardLayout<T>(
  * TableHeader Component
  * Pure presentational component that renders pre-computed column headers.
  */
-const TableHeader = <T,>({ columns, minWidth }: TableHeaderProps<T>) => {
+const TableHeader = <T,>({ columns, minWidth,_tableHeader,_th,_thText}: TableHeaderProps<T>) => {
   const { t } = useLanguage();
   
   return (
     <HStack
       {...styles.tableHeader}
       minWidth={minWidth}
+      {..._tableHeader}
     >
       {columns.map(column => {
         const showLabel = column.desktopConfig?.showLabel ?? true;
         return (
           <Box
+            {..._th}
             key={column.key}
             flex={column.flex}
             width={column.width}
@@ -194,7 +199,7 @@ const TableHeader = <T,>({ columns, minWidth }: TableHeaderProps<T>) => {
             }
           >
             {showLabel && (
-              <Text {...TYPOGRAPHY.label} color="$textForeground">
+              <Text {...TYPOGRAPHY.label} color="$textForeground" {..._thText}>
                 {t(column.label)}
               </Text>
             )}
@@ -415,6 +420,7 @@ const DataTable = <T,>({
   columns,
   onRowClick,
   isLoading = false,
+  showHeader = true,
   emptyMessage,
   loadingMessage,
   getRowKey,
@@ -422,11 +428,13 @@ const DataTable = <T,>({
   onPageChange,
   onPageSizeChange,
   responsive = true,
+  minWidth,
+  _css,
 }: DataTableProps<T>) => {
   // ========================================================================
   // HOOKS & INITIAL STATE
   // ========================================================================
-  const { isMobile } = usePlatform();
+  const { isMobile, isWeb } = usePlatform();
   const { t } = useLanguage();
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -548,7 +556,7 @@ const DataTable = <T,>({
   // VIEW CONFIGURATION
   // ========================================================================
 
-  const minTableWidth = isMobile && !responsive ? 800 : undefined;
+  const minTableWidth = isMobile && !responsive ? 800 : minWidth;
   const shouldShowCardView = responsive && isMobile;
 
   // ========================================================================
@@ -569,7 +577,9 @@ const DataTable = <T,>({
   // Table content for desktop or when responsive is disabled
   const tableContent = (
     <VStack {...styles.tableContentContainer} minWidth={minTableWidth}>
-      <TableHeader columns={visibleDesktopColumns} minWidth={minTableWidth} />
+      {showHeader && (
+        <TableHeader columns={visibleDesktopColumns} minWidth={minTableWidth} {..._css?._header} />
+      )}
       <Box>
         {renderDataContent((item, index) => (
           <TableRow
@@ -606,6 +616,7 @@ const DataTable = <T,>({
         {...styles.tableWrapper}
         {...(!isMobile ? styles.tableWrapperWeb : {})}
         overflow={shouldShowCardView ? 'hidden' : isMobile ? 'hidden' : 'visible'}
+        {..._css?._table}
       >
         {shouldShowCardView ? (
           // Mobile: Show card view when responsive is enabled
@@ -615,9 +626,19 @@ const DataTable = <T,>({
           <ScrollView horizontal showsHorizontalScrollIndicator>
             {tableContent}
           </ScrollView>
+        ) : isWeb ? (
+          // Desktop Web: Use Box with overflow-x for better web scrolling
+          <Box {...styles.desktopScrollContainer}>
+            {tableContent}
+          </Box>
         ) : (
-          // Desktop: Show table view
-          tableContent
+          // Desktop Native: Use ScrollView for native platforms
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator
+          >
+            {tableContent}
+          </ScrollView>
         )}
       </Box>
       {paginationConfig.isEnabled && paginationConfig.totalPages > 1 && pagination && (

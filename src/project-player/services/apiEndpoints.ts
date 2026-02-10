@@ -1,5 +1,5 @@
 const prefix = '/api';
-const templateId = process.env.PROJECT_TEMPLATE_ID;
+const templateId = process.env.PROJECT_TEMPLATE_EXTERNAL_ID;
 
 export const API_ENDPOINTS = {
   PROJECT_TEMPLATES_LIST: `${prefix}/project/v1/project/templates/list`,
@@ -17,4 +17,6 @@ export const API_ENDPOINTS = {
   GET_SOLUTION_DETAILS: (solutionId: string, taskId: string) =>
     `${prefix}/project/v1/userProjects/solutionDetails/${solutionId}?taskId=${taskId}`,
   TASK_STATUS: (id: string) => `${prefix}/project/v1/userProjects/tasksStatus/${id}`,
+  PRE_SIGNED_URLS: `${prefix}/project/v1/cloud-services/files/preSignedUrls`,
+  UPDATE_PROJECT_INFO: (id: string) => `${prefix}/project/v1/userProjects/update/${id}`,
 } as const;

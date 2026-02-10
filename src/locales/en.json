@@ -12,6 +12,7 @@
         "site": "Site"
       }
     },
+    "comingSoon": "Coming Soon",
     "settings": "Settings",
     "logout": "Logout",
     "loading": "Loading...",
@@ -140,6 +141,7 @@
     "addToPlan": "Add to Plan",
     "remove": "Remove",
     "evidenceUploaded": "Evidence uploaded successfully",
+    "evidenceUploadFailed": "Evidence upload failed. Please try again.",
     "consentUploaded": "Consent uploaded successfully",
     "slaUploaded": "SLA uploaded successfully",
     "selectedFiles": "Selected Files",
@@ -330,7 +332,7 @@
       "dropoutMessage": "Mark {{name}} as dropout from the program",
       "dropoutReasonLabel": "Reason for Dropout",
       "dropoutReasonPlaceholder": "Enter reason for dropout...",
-      "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history.",
+      "dropoutHint": "This will change the participant's status to \"Dropped Out\" and log the action in their history.",
       "dropoutSuccess": "Participant marked as dropout",
       "dropoutError": "Failed to mark participant as dropout",
       "observationLogs": "Observation Logs",
@@ -444,6 +446,7 @@
       "filterAndSelectParticipants": "Filter and select participants to assign to {{lc}}",
       "selectParticipants": "Select Participants ({{count}} selected)",
       "assignParticipantsToLc": "Assign {{count}} Participants to LC",
+      "assignLCsToSupervisor": "Assign {{count}} LCs to Supervisor",
       "listOfParticipantsMappedToLc": "List of Participants Mapped to LC",
       "currentParticipantAssignmentsFor": "Current participant assignments for {{lc}}",
       "participant": "Participant",
@@ -451,9 +454,21 @@
       "listOfLcsMappedToSupervisor": "List of LCs Mapped to Supervisor",
       "currentLcAssignmentsFor": "Current LC assignments for {{supervisor}}",
       "linkageChampion": "Linkage Champion",
+      "linkageChampions": "Linkage Champions",
       "email": "Email",
       "location": "Location",
       "site": "Site",
+      "supervisor": "Supervisor",
+      "confirmLcAssignment": "Confirm LC Assignment",
+      "confirmLcAssignmentDescription": "You are about to assign {{count}} Linkage Champion(s) to {{supervisor}}",
+      "confirmParticipantAssignment": "Confirm Participant Assignment",
+      "confirmParticipantAssignmentDescription": "You are about to assign {{count}} participant(s) to {{lc}}",
+      "confirmAssignment": "Confirm Assignment",
+      "lcsAssignedSuccess": "{{count}} LC(s) assigned to {{supervisor}}",
+      "lcsAssignmentError": "Failed to assign LCs. Please try again.",
+      "participantsAssignedSuccess": "{{count}} participant(s) assigned to {{lc}} successfully!",
+      "participantsAssignmentError": "Failed to assign participant(s) to LC. Please try again.",
+      "participants": "Participants",
       "status": {
         "assigned": "Assigned",
         "unassigned": "Unassigned"
@@ -553,6 +568,55 @@
         "targetId": "Target ID",
         "changeSummary": "Change Summary",
         "noEntries": "No audit log entries found"
+      }
+    },
+    "profilePermissionsPage": {
+      "pageTitle": "Profile Field Edit Permissions",
+      "pageSubtitle": "Configuration-driven editable/read-only field settings based on user hierarchy",
+      "infoAlert": "Form-Based Control: Users can edit their own profiles with broader access. Higher hierarchy levels can edit limited fields for subordinates. Some changes require supervisor approval.",
+      "tableHeaders": {
+        "profileField": "Profile Field",
+        "admin": "Admin",
+        "adminSubtitle": "Global",
+        "supervisor": "Supervisor",
+        "supervisorSubtitle": "District",
+        "lc": "LC",
+        "lcSubtitle": "Site",
+        "participant": "Participant",
+        "participantSubtitle": "Self",
+        "approvalRequired": "Approval Required"
+      },
+      "fields": {
+        "firstName": "First Name",
+        "lastName": "Last Name",
+        "email": "Email",
+        "idNumber": "ID Number",
+        "phoneNumber": "Phone Number",
+        "role": "Role",
+        "province": "Province",
+        "district": "District",
+        "siteLocation": "Site/Location",
+        "address": "Address",
+        "assignedSupervisor": "Assigned Supervisor",
+        "assignedLC": "Assigned LC",
+        "status": "Status (Active/Inactive)",
+        "password": "Password"
+      },
+      "approvalBadges": {
+        "supervisor": "Supervisor",
+        "siteDataChange": "Supervisor (if site changes)"
+      },
+      "legend": {
+        "title": "Legend",
+        "canEdit": "Can Edit - User has permission to modify this field",
+        "viewOnly": "View Only - User can see but not modify this field"
+      },
+      "keyRules": {
+        "title": "Key Rules",
+        "rule1": "Supervisors can only edit LC profiles (limited fields)",
+        "rule2": "Users can edit their own profiles with broader permissions",
+        "rule3": "Site/location changes always require supervisor approval",
+        "rule4": "Address changes need approval if they involve site modifications"
       }
     },
     "csvTemplatePage": {
@@ -823,7 +887,7 @@
   "participants": {
     "myParticipants": "My Participants",
     "dashboard": "Dashboard",
-    "searchByNameOrId": "Search by name or ID...",
+    "searchByNameOrId": "Search by name",
     "notEnrolled": "Not Onboarded",
     "enrolled": "Onboarded",
     "inProgress": "In Progress",
@@ -860,7 +924,7 @@
     "dropoutMessage": "Mark {{name}} as dropout from the program",
     "dropoutReasonLabel": "Reason for Dropout",
     "dropoutReasonPlaceholder": "Enter reason for dropout...",
-    "dropoutHint": "This will change the participant's status to \"Not Onboarded\" and log the action in their history.",
+    "dropoutHint": "This will change the participant's status to \"Dropped Out\" and log the action in their history.",
     "dropoutSuccess": "Participant marked as dropout",
     "dropoutError": "Failed to mark participant as dropout",
     "observationLogs": "Observation Logs"

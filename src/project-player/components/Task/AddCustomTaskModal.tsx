@@ -197,7 +197,8 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
           ? 'projectPlayer.editCustomTaskSubtitle'
           : 'projectPlayer.addCustomTaskSubtitle'
       }
-      maxWidth={550}
+      headerAlignment="baseline"
+      maxWidth={480}
       footerContent={
         <HStack
           {...addCustomTaskModalStyles.footerButtons}

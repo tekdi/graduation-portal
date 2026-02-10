@@ -23,6 +23,7 @@ import { theme } from '@config/theme';
 import { useLanguage } from '@contexts/LanguageContext';
 import { ModalProps } from '@app-types/components';
 import { commonModalContentStyles, commonModalContainerStyles, profileStyles } from './Styles';
+import { usePlatform } from '@utils/platform';
 
 /**
  * Modal Component
@@ -58,6 +59,7 @@ const Modal: React.FC<ModalProps> = ({
   headerDescription,
   headerIcon,
   showCloseButton = true,
+  headerAlignment = 'center',
   headerProps,
   // Body props
   children,
@@ -79,7 +81,8 @@ const Modal: React.FC<ModalProps> = ({
   
 }) => {
   const { t } = useLanguage();
-  
+
+  const { isMobile } = usePlatform();
   // Determine if footer should be shown
   const hasFooter = footerContent || cancelButtonText || confirmButtonText;
   
@@ -99,12 +102,12 @@ const Modal: React.FC<ModalProps> = ({
       <ModalContent
         {...commonModalContentStyles}
         {...(maxWidth && { maxWidth: `${maxWidth}px` })}
-        {...contentProps} maxHeight="100%"
+        {...contentProps} maxHeight="90%"
       >
         {/* Header with Title, Description, and Icon */}
         {(headerTitle || headerDescription || headerIcon || showCloseButton) && (
           <ModalHeader borderBottomWidth={0} padding="$6" paddingBottom="$4" {...headerProps}>
-            <HStack space="md" alignItems="center" flex={1}>
+            <HStack space="md" alignItems={headerAlignment} flex={1}>
               {/* Header Icon Section */}
               {headerIcon && (
                 <Box {...profileStyles.headerIconContainer}>
@@ -167,7 +170,7 @@ const Modal: React.FC<ModalProps> = ({
             {footerContent ? (
               footerContent
             ) : (
-              <HStack space="md" width="$full" justifyContent="flex-end">
+              <HStack space="md" width="$full" justifyContent="flex-end" flexDirection={isMobile ? 'column' : 'row'}>
                 {/* Cancel Button */}
                 {cancelButtonText && (
                   <Button

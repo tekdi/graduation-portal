@@ -23,4 +23,5 @@ export const API_ENDPOINTS = {
   USERS_LIST: `${prefix}/user/v1/account/search`,  // Search users for user management
   GET_SIGNED_URL: `${prefix}/user/v1/cloud-services/file/getSignedUrl`,
   BULK_USER_CREATE: `${prefix}/user/v1/tenant/bulkUserCreate`,
+  PROGRAM_USERS_SEARCH: `${prefix}/project/v1/programUsers/search`, // Search program users (LCs, participants, etc.)
 };

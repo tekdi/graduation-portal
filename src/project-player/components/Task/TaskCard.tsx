@@ -3,7 +3,6 @@ import {
   Box,
   HStack,
   Card,
-  useToast,
   Checkbox,
   CheckboxIndicator,
   CheckboxIcon,
@@ -13,7 +12,7 @@ import {
   ButtonText,
   Pressable,
   CheckIcon,
-  showSuccessToast,
+  useAlert,
 } from '@ui';
 import { useProjectContext } from '../../context/ProjectContext';
 import { useTaskActions } from '../../hooks/useTaskActions';
@@ -49,15 +48,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
   const route = useRoute();
   const navigation = useNavigation();
   // Retrieve updateTask from context
-  const { mode, config, updateTask, addedToPlanTaskIds } =
+  const { mode, config, addedToPlanTaskIds, deleteTask } =
     useProjectContext();
-  const { deleteTask } = useProjectContext();
   // handleOpenForm
   const { handleStatusChange, handleAddToPlan } =
     useTaskActions();
   const { isWeb, isMobile } = usePlatform();
   const { t } = useLanguage();
-  const toast = useToast();
+  const { showAlert } = useAlert();
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [isAddedToPlan, setIsAddedToPlan] = useState(
@@ -114,7 +112,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
   );
 
   const showSuccess = (message: string) => {
-    showSuccessToast(toast, message);
+    showAlert("success", message);
+  };
+
+  const showError = (message: string) => {
+    showAlert("error", message);
   };
 
   // Modal actions (Incoming)
@@ -170,10 +172,10 @@ const TaskCard: React.FC<TaskCardProps> = ({
   };
 
   // Checkbox change handler
-  const handleCheckboxChange = (checked: boolean) => {
+  const handleCheckboxChange = async (checked: boolean) => {
     if (!isEdit) return;
     const newStatus = checked ? TASK_STATUS.COMPLETED : TASK_STATUS.TO_DO;
-    handleStatusChange(task._id, newStatus);
+    await handleStatusChange(task._id, newStatus);
   };
 
   // Custom Renderers (From HEAD to preserve styling)
@@ -207,7 +209,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
     // Simple status circle
     const circleSize = 20;
-    const checkSize = 28;
+    const checkSize = 15;
 
     // Status Circle Logic
     const isOptional = task?.isDeletable;
@@ -360,13 +362,13 @@ const TaskCard: React.FC<TaskCardProps> = ({
     const statusBadge =
       isEditModeOnly && uiConfig.showAsCard ? (
         <Box
-          bg={isCompleted ? '$textMuted' : '$primary500'}
-          paddingHorizontal="$2"
-          paddingVertical="$1"
-          borderRadius="$md"
+          bg={isCompleted ? '$accent200' : '$textSecondary'}
+          paddingHorizontal="$3"
+          paddingVertical="$0.5"
+          borderRadius="$full"
           alignSelf="flex-start"
         >
-          <Text fontSize="$xs" fontWeight="$semibold" color="$white">
+          <Text fontSize="$xs" fontWeight="$semibold" color={isCompleted ? '$textPrimary' : '$white'}>
             {isCompleted ? t('projectPlayer.done') : t('projectPlayer.toDo')}
           </Text>
         </Box>
@@ -406,6 +408,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 (!isWeb && !uiConfig.showAsCard
                   ? '$sm'
                   : (titleTypography as any).fontSize) as any
+              }
+              fontWeight={
+                (titleTypography as any).fontWeight
               }
               style={isWeb ? (taskCardStyles.webTextWrap as any) : undefined}
             >
@@ -562,13 +567,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
     return (
       <Button
         {...taskCardStyles.actionButton}
+        variant={(isInterventionPlanEditMode || isOnboardingTask) ? 'outline' : 'solid'}
         onPress={handleTaskClick}
         ml="$0"
         isDisabled={isReadOnly}
-        size={isWeb ? (uiConfig.showAsCard || isOnboardingTask ? 'sm' : 'md') : 'xs'}
+        size={isWeb ? (uiConfig.showAsCard || isOnboardingTask ? 'xs' : 'md') : 'xs'}
         borderRadius="$lg"
         bg={isOnboardingTask ? (buttonStyles as any).bg : undefined}
-        borderColor={buttonStyles.borderColor}
+        borderColor={(buttonStyles as any).borderColor}
         opacity={isReadOnly ? 0.5 : 1}
         $hover-bg={
           isEdit ? ((buttonStyles as any).hoverBg ?? '$primary100') : 'transparent'
@@ -626,7 +632,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 color={textColor}
               >
                 {' '}
-                {task.metaInformation?.buttonLabel || 'Upload Evidence'}
+                {task.metaInformation?.buttonLabel || 'Upload'}
               </ButtonText>
             </HStack>
           );
@@ -660,16 +666,15 @@ const TaskCard: React.FC<TaskCardProps> = ({
       onUpload={method => {
         console.log('Upload method selected:', method);
       }}
-      onConfirm={files => {
-        handleStatusChange(task._id, TASK_STATUS.COMPLETED);
-        // If files were passed, update the task with them
-        if (files) {
-          console.log(files);
-          updateTask(task._id, { attachments: files });
+      onConfirm={async (files) => {
+        const data = await handleStatusChange(task._id, TASK_STATUS.COMPLETED, files);
+        if(data?.success) {
+          // Show success toast with task-specific message
+          showSuccess(t('projectPlayer.evidenceUploaded'));
+          setShowUploadModal(false);
+        } else {
+          showError(t('projectPlayer.evidenceUploadFailed'));
         }
-        setShowUploadModal(false);
-        // Show success toast with task-specific message
-        showSuccess(t('projectPlayer.evidenceUploaded'));
       }}
     />
   );
@@ -693,7 +698,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       <Box
         {...taskCardStyles.onboardingStepCard}
         padding={isMobile ? taskCardStyles.onboardingCardPaddingMobile : taskCardStyles.onboardingCardPaddingDesktop}
-        marginBottom={isMobile ? taskCardStyles.onboardingCardMarginBottomMobile : taskCardStyles.onboardingCardMarginBottomDesktop}
+        marginBottom={isLastTask ? 0 : (isMobile ? taskCardStyles.onboardingCardMarginBottomMobile : taskCardStyles.onboardingCardMarginBottomDesktop)}
       >
         {isMobile ? (
           <VStack {...taskCardStyles.onboardingMobileContainer}>
@@ -779,8 +784,11 @@ const TaskCard: React.FC<TaskCardProps> = ({
                 : isRejected
                   ? '$error50'
                   : '$warning50'
-              : taskCardStyles.childCard?.bg
+              : isInterventionPlanEditMode
+                ? '#F9FAFD'
+                : taskCardStyles.childCard?.bg
         }
+        borderRadius={taskCardStyles.childCard?.borderRadius as any}
         borderColor={
           isEdit && !isPreview && task.type === TASK_TYPE.OBSERVATION
             ? '$observationTaskBorder'

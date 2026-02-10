@@ -9,6 +9,7 @@ export interface FeatureCardData {
   navigationUrl?: string;
   isDisabled?: boolean;
   pressableActionText?: string;
+  isComingSoon?: boolean;
 }
 
 export interface FeatureCardProps {
@@ -84,6 +85,7 @@ export interface DataTableProps<T> {
   columns: ColumnDef<T>[];
   onRowClick?: (item: T) => void;
   isLoading?: boolean;
+  showHeader?: boolean; // Default: true. Set to false to hide table header row (desktop/table view)
   emptyMessage?: string;
   loadingMessage?: string;
   getRowKey: (item: T) => string;
@@ -93,6 +95,8 @@ export interface DataTableProps<T> {
   onPageSizeChange?: (size: number) => void;  // Optional callback when page size changes
   // Responsive props
   responsive?: boolean;  // Enable responsive card view on mobile (default: true)
+  minWidth?: number;  // Minimum width of the table
+  _css?: any; // Additional styling props
 }
 
 export interface PaginationControlsProps {
@@ -123,6 +127,7 @@ export interface ModalProps extends Omit<ComponentProps<typeof GluestackModalTyp
   headerDescription?: string | ReactNode; // Description (string will be translated, ReactNode for custom content)
   headerIcon?: ReactNode; // Icon section (can be any ReactNode)
   showCloseButton?: boolean; // Default: true
+  headerAlignment?: 'center' | 'flex-start' | 'flex-end' | 'baseline'; // Alignment for header items
   // Body props - This is the only part that changes per requirement
   children: ReactNode; // Flexible body content
   // Footer props - Either use footerContent (custom) or button texts (simple buttons)

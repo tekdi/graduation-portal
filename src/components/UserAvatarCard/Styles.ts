@@ -73,5 +73,14 @@ export const AssignUsersStyles = {
     avatarTextStyles: {
       color: '$primary500',
     },
+    // Small initials circle used in tables/lists
+    initialsBoxSmStyles: {
+      width: '$8',
+      height: '$8',
+      backgroundColor: '$bgPrimary/10',
+      borderRadius: '$full',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
 };
    
