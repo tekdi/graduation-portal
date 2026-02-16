@@ -198,6 +198,7 @@ export const AddCustomTaskModal: React.FC<AddCustomTaskModalProps> = ({
           : 'projectPlayer.addCustomTaskSubtitle'
       }
       headerAlignment="baseline"
+      size="lg"
       maxWidth={480}
       footerContent={
         <HStack
