@@ -30,6 +30,11 @@ export interface MenuItemData {
   iconName?: string; // LucideIcon name (e.g., 'Home', 'User', 'LogOut')
   iconColor?: string; // Icon color value
   iconSizeValue?: number; // Icon size in pixels
+  // Optional right-side icon/element (useful for selected indicators in dropdowns)
+  rightIconElement?: React.ReactNode;
+  rightIconName?: string;
+  rightIconColor?: string;
+  rightIconSizeValue?: number;
   color?: string;
   showDividerAfter?: boolean; // Render divider after this menu item
   route?: string; // Navigation route name for menu items that navigate
@@ -56,8 +61,10 @@ export interface CustomMenuProps {
   triggerLabel?: string;
   trigger?: (triggerProps: any) => React.ReactElement;
   onSelect?: (key: string) => void;
+  /** Extra props forwarded to the underlying Gluestack `Menu` (use this to control minWidth/width). */
   menuProps?: any;
   triggerProps?: any;
+  backgroundColor?: string;
 }
 
 const DefaultTrigger: React.FC<{ label: string; triggerProps: any }> = ({
@@ -80,7 +87,9 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
   triggerProps = {},
   trigger,
   onSelect,
-  ...menuProps
+  backgroundColor = '$white',
+  menuProps: forwardedMenuProps = {},
+  ...restMenuProps
 }) => {
   const { t } = useLanguage();
   const handleMenuItemPress = (key: string) => {
@@ -112,10 +121,16 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
       offset={offset}
       disabledKeys={disabledKeys}
       trigger={renderTrigger}
-      {...menuProps}
+      {...forwardedMenuProps}
+      {...restMenuProps}
     >
       {items?.map((item: MenuItemData, index: number) => {
         const isDisabled = item.isComingSoon || disabledKeys.includes(item.key);
+        const translatedLabel = t(item.label);
+        const displayLabel =
+          translatedLabel === item.label
+            ? (item.textValue || item.label)
+            : translatedLabel;
         
         // Render menu item with icon support (priority: iconElement > iconName > icon)
         const menuItem = (
@@ -151,9 +166,23 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
                   <Icon as={item.icon} size={item.iconSize || 'sm'} me="$2" />
                 ) : null}
                 <MenuItemLabel size="sm" color={item.color}>
-                  {t(item.label)}
+                  {displayLabel}
                 </MenuItemLabel>
               </Box>
+              {/* Optional right-side icon/element (e.g., selected check) */}
+              {item.rightIconElement ? (
+                <Box ml="$2">
+                  {item.rightIconElement}
+                </Box>
+              ) : item.rightIconName ? (
+                <Box ml="$2">
+                  <LucideIcon
+                    name={item.rightIconName}
+                    size={item.rightIconSizeValue || 16}
+                    color={item.rightIconColor}
+                  />
+                </Box>
+              ) : null}
               {/* Coming Soon Badge */}
               {item.isComingSoon && (
                 <Box
