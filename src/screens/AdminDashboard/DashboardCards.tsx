@@ -14,6 +14,11 @@ interface DashboardCardsProps {
   userId?: string;
   infoHeadingKey?: string; // Translation key for info card heading
   infoDescriptionKey?: string; // Translation key for info card description
+  initialSelectedCardViewId?: string;
+  initialPathway?: string;
+  initialParticipant?: string;
+  initialCardViewTabKey?: string;
+  hideBreadcrumb?: boolean;
 }
 
 /**
@@ -26,6 +31,11 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
   userId = '',
   infoHeadingKey,
   infoDescriptionKey,
+  initialSelectedCardViewId,
+  initialPathway,
+  initialParticipant,
+  initialCardViewTabKey,
+  hideBreadcrumb = false,
 }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
@@ -33,9 +43,13 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [currentCards, setCurrentCards] = useState<DashboardCard[]>(cards);
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
-  const [selectedCardView, setSelectedCardView] = useState<string | null>(null);
-  const [individualPathway, setIndividualPathway] = useState<string>('');
-  const [individualParticipant, setIndividualParticipant] = useState<string>('');
+  const [selectedCardView, setSelectedCardView] = useState<string | null>(
+    initialSelectedCardViewId || null,
+  );
+  const [individualPathway, setIndividualPathway] = useState<string>(initialPathway || '');
+  const [individualParticipant, setIndividualParticipant] = useState<string>(
+    initialParticipant || '',
+  );
 
   // Get card view data from constants
   const cardViewData = useMemo(() => {
@@ -420,7 +434,7 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
     return (
       <VStack space="md">
         {/* Breadcrumb */}
-        {breadcrumbItems.length > 0 && (
+        {!hideBreadcrumb && breadcrumbItems.length > 0 && (
           <Breadcrumb
             items={breadcrumbItems}
             onItemClick={handleBreadcrumbClick}
@@ -443,6 +457,7 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
           insightsItems={cardViewData.insightsItems}
           insightsDotColor={cardViewData.insightsDotColor}
           snapshotPlaceholderKey={cardViewData.snapshotPlaceholderKey}
+          defaultActiveTab={initialCardViewTabKey}
           topContent={
             isIndividualCardView ? (
               <Card
@@ -497,7 +512,7 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
   return (
     <VStack space="md">
       {/* Breadcrumb - Only shown when there's hierarchy */}
-      {breadcrumbItems.length > 0 && (
+      {!hideBreadcrumb && breadcrumbItems.length > 0 && (
         <Breadcrumb
           items={breadcrumbItems}
           onItemClick={handleBreadcrumbClick}

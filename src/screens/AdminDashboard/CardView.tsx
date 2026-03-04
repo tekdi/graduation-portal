@@ -53,6 +53,7 @@ interface CardViewProps {
   snapshotHeader?: React.ReactNode; // optional block above metric cards in Snapshot
   insightsDotColor?: string; // optional override color for insight bullets
   snapshotPlaceholderKey?: string; // Translation key for placeholder when snapshot is empty
+  defaultActiveTab?: string;
 }
 
 /**
@@ -74,9 +75,12 @@ const CardView: React.FC<CardViewProps> = ({
   snapshotHeader,
   insightsDotColor,
   snapshotPlaceholderKey,
+  defaultActiveTab,
 }) => {
   const { t } = useLanguage();
-  const [activeTab, setActiveTab] = useState<string>(tabs[0]?.key || '');
+  const [activeTab, setActiveTab] = useState<string>(
+    defaultActiveTab || tabs[0]?.key || '',
+  );
   const { width: windowWidth } = useWindowDimensions();
 
   const metricColumns = useMemo(() => {

@@ -19,6 +19,7 @@ import type {
 interface DashboardGraphsProps {
   blocks?: DashboardGraphBlock[];
   fallbackPlaceholderKey: string; // translation key
+  columns?: 1 | 2;
 }
 
 const GraphStatCard: React.FC<{ card: DashboardGraphStatCard }> = ({ card }) => {
@@ -656,6 +657,7 @@ const ReportSection: React.FC<{
 const DashboardGraphs: React.FC<DashboardGraphsProps> = ({
   blocks,
   fallbackPlaceholderKey,
+  columns = 1,
 }) => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
@@ -693,27 +695,30 @@ const DashboardGraphs: React.FC<DashboardGraphsProps> = ({
         py={isMobile ? '$0' : '$2'}
         px={isMobile ? '$0' : '$2'}
       >
-        {blocks.map(block => (
-          block.kind === 'reportSection' ? (
-            <ReportSection
-              key={block.id}
-              block={block}
-              fallbackPlaceholderKey={fallbackPlaceholderKey}
-            />
-          ) : block.kind === 'groupHeader' ? (
-            (() => {
-              const accent = getGroupHeaderAccent(block as any);
-              const titleStr = t((block as any).title);
-              return (
-              <Box
+        {(() => {
+          const shouldTwoCol = !isMobile && columns === 2;
+
+          const renderBlock = (block: DashboardGraphBlock) => {
+            return block.kind === 'reportSection' ? (
+              <ReportSection
                 key={block.id}
+                block={block}
+                fallbackPlaceholderKey={fallbackPlaceholderKey}
+              />
+            ) : block.kind === 'groupHeader' ? (
+              (() => {
+                const accent = getGroupHeaderAccent(block as any);
+                const titleStr = t((block as any).title);
+                return (
+                  <Box
+                    key={block.id}
                     width="100%"
-                bg={(block as any).bg ? ((block as any).bg as any) : '$backgroundLight50'}
-                borderRadius="$lg"
+                    bg={(block as any).bg ? ((block as any).bg as any) : '$backgroundLight50'}
+                    borderRadius="$lg"
                     px="$6"
                     py="$5"
-                borderWidth={1}
-                borderColor="$borderLight200"
+                    borderWidth={1}
+                    borderColor="$borderLight200"
                     position="relative"
                     overflow="hidden"
                     minHeight={64}
@@ -736,51 +741,104 @@ const DashboardGraphs: React.FC<DashboardGraphsProps> = ({
                     >
                       {String(titleStr || '').toUpperCase()}
                     </Text>
-              </Box>
-              );
-            })()
-          ) : (
-            <Card key={block.id} p="$4" borderRadius="$lg" borderWidth={1} borderColor="$borderLight200">
-              <VStack space="sm" width="100%">
-                {'title' in block && block.title ? <Heading size="md">{t(block.title as any)}</Heading> : null}
-                {'description' in block && block.description ? (
-                  <Text fontSize="$sm" color="$textMutedForeground">
-                    {t(block.description as any)}
-                  </Text>
-                ) : null}
-
-                <Box width="100%" mt="$2">
-                  {block.kind === 'line' ? (
-                    <SimpleLineChart
-                      data={block.data}
-                      title={t(block.title)}
-                      color={block.color}
-                      yAxisLabel={block.yAxisLabel}
-                      valueLabel={block.valueLabel}
-                    />
+                  </Box>
+                );
+              })()
+            ) : (
+              <Card key={block.id} p="$4" borderRadius="$lg" borderWidth={1} borderColor="$borderLight200">
+                <VStack space="sm" width="100%">
+                  {'title' in block && (block as any).title ? (
+                    <Heading size="md">{t((block as any).title)}</Heading>
+                  ) : null}
+                  {'description' in block && (block as any).description ? (
+                    <Text fontSize="$sm" color="$textMutedForeground">
+                      {t((block as any).description)}
+                    </Text>
                   ) : null}
 
-                  {block.kind === 'bar' ? (
-                    <SimpleBarChart
-                      data={block.data}
-                      title={t(block.title)}
-                      orientation={(block as any).orientation}
-                      height={(block as any).height}
-                    />
-                  ) : null}
+                  <Box width="100%" mt="$2">
+                    {block.kind === 'line' ? (
+                      <SimpleLineChart
+                        data={(block as any).data}
+                        title={t((block as any).title)}
+                        color={(block as any).color}
+                        yAxisLabel={(block as any).yAxisLabel}
+                        valueLabel={(block as any).valueLabel}
+                      />
+                    ) : null}
 
-                  {block.kind === 'pie' ? (
-                    <SimplePieChart data={block.data} title={t(block.title)} />
-                  ) : null}
+                    {block.kind === 'bar' ? (
+                      <SimpleBarChart
+                        data={(block as any).data}
+                        title={t((block as any).title)}
+                        orientation={(block as any).orientation}
+                        height={(block as any).height}
+                      />
+                    ) : null}
 
-                  {block.kind === 'placeholder' ? (
-                    <Text>{t(block.placeholderTextKey || fallbackPlaceholderKey)}</Text>
-                  ) : null}
+                    {block.kind === 'pie' ? (
+                      <SimplePieChart data={(block as any).data} title={t((block as any).title)} />
+                    ) : null}
+
+                    {block.kind === 'placeholder' ? (
+                      <Text>{t((block as any).placeholderTextKey || fallbackPlaceholderKey)}</Text>
+                    ) : null}
+                  </Box>
+                </VStack>
+              </Card>
+            );
+          };
+
+          if (!shouldTwoCol) {
+            return blocks.map(b => renderBlock(b));
+          }
+
+          // 2-column rows for report sections (desktop); keep group headers / other blocks full-width.
+          const rows: Array<
+            | { kind: 'row'; id: string; left: DashboardGraphBlock; right?: DashboardGraphBlock }
+            | { kind: 'full'; id: string; block: DashboardGraphBlock }
+          > = [];
+
+          let pending: DashboardGraphBlock | null = null;
+          let rowIdx = 0;
+
+          const flushPending = () => {
+            if (!pending) return;
+            rows.push({ kind: 'row', id: `row-${rowIdx++}`, left: pending });
+            pending = null;
+          };
+
+          blocks.forEach(block => {
+            if (block.kind !== 'reportSection') {
+              flushPending();
+              rows.push({ kind: 'full', id: block.id, block });
+              return;
+            }
+
+            if (!pending) {
+              pending = block;
+              return;
+            }
+
+            rows.push({ kind: 'row', id: `row-${rowIdx++}`, left: pending, right: block });
+            pending = null;
+          });
+          flushPending();
+
+          return rows.map(r => {
+            if (r.kind === 'full') return renderBlock(r.block);
+            return (
+              <HStack key={r.id} space="lg" alignItems="stretch">
+                <Box flex={1} minWidth={0}>
+                  {renderBlock(r.left)}
                 </Box>
-              </VStack>
-            </Card>
-          )
-        ))}
+                <Box flex={1} minWidth={0}>
+                  {r.right ? renderBlock(r.right) : null}
+                </Box>
+              </HStack>
+            );
+          });
+        })()}
       </VStack>
     </ScrollView>
   );

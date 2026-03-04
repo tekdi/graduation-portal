@@ -12,20 +12,33 @@ export const dashboardStyles = {
   },
   metricsRow: {
     flexWrap: 'wrap',
-    gap: '$4',
+    gap: '$2',
+    justifyContent: 'space-between',
     $md: {
       flexWrap: 'nowrap',
+      justifyContent: 'flex-start',
+      gap: '$4',
+    },
+  },
+  metricColumn: {
+    width: '48%',
+    gap: '$2',
+    $md: {
+      width: 'auto',
+      flex: 1,
     },
   },
   cardsRow: {
     flexWrap: 'wrap',
     gap: '$4',
+    alignItems: 'stretch' as const,
     $md: {
       flexWrap: 'nowrap',
     },
   },
   cardColumn: {
     flex: 1,
+    alignSelf: 'stretch' as const,
     minWidth: '100%',
     $md: {
       minWidth: '48%',

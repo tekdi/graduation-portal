@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, VStack, HStack, Text, Progress, ProgressFilledTrack } from '@ui';
+import { Box, VStack, HStack, Text, Progress, ProgressFilledTrack, Card } from '@ui';
 import { LucideIcon } from '@ui';
 import { topPerformersCardStyles } from './Styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
@@ -24,7 +24,7 @@ const TopPerformersCard: React.FC<TopPerformersCardProps> = ({
   ],
 }) => {
   return (
-    <Box {...topPerformersCardStyles.container}>
+    <Card {...topPerformersCardStyles.container} variant="elevated">
       <HStack {...topPerformersCardStyles.header}>
         <Box {...topPerformersCardStyles.iconContainer}>
           <LucideIcon name="User" size={20} color="$primary500" />
@@ -36,33 +36,40 @@ const TopPerformersCard: React.FC<TopPerformersCardProps> = ({
       
       <VStack {...topPerformersCardStyles.content}>
         {performers.map((performer, index) => (
-          <VStack key={index} {...topPerformersCardStyles.performerItem}>
+          <Card key={index} {...topPerformersCardStyles.performerItem} variant="elevated">
             <HStack {...topPerformersCardStyles.performerRow}>
-              <VStack {...topPerformersCardStyles.performerInfo}>
-                <Text {...TYPOGRAPHY.bodySmall} color="$textPrimary" fontWeight="$medium">
-                  {performer.name}
+              <HStack {...topPerformersCardStyles.performerLeft}>
+                <Box {...topPerformersCardStyles.rankBadge}>
+                  <Text {...topPerformersCardStyles.rankText}>{index + 1}</Text>
+                </Box>
+                <VStack {...topPerformersCardStyles.performerInfo}>
+                  <Text {...TYPOGRAPHY.bodySmall} color="$textPrimary" fontWeight="$medium">
+                    {performer.name}
+                  </Text>
+                  <Text {...TYPOGRAPHY.caption} color="$textSecondary">
+                    {performer.id}
+                  </Text>
+                </VStack>
+              </HStack>
+              <HStack {...topPerformersCardStyles.performerRight} space="sm" alignItems="center">
+                <Text {...TYPOGRAPHY.h4} color="$blue500" fontWeight="$bold">
+                  {performer.progress}%
                 </Text>
-                <Text {...TYPOGRAPHY.caption} color="$textSecondary">
-                  ID: {performer.id}
-                </Text>
-              </VStack>
-              <Text {...TYPOGRAPHY.h4} color="$success600" fontWeight="$bold">
-                {performer.progress}%
-              </Text>
+                <Progress
+                  value={performer.progress}
+                  w={60}
+                  h="$1.5"
+                  bg="$progressBarBackground"
+                  {...topPerformersCardStyles.progressBar}
+                >
+                  <ProgressFilledTrack bg="$blue500" />
+                </Progress>
+              </HStack>
             </HStack>
-            <Progress
-              value={performer.progress}
-              w="$full"
-              h="$1.5"
-              bg="$progressBarBackground"
-              {...topPerformersCardStyles.progressBar}
-            >
-              <ProgressFilledTrack bg="$success600" />
-            </Progress>
-          </VStack>
+          </Card>
         ))}
       </VStack>
-    </Box>
+    </Card>
   );
 };
 

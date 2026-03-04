@@ -1,15 +1,13 @@
 export const needsAttentionCardStyles = {
   container: {
+    flex: 1,
+    height: '100%',
     bg: '$white',
     borderRadius: '$xl',
     p: '$4',
     borderWidth: 1,
     borderColor: '$borderColor',
-    shadowColor: '$shadowColor',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+ 
   },
   header: {
     space: 'sm',
@@ -20,7 +18,6 @@ export const needsAttentionCardStyles = {
     width: 32,
     height: 32,
     borderRadius: '$md',
-    bg: '$warning50020',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -28,7 +25,9 @@ export const needsAttentionCardStyles = {
     space: 'md',
   },
   participantItem: {
-    space: 'xs',
+    borderWidth: 1,
+    borderRadius: '$lg' as const,
+    p: '$3' as const,
   },
   participantRow: {
     justifyContent: 'space-between',
@@ -37,6 +36,9 @@ export const needsAttentionCardStyles = {
   participantInfo: {
     flex: 1,
     space: 'xs',
+  },
+  participantRight: {
+    alignItems: 'center' as const,
   },
   progressBar: {
     borderRadius: '$full',

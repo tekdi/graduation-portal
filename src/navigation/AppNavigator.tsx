@@ -36,6 +36,7 @@ import PasswordPolicy from '../screens/PasswordPolicy';
 import AuditLogScreen from '../screens/AuditLog';
 import AssignUsersScreen from '../screens/AssignUsers';
 import AdminDashboard from '../screens/AdminDashboard';
+import LcDashboardScreen from '../screens/Home/index1';
 import ProfilePermissions from '../screens/ProfilePermissions';
 // Error Boundary for Navigation
 class NavigationErrorBoundary extends Component<
@@ -62,7 +63,9 @@ class NavigationErrorBoundary extends Component<
   render() {
     if (this.state.hasError) {
       return (
-        this.props.fallback || <Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />
+        this.props.fallback || (
+          <Spinner height={isWeb ? ('$100vh' as any) : '$full'} size="large" color="$primary500" />
+        )
       );
     }
     return this.props.children;
@@ -152,6 +155,8 @@ const getAccessPages = (
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
         { name: 'dashboard', component: HomeScreen },
+        // URL-only LC dashboard (not shown in LC menus)
+        { name: 'lc-dashboard', path: '/lc-dashboard', component: LcDashboardScreen },
         { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
         { name: 'log-visit', path: '/participants/:id/log-visit', component: LogVisit },
         { name: 'check-ins-list', path: '/participants/:id/check-ins-list', component: CheckInsList },
@@ -235,7 +240,7 @@ const RoleBasedNavigator: React.FC = () => {
   }
 
   return (
-    <Suspense fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}>
+    <Suspense fallback={<Spinner height={isWeb ? ('$100vh' as any) : '$full'} size="large" color="$primary500" />}>
       <AccessBaseNavigator accessPages={accessPages} />
     </Suspense>
   );
@@ -316,7 +321,7 @@ const AppNavigator: React.FC = () => {
   }, [isLoggedIn, user?.role, accessPages.length]);
 
   if (loading) {
-    return <Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />;
+    return <Spinner height={isWeb ? ('$100vh' as any) : '$full'} size="large" color="$primary500" />;
   }
 
   return (
@@ -325,7 +330,7 @@ const AppNavigator: React.FC = () => {
         ref={navigationRef}
         key={navigationKey}
         linking={linking}
-        fallback={<Spinner height={isWeb ? '$100vh' : '$full'} size="large" color="$primary500" />}
+        fallback={<Spinner height={isWeb ? ('$100vh' as any) : '$full'} size="large" color="$primary500" />}
         onReady={() => {
           if (isWeb) {
             logger.log('Navigation container ready');

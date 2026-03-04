@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, VStack, HStack, Text, Progress, ProgressFilledTrack } from '@ui';
+import { Box, VStack, HStack, Text, Progress, ProgressFilledTrack, Card } from '@ui';
 import { LucideIcon } from '@ui';
 import { enrollmentStatusCardStyles } from './Styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
@@ -25,7 +25,7 @@ const EnrollmentStatusCard: React.FC<EnrollmentStatusCardProps> = ({
   const total = statuses.reduce((sum, status) => sum + status.count, 0);
 
   return (
-    <Box {...enrollmentStatusCardStyles.container}>
+    <Card {...enrollmentStatusCardStyles.container} variant="elevated">
       <HStack {...enrollmentStatusCardStyles.header}>
         <Box {...enrollmentStatusCardStyles.iconContainer}>
           <LucideIcon name="User" size={20} color="$primary500" />
@@ -58,7 +58,7 @@ const EnrollmentStatusCard: React.FC<EnrollmentStatusCardProps> = ({
           </VStack>
         ))}
       </VStack>
-    </Box>
+    </Card>
   );
 };
 

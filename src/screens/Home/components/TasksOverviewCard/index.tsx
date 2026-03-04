@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, VStack, HStack, Text, Progress, ProgressFilledTrack } from '@ui';
+import { Box, VStack, HStack, Text, Progress, ProgressFilledTrack, Card } from '@ui';
 import { LucideIcon } from '@ui';
 import { tasksOverviewCardStyles } from './Styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
@@ -20,7 +20,7 @@ const TasksOverviewCard: React.FC<TasksOverviewCardProps> = ({
     : 0;
 
   return (
-    <Box {...tasksOverviewCardStyles.container}>
+    <Card {...tasksOverviewCardStyles.container} variant="elevated">
       <HStack {...tasksOverviewCardStyles.header}>
         <Box {...tasksOverviewCardStyles.iconContainer}>
           <LucideIcon name="Target" size={20} color="$primary500" />
@@ -69,7 +69,7 @@ const TasksOverviewCard: React.FC<TasksOverviewCardProps> = ({
           </Text>
         </HStack>
       </VStack>
-    </Box>
+    </Card>
   );
 };
 
