@@ -92,6 +92,8 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
   ...restMenuProps
 }) => {
   const { t } = useLanguage();
+  // Allow callers to set menu background while still being able to override via menuProps.
+  const menuProps = { bg: backgroundColor as any, ...(forwardedMenuProps as any) };
   const handleMenuItemPress = (key: string) => {
     if (onSelect) {
       onSelect(key);
@@ -121,7 +123,7 @@ export const CustomMenu: React.FC<CustomMenuProps> = ({
       offset={offset}
       disabledKeys={disabledKeys}
       trigger={renderTrigger}
-      {...forwardedMenuProps}
+      {...menuProps}
       {...restMenuProps}
     >
       {items?.map((item: MenuItemData, index: number) => {
