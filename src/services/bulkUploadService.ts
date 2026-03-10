@@ -51,7 +51,7 @@ export const getSignedUrl = async (fileName: string): Promise<SignedUrlResponse>
     });
     
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error getting signed URL:', error);
     throw error;
   }
@@ -107,13 +107,13 @@ export const bulkUserCreate = async (
     };
     
     // Get organization and tenant codes from stored user data
-    const userData = await offlineStorage.read<any>(STORAGE_KEYS.AUTH_USER);
+    const userData = await offlineStorage.read<Record<string, unknown> & { tenant_code?: string; organizations?: Array<{ code?: string }> }>(STORAGE_KEYS.AUTH_USER);
     const tenantCode = userData?.tenant_code;
     const orgCode = userData?.organizations?.[0]?.code;
     
-    console.log('=== BULK UPLOAD API HEADERS ===');
-    console.log('OrgId from login response:', orgCode);
-    console.log('Tenant Code from login response:', tenantCode);
+    logger.log('=== BULK UPLOAD API HEADERS ===');
+    logger.log('OrgId from login response:', orgCode);
+    logger.log('Tenant Code from login response:', tenantCode);
     
     // Set headers as required by API (orgid, tenantid for admin override)
     const headers: Record<string, string> = {
@@ -129,11 +129,11 @@ export const bulkUserCreate = async (
       throw new Error('Tenant code (x-tenant-code) is required but not found in user data');
     }
     
-    headers['orgid'] = orgCode;
-    headers['tenantid'] = tenantCode;
+    headers.orgid = orgCode;
+    headers.tenantid = tenantCode;
     headers['x-tenant-code'] = tenantCode;
     
-    console.log('Headers being sent:', headers);
+    logger.log('Headers being sent:', headers);
     
     // Remove interceptor's default headers (tenant, organization) and use API-specific headers (x-tenant-code, orgId)
     // This is necessary because the bulkUserCreate API endpoint expects specific header names that differ from
@@ -141,8 +141,8 @@ export const bulkUserCreate = async (
     const interceptorId = api.interceptors.request.use(
       (config) => {
         if (config.headers) {
-          delete config.headers['tenant'];
-          delete config.headers['organization'];
+          delete config.headers.tenant;
+          delete config.headers.organization;
         }
         api.interceptors.request.eject(interceptorId);
         return config;
@@ -162,7 +162,7 @@ export const bulkUserCreate = async (
     );
     
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     logger.error('Error triggering bulk user create:', error);
     throw error;
   }

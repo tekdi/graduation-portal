@@ -32,7 +32,7 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       page: page.toString(),
       limit: limit.toString(),
       search: search || '',
-      programId: process.env.GLOBAL_LC_PROGRAM_ID as string,
+      programId: process.env.GLOBAL_LC_PROGRAM_ID || '',
       ...(entityId ? {entityId}:{})
     });
 
@@ -55,13 +55,25 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
 
     const response = await api.get<ParticipantSearchResponse>(endpoint);
     return response.data;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
+  } catch (error: unknown) {
     throw error;
   }
 };
 
-export const getParticipantById = (id: string): any => {
+export interface ParticipantByIdResult {
+  id: string;
+  name: string;
+  contact: string;
+  status: string;
+  progress?: number;
+  pathway?: string;
+  graduationProgress?: number;
+  graduationDate?: string;
+  email: string;
+  address: string;
+}
+
+export const getParticipantById = (id: string): ParticipantByIdResult | undefined => {
   const participant = PARTICIPANTS_DATA.find(p => p.id === id);
   if (!participant) return undefined;
   return {
@@ -77,8 +89,12 @@ export const getParticipantById = (id: string): any => {
         ? participant.graduationProgress
         : undefined,
     graduationDate:
-      participant.graduationDate && participant.graduationDate !== ''
-        ? participant.graduationDate
+      participant.graduationDate != null && participant.graduationDate !== ''
+        ? typeof participant.graduationDate === 'string'
+          ? participant.graduationDate
+          : participant.graduationDate instanceof Date
+            ? participant.graduationDate.toISOString()
+            : undefined
         : undefined,
     email: participant.email,
     address: participant.address,
@@ -89,13 +105,11 @@ export const getParticipantById = (id: string): any => {
  * Returns full participant data including contact info and address
  * Currently uses mock data, will be replaced with API call later
  */
-export const getParticipantProfile = async (id: string): Promise<User |undefined> => {
+export const getParticipantProfile = async (id: string): Promise<User | undefined> => {
   try {
     const userProfile = await getUserProfile(id);
-
-    return userProfile;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
+    return userProfile as User;
+  } catch (error: unknown) {
     throw error;
   }
 };
@@ -167,7 +181,7 @@ export const getSitesByProvince = (provinceValue: string): Site[] => {
   return SITES;
 };
 
-export const getEntityDetails = async (userId: string): Promise<any> => {
+export const getEntityDetails = async (userId: string): Promise<{ data: unknown }> => {
   try {
     const response = await api.get(API_ENDPOINTS.GET_ENTITY_DETAILS(userId));
 
@@ -182,10 +196,10 @@ export const updateEntityDetails = async ({
   entityId,
   entityUpdates,
 }: {
-  userId:string;
+  userId: string;
   entityId: string;
-  entityUpdates: any;
-}): Promise<any> => {
+  entityUpdates: Record<string, unknown>;
+}): Promise<unknown> => {
   try {
 
     const requestBody = {
@@ -210,8 +224,13 @@ export const createOrUpdateProgramUserMapping = async ({
   userId,
   programId,
   metaInformation,
-  status
-}): Promise<any> => {
+  status,
+}: {
+  userId: string;
+  programId: string;
+  metaInformation: Record<string, unknown>;
+  status?: string;
+}): Promise<unknown> => {
   try {
 
     const requestBody = {

@@ -25,7 +25,6 @@ import {
   TASK_STATUS,
   TASK_TYPE,
   PROJECT_MODES,
-  BADGE_TYPES,
 } from '../../../constants/app.constant';
 import { TaskCardProps } from '../../types/components.types';
 import { Task } from '../../types/project.types';
@@ -41,6 +40,7 @@ import { renderCustomTaskActions, renderModals } from './renderHelpers';
 import { useNavigation } from '@react-navigation/native';
 import { useRoute } from '@react-navigation/native';
 import { getSolutionDetails } from '../../services/projectPlayerService';
+import logger from '@utils/logger';
 
 const TaskCard: React.FC<TaskCardProps> = ({
   task,
@@ -160,18 +160,22 @@ const TaskCard: React.FC<TaskCardProps> = ({
     if (task?.type === TASK_TYPE.OBSERVATION) {
       const projectTemplateId = projectData?._id;
       if (!participantId || !projectTemplateId) {
-        console.error('Missing userId or projectTemplateId');
+        logger.error('Missing userId or projectTemplateId');
         return;
       }
       const solutionDetails = await getSolutionDetails(projectTemplateId, task._id);
 
-      if(solutionDetails.data._id) {
+      // @ts-ignore
+      if(solutionDetails?.data?._id) {
         // @ts-ignore Navigate to observation screen - task will be marked as completed on return
         navigation.navigate('observation', {
           id: participantId,
-          solutionId: solutionDetails.data._id,
+          // @ts-ignore
+          solutionId: solutionDetails?.data?._id,
           submissionNumber: 1, // First submission number for the task
         });
+      } else {
+        showError(t('common.serverError500'));
       }
     } else {
       setShowUploadModal(true); // Open modal instead of file picker
@@ -475,7 +479,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
     ) : null;
 
     // In Edit mode only (non-preview), hide description
-    const showDescription = !isEditModeOnly || !uiConfig.showAsCard;
+    // const showDescription = !isEditModeOnly || !uiConfig.showAsCard;
 
     // Wrap content in Pressable for Observation tasks in Edit mode to allow opening the form by clicking the text
     const ContentWrapper = ({ children }: { children: React.ReactNode }) => {
@@ -753,7 +757,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       participantName={!isChildOfProject ? config.profileInfo?.name : undefined}
       existingAttachments={task?.attachments}
       onUpload={method => {
-        console.log('Upload method selected:', method);
+        logger.log('Upload method selected:', method);
       }}
       onConfirm={async (files) => {
         setIsStatusUpdating(true);

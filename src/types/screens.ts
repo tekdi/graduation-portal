@@ -1,15 +1,15 @@
 import { User } from '@contexts/AuthContext';
-import { STATUS } from '../constants/app.constant';
+import { STATUS } from '@constants/app.constant';
 import { ParticipantStatus, PathwayType } from './participant';
 export type StatusType = (typeof STATUS)[keyof typeof STATUS];
 export interface Participant {
   userId: string;
   name: string;
-  idpProgress?: any;
+  idpProgress?: unknown;
   status?: StatusType;
   userDetails?: User;
-  idpProjectId?:string;
-  certificateId?:string;
+  idpProjectId?: string;
+  certificateId?: string;
 }
 
 export type StatusCount = {
@@ -34,35 +34,13 @@ export interface ParticipantsQueryParams {
 }
 
 export interface TemplateData {
-    id: string;
-    title: string;
-    description: string;
-    tag: string;
-    pillarsCount: number;
-    tasksCount: number;
-    version: string;
-    includedPillars: {
-        name: string;
-        tasks: number;
-    }[];
-}
-
-export interface InterventionPlanProps {
-    participantStatus?: StatusType;
-    participantId?: string;
-    participantName?: string;
-    participantProfile?:any;
-    onIdpCreation?: (projectId?: string) => void;
-    onProgressChange?: (progress: number) => void;
-}
-
-export interface TemplateData {
   id: string;
-  name: string;
+  title?: string;
+  name?: string;
   description: string;
   tag: string;
-  badgeBg?: string; // Badge background color token
-  badgeTextColor?: string; // Badge text color token
+  badgeBg?: string;
+  badgeTextColor?: string;
   pillarsCount: number;
   tasksCount: number;
   version: string;
@@ -70,6 +48,15 @@ export interface TemplateData {
     name: string;
     tasks: number;
   }[];
+}
+
+export interface InterventionPlanProps {
+  participantStatus?: StatusType;
+  participantId?: string;
+  participantName?: string;
+  participantProfile?: unknown;
+  onIdpCreation?: (projectId?: string) => void;
+  onProgressChange?: (progress: number) => void;
 }
 
 export interface ParticipantHeaderProps {

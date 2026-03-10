@@ -6,7 +6,6 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { useUserManagementFilters, mapStatusLabelToAPI, PAGE_SIZE_OPTIONS } from '@constants/USER_MANAGEMENT';
 import FilterButton from '@components/Filter';
 import TitleHeader from '@components/TitleHeader';
-// import { titleHeaderStyles } from '@components/TitleHeader/Styles';
 import DataTable from '@components/DataTable';
 import { getUsersColumns, RoleBadge } from './UsersTableConfig';
 import { AdminUserManagementData } from '@app-types/Users';
@@ -14,10 +13,7 @@ import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 import { usePlatform } from '@utils/platform';
 import { styles } from './Styles';
 import { deactivateUser, getUsersList, resetPassword } from '../../services/usersService';
-import type { 
-  // UserSearchParams,
-   Role
-} from '@app-types/Users';
+import type { UserSearchParams, Role } from '@app-types/Users';
 import { getSignedUrl, uploadFileToSignedUrl, bulkUserCreate } from '../../services/bulkUploadService';
 import { theme } from '@config/theme';
 import { getUserProfile } from '../../services/authenticationService';
@@ -26,12 +22,26 @@ import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import offlineStorage from '../../services/offlineStorage';
 import logger from '@utils/logger';
 
+/** Profile/API shape for modal display (role, province, site may be string or object) */
+type UserProfileDisplay = Record<string, unknown> & {
+  role?: string | { label?: string };
+  province?: string | { label?: string };
+  site?: string | { label?: string };
+  createdAt?: string;
+  created_at?: string;
+};
+type UserBaseWithOrgs = AdminUserManagementData & {
+  user_organizations?: Array<{ roles?: Array<{ role?: { label?: string } }> }>;
+  province?: string | { label?: string };
+  site?: string | { label?: string };
+};
+
 /**
  * ProfileModalHeader - Header component for the profile modal
  */
 interface ProfileModalHeaderProps {
   selectedUserBase: AdminUserManagementData | null;
-  selectedUserProfile: any | null;
+  selectedUserProfile: UserProfileDisplay | null;
   isMobile: boolean;
   t: (key: string) => string;
 }
@@ -42,16 +52,16 @@ const ProfileModalHeader: React.FC<ProfileModalHeaderProps> = ({
   isMobile,
   t,
 }) => {
+  const base = selectedUserBase as UserBaseWithOrgs | null;
   const roles =
-    (selectedUserBase as any)?.user_organizations?.[0]?.roles
-      ?.map((r: any) => r?.role?.label)
-      .filter(Boolean) || [];
+    base?.user_organizations?.[0]?.roles
+      ?.map((r) => (r?.role as { label?: string })?.label)
+      .filter((x): x is string => Boolean(x)) ?? [];
 
-  // Ensure we never render an object as text (prevents React error #31)
   const profileRole =
-    typeof (selectedUserProfile as any)?.role === 'string'
-      ? (selectedUserProfile as any)?.role
-      : (selectedUserProfile as any)?.role?.label;
+    typeof selectedUserProfile?.role === 'string'
+      ? selectedUserProfile.role
+      : (selectedUserProfile?.role as { label?: string } | undefined)?.label;
 
   const roleLabel =
     roles[0] ||
@@ -167,6 +177,39 @@ const UserManagementScreen = () => {
     setDeactivateState({ user: null, isSubmitting: false });
   }, []);
 
+  const deactivateModalDescription = useMemo(() => {
+    const name = deactivateState.user?.name ?? '';
+    const msg =
+      t('admin.users.actionMenu.deactivateMessage', { name }) ||
+      'Are you sure you want to deactivate this user?';
+    if (!name || typeof msg !== 'string') {
+      return (
+        <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
+          {String(msg)}
+        </Text>
+      );
+    }
+    const idx = msg.indexOf(name);
+    if (idx < 0) {
+      return (
+        <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
+          {msg}
+        </Text>
+      );
+    }
+    const before = msg.slice(0, idx);
+    const after = msg.slice(idx + name.length);
+    return (
+      <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
+        {before}
+        <Text color="$textForeground" fontWeight="$medium">
+          {name}
+        </Text>
+        {after}
+      </Text>
+    );
+  }, [deactivateState.user?.name, t]);
+
   const openDeactivateModal = useCallback((user: AdminUserManagementData) => {
     setDeactivateState({ user, isSubmitting: false });
   }, []);
@@ -181,8 +224,8 @@ const UserManagementScreen = () => {
       showAlert('success', t('admin.users.deactivate.success') || 'User deactivated successfully');
       closeDeactivateModal();
       setRefetchKey(k => k + 1);
-    } catch (error: any) {
-      showAlert('error', error?.message || t('common.somethingWentWrong'));
+    } catch (error: unknown) {
+      showAlert('error', (error as Error)?.message ?? t('common.somethingWentWrong'));
       setDeactivateState(prev => ({ ...prev, isSubmitting: false }));
     }
   }, [closeDeactivateModal, deactivateState.user, showAlert, t]);
@@ -204,8 +247,8 @@ const UserManagementScreen = () => {
     try {
       const profile = await getUserProfile(user.id);
       setSelectedUserProfile(profile);
-    } catch (error: any) {
-      showAlert('error', error?.message || t('common.somethingWentWrong'));
+    } catch (error: unknown) {
+      showAlert('error', (error as Error)?.message ?? t('common.somethingWentWrong'));
     } finally {
       setProfileLoading(false);
     }
@@ -262,10 +305,10 @@ const UserManagementScreen = () => {
       );
 
       closeResetPasswordModal();
-    } catch (error: any) {
+    } catch (error: unknown) {
       showAlert(
         'error',
-        error?.message || t('admin.users.resetPassword.error') || 'Failed to reset password',
+        (error as Error)?.message ?? t('admin.users.resetPassword.error') ?? 'Failed to reset password',
         { placement: 'bottom' }
       );
       setResetPasswordState(prev => ({ ...prev, isSubmitting: false }));
@@ -303,7 +346,7 @@ const UserManagementScreen = () => {
   }, []);
 
   // Use custom hook for filter management - handles all API calls for roles, provinces
-  const { filters: filterOptions, roles, provinces } = useUserManagementFilters(filters);
+  const { filters: filterOptions, roles } = useUserManagementFilters(filters);
 
   // Fetch users from API when filters change or when roles are first loaded
   useEffect(() => {
@@ -338,11 +381,11 @@ const UserManagementScreen = () => {
           apiType = allRoleTitles.length > 0 ? allRoleTitles.join(',') : 'all';
         }
 
-        const apiParams: any = {
+        const apiParams: UserSearchParams = {
           tenant_code: 'brac',
           type: apiType,
           page: currentPage,
-          limit: pageSize,
+          limit: pageSize ?? undefined,
         };
 
         // Add search parameter if present
@@ -378,7 +421,7 @@ const UserManagementScreen = () => {
         // Get total count from API response (if available), otherwise use data length
         const apiTotalCount = response.result?.count ?? response.result?.total ?? usersData.length;
 
-        setUsers(usersData);
+        setUsers((usersData ?? []) as AdminUserManagementData[]);
         // Use API total count
         setTotalCount(apiTotalCount);
       } catch (error) {
@@ -470,11 +513,11 @@ const UserManagementScreen = () => {
       // Trigger fetchUsers by updating a dummy filter or refetching
       setFilters((prev) => ({ ...prev, _refresh: Date.now() }));
 
-    } catch (error: any) {
-      // Use API error message if available, otherwise use generic error message
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } }; message?: string };
       const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
+        err?.response?.data?.message ??
+        err?.message ??
         t('admin.actions.uploadError');
 
       showAlert('error', errorMessage);
@@ -495,7 +538,7 @@ const UserManagementScreen = () => {
         description="admin.userManagementDescription"
         right={
           <HStack space="md" alignItems="center">
-            <Button variant={"outlineghost" as any}
+            <Button variant="outline"
               onPress={() => setIsUploadModalOpen(true)}
               isDisabled={isUploading}
             >
@@ -615,13 +658,13 @@ const UserManagementScreen = () => {
             onPress={handleUploadCSV}
           >
             <Card
-              {...(styles.uploadOptionCard as any)}
+              {...(styles.uploadOptionCard as Record<string, unknown>)}
               bg="$white"
             >
               <HStack space="md" alignItems="center">
                 {/* Icon Container */}
                 <Box
-                  {...(styles.uploadCSVIconContainer as any)}
+                  {...(styles.uploadCSVIconContainer as Record<string, unknown>)}
                 >
                   <LucideIcon
                     name="FileUp"
@@ -653,13 +696,13 @@ const UserManagementScreen = () => {
           {/* Add User Option - Disabled */}
           <Pressable disabled>
             <Card
-              {...(styles.uploadOptionCardDisabled as any)}
+              {...(styles.uploadOptionCardDisabled as Record<string, unknown>)}
               bg="$white"
             >
               <HStack space="md" alignItems="center">
                 {/* Icon Container */}
                 <Box
-                  {...(styles.addUserIconContainer as any)}
+                  {...(styles.addUserIconContainer as Record<string, unknown>)}
                 >
                   <LucideIcon
                     name="UserPlus"
@@ -798,28 +841,20 @@ const UserManagementScreen = () => {
                     <VStack flex={1} space="xs">
                       <Text {...TYPOGRAPHY.caption} color="$textMutedForeground">{t('admin.users.province')}</Text>
                       <Text {...TYPOGRAPHY.bodySmall} color="$textForeground">
-                        {selectedUserProfile?.province?.label ||
-                          (typeof (selectedUserProfile as any)?.province === 'string'
-                            ? (selectedUserProfile as any)?.province
-                            : '') ||
-                          (selectedUserBase as any)?.province?.label ||
-                          (typeof (selectedUserBase as any)?.province === 'string'
-                            ? (selectedUserBase as any)?.province
-                            : '') ||
+                        {(selectedUserProfile?.province as { label?: string } | undefined)?.label ||
+                          (typeof selectedUserProfile?.province === 'string' ? selectedUserProfile.province : '') ||
+                          ((selectedUserBase as UserBaseWithOrgs)?.province as { label?: string } | undefined)?.label ||
+                          (typeof (selectedUserBase as UserBaseWithOrgs)?.province === 'string' ? (selectedUserBase as UserBaseWithOrgs).province : '') ||
                           '-'}
                       </Text>
                     </VStack>
                     <VStack flex={1} space="xs">
                       <Text {...TYPOGRAPHY.caption} color="$textMutedForeground">{t('admin.users.site')}</Text>
                       <Text {...TYPOGRAPHY.bodySmall} color="$textForeground">
-                        {selectedUserProfile?.site?.label ||
-                          (typeof (selectedUserProfile as any)?.site === 'string'
-                            ? (selectedUserProfile as any)?.site
-                            : '') ||
-                          (selectedUserBase as any)?.site?.label ||
-                          (typeof (selectedUserBase as any)?.site === 'string'
-                            ? (selectedUserBase as any)?.site
-                            : '') ||
+                        {(selectedUserProfile?.site as { label?: string } | undefined)?.label ||
+                          (typeof selectedUserProfile?.site === 'string' ? selectedUserProfile.site : '') ||
+                          ((selectedUserBase as UserBaseWithOrgs)?.site as { label?: string } | undefined)?.label ||
+                          (typeof (selectedUserBase as UserBaseWithOrgs)?.site === 'string' ? (selectedUserBase as UserBaseWithOrgs).site : '') ||
                           '-'}
                       </Text>
                     </VStack>
@@ -843,19 +878,19 @@ const UserManagementScreen = () => {
                       <Text {...TYPOGRAPHY.caption} color="$textMutedForeground">{t('admin.users.role')}</Text>
                       <Text {...TYPOGRAPHY.bodySmall} color="$textForeground">
                         {(() => {
-                          const roles =
-                            (selectedUserBase as any)?.user_organizations?.[0]?.roles
-                              ?.map((r: any) => r?.role?.label)
-                              .filter(Boolean) || [];
-
-                          // Ensure we never render an object as text (prevents React error #31)
+                          const base = selectedUserBase as AdminUserManagementData & {
+                            user_organizations?: Array<{ roles?: Array<{ role?: { label?: string } }> }>;
+                          };
+                          const roleLabels =
+                            base?.user_organizations?.[0]?.roles
+                              ?.map((r: { role?: { label?: string } }) => r?.role?.label)
+                              .filter((x): x is string => Boolean(x)) ?? [];
                           const profileRole =
-                            typeof (selectedUserProfile as any)?.role === 'string'
-                              ? (selectedUserProfile as any)?.role
-                              : (selectedUserProfile as any)?.role?.label;
-
+                            typeof (selectedUserProfile as { role?: string | { label?: string } })?.role === 'string'
+                              ? (selectedUserProfile as { role: string }).role
+                              : (selectedUserProfile as { role?: { label?: string } })?.role?.label;
                           return (
-                            roles[0] ||
+                            roleLabels[0] ||
                             profileRole ||
                             selectedUserBase?.role ||
                             '-'
@@ -877,12 +912,12 @@ const UserManagementScreen = () => {
 
           {/* Footer */}
           <HStack space="md" alignItems="center" justifyContent="flex-end" mt="$4">
-            <Button variant={"outlineghost" as any}
+            <Button variant="outline"
               onPress={closeProfileModal}
             >
               <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.users.profileModal.close')}</ButtonText>
             </Button>
-            <Button variant={"solid" as any}
+            <Button variant="solid"
               onPress={() => showAlert('info', t('common.comingSoon'))}
             >
               <ButtonText {...TYPOGRAPHY.bodySmall}>{t('admin.users.profileModal.editUser')}</ButtonText>
@@ -991,41 +1026,7 @@ const UserManagementScreen = () => {
         isOpen={!!deactivateState.user?.id}
         onClose={closeDeactivateModal}
         headerTitle={t('admin.users.actionMenu.confirmDeactivate') || 'Confirm Deactivation'}
-        headerDescription={(() => {
-          const name = deactivateState.user?.name || '';
-          const msg =
-            t('admin.users.actionMenu.deactivateMessage', { name }) ||
-            'Are you sure you want to deactivate this user?';
-
-          if (!name || typeof msg !== 'string') {
-            return (
-              <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
-                {String(msg)}
-              </Text>
-            );
-          }
-
-          const idx = msg.indexOf(name);
-          if (idx < 0) {
-            return (
-              <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
-                {msg}
-              </Text>
-            );
-          }
-
-          const before = msg.slice(0, idx);
-          const after = msg.slice(idx + name.length);
-          return (
-            <Text {...TYPOGRAPHY.bodySmall} color="$textMutedForeground">
-              {before}
-              <Text color="$textForeground" fontWeight="$medium">
-                {name}
-              </Text>
-              {after}
-            </Text>
-          );
-        })()}
+        headerDescription={deactivateModalDescription}
         headerAlignment="baseline"
         maxWidth={420}
         size="sm"
@@ -1068,7 +1069,7 @@ const UserManagementScreen = () => {
           type="file"
           accept=".csv"
           onChange={handleFileSelect}
-          style={{ display: 'none' }}
+          style={styles.hiddenFileInput}
         />
       )}
     </VStack>

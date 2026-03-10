@@ -10,8 +10,9 @@ import type {
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
 import { ROLE_NAMES } from '@constants/ROLES';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
+import logger from '@utils/logger';
+import offlineStorage from './offlineStorage';
 
 // Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
 declare const process: {
@@ -30,7 +31,7 @@ declare const process: {
 export const getUsersList = async (params: UserSearchParams): Promise<UserSearchResponse> => {
   try {
     const {
-      tenant_code = process?.env?.TENANT_CODE_NAME || 'brac',
+      tenant_code = process.env.TENANT_CODE_NAME || 'brac',
       type = ROLE_NAMES.USER,
       page = 1,
       limit = 20, 
@@ -63,30 +64,17 @@ export const getUsersList = async (params: UserSearchParams): Promise<UserSearch
     }
 
     const endpoint = `${API_ENDPOINTS.USERS_LIST}?${queryParams.toString()}`;
-    
-    // Build request body - province/site go in meta
-    const requestBody: any = {};
-    if (province || site) {
+
+    const requestBody: { meta?: { province?: string; site?: string } } = {};
+    if (province ?? site) {
       requestBody.meta = {};
-      if (province) {
-        requestBody.meta.province = province; // Province ID (e.g., "6952163ae83c1c00147132a8")
-      }
-      if (site) {
-        requestBody.meta.site = site; // Site ID
-      }
+      if (province) requestBody.meta.province = province;
+      if (site) requestBody.meta.site = site;
     }
-    
-    // Log the complete API URL with query parameters (for debugging)
-    const paramsObj: Record<string, string> = {};
-    queryParams.forEach((value, key) => {
-      paramsObj[key] = value;
-    });
-    
-    // POST request to fetch users
+
     const response = await api.post<UserSearchResponse>(endpoint, requestBody);
     return response.data;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
+  } catch (error: unknown) {
     throw error;
   }
 };
@@ -112,8 +100,7 @@ export const getRolesList = async (
     const response = await api.get<RolesListResponse>(endpoint);
 
     return response.data;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
+  } catch (error: unknown) {
     throw error;
   }
 };
@@ -129,21 +116,16 @@ export const getEntityTypesList = async (): Promise<EntityTypesListResponse> => 
     // GET request - internal-access-token header is added automatically by interceptor for entity-management endpoints
     const response = await api.get<EntityTypesListResponse>(endpoint);
 
-    // Store entity types in local storage (name -> _id mapping)
     if (response.data?.result && Array.isArray(response.data.result)) {
       const entityTypesMap: Record<string, string> = {};
       response.data.result.forEach((entityType) => {
         entityTypesMap[entityType.name] = entityType._id;
       });
-      
-      await AsyncStorage.setItem(
-        STORAGE_KEYS.ENTITY_TYPES,
-        JSON.stringify(entityTypesMap)
-      );
+      await offlineStorage.create(STORAGE_KEYS.ENTITY_TYPES, entityTypesMap);
     }
 
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Error is already handled by axios interceptor
     throw error;
   }
@@ -155,13 +137,9 @@ export const getEntityTypesList = async (): Promise<EntityTypesListResponse> => 
  */
 export const getEntityTypesFromStorage = async (): Promise<Record<string, string> | null> => {
   try {
-    const stored = await AsyncStorage.getItem(STORAGE_KEYS.ENTITY_TYPES);
-    if (stored) {
-      return JSON.parse(stored);
-    }
-    return null;
+    return await offlineStorage.read<Record<string, string>>(STORAGE_KEYS.ENTITY_TYPES);
   } catch (error) {
-    console.error('Error reading entity types from storage:', error);
+    logger.error('Error reading entity types from storage:', error);
     return null;
   }
 };
@@ -188,8 +166,7 @@ export const getProvincesByEntityType = async (
     }>(endpoint);
 
     return response.data;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
+  } catch (error: unknown) {
     throw error;
   }
 };
@@ -207,13 +184,13 @@ export const getProvincesList = async (): Promise<ProvinceEntity[]> => {
     let entityTypes = await getEntityTypesFromStorage();
     
     // If not in storage, fetch entity types from API
-    if (!entityTypes || !entityTypes['province']) {
+    if (!entityTypes || !entityTypes.province) {
       await getEntityTypesList();
       entityTypes = await getEntityTypesFromStorage();
     }
 
     // Get province entity type ID
-    const provinceEntityTypeId = entityTypes?.['province'];
+    const provinceEntityTypeId = entityTypes?.province;
     
     if (!provinceEntityTypeId) {
       return [];
@@ -223,7 +200,7 @@ export const getProvincesList = async (): Promise<ProvinceEntity[]> => {
     const provincesResponse = await getProvincesByEntityType(provinceEntityTypeId);
     return provincesResponse.result || [];
   } catch (error) {
-    console.error('Error fetching provinces:', error);
+    logger.error('Error fetching provinces:', error);
     return [];
   }
 };
@@ -258,8 +235,7 @@ export const getSitesByEntityType = async (
     }>(endpoint);
 
     return response.data;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
+  } catch (error: unknown) {
     throw error;
   }
 };
@@ -276,13 +252,13 @@ export const getAllSites = async (): Promise<SiteEntity[]> => {
     let entityTypes = await getEntityTypesFromStorage();
     
     // If not in storage, fetch entity types from API
-    if (!entityTypes || !entityTypes['site']) {
+    if (!entityTypes || !entityTypes.site) {
       await getEntityTypesList();
       entityTypes = await getEntityTypesFromStorage();
     }
 
     // Get site entity type ID
-    const siteEntityTypeId = entityTypes?.['site'];
+    const siteEntityTypeId = entityTypes?.site;
     
     if (!siteEntityTypeId) {
       return [];
@@ -295,7 +271,7 @@ export const getAllSites = async (): Promise<SiteEntity[]> => {
     });
     return sitesResponse.result || [];
   } catch (error) {
-    console.error('Error fetching all sites:', error);
+    logger.error('Error fetching all sites:', error);
     return [];
   }
 };
@@ -355,20 +331,15 @@ export const getSitesByProvince = async (
     }>(endpoint);
 
     return response.data;
-  } catch (error: any) {
-    // Error is already handled by axios interceptor
+  } catch (error: unknown) {
     throw error;
   }
 };
 
-
-/**
- * Reset Password Response Interface
- */
 export interface ResetPasswordResponse {
   responseCode: string;
   message: string;
-  result?: any;
+  result?: { username?: string; email?: string; updatedAt?: string };
 }
 
 /**
@@ -394,7 +365,7 @@ export const resetPassword = async (
   params: ResetPasswordRequest
 ): Promise<ResetPasswordResponse> => {
   try {
-    console.log('Reset password called for user:', params.username);
+    logger.log('Reset password called for user:', params.username);
     
     // TODO: Replace this with actual API call when endpoint is available
     // Example:
@@ -415,17 +386,18 @@ export const resetPassword = async (
       },
     };
     
-    console.log('Password reset successful (static response)');
+    logger.log('Password reset successful (static response)');
     
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
     
     return staticResponse;
-  } catch (error: any) {
-    console.error('Reset password error:', {
-      message: error?.message,
-      response: error?.response?.data,
-      status: error?.response?.status,
+  } catch (error: unknown) {
+    const err = error as { message?: string; response?: { data?: unknown; status?: number } };
+    logger.error('Reset password error:', {
+      message: err?.message,
+      response: err?.response?.data,
+      status: err?.response?.status,
     });
     throw error;
   }
@@ -437,7 +409,7 @@ export const resetPassword = async (
  * API: POST /user/v1/admin/deactivateUser
  * Body: { "id": [3125] }
  */
-export const deactivateUser = async (ids: Array<string | number>): Promise<any> => {
+export const deactivateUser = async (ids: Array<string | number>): Promise<unknown> => {
   try {
     const normalized = (ids || []).map((v) => {
       const n = typeof v === 'number' ? v : Number(v);
@@ -445,7 +417,7 @@ export const deactivateUser = async (ids: Array<string | number>): Promise<any> 
     });
     const response = await api.post(API_ENDPOINTS.DEACTIVATE_USER, { id: normalized });
     return response.data;
-  } catch (error: any) {
+  } catch (error: unknown) {
     throw error;
   }
 };

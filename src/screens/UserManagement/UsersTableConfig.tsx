@@ -7,19 +7,26 @@ import { useLanguage } from '@contexts/LanguageContext';
 import { theme } from '@config/theme';
 import { AdminUserManagementData } from '@app-types/Users';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
+
+type UserTableRow = AdminUserManagementData & {
+  user_organizations?: Array<{ roles?: Array<{ role?: { label?: string } }> }>;
+  site?: { label?: string } | string;
+  province?: { label?: string } | string;
+};
 import { MenuItemData } from '@components/ui/Menu';
 import { styles } from './Styles';
 import { useAuth } from '@contexts/AuthContext';
+import logger from '@utils/logger';
 
 /**
  * Helper function to extract role label from user object
  * Extracts role label from nested user_organizations structure
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const useRole = (user: any): string => {
-  return user?.user_organizations?.[0]?.organization?.roles?.[0]?.role?.label ||
-    user?.role ||
-    '-';
+const useRole = (user: Record<string, unknown>): string => {
+  const orgs = user?.user_organizations as Array<{ organization?: { roles?: Array<{ role?: { label?: string } }> }; role?: string }> | undefined;
+  const roleLabel = orgs?.[0]?.organization?.roles?.[0]?.role?.label ?? (user?.role as string | undefined);
+  return roleLabel ?? '-';
 };
 
 /**
@@ -27,8 +34,8 @@ const useRole = (user: any): string => {
  * Extracts province from API response, returns "-" if not found
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getProvince = (user: any): string => {
-  return user?.province || user?.province_name || user?.location?.province || '-';
+const getProvince = (user: Record<string, unknown>): string => {
+  return (user?.province as string) || (user?.province_name as string) || (user?.location as { province?: string })?.province || '-';
 };
 
 /**
@@ -36,8 +43,8 @@ const getProvince = (user: any): string => {
  * Extracts site from API response, returns "-" if not found
  */
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getSite = (user: any): string => {
-  return user?.site || user?.site_name || user?.location?.site || '-';
+const getSite = (user: Record<string, unknown>): string => {
+  return (user?.site as string) || (user?.site_name as string) || (user?.location as { site?: string })?.site || '-';
 };
 
 /**
@@ -66,6 +73,7 @@ export const RoleBadge: React.FC<{ role: string }> = ({ role }) => {
  * Status Badge Component
  */
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
+  const { t } = useLanguage();
   const isActive = status?.toLowerCase() === 'active';
 
   return (
@@ -77,11 +85,12 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
         {...TYPOGRAPHY.bodySmall}
         {...styles.statusBadgeText}
       >
-        {status?.toLowerCase() === 'active' ? 'Active' : 'Deactivated'}
+        {isActive ? t('admin.filters.active') : t('admin.filters.deactivated')}
       </Text>
     </HStack>
   );
 };
+
 
 /**
  * Details Component
@@ -123,7 +132,7 @@ const DetailsCell: React.FC<{ details: AdminUserManagementData['details'] }> = (
 /**
  * Custom trigger for actions menu
  */
-const getCustomTrigger = (triggerProps: any) => (
+const getCustomTrigger = (triggerProps: Record<string, unknown>) => (
   <Pressable {...triggerProps} {...dataTableStyles.customTrigger}>
     <LucideIcon
       name="MoreVertical"
@@ -201,7 +210,7 @@ const ActionsColumn: React.FC<{
         onViewProfile?.(user);
         break;
       case 'edit':
-        console.log('Edit user:', user.id);
+        logger.log('Edit user:', user.id);
         // TODO: Open edit modal or navigate to edit page
         break;
       case 'reset-password':
@@ -212,7 +221,7 @@ const ActionsColumn: React.FC<{
         onDeactivate?.(user);
         break;
       default:
-        console.log('Action:', key, 'for user:', user.id);
+        logger.log('Action:', key, 'for user:', user.id);
     }
   };
 
@@ -283,9 +292,8 @@ export const getUsersColumns = (handlers?: {
     key: 'role',
     label: 'admin.users.role',
     flex: 1.2,
-    render: (user: any) => {
-      // Extract all roles from user_organizations
-      const roles = user?.user_organizations?.[0]?.roles?.map((role: any) => role.role.label) || [];
+    render: (user: UserTableRow) => {
+      const roles = user?.user_organizations?.[0]?.roles?.map((r) => r?.role?.label) ?? [];
 
       // If no roles found, show "-"
       if (roles.length === 0) {
@@ -299,7 +307,7 @@ export const getUsersColumns = (handlers?: {
       // Render separate badges for each role
       return (
         <HStack space="xs" flexWrap="wrap">
-          {roles.map((roleLabel: string, index: number) => (
+          {roles.filter((label): label is string => Boolean(label)).map((roleLabel, index) => (
             <RoleBadge key={`${roleLabel}-${index}`} role={roleLabel} />
           ))}
         </HStack>
@@ -324,9 +332,13 @@ export const getUsersColumns = (handlers?: {
     key: 'province',
     label: 'admin.users.province',
     flex: 1.2,
-    render: (user: any) => (
+    render: (user: UserTableRow) => (
       <Text {...TYPOGRAPHY.paragraph} {...styles.provinceText}>
-        {user?.province?.label || '-'}
+        {typeof user?.province === 'object' && user?.province && 'label' in user.province
+          ? (user.province as { label: string }).label
+          : typeof user?.province === 'string'
+            ? user.province
+            : '-'}
       </Text>
     ),
     mobileConfig: {
@@ -338,11 +350,15 @@ export const getUsersColumns = (handlers?: {
     key: 'site',
     label: 'admin.users.site',
     flex: 1.2,
-    render: (user: any) => (
-      <Text {...TYPOGRAPHY.paragraph} {...styles.districtText}>
-        {user?.site?.label || user?.site || '-'}
-      </Text>
-    ),
+    render: (user: UserTableRow) => {
+      const site = user?.site;
+      const label = typeof site === 'object' && site && 'label' in site ? (site as { label: string }).label : typeof site === 'string' ? site : '-';
+      return (
+        <Text {...TYPOGRAPHY.paragraph} {...styles.districtText}>
+          {label}
+        </Text>
+      );
+    },
     mobileConfig: {
       rightRank: 3,
       showLabel: false,

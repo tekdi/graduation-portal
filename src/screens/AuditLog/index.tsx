@@ -9,6 +9,7 @@ import { AuditLogFilterOptions } from '@constants/AUDIT_LOG_FILTERS';
 import DataTable from '@components/DataTable';
 import { getAuditLogColumns } from './AuditLogTableConfig';
 import { AUDIT_LOG_MOCK_DATA, AuditLogEntry } from '@constants/AUDIT_LOG_MOCK_DATA';
+import logger from '@utils/logger';
 
 const AuditLogScreen = () => {
   const { t } = useLanguage();
@@ -16,8 +17,8 @@ const AuditLogScreen = () => {
   const columns = getAuditLogColumns();
 
   const handleRowClick = (entry: AuditLogEntry) => {
-    // Handle row click if needed
-    console.log('Clicked entry:', entry);
+    // Handle row click if needed (logger is dev-only; log non-sensitive id only)
+    logger.log('Clicked entry id:', entry.id);
   };
 
   return(

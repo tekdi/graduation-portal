@@ -13,7 +13,9 @@ import {
 import { updateEntityDetails } from '../../../src/services/participantService';
 import { getProjectCategoryList} from '../../../src/services/projectService';
 import { useAuth } from '@contexts/AuthContext';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import logger from '@utils/logger';
+import offlineStorage from '../../services/offlineStorage';
+
 export const useProjectLoader = (
   config: ProjectPlayerConfig,
   data: ProjectPlayerData,
@@ -39,23 +41,26 @@ export const useProjectLoader = (
               projectData = res.data;
             } else {
               try {
-              projectData = await createProjectForEntity(entityId, province);
+              if (!entityId) throw new Error('entityId is required');
+              const createdProject = await createProjectForEntity(entityId, province ?? '');
 
-              if (projectData?._id) {
+              if (createdProject && typeof createdProject === 'object' && '_id' in createdProject && createdProject._id) {
+                const projectId = createdProject._id as string;
                 await updateEntityDetails({
-                  userId: `${user?.id}`,
-                  entityId:entityId,
-                 entityUpdates:{
-                   onBoardedProjectId: projectData._id,
-                 }
+                  userId: user?.id ?? '',
+                  entityId,
+                  entityUpdates: {
+                    onBoardedProjectId: projectId,
+                  },
                 });
-                const ref = await AsyncStorage.getItem('my_program_user_ref');
-                if (ref) {
-                  await updateProjectInfo(projectData._id, ref);
+                const ref = await offlineStorage.read<string>('my_program_user_ref');
+                if (ref && projectId) {
+                  await updateProjectInfo(projectId, ref);
                 }
               }
+              projectData = createdProject;
               } catch (err) {
-                console.error('Failed to create project for entity:', err);
+                logger.error('Failed to create project for entity:', err);
                 // Re-throw the error to be handled by the outer catch block
                 throw err;
               }
@@ -64,7 +69,7 @@ export const useProjectLoader = (
 
             setProjectData(projectData);
           } catch (err) {
-            console.error('Failed to load project templates:', err);
+            logger.error('Failed to load project templates:', err);
             setProjectData(null);
             setError(err as Error);
           }
@@ -72,7 +77,7 @@ export const useProjectLoader = (
           const templatesData = await getProjectCategoryList();
           const selectedPathway = data?.selectedPathway;
           const pathwayData = templatesData?.find(
-            (template: any) => template._id === selectedPathway,
+            (template: { _id?: string }) => template._id === selectedPathway,
           );
           const categoryIdsString = data?.categoryIds.join(',');
           const taskResponse = await getTaskDetails(categoryIdsString);
@@ -80,12 +85,12 @@ export const useProjectLoader = (
 
           const updatedPathwayData = {
             ...pathwayData,
-            children: pathwayData?.children?.map((child: any) => {
-              let taskEntry = taskResult?.[child._id];
+            children: pathwayData?.children?.map((child: { _id?: string }) => {
+              let taskEntry = child._id != null ? taskResult?.[child._id] : undefined;
 
               if (!taskEntry) {
                 const relation = data?.pillarCategoryRelation?.find(
-                  (rel: any) => rel.pillarId === child._id,
+                  (rel: { pillarId?: string; selectedCategoryId?: string }) => rel.pillarId === child._id,
                 );
 
                 const newChildId = relation?.selectedCategoryId;
@@ -121,7 +126,7 @@ export const useProjectLoader = (
     };
 
     loadData();
-  }, [config.mode, data.projectId, data.solutionId, data.data, data,error, user?.id]);
+  }, [config.mode, data, user?.id]);
 
   return { projectData, isLoading, error };
 };

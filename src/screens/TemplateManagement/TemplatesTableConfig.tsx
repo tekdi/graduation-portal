@@ -9,6 +9,7 @@ import { Template } from '@constants/TEMPLATE_MANAGEMENT_MOCK_DATA';
 import { styles as dataTableStyles } from '@components/DataTable/Styles';
 import { MenuItemData } from '@components/ui/Menu';
 import { templateManagementStyles as styles } from './Styles';
+import logger from '@utils/logger';
 
 /**
  * Status Badge Component
@@ -34,7 +35,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
 /**
  * Custom trigger for actions menu
  */
-const getCustomTrigger = (triggerProps: any) => (
+const getCustomTrigger = (triggerProps: Record<string, unknown>) => (
   <Pressable {...triggerProps} {...dataTableStyles.customTrigger}>
     <LucideIcon
       name="MoreVertical"
@@ -47,7 +48,7 @@ const getCustomTrigger = (triggerProps: any) => (
 /**
  * Get Template Menu Items
  */
-const getTemplateMenuItems = (t: (key: string) => string): MenuItemData[] => [
+const getTemplateMenuItems = (_t: (key: string) => string): MenuItemData[] => [
   {
     key: 'view',
     label: 'admin.templates.actionMenu.view',
@@ -83,19 +84,19 @@ const ActionsColumn: React.FC<{ template: Template }> = ({ template }) => {
   const handleMenuSelect = (key: string) => {
     switch (key) {
       case 'view':
-        console.log('View template:', template.id);
+        logger.log('View template:', template.id);
         // TODO: Navigate to template view (read-only)
         break;
       case 'deactivate':
-        console.log('Deactivate template:', template.id);
+        logger.log('Deactivate template:', template.id);
         // TODO: Implement deactivate logic
         break;
       case 'export':
-        console.log('Export template:', template.id);
+        logger.log('Export template:', template.id);
         // TODO: Implement export logic
         break;
       default:
-        console.log('Action:', key, 'for template:', template.id);
+        logger.log('Action:', key, 'for template:', template.id);
     }
   };
 

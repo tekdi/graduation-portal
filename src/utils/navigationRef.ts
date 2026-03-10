@@ -1,5 +1,5 @@
 import { createNavigationContainerRef, CommonActions } from '@react-navigation/native';
-
+import logger from '@utils/logger';
 export const navigationRef = createNavigationContainerRef();
 
 /**
@@ -7,17 +7,17 @@ export const navigationRef = createNavigationContainerRef();
  * @param name - Screen name to navigate to
  * @param params - Optional navigation parameters
  */
-export function navigate(name: string, params?: any) {
+export function navigate(name: string, params?: Record<string, unknown>) {
   if (navigationRef.isReady()) {
     try {
       // @ts-ignore - navigation type inference
       navigationRef.navigate(name, params);
     } catch (error) {
-      console.warn('Navigation error:', error);
+      logger.warn('Navigation error:', error);
     }
   } else {
     // If navigation is not ready, log a warning
-    console.warn('Navigation is not ready yet. Cannot navigate to:', name);
+    logger.warn('Navigation is not ready yet. Cannot navigate to:', name);
   }
 }
 
@@ -27,7 +27,7 @@ export function navigate(name: string, params?: any) {
  * @param name - Screen name to reset to
  * @param params - Optional navigation parameters
  */
-export function resetToScreen(name: string, params?: any) {
+export function resetToScreen(name: string, params?: Record<string, unknown>) {
   if (navigationRef.isReady()) {
     try {
       navigationRef.dispatch(
@@ -38,10 +38,10 @@ export function resetToScreen(name: string, params?: any) {
         })
       );
     } catch (error) {
-      console.warn('Navigation reset error:', error);
+      logger.warn('Navigation reset error:', error);
     }
   } else {
-    console.warn('Navigation is not ready yet. Cannot reset to:', name);
+    logger.warn('Navigation is not ready yet. Cannot reset to:', name);
   }
 }
 

@@ -34,13 +34,13 @@ import { getCategoryList, getProjectDetails} from '../../project-player/services
 import { useAuth } from '@contexts/AuthContext';
 import { STATUS, PATHWAY_TAGS } from '@constants/app.constant';
 import { Category, PillarCategoryMap, PillarSelection, SubCategory } from '@app-types/screens';
-
+import logger from '@utils/logger';
 
 const DevelopInterventionPlan: React.FC = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { t } = useLanguage();
-  const { isWeb , isMobile} = usePlatform();
+  const { isMobile } = usePlatform();
   const { user } = useAuth();
 
   const participantId = (route.params as { id?: string })?.id || '';
@@ -79,8 +79,8 @@ const DevelopInterventionPlan: React.FC = () => {
             const {userDetails,...rest} = response?.result?.data?.[0]
             const participantData = {...(userDetails || {}),...rest}
             setParticipant(participantData);
-          } catch (error) {
-            console.log(error);
+          } catch (err) {
+            logger.error('Failed to fetch entity details', err);
           }
         }
       };
@@ -100,19 +100,18 @@ const DevelopInterventionPlan: React.FC = () => {
     return selectedCategory?.subcategories || [];
   };
 
-  const handleIdpCreation = useCallback(async (newProjectId: any) => {
-    console.log('handleIdpCreation -  Project ID:', newProjectId);
+  const handleIdpCreation = useCallback(async (newProjectId: string | undefined) => {
+    logger.log('handleIdpCreation -  Project ID:', newProjectId);
     setIdpCreated(true);
     if (newProjectId) {
       // Extract project ID from the response
-      setProjectId(projectId);
-
+      setProjectId(newProjectId);
 
       const response = await getProjectDetails(newProjectId);
       const project = response?.data;
       // update entity to IN_PROGRESS
-      const res = await updateEntityDetails({
-        userId: user?.userId,
+      await updateEntityDetails({
+        userId: user?.userId || '',
         entityId: participantId,
         entityUpdates: {
           idpProjectId: newProjectId,
@@ -121,7 +120,7 @@ const DevelopInterventionPlan: React.FC = () => {
       });
 
      // create user program Mapping for the participant
-      const userProgramMapping = await createOrUpdateProgramUserMapping({
+      await createOrUpdateProgramUserMapping({
         userId: participantId,
         programId: project.programId,
         metaInformation: {
@@ -137,9 +136,10 @@ const DevelopInterventionPlan: React.FC = () => {
       //     status: STATUS.IN_PROGRESS,
       //   },
       // });
+    // @ts-ignore - Navigation type issue
     navigation.navigate('participant-detail', { id: route.params?.id });
     }
-  }, []);
+  }, [navigation, participantId, projectId, route, user?.userId]);
 
   const handleChangePathway = useCallback(() => {
     setShowProjectPlayerPreview(false);
@@ -153,12 +153,13 @@ const DevelopInterventionPlan: React.FC = () => {
 
   const getPillarCategoryRelationships = useMemo(() => {
     // Get all pillars that have child categories from pillarData
+    type PillarItem = { _id?: string; name?: string; hasChildCategories?: boolean };
     const pillarsWithCategories = pillarData.filter(
-      (pillar: any) => pillar?.hasChildCategories,
+      (pillar: PillarItem) => pillar?.hasChildCategories,
     );
 
     return pillarsWithCategories
-      .map((pillar: any) => {
+      .map((pillar: PillarItem) => {
         const pillarId = pillar._id;
         const selection = selectionByPillar[pillarId];
 
@@ -272,7 +273,7 @@ const DevelopInterventionPlan: React.FC = () => {
         if (!isMounted) return;
         setTemplates(templatesData || []);
       } catch (err) {
-        console.error('Failed to fetch project data', err);
+        logger.error('Failed to fetch project data', err);
         if (isMounted) {
           setError('Failed to load templates');
         }
@@ -294,17 +295,18 @@ const DevelopInterventionPlan: React.FC = () => {
 
   const handleConfirm = () => {
     // Check if all pillars with child categories have both category and subcategory selected
+    type PillarItem = { _id?: string; hasChildCategories?: boolean };
     const allPillarsHaveSelections = pillarData
-      .filter((pillar: any) => pillar?.hasChildCategories)
+      .filter((pillar: PillarItem) => pillar?.hasChildCategories)
       .every(
-        (pillar: any) =>
-          selectionByPillar[pillar._id]?.categoryId &&
-          selectionByPillar[pillar._id]?.subCategoryId,
+        (pillar: PillarItem) =>
+          selectionByPillar[pillar._id!]?.categoryId &&
+          selectionByPillar[pillar._id!]?.subCategoryId,
       );
 
     if (allPillarsHaveSelections) {
       // Log the pillar-category relationships
-      console.log(
+      logger.log(
         'Pillar-Category Relationships:',
         getPillarCategoryRelationships,
       );
@@ -321,13 +323,14 @@ const DevelopInterventionPlan: React.FC = () => {
       const pillars = res?.data ?? [];
       setPillarData(pillars);
 
+      type PillarItem = { _id?: string; hasChildCategories?: boolean };
       const pillarIdsWithCategories = pillars
-        .filter((pillar: any) => pillar?.hasChildCategories)
-        .map((pillar: any) => pillar._id);
+        .filter((pillar: PillarItem) => pillar?.hasChildCategories)
+        .map((pillar: PillarItem) => pillar._id);
 
       const pillarIdsWithoutCategories = pillars
-        .filter((pillar: any) => pillar?.hasChildCategories === false)
-        .map((pillar: any) => pillar._id);
+        .filter((pillar: PillarItem) => pillar?.hasChildCategories === false)
+        .map((pillar: PillarItem) => pillar._id);
       setPillarIdsToGetIdp(pillarIdsWithoutCategories);
 
       // If no pillars have child categories, skip modal and directly show project player
@@ -381,21 +384,20 @@ const DevelopInterventionPlan: React.FC = () => {
 
       // setCategories(categoriesData || []);
     } catch (err) {
-      console.error('Failed to fetch project data', err);
+      logger.error('Failed to fetch project data', err);
       setError('Failed to load templates');
     }
   };
 
   const handleBackPress = () => {
-    navigation.navigate(
-      'participant-detail' as never,
-      { id: participantId } as never,
-    );
+    // @ts-ignore - Navigation type issue
+    navigation.navigate('participant-detail', { id: participantId });
     setShowProjectPlayerPreview(false);
   };
 
   const handleViewCheckIns = () => {
-    navigation.navigate('log-visit' as never, { id: participantId } as never);
+    // @ts-ignore - Navigation type issue
+    navigation.navigate('log-visit', { id: participantId });
   };
 
   /* -------------------- UI -------------------- */
@@ -459,7 +461,7 @@ const DevelopInterventionPlan: React.FC = () => {
         {!isLoading &&
           !error &&
           !showProjectPlayerPreview && (
-        <ScrollView flex={1} contentContainerStyle={{ flexGrow: 1 }} showsVerticalScrollIndicator={false}>
+        <ScrollView flex={1} contentContainerStyle={templateStyles.scrollViewContent} showsVerticalScrollIndicator={false}>
           {templates?.map(pathway => (
             <Pressable
               key={pathway?._id}

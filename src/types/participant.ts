@@ -37,7 +37,7 @@ export interface ParticipantData extends User {
   progress?: number;
   graduationProgress?: number;
   graduationDate?: string | Date;
-  [key: string]: any; // Allow additional properties for flexibility
+  [key: string]: unknown;
 }
 
 /**
@@ -47,13 +47,14 @@ export interface ParticipantData extends User {
 export interface AssessmentSurveyCardData {
   id: string;
   solutionId: string;
-  name: string; // Translation key
+  name?: string; // Translation key
+  title?: string; // Alias used in some constants
   description: string; // Translation key
   additionalInfo?: string; // Optional translation key for additional information
   icon?: string; // Lucide icon name
   iconColor?: string; // Optional icon background color
   navigationUrl?: string; // Optional navigation route
-  status?: ValueOf<typeof CARD_STATUS>; // Restrict to CARD_STATUS keys: 'ACTIVE', 'INACTIVE', etc.
+  status?: ValueOf<typeof CARD_STATUS> | { type: string; label: string; percentage?: number };
   actionButton?: {
     label: string; // Translation key
     icon: string; // Lucide icon name
@@ -65,7 +66,7 @@ export interface AssessmentSurveyCardData {
     showForStatuses?: Array<ParticipantStatus>;
     hideForStatuses?: Array<ParticipantStatus>;
   };
-  entity:any;
+  entity?: unknown;
   entityType?: string;
 }
 
@@ -127,9 +128,9 @@ export interface ParticipantSearchResponse {
   responseCode: string;
   message: string;
   result: {
-    data: any[];
+    data: unknown[];
     overview?: ParticipantOverview;
-    details:any;
+    details: unknown;
   };
   count?: number;
   total?: number;

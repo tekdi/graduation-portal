@@ -9,6 +9,7 @@ import { getProvincesList, getSitesByProvince } from '../services/usersService';
 import { getSupervisorsByProvince } from '../services/assignUsersService';
 import type { FilterConfig } from './USER_MANAGEMENT';
 import type { ProvinceEntity, AdminUserManagementData, SiteEntity } from '@app-types/Users';
+import logger from '@utils/logger';
 
 // Search filter for LC assignment
 export const SearchFilter: FilterConfig = {
@@ -35,7 +36,7 @@ export const ParticipantSearchFilter: FilterConfig = {
  * @param filters - Current filter values to check if province is selected
  * @returns Object containing filter configurations and supervisors data
  */
-export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
+export const useSupervisorFilterOptions = (filters: Record<string, unknown> = {}): {
   filters: ReadonlyArray<FilterConfig>;
   supervisors: AdminUserManagementData[];
 } => {
@@ -56,7 +57,7 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
   // Fetch supervisors - all supervisors initially, filtered by province when selected
   useEffect(() => {
     const fetchSupervisors = async () => {
-      const selectedProvince = filters.filterByProvince;
+      const selectedProvince = filters.filterByProvince as string | undefined;
       
       try {
         // Fetch all supervisors if no province selected, or filtered by province if selected
@@ -68,15 +69,15 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
           limit: 100,
         });
         const supervisorsData = supervisorsResponse.result?.data || [];
-        setSupervisors(supervisorsData);
+        setSupervisors((supervisorsData ?? []) as AdminUserManagementData[]);
       } catch (error) {
-        console.error('Error fetching supervisors:', error);
+        logger.error('Error fetching supervisors:', error);
         setSupervisors([]);
       }
     };
 
     fetchSupervisors();
-  }, [filters.filterByProvince]); // Re-fetch when province filter changes
+  }, [filters.filterByProvince]);
 
   // Build dynamic filter options with API data
   return useMemo(() => {
@@ -90,9 +91,9 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
     ];
 
     // Build supervisor filter from API supervisors
-    const supervisorFilterOptions = supervisors.map((supervisor: any) => {
-      const name = supervisor.name || supervisor.full_name || supervisor.email || 'Unknown';
-      const value = supervisor.id || supervisor._id || supervisor.email || name;
+    const supervisorFilterOptions = supervisors.map((supervisor: AdminUserManagementData) => {
+      const name = supervisor.name ?? (supervisor as { full_name?: string }).full_name ?? supervisor.email ?? 'Unknown';
+      const value = String(supervisor.id ?? (supervisor as { _id?: string })._id ?? supervisor.email ?? name);
       return {
         label: name,
         value: value,
@@ -117,7 +118,7 @@ export const useSupervisorFilterOptions = (filters: Record<string, any> = {}): {
       ],
       supervisors, // Return supervisors data for accessing location and other details
     };
-  }, [provinces, supervisors, filters.filterByProvince]);
+  }, [provinces, supervisors]);
 };
 
 /**
@@ -149,7 +150,7 @@ export const useSiteFilterOptions = (selectedProvinceId?: string): {
         const sitesData = sitesResponse.result?.data || [];
         setSites(sitesData);
       } catch (error) {
-        console.error('Error fetching sites:', error);
+        logger.error('Error fetching sites:', error);
         setSites([]);
       }
     };
@@ -180,7 +181,7 @@ export const useSiteFilterOptions = (selectedProvinceId?: string): {
       ],
       sites, // Return sites data for accessing details
     };
-  }, [sites, selectedProvinceId]);
+  }, [sites]);
 };
 
 /**
@@ -222,7 +223,7 @@ export const useParticipantFilterOptions = (selectedProvinceId?: string): {
         const sitesData = sitesResponse.result?.data || [];
         setSites(sitesData);
       } catch (error) {
-        console.error('Error fetching sites:', error);
+        logger.error('Error fetching sites:', error);
         setSites([]);
       }
     };
@@ -268,7 +269,7 @@ export const useParticipantFilterOptions = (selectedProvinceId?: string): {
       ],
       sites,
     };
-  }, [provinces, sites, selectedProvinceId]);
+  }, [provinces, sites]);
 };
 
 // NOTE: Participant filters are now provided by `useParticipantFilterOptions`.

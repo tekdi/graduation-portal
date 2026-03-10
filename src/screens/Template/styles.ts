@@ -1,4 +1,9 @@
+import { CONTENT_MAX_WIDTH } from '@constants/STYLE_CONSTANTS';
+
 export const templateStyles = {
+  scrollViewContent: {
+    flexGrow: 1,
+  },
   iconContainer: {
     $md: {
       width: '$12',
@@ -104,7 +109,7 @@ export const templateStyles = {
   },
   contentContainer: {
     width: '100%',
-    maxWidth: 1150,
+    maxWidth: CONTENT_MAX_WIDTH,
     alignSelf: 'center',
   },
   navigationRow: {

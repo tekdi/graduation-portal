@@ -188,7 +188,7 @@ export const readAllKeys = async (): Promise<string[]> => {
   try {
     const keys = await AsyncStorage.getAllKeys();
     logger.info(`OfflineStorage: Retrieved ${keys.length} keys`);
-    return keys;
+    return [...keys];
   } catch (error) {
     logger.error('OfflineStorage: Error reading all keys', error);
     throw error;
@@ -207,7 +207,7 @@ export const readMultiple = async <T>(
     const values = await AsyncStorage.multiGet(keys);
     const result = values.map(([key, value]) => ({
       key,
-      value: value ? (JSON.parse(value) as T) : null,
+      value: value != null ? (JSON.parse(value) as T) : null,
     }));
     logger.info(`OfflineStorage: Read ${keys.length} keys`);
     return result;
@@ -226,7 +226,7 @@ export const createMultiple = async <T>(
   items: Array<{ key: string; value: T }>
 ): Promise<void> => {
   try {
-    const pairs = items.map(({ key, value }) => [
+    const pairs: [string, string][] = items.map(({ key, value }) => [
       key,
       JSON.stringify(value),
     ]);

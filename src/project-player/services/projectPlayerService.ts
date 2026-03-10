@@ -4,6 +4,7 @@ import { ApiResponse } from '../types/components.types';
 import { API_ENDPOINTS } from './apiEndpoints';
 import { isWeb } from '@utils/platform';
 import { createProjectPlanPayload } from '../types';
+import logger from '@utils/logger';
 
 export const apiClient = axios.create({
   // Use baseUrl from PROJECT_PLAYER_CONFIGS (which gets from env, with fallback)
@@ -21,10 +22,7 @@ apiClient.interceptors.request.use(async config => {
       config.headers['X-auth-token'] = token;
     }
   } catch (error) {
-    console.error(
-      'Error getting token from AsyncStorage in interceptor:',
-      error,
-    );
+    logger.error('Error getting token from AsyncStorage in interceptor:', error);
     // No token will be added if AsyncStorage fails
   }
 
@@ -40,11 +38,8 @@ apiClient.interceptors.response.use(
 
       if (isWeb) {
         window.location.href = redirectUrl;
-      } else {
-        const routeName = redirectUrl.startsWith('/')
-          ? redirectUrl.slice(1)
-          : redirectUrl;
       }
+      // On native, redirectUrl could be used for deep linking if needed
     }
     return Promise.reject(error);
   },
@@ -109,15 +104,15 @@ export const getProjectDetails = async (
 
 export const updateTask = async (
   projectId: string,
-  requestBody: any,
-): Promise<ApiResponse<any>> => {
+  requestBody: Record<string, unknown>,
+): Promise<ApiResponse<unknown>> => {
   try {
     const response = await apiClient.post(
       API_ENDPOINTS.UPDATE_TASK(projectId),
       requestBody,
     );
 
-    return response.data.result;
+    return { data: response.data.result };
   } catch (error) {
     return handleApiError(error);
   }
@@ -130,7 +125,7 @@ export const updateProjectInfo = async (projectId: string, programUsersRef: stri
       programUserMappingReference: programUsersRef
     });
     return response.data.result;
-  } catch (error: any) {
+  } catch (error: unknown) {
     throw error;
   }
 };
@@ -191,8 +186,8 @@ export const submitInterventionPlan = async (
 export const getSolutionDetails = async (
   solutionId: string,
   taskId: string,
-  payload: any = {}
-): Promise<ApiResponse<any>> => {
+  payload: Record<string, unknown> = {}
+): Promise<ApiResponse<unknown>> => {
   try {
     const response = await apiClient.post(
       API_ENDPOINTS.GET_SOLUTION_DETAILS(solutionId, taskId),
@@ -241,11 +236,17 @@ export const uploadFiles = async (
       }
     });
     if (response?.data?.[id]) {
-      const responceData = await Promise.all(files.map(async file => {
-        const presignedUrl = response.data[id].files.find(f => f.file === file.name);
-        
+      const responseData = await Promise.all(files.map(async file => {
+        const presignedUrl = response.data[id].files.find(
+          (f: { file?: string; url?: string }) => f.file === file.name,
+        );
+
+        if (!presignedUrl?.url) {
+          throw new Error(`Missing presigned URL for ${file.name}`);
+        }
+
         // Upload file to presigned URL
-        const res = await fetch(presignedUrl?.url, {
+        const res = await fetch(presignedUrl.url, {
           method: 'PUT',
           body: file
         });
@@ -253,7 +254,7 @@ export const uploadFiles = async (
         // Check upload success
         if (!res.ok) {
           const errorMsg = `Failed to upload ${file.name}: ${res.status} ${res.statusText}`;
-          console.error(errorMsg);
+          logger.error(errorMsg);
           throw new Error(errorMsg);
         }
         
@@ -261,12 +262,12 @@ export const uploadFiles = async (
           name: file.name,
           sourcePath: presignedUrl?.payload?.sourcePath,
           type: file?.type,
-          url: presignedUrl?.url ? presignedUrl.url.split('?')[0] : undefined,
-          size:file?.size
+          url: presignedUrl.url.split('?')[0],
+          size: file?.size
         }
       }));
-      
-      return { data: responceData };
+
+      return { data: responseData };
     }
     return { data: [] };
   } catch (error) {
