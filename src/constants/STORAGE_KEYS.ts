@@ -25,5 +25,6 @@ export const STORAGE_KEYS = {
   PARTICIPANTS_PAGE_SIZE: 'participants_page_size',
   /** Admin sidebar open/collapsed state (true=open, false=collapsed) */
   ADMIN_SIDEBAR_OPEN: 'admin_sidebar_open',
+  /** Admin Dashboard filter selections (JSON object) */
+  ADMIN_DASHBOARD_FILTERS: 'admin_dashboard_filters',
 } as const;
-

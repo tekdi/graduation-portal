@@ -13,8 +13,9 @@ export const dashboardCardsStyles = {
     gap: '$4' as const, // Explicit gap for better control
   },
   pressable: {
-    // Width is calculated dynamically in component based on number of cards
-    minWidth: '$64' as const,
+    // Width is calculated dynamically in component based on number of cards.
+    // minWidth must not force a large floor (e.g. $64) or 4× columns won't fit—only ~3 show per row.
+    minWidth: 0 as const,
     display: 'flex' as const,
     alignItems: 'stretch' as const, // Ensure cards stretch to same height
     $sm: {

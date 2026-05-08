@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo } from "react";
-import { VStack, HStack, Text, Image, Input, InputField, Pressable, Box, LucideIcon } from "@ui";
+import { VStack, HStack, Text, Input, InputField, Pressable, Box, LucideIcon } from "@ui";
 import Select from "../ui/Inputs/Select";
 import DatePicker from "../ui/Inputs/DatePicker";
 import { filterStyles } from "./Styles";
@@ -9,6 +9,8 @@ import SearchBar from "@components/SearchBar";
 interface FilterButtonProps {
   data: any[];
   onFilterChange?: (filters: Record<string, any>) => void;
+  /** When set, filter state is controlled by the parent (e.g. persisted filters). */
+  filterValues?: Record<string, any>;
   // Configuration for right section (Clear Button)
   showClearButton?: boolean; // Show clear button (default: true)
   rightContent?: React.ReactNode; // Custom right content (overrides default clear button)
@@ -18,12 +20,28 @@ interface FilterButtonProps {
 export default function FilterButton({
   data,
   onFilterChange,
+  filterValues,
   showClearButton = true,
   rightContent
   // disabled prop is passed via data items - Used for district filter when no province selected
 }: FilterButtonProps) {
   const { t } = useLanguage();
-  const [value, setValue] = React.useState<any>({});
+  const isControlled = filterValues !== undefined;
+  const [internalValue, setInternalValue] = React.useState<any>({});
+  const value = isControlled ? filterValues : internalValue;
+
+  const setValue = React.useCallback(
+    (updater: any) => {
+      if (isControlled) {
+        const next =
+          typeof updater === 'function' ? updater(filterValues as Record<string, any>) : updater;
+        onFilterChange?.(next);
+      } else {
+        setInternalValue(updater);
+      }
+    },
+    [isControlled, filterValues, onFilterChange],
+  );
   const [openDatePicker, setOpenDatePicker] = React.useState<string | null>(null);
   const [searchKey, setSearchKey] = React.useState('');
   const isInitialSearchRef = React.useRef(true);
@@ -60,12 +78,14 @@ export default function FilterButton({
         setValue((prev: any) => ({ ...prev, [searchItem.attr]: text.trim() }));
       }
     }
-  }, [searchItem]);
+  }, [searchItem, setValue]);
 
-  // Notify parent when filters change
+  // Notify parent when filters change (uncontrolled only; controlled parents own state)
   React.useEffect(() => {
-    onFilterChange?.(value);
-  }, [value, onFilterChange]);
+    if (!isControlled) {
+      onFilterChange?.(value);
+    }
+  }, [value, onFilterChange, isControlled]);
 
   // Get default display values for UI (not included in output)
   const getDefaultDisplayValue = (item: any) => {

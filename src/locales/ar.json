@@ -61,6 +61,8 @@
       "PasswordPolicy": "سياسة كلمة المرور",
       "audit-log": "سجل التدقيق",
       "assign-users": "تعيين المستخدمين",
+      "observation-editor": "محرر الملاحظة",
+      "observation-editor-detail": "محرر القالب",
       "welcome": "مرحبا",
       "select-language": "اختر اللغة",
       "dashboard": "لوحة القيادة",
@@ -79,7 +81,11 @@
       "uploadUsers": "تحميل المستخدمين",
       "createUser": "إنشاء مستخدم",
       "main": "الرئيسية",
-      "quickActions": "إجراءات سريعة"
+      "quickActions": "إجراءات سريعة",
+      "observationEditor": "محرر نماذج الملاحظة"
+    },
+    "observationEditor": {
+      "description": "تحرير قوالب نماذج الملاحظة وإدارة الأسئلة وتهيئة المنطق الشرطي."
     }
   },
   "brand": {

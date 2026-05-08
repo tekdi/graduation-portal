@@ -2,25 +2,35 @@
  * Admin Dashboard Filter Configurations
  * Data-driven filter definitions for the Admin Dashboard screen
  */
+import { useEffect, useMemo, useState } from 'react';
+import {
+  getProvincesList,
+  getSitesByProvince,
+  getUsersList,
+} from '../services/usersService';
+import type { ProvinceEntity, SiteEntity, UserSearchParams } from '@app-types/Users';
+
+/** API user type for Linkage Champion / org admin lists (see assignUsersService) */
+const LINKAGE_CHAMPION_USER_TYPE = 'org_admin';
 
 // Type definition for filter configuration
-// Supports all filter types: 'search', 'select', 'date', 'datepicker', etc.
 type FilterConfig = {
-  name?: string; // Fallback if nameKey is not provided
-  nameKey?: string; // Translation key for the filter name
+  name?: string;
+  nameKey?: string;
   attr: string;
-  type?: string; // Optional: supports 'search', 'select', 'date', 'datepicker', or any custom type
-  data?: any[]; // Flexible data structure - can be array of strings, objects, or any type
-  placeholder?: string; // Fallback if placeholderKey is not provided
-  placeholderKey?: string; // Translation key for the placeholder
-  [key: string]: any; // Allow additional properties for future filter types
+  type?: string;
+  data?: any[];
+  placeholder?: string;
+  placeholderKey?: string;
+  disabled?: boolean;
+  [key: string]: any;
 };
 
 // Date filter configurations (using search type with date placeholder)
 export const FromDateFilter: FilterConfig = {
   nameKey: 'admin.dashboardFilters.fromDate',
   attr: 'fromDate',
-  type: 'date', // Can be changed to 'date' or 'datepicker' when date picker component is implemented
+  type: 'date',
   data: [],
   placeholderKey: 'admin.dashboardFilters.datePlaceholder',
 };
@@ -28,7 +38,7 @@ export const FromDateFilter: FilterConfig = {
 export const ToDateFilter: FilterConfig = {
   nameKey: 'admin.dashboardFilters.toDate',
   attr: 'toDate',
-  type: 'date', // Can be changed to 'date' or 'datepicker' when date picker component is implemented
+  type: 'date',
   data: [],
   placeholderKey: 'admin.dashboardFilters.datePlaceholder',
 };
@@ -48,41 +58,25 @@ export const TimePeriodFilter: FilterConfig = {
   ],
 };
 
-// Provinces filter
 export const ProvincesFilter: FilterConfig = {
   nameKey: 'admin.filters.filterByProvince',
   attr: 'province',
   type: 'select',
-  data: [
-    { labelKey: 'admin.filters.allProvinces', value: 'all-provinces' },
-    { labelKey: 'Gauteng', value: 'Gauteng' },
-    { labelKey: 'KwaZulu-nutal', value: 'KwaZulu-nutal' },
-    { labelKey: 'Western Cape', value: 'Western Cape' },
-  ],
+  data: [],
 };
 
-// Districts filter
-export const DistrictsFilter: FilterConfig = {
-  nameKey: 'admin.filters.allDistrict',
-  attr: 'district',
+export const SitesFilter: FilterConfig = {
+  nameKey: 'admin.filters.site',
+  attr: 'site',
   type: 'select',
-  data: [
-    { labelKey: 'admin.filters.allDistrict', value: 'all-districts' },
-    { labelKey: 'Johannesburg', value: 'Johannesburg' },
-    { labelKey: 'eThekwini', value: 'eThekwini' },
-    { labelKey: 'Cape Town', value: 'Cape Town' },
-  ],
+  data: [],
 };
 
-// Linkage Champions filter
 export const ChampionsFilter: FilterConfig = {
   nameKey: 'admin.dashboardFilters.champions',
   attr: 'champions',
   type: 'select',
-  data: [
-    { labelKey: 'admin.dashboardFilters.allChampions', value: 'all-champions' },
-    { labelKey: 'admin.filters.linkageChampion', value: 'linkage-champion' },
-  ],
+  data: [],
 };
 
 // Genders filter
@@ -98,13 +92,118 @@ export const GendersFilter: FilterConfig = {
   ],
 };
 
-// Combined filter options for Admin Dashboard
-export const AdminDashboardFilterOptions: ReadonlyArray<FilterConfig> = [
-  FromDateFilter,
-  ToDateFilter,
-  TimePeriodFilter,
-  ProvincesFilter,
-  DistrictsFilter,
-  ChampionsFilter,
-  GendersFilter,
-];
+/**
+ * Builds dashboard filter rows with provinces, sites, and linkage champions from the API.
+ * Pass current `filters` from the screen so sites and LC lists react to province/site.
+ */
+export const useAdminDashboardFilters = (filters: Record<string, any>) => {
+  const [provinces, setProvinces] = useState<ProvinceEntity[]>([]);
+  const [sites, setSites] = useState<SiteEntity[]>([]);
+  const [champions, setChampions] = useState<any[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const list = await getProvincesList();
+      if (!cancelled) setProvinces(list);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    const selectedProvince = filters.province;
+
+    const run = async () => {
+      if (!selectedProvince || selectedProvince === 'all-provinces') {
+        if (!cancelled) setSites([]);
+        return;
+      }
+      try {
+        const sitesResponse = await getSitesByProvince({
+          provinceId: selectedProvince,
+          page: 1,
+          limit: 100,
+        });
+        if (!cancelled) setSites(sitesResponse.result?.data || []);
+      } catch {
+        if (!cancelled) setSites([]);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.province]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const apiParams: UserSearchParams = {
+          tenant_code: 'brac',
+          type: LINKAGE_CHAMPION_USER_TYPE,
+          page: 1,
+          limit: 200,
+        };
+        if (filters.province && filters.province !== 'all-provinces') {
+          apiParams.province = filters.province;
+        }
+        if (filters.site && filters.site !== 'all-sites') {
+          apiParams.site = filters.site;
+        }
+        const response = await getUsersList(apiParams);
+        const usersData = response.result?.data || [];
+        if (!cancelled) setChampions(usersData);
+      } catch {
+        if (!cancelled) setChampions([]);
+      }
+    };
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [filters.province, filters.site]);
+
+  const filterOptions = useMemo(() => {
+    const provinceOptions = [
+      { labelKey: 'admin.filters.allProvinces', value: 'all-provinces' },
+      ...provinces.map((p) => ({ label: p.name, value: p._id })),
+    ];
+
+    const isProvinceSelected =
+      Boolean(filters.province) && filters.province !== 'all-provinces';
+
+    const siteOptions = [
+      { labelKey: 'admin.filters.allSites', value: 'all-sites' },
+      ...sites.map((s) => ({ label: s.name, value: s._id })),
+    ];
+
+    const championsOptions = [
+      { labelKey: 'admin.dashboardFilters.allChampions', value: 'all-champions' },
+      ...champions.map((u: any) => ({
+        label: u.name || u.email || String(u.id ?? ''),
+        value: String(u.id),
+      })),
+    ];
+
+    const showCustomRange = filters.timePeriod === 'custom';
+
+    return [
+      TimePeriodFilter,
+      ...(showCustomRange ? [FromDateFilter, ToDateFilter] : []),
+      { ...ProvincesFilter, data: provinceOptions },
+      {
+        ...SitesFilter,
+        data: siteOptions,
+        disabled: !isProvinceSelected,
+      },
+      { ...ChampionsFilter, data: championsOptions },
+      GendersFilter,
+    ];
+  }, [provinces, sites, champions, filters.province, filters.timePeriod]);
+
+  return { filterOptions };
+};

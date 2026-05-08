@@ -57,7 +57,11 @@
       "uploadUsers": "उपयोगकर्ताओं अपलोड करें",
       "createUser": "उपयोगकर्ता बनाएं",
       "main": "मुख्य",
-      "quickActions": "त्वरित कार्य"
+      "quickActions": "त्वरित कार्य",
+      "observationEditor": "अवलोकन टेम्पलेट संपादक"
+    },
+    "observationEditor": {
+      "description": "अवलोकन फ़ॉर्म टेम्पलेट संपादित करें और प्रश्न प्रबंधित करें।"
     },
     "actions": {
       "bulkUploadCSV": "बल्क अपलोड (CSV)",

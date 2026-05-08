@@ -46,6 +46,8 @@ const AssignUsersScreen = lazyScreen(() => import('../screens/AssignUsers'));
 const AdminDashboard = lazyScreen(() => import('../screens/AdminDashboard'));
 const ProfilePermissions = lazyScreen(() => import('../screens/ProfilePermissions'));
 const ForgotPasswordScreen = lazyScreen(() => import('../screens/Auth/ForgotPasswordScreen'));
+const ObservationEditorScreen = lazyScreen(() => import('../screens/ObservationEditor'));
+const TemplateEditorScreen = lazyScreen(() => import('../screens/ObservationEditor/TemplateEditorScreen'));
 const spinnerHeight = (isWebPlatform ? '$100vh' : '$full') as any;
 
 // Error Boundary for Navigation
@@ -127,6 +129,16 @@ const getAccessPages = (
           name: 'assign-users',
           path: '/assign-users',
           component: AssignUsersScreen,
+        },
+        {
+          name: 'observation-editor',
+          path: '/observation-editor',
+          component: ObservationEditorScreen,
+        },
+        {
+          name: 'observation-editor-detail',
+          path: '/observation-editor-detail',
+          component: TemplateEditorScreen,
         },
       ];
     case 'supervisor':

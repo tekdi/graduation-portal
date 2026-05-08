@@ -201,6 +201,8 @@
       "PasswordPolicy": "Password Management Policy",
       "audit-log": "Audit Log",
       "assign-users": "Assign Users",
+      "observation-editor": "Observation Editor",
+      "observation-editor-detail": "Template Editor",
       "welcome": "Welcome",
       "select-language": "Select Language",
       "dashboard": "Dashboard",
@@ -739,10 +741,10 @@
       "metrics": {
         "assigned": {
           "title": "Assigned (CSG Lists)",
-          "subtitle": "By Coaches"
+          "subtitle": "By Supervisors to Coaches"
         },
         "contacted": {
-          "title": "Contacted by Coach",
+          "title": "Contacted by Coaches",
           "subtitle": "contacted"
         },
         "consent": {
@@ -756,15 +758,15 @@
       },
       "insights": {
         "title": "Key Insights - Participant Targeting & Onboarding",
-        "assigned": "2,718 prospective participants assigned to Coaches based on CSG lists across all sites.",
-        "contacted": "90% contact rate achieved - 2,456 participants reached through door-to-door outreach.",
-        "consent": "96% signed consent forms and completed profiling - 2,609 participants onboarded.",
-        "sla": "100% SLA completion - All profiled participants have signed SLAs with intervention plans."
+        "assigned": "{{assigned}} prospective participant{{assignedPlural}} assigned by supervisors to coaches based on CSG lists across all sites.",
+        "contacted": "{{contactedRate}} contact rate achieved — {{contactedCount}} participant{{contactedPlural}} reached through door-to-door outreach.",
+        "consent": "{{consentedRate}} signed consent forms and completed profiling.",
+        "sla": "{{slaRate}} SLA completion — {{slaCount}} of {{assigned}} participants have signed SLAs with intervention plans."
       },
       "graphs": {
         "sections": {
           "assigned": {
-            "header": "1.1 Prospective Participants Assigned by Supervisors to Coaches (CSG Lists)",
+            "header": "1.1 Prospective Participants Assigned by Supervisors to Coaches (CSG Lists) and Prospective Participants Contacted by Coaches",
             "meta": "Target: Participant | Time: Monthly / Per graduation cycle | Data: Assigned Participants by Supervisor"
           },
           "contacted": {
@@ -1221,7 +1223,11 @@
       "userStoryGblLcGuide": "GBL Coach Guide",
       "csvImportTemplates": "CSV Import Templates",
       "passwordManagementPolicy": "Password Management Policy",
-      "profileFieldEditPermissions": "Profile Field Edit Permissions"
+      "profileFieldEditPermissions": "Profile Field Edit Permissions",
+      "observationEditor": "Observation Template Editor"
+    },
+    "observationEditor": {
+      "description": "Edit observation form templates, manage questions, options, and configure conditional visibility logic."
     },
     "userManagementDescription": "Manage all users across your organization with unified controls and bulk operations.",
     "assignUsersDescription": "Assign Coaches to Supervisors and Participants to Coaches",
