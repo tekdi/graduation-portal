@@ -215,7 +215,10 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
           </VStack>
         </HStack>
       </HStack>
-      <ScrollView {...sidebarStyles.scrollContent}>
+      <ScrollView
+        key="admin-sidebar-expanded"
+        {...sidebarStyles.scrollContent}
+      >
         {/* MAIN Section */}
         <Box {...sidebarStyles.mainSection}>
           <Text {...sidebarStyles.sectionTitle}>{t('admin.menu.main')}</Text>
@@ -324,6 +327,7 @@ const AdminSidebar: React.FC<AdminSidebarProps> = ({
       </HStack>
 
       <ScrollView
+        key="admin-sidebar-collapsed"
         {...sidebarStyles.collapsedScroll}
         contentContainerStyle={sidebarStyles.collapsedScrollContentContainer as any}
       >

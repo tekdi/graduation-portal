@@ -39,6 +39,7 @@ const Observation = lazyScreen(() => import('../screens/Observation/Observation'
 const TemplateScreen = lazyScreen(() => import('../screens/Template'));
 const CheckInsList = lazyScreen(() => import('../screens/ParticipantDetail/Check-ins-list'));
 const TemplateManagementScreen = lazyScreen(() => import('../screens/TemplateManagement'));
+const TemplateDetailScreen = lazyScreen(() => import('../screens/TemplateDetail'));
 const CsvImportTemplates = lazyScreen(() => import('../screens/CsvImportTemplates'));
 const PasswordPolicy = lazyScreen(() => import('../screens/PasswordPolicy'));
 const AuditLogScreen = lazyScreen(() => import('../screens/AuditLog'));
@@ -100,8 +101,13 @@ const getAccessPages = (
         { name: 'admin-dashboard', path: '/admin-dashboard', component: AdminDashboard },
         {
           name: 'template-management',
-          path: '/template-managemnt',
+          path: '/project-templates',
           component: TemplateManagementScreen,
+        },
+        {
+          name: 'template-detail',
+          path: '/project-templates/:id',
+          component: TemplateDetailScreen,
         },
         {
           name: 'csv-templates',

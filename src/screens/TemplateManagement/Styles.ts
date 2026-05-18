@@ -141,4 +141,16 @@ export const templateManagementStyles = {
         fontWeight: '$normal' as const,
         color: '$textMutedForeground' as const,
     },
+      // Table Header Styles
+    tableHeader: {
+        justifyContent: 'space-between' as const,
+        alignItems: 'center' as const,
+        marginBottom: '$4' as const,
+    },
+
+    // Table Header Actions Styles
+    tableHeaderActions: {
+        space: 'md' as const,
+        alignItems: 'center' as const,
+    },
 } as const;

@@ -6,10 +6,14 @@
 export interface Template {
   id: string;
   templateName: string;
-  status: 'Active' | 'Inactive';
+  title?: string;
+  description?: string;
+  status: string;
   creator: string;
   tasks: number;
   createdDate: string;
+  /** API-created timestamp (ISO 8601). */
+  createdAt?: string;
 }
 
 export const TEMPLATE_MANAGEMENT_MOCK_DATA: Template[] = [

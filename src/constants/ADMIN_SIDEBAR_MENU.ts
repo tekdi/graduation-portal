@@ -43,12 +43,12 @@ export const MAIN_MENU_ITEMS: SidebarMenuItem[] = [
     icon: 'UserCheck', // Lucide icon name - distinct from Users icon
     route: 'assign-users',
   },
-  // {
-  //   key: 'template-management',
-  //   label: 'admin.menu.templateManagement',
-  //   icon: 'FileText', // Lucide icon name
-  //   route: 'template-management',
-  // },
+  {
+    key: 'template-management',
+    label: 'admin.menu.templateManagement',
+    icon: 'FileText', // Lucide icon name
+    route: 'template-management',
+  },
   // {
   //   key: 'audit-log',
   //   label: 'admin.menu.auditLog',
