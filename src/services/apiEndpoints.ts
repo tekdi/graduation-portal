@@ -16,7 +16,16 @@ export const API_ENDPOINTS = {
   PARTICIPANTS_LIST: `${prefix}/project/v1/programUsers/entities`,
   PARTICIPANTS_SUB_ENTITY_LIST: `${prefix}/entity-management/v1/entities/subEntityList`,
   ENTITY_DETAILS: `${prefix}/entity-management/v1/entities/details`,
-  PROJECT_CATEGORIES_LIST: `/project/v1/library/categories/list?parentId=null&keywords=idp&getChildren=true`,
+  PROJECT_CATEGORIES_LIST: `${prefix}/project/v1/library/categories/list?parentId=null&keywords=idp&getChildren=true`,
+  GET_CATEGORIES_BY_PARENT: (parentId: string) =>
+    `${prefix}/project/v1/library/categories/list?parentId=${parentId}`,
+  PROJECT_TEMPLATES_LIST: `${prefix}/project/v1/project/templates/list`,
+  GET_PROJECT_TEMPLATE_DETAILS: (id: string) =>
+    `${prefix}/project/v1/project/templates/details/${id}`,
+  UPDATE_PROJECT_TEMPLATE: (id: string) =>
+    `${prefix}/project/v1/project/templates/update/${id}`,
+  UPDATE_PROJECT_TEMPLATE_TASK: (id: string) =>
+    `${prefix}/project/v1/project/templateTasks/update/${id}`,
   GET_ENTITY_DETAILS: (id: string) =>
     `${prefix}/entity-management/v1/entities/details/${id}`,
   UPDATE_ENTITY_DETAILS: `${prefix}/project/v1/programUsers/createOrUpdate`,

@@ -10,12 +10,34 @@ import { styles as dataTableStyles } from '@components/DataTable/Styles';
 import { MenuItemData } from '@components/ui/Menu';
 import { templateManagementStyles as styles } from './Styles';
 
+function formatTemplateDateForLocale(
+  value: string | undefined | null,
+  locale: string,
+): string {
+  if (value == null || value === '') {
+    return '';
+  }
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) {
+    return '';
+  }
+  return d.toLocaleDateString(locale || undefined, {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  });
+}
+
 /**
  * Status Badge Component
  */
 const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
-  const isActive = status === 'Active';
-
+  const { t } = useLanguage();
+  const isActive = status === 'published';
+  const statusToShow =
+    status === 'published'
+      ? t('admin.templates.statusToShow.published')
+      : status;
   return (
     <HStack
       {...(isActive ? styles.statusBadgeActive : styles.statusBadgeInactive)}
@@ -25,7 +47,7 @@ const StatusBadge: React.FC<{ status: string }> = ({ status }) => {
         {...TYPOGRAPHY.bodySmall}
         {...styles.statusBadgeText}
       >
-        {status}
+        {statusToShow}
       </Text>
     </HStack>
   );
@@ -48,14 +70,14 @@ const getCustomTrigger = (triggerProps: any) => (
  * Get Template Menu Items
  */
 const getTemplateMenuItems = (t: (key: string) => string): MenuItemData[] => [
-  {
-    key: 'view',
-    label: 'admin.templates.actionMenu.view',
-    textValue: 'View (Read-Only)',
-    iconName: 'Eye',
-    iconColor: theme.tokens.colors.textMutedForeground,
-    iconSizeValue: 16,
-  },
+  // {
+  //   key: 'view',
+  //   label: 'admin.templates.actionMenu.view',
+  //   textValue: 'Edit',
+  //   iconName: 'Eye',
+  //   iconColor: theme.tokens.colors.textMutedForeground,
+  //   iconSizeValue: 16,
+  // },
   {
     key: 'deactivate',
     label: 'admin.templates.actionMenu.deactivate',
@@ -64,20 +86,20 @@ const getTemplateMenuItems = (t: (key: string) => string): MenuItemData[] => [
     iconColor: theme.tokens.colors.textMutedForeground,
     iconSizeValue: 16,
   },
-  {
-    key: 'export',
-    label: 'admin.templates.actionMenu.export',
-    textValue: 'Export as CSV',
-    iconName: 'Download',
-    iconColor: theme.tokens.colors.textMutedForeground,
-    iconSizeValue: 16,
-  },
+  // {
+  //   key: 'export',
+  //   label: 'admin.templates.actionMenu.export',
+  //   textValue: 'Export as CSV',
+  //   iconName: 'Download',
+  //   iconColor: theme.tokens.colors.textMutedForeground,
+  //   iconSizeValue: 16,
+  // },
 ];
 
 /**
  * Actions Column Component
  */
-const ActionsColumn: React.FC<{ template: Template }> = ({ template }) => {
+const ActionsColumn: React.FC<{ template: any }> = ({ template }) => {
   const { t } = useLanguage();
 
   const handleMenuSelect = (key: string) => {
@@ -121,10 +143,10 @@ const TemplateNameCell: React.FC<{ template: Template }> = ({ template }) => {
   return (
     <VStack space="xs">
       <Text {...TYPOGRAPHY.paragraph} {...styles.templateNameText}>
-        {template.templateName}
+        {template.title}
       </Text>
       <Text {...TYPOGRAPHY.bodySmall} {...styles.uploadedViaText}>
-        {t('admin.templates.uploadedViaCsv')}
+      {template.description}
       </Text>
     </VStack>
   );
@@ -135,10 +157,22 @@ const TemplateNameCell: React.FC<{ template: Template }> = ({ template }) => {
  */
 const TasksCell: React.FC<{ template: Template }> = ({ template }) => {
   const { t } = useLanguage();
-  
+
   return (
     <Text {...TYPOGRAPHY.paragraph} {...styles.tasksText}>
-      {template.tasks} {t('admin.templates.tasksLabel')}
+      {t('admin.templates.showTasks')}
+    </Text>
+  );
+};
+
+const CreatedDateCell: React.FC<{ template: Template }> = ({ template }) => {
+  const { currentLanguage } = useLanguage();
+  const raw = template.createdAt ?? template.createdDate;
+  const label = formatTemplateDateForLocale(raw, currentLanguage);
+
+  return (
+    <Text {...TYPOGRAPHY.paragraph} {...styles.createdDateText}>
+      {label}
     </Text>
   );
 };
@@ -168,20 +202,6 @@ export const getTemplatesColumns = (): ColumnDef<Template>[] => [
     },
   },
   {
-    key: 'creator',
-    label: 'admin.templates.creator',
-    flex: 1.2,
-    render: (template) => (
-      <Text {...TYPOGRAPHY.paragraph} {...styles.creatorText}>
-        {template.creator}
-      </Text>
-    ),
-    mobileConfig: {
-      leftRank: 2,
-      showLabel: false,
-    },
-  },
-  {
     key: 'tasks',
     label: 'admin.templates.tasks',
     flex: 1,
@@ -195,11 +215,7 @@ export const getTemplatesColumns = (): ColumnDef<Template>[] => [
     key: 'createdDate',
     label: 'admin.templates.createdDate',
     flex: 1.2,
-    render: (template) => (
-      <Text {...TYPOGRAPHY.paragraph} {...styles.createdDateText}>
-        {template.createdDate}
-      </Text>
-    ),
+    render: (template) => <CreatedDateCell template={template} />,
     mobileConfig: {
       leftRank: 3,
       showLabel: false,
