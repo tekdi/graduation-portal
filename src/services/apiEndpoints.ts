@@ -16,7 +16,7 @@ export const API_ENDPOINTS = {
   PARTICIPANTS_LIST: `${prefix}/project/v1/programUsers/entities`,
   PARTICIPANTS_SUB_ENTITY_LIST: `${prefix}/entity-management/v1/entities/subEntityList`,
   ENTITY_DETAILS: `${prefix}/entity-management/v1/entities/details`,
-  PROJECT_CATEGORIES_LIST: `/project/v1/library/categories/list?parentId=null&keywords=idp&getChildren=true`,
+  PROJECT_CATEGORIES_LIST: `${prefix}/project/v1/library/categories/list?parentId=null&keywords=idp&getChildren=true`,
   GET_CATEGORIES_BY_PARENT: (parentId: string) =>
     `${prefix}/project/v1/library/categories/list?parentId=${parentId}`,
   PROJECT_TEMPLATES_LIST: `${prefix}/project/v1/project/templates/list`,

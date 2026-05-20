@@ -24,8 +24,6 @@ declare const process:
 
 const TOKEN_STORAGE_KEY = STORAGE_KEYS.AUTH_TOKEN;
 const INTERNAL_ACCESS_TOKEN_KEY = STORAGE_KEYS.INTERNAL_ACCESS_TOKEN;
-// @ts-ignore - process.env is injected by webpack DefinePlugin on web
-const ADMIN_TOKEN: string = process.env.ADMIN_ACCESS_TOKEN || '';
 
 export interface ApiRetryConfig {
   enabled?: boolean;
@@ -186,10 +184,6 @@ api.interceptors.request.use(
           config.headers.Authorization = `Bearer ${token}`;
           config.headers['x-auth-token'] = token;
         }
-      }
-      const isUpdateTempRequest = config.url?.includes('project/templates/update') || config.url?.includes('project/templateTasks/update');
-      if (isUpdateTempRequest && config.headers) {
-        config.headers['admin-access-token'] = ADMIN_TOKEN;
       }
       // Add internal-access-token header if available - Required for entity-management API endpoints
       const internalAccessToken = await offlineStorage.read<string>(INTERNAL_ACCESS_TOKEN_KEY);
