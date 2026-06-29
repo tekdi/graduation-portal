@@ -121,6 +121,9 @@ export const getTargetedSolutions = async (
   }
 };
 
+const isSuperVisorFlow = (): boolean => { 
+  return true;
+}
 /**
  * Fetch entities for a given observation solution
  *
@@ -148,10 +151,16 @@ export const getObservationEntities = async ({
 }): Promise<any> => {
   try {
     // POST body
-    const data = { ...profileData };
+            console.log('UserData:', profileData, solutionId);
+    
+    const data = { ...profileData,  };
+    let url = `${API_ENDPOINTS.OBSERVATION_ENTITIES}?solutionId=${solutionId}`;
+    if (isSuperVisorFlow()) {
+      url += `&createdBy=${profileData?.createdBy}`;
+    }
 
     const response = await api.post(
-      `${API_ENDPOINTS.OBSERVATION_ENTITIES}?solutionId=${solutionId}`,
+      url,
       data,
       withRetry(OBSERVATION_RETRY_CONFIG),
     );
@@ -267,15 +276,21 @@ export const getObservationSolution = async ({
   entityId,
   submissionNumber,
   evidenceCode,
+  createdBy
 }: {
   observationId: string;
   entityId: string;
   submissionNumber: number;
   evidenceCode: string;
+  createdBy?: string;
 }): Promise<any> => {
   try {
+    let url = `${API_ENDPOINTS.OBSERVATION_SOLUTION}/${observationId}?entityId=${entityId}&submissionNumber=${submissionNumber}&evidenceCode=${evidenceCode}`;
+    if (isSuperVisorFlow()) {
+      url += `&createdBy=${createdBy}`;
+    }
     const response = await api.post(
-      `${API_ENDPOINTS.OBSERVATION_SOLUTION}/${observationId}?entityId=${entityId}&submissionNumber=${submissionNumber}&evidenceCode=${evidenceCode}`,
+      url,
       undefined,
       withRetry(OBSERVATION_RETRY_CONFIG),
     );

@@ -98,11 +98,13 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
   const fetchObservationSolution = async ({
     entityId,
     observationId,
-    submissionNumberInput
+    submissionNumberInput,
+    createdBy
   }: {
     entityId: string;
     observationId: string;
     submissionNumberInput: number | undefined;
+    createdBy: string;
   }) => {
     try {
       let observationSubmissions = await getObservationSubmissions({
@@ -163,6 +165,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
           entityId,
           submissionNumber:numsub,
           evidenceCode:observationSubmissionsLast?.evidencesStatus?.[0]?.code,
+          createdBy: createdBy
         });
         observationSolution = response.result;
       }
@@ -230,7 +233,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       try {
         const observationData = await getObservationEntities({
           solutionId,
-          profileData: {},
+          profileData: {createdBy: participant?.hierarchy[0]},
         });
         if(!observationData.result?.allowMultipleAssessemts && submissionNumber && submissionNumber > 1){
           showAlert('error', t('logVisit.multipleAssessemtsNotAllowed'));
@@ -246,6 +249,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
               entityId: newData._id,
               observationId: observationId,
               submissionNumberInput: !observationData.result?.allowMultipleAssessemts ? 1 : submissionNumber,
+              createdBy: participant?.hierarchy[0]
             });
             setLoadingOff();
           } else {
@@ -267,6 +271,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
                     entityId: entityData._id,
                     observationId: observationId,
                     submissionNumberInput: !observationData.result?.allowMultipleAssessemts ? 1 : submissionNumber,
+                    createdBy: participant?.hierarchy[0]
                   });
                   setLoadingOff();
                 }
@@ -393,8 +398,9 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
   const playerConfigMemoized = React.useMemo(
     () => ({
       // @ts-ignore - process.env is injected by webpack DefinePlugin on web
-      baseURL: `${process.env.API_BASE_URL}/api`,
-      offline: isNetworkOffline(),
+      baseURL: process.env.API_BASE_URL
+        ? `${process.env.API_BASE_URL.replace(/\/+$/, '')}/api`
+        : '/api',
       fileSizeLimit: 50,
       userAuthToken: token,
       solutionType: 'observation' as const,
