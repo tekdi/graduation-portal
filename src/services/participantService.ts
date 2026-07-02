@@ -12,6 +12,8 @@ import { STATUS, ENTITY_STATUS, PROJECT_STATUS, GRADUATION_READINESS_PROGRESS_TH
 import { isNetworkOffline } from '@utils/networkStatus';
 import offlineStorage, { getOfflineParticipantIds } from './offlineStorage';
 import { PARTICIPANT_KEYS } from '@constants/STORAGE_KEYS';
+import { UserSearchResponse } from '@app-types/search';
+import { getUsersByIds } from './usersService';
 
 /**
  * Get participants list for table view
@@ -59,7 +61,7 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       limit: limit.toString(),
       search: search || '',
       programId: process.env.GLOBAL_LC_PROGRAM_ID as string,
-      ...(entityId ? {entityId}:{})
+      ...(entityId ? { entityId } : {})
     });
 
     // Add status to query params if provided
@@ -67,14 +69,15 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       queryParams.append('status', status);
     }
 
+    // console.log("Testing API");
 
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
-    
+
     // Validate entity_id before constructing endpoint
     // if (!entity_id?.trim()) {
     //   throw new Error('entity_id is required and cannot be empty');
     // }
-    
+
     // const subEntityListEndpoint = `${API_ENDPOINTS.PARTICIPANTS_SUB_ENTITY_LIST}/${encodeURIComponent(entity_id)}?type=${ROLE_NAMES.PARTICIPANT.toLowerCase()}`;
     // const subEntityListResponse = await api.get<any>(subEntityListEndpoint);
     // const subEntityList = subEntityListResponse.data?.result?.data || [];
@@ -83,6 +86,26 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       endpoint,
       entityId ? withRetry(OBSERVATION_RETRY_CONFIG) : undefined,
     );
+
+    if (response.data?.result?.data && Array.isArray(response.data.result.data)) {
+      const dataList = response.data.result.data;
+      const userIds = dataList.map((item: any) => item.userId).filter(Boolean);
+      if (userIds.length > 0) {
+        try {
+          const usersRes = await getUsersByIds(userIds);
+          if (usersRes?.result?.data) {
+            dataList.forEach((item: any) => {
+              const uData = usersRes.result.data.find((user: any) => String(user.id) === String(item.userId));
+              item.userDetails = uData || null;
+            });
+            console.log('SUCCESS: Client-side hydrated userDetails in getParticipantsList:', dataList.map(item => ({ userId: item.userId, name: item.name, email: item.userDetails?.email })));
+          }
+        } catch (err) {
+          logger.error('Failed to fetch userDetails in getParticipantsList:', err);
+        }
+      }
+    }
+
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor
@@ -102,7 +125,7 @@ export const getParticipantById = (id: string): any => {
     pathway: participant.pathway || undefined,
     graduationProgress:
       participant.graduationProgress != null &&
-      !isNaN(Number(participant.graduationProgress))
+        !isNaN(Number(participant.graduationProgress))
         ? participant.graduationProgress
         : undefined,
     graduationDate:
@@ -118,7 +141,7 @@ export const getParticipantById = (id: string): any => {
  * Returns full participant data including contact info and address
  * Currently uses mock data, will be replaced with API call later
  */
-export const getParticipantProfile = async (id: string): Promise<User |undefined> => {
+export const getParticipantProfile = async (id: string): Promise<User | undefined> => {
   try {
     const userProfile = await getUserProfile(id);
 
@@ -141,7 +164,7 @@ export const getParticipantProfile = async (id: string): Promise<User |undefined
 interface UpdateParticipantAddressPayload {
   // userId: string;
   entityId: string;
-  programId:string;
+  programId: string;
   updateData: {
     // province: string;
     // site: string;
@@ -213,7 +236,7 @@ export const updateEntityDetails = async ({
   entityId,
   entityUpdates,
 }: {
-  userId:string;
+  userId: string;
   entityId: string;
   entityUpdates: any;
 }): Promise<any> => {
@@ -273,12 +296,12 @@ export const createOrUpdateProgramUserMapping = async ({
  * @returns Certificate generation response
  */
 export const generateCertificate = async (projectId: string): Promise<any> => {
-  try {  
+  try {
     const response = await api.post(API_ENDPOINTS.GENERATE_CERTIFICATE(projectId), {
       status: PROJECT_STATUS.SUBMITTED,
     });
-    
-    return response.data; 
+
+    return response.data;
   } catch (error) {
     throw error
   }
@@ -297,7 +320,7 @@ const checkSolutionByKeyword = (solutionData: any, keyword: string): boolean => 
     (k: string) => k.toLowerCase() === keyword.toLowerCase()
   );
   if (!hasKeyword) return false;
-  
+
   return true;
 };
 
@@ -353,7 +376,7 @@ export const verifyParticipantCompletionActions = async ({
       });
       return { success: false, type: '' };
     }
-    
+
     // 2. Get entity details for each solution to check completion status
     const solutionsWithEntityStatus = await getSolutionWithEntityStatus(solutions, participantId);
     // 3. Process certificate solution
@@ -450,7 +473,7 @@ export const getSolutionWithEntityStatus = async (solutions: any[], participantI
       try {
         const entityResponse = await getObservationEntities({
           solutionId: solution.solutionId,
-          profileData: (createdBy ? {createdBy} : {}),
+          profileData: (createdBy ? { createdBy } : {}),
         });
         // Find the participant entity from the response
         const participantEntity = entityResponse.result?.entities?.find(

@@ -7,6 +7,7 @@
 import type { UserSearchResponse } from '@app-types/Users';
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
+import { getUsersByIds } from './usersService';
 
 // Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
 declare const process: {
@@ -226,6 +227,25 @@ export const getMappedLCsForSupervisor = async (params: {
     
     // GET request to fetch mapped LCs
     const response = await api.get<any>(endpoint);
+
+    if (response.data?.result?.data && Array.isArray(response.data.result.data)) {
+      const dataList = response.data.result.data;
+      const userIds = dataList.map((item: any) => item.userId).filter(Boolean);
+      if (userIds.length > 0) {
+        try {
+          const usersRes = await getUsersByIds(userIds);
+          if (usersRes?.result?.data) {
+            dataList.forEach((item: any) => {
+              const uData = usersRes.result.data.find((user: any) => String(user.id) === String(item.userId));
+              item.userDetails = uData || null;
+            });
+          }
+        } catch (err) {
+          console.error('Failed to fetch userDetails in getMappedLCsForSupervisor:', err);
+        }
+      }
+    }
+
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor
@@ -418,6 +438,25 @@ export const getMappedParticipantsForLC = async (params: {
     
     // GET request to fetch mapped participants
     const response = await api.get<any>(endpoint);
+
+    if (response.data?.result?.data && Array.isArray(response.data.result.data)) {
+      const dataList = response.data.result.data;
+      const userIds = dataList.map((item: any) => item.userId).filter(Boolean);
+      if (userIds.length > 0) {
+        try {
+          const usersRes = await getUsersByIds(userIds);
+          if (usersRes?.result?.data) {
+            dataList.forEach((item: any) => {
+              const uData = usersRes.result.data.find((user: any) => String(user.id) === String(item.userId));
+              item.userDetails = uData || null;
+            });
+          }
+        } catch (err) {
+          console.error('Failed to fetch userDetails in getMappedParticipantsForLC:', err);
+        }
+      }
+    }
+
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor

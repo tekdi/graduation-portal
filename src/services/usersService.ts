@@ -574,3 +574,34 @@ export const getPositionList = async (): Promise<ProvinceEntity[]> => {
     return [];
   }
 };
+
+/**
+ * Fetch specific users by their IDs
+ * 
+ * @param userIds - Array of user IDs to fetch
+ * @param tenantCode - Tenant code (defaults to 'brac')
+ * @returns A promise resolving to the user search response
+ */
+export const getUsersByIds = async (
+  userIds: (string | number)[],
+  tenantCode = (typeof process !== 'undefined' && process.env.TENANT_CODE_NAME) || 'brac'
+): Promise<UserSearchResponse> => {
+  try {
+    const queryParams = new URLSearchParams({
+      tenant_code: tenantCode,
+      type: 'all',
+      page: '1',
+      limit: Math.max(userIds.length, 1).toString(),
+    });
+
+    const endpoint = `${API_ENDPOINTS.USERS_LIST}?${queryParams.toString()}`;
+    const requestBody = {
+      user_ids: userIds.map((id) => (typeof id === 'string' && /^\d+$/.test(id) ? Number(id) : id)),
+    };
+
+    const response = await api.post<UserSearchResponse>(endpoint, requestBody);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
