@@ -605,3 +605,22 @@ export const getUsersByIds = async (
     throw error;
   }
 };
+
+/**
+ * Hydrates user details for a list of items having a `userId` property.
+ * Fetches user profile data from the users service and attaches it as `userDetails`.
+ * 
+ * @param dataList - List of objects to hydrate (each must have a `userId` property)
+ */
+export const hydrateUserDetails = async (dataList: any[]): Promise<void> => {
+  const userIds = dataList.map((item: any) => item.userId).filter(Boolean);
+  if (userIds.length > 0) {
+    const usersRes = await getUsersByIds(userIds);
+    if (usersRes?.result?.data) {
+      dataList.forEach((item: any) => {
+        const uData = usersRes.result.data.find((user: any) => String(user.id) === String(item.userId));
+        item.userDetails = uData || null;
+      });
+    }
+  }
+};

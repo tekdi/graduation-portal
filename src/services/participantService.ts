@@ -13,7 +13,14 @@ import { isNetworkOffline } from '@utils/networkStatus';
 import offlineStorage, { getOfflineParticipantIds } from './offlineStorage';
 import { PARTICIPANT_KEYS } from '@constants/STORAGE_KEYS';
 import { UserSearchResponse } from '@app-types/search';
-import { getUsersByIds } from './usersService';
+import { getUsersByIds, hydrateUserDetails } from './usersService';
+
+// Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
+declare const process: {
+  env: {
+    [key: string]: string | undefined;
+  };
+};
 
 /**
  * Get participants list for table view
@@ -69,8 +76,6 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
       queryParams.append('status', status);
     }
 
-    // console.log("Testing API");
-
     const endpoint = `${API_ENDPOINTS.PARTICIPANTS_LIST}?${queryParams.toString()}`;
 
     // Validate entity_id before constructing endpoint
@@ -88,21 +93,13 @@ export const getParticipantsList = async (params: ParticipantSearchParams): Prom
     );
 
     if (response.data?.result?.data && Array.isArray(response.data.result.data)) {
-      const dataList = response.data.result.data;
-      const userIds = dataList.map((item: any) => item.userId).filter(Boolean);
-      if (userIds.length > 0) {
-        try {
-          const usersRes = await getUsersByIds(userIds);
-          if (usersRes?.result?.data) {
-            dataList.forEach((item: any) => {
-              const uData = usersRes.result.data.find((user: any) => String(user.id) === String(item.userId));
-              item.userDetails = uData || null;
-            });
-            console.log('SUCCESS: Client-side hydrated userDetails in getParticipantsList:', dataList.map(item => ({ userId: item.userId, name: item.name, email: item.userDetails?.email })));
-          }
-        } catch (err) {
-          logger.error('Failed to fetch userDetails in getParticipantsList:', err);
-        }
+      try {
+        await hydrateUserDetails(response.data.result.data);
+        logger.info('SUCCESS: Client-side hydrated userDetails in getParticipantsList', {
+          users: response.data.result.data.map(item => ({ userId: item.userId, name: item.name, email: item.userDetails?.email }))
+        });
+      } catch (err) {
+        logger.error('Failed to fetch userDetails in getParticipantsList:', err);
       }
     }
 
