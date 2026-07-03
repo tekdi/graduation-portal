@@ -7,6 +7,7 @@
 import type { UserSearchResponse } from '@app-types/Users';
 import api from './api';
 import { API_ENDPOINTS } from './apiEndpoints';
+import { getUsersByIds, hydrateUserDetails } from './usersService';
 
 // Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
 declare const process: {
@@ -226,6 +227,15 @@ export const getMappedLCsForSupervisor = async (params: {
     
     // GET request to fetch mapped LCs
     const response = await api.get<any>(endpoint);
+
+    if (response.data?.result?.data && Array.isArray(response.data.result.data)) {
+      try {
+        await hydrateUserDetails(response.data.result.data);
+      } catch (err) {
+        console.error('Failed to fetch userDetails in getMappedLCsForSupervisor:', err);
+      }
+    }
+
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor
@@ -418,6 +428,15 @@ export const getMappedParticipantsForLC = async (params: {
     
     // GET request to fetch mapped participants
     const response = await api.get<any>(endpoint);
+
+    if (response.data?.result?.data && Array.isArray(response.data.result.data)) {
+      try {
+        await hydrateUserDetails(response.data.result.data);
+      } catch (err) {
+        console.error('Failed to fetch userDetails in getMappedParticipantsForLC:', err);
+      }
+    }
+
     return response.data;
   } catch (error: any) {
     // Error is already handled by axios interceptor

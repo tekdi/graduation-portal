@@ -574,3 +574,53 @@ export const getPositionList = async (): Promise<ProvinceEntity[]> => {
     return [];
   }
 };
+
+/**
+ * Fetch specific users by their IDs
+ * 
+ * @param userIds - Array of user IDs to fetch
+ * @param tenantCode - Tenant code (defaults to 'brac')
+ * @returns A promise resolving to the user search response
+ */
+export const getUsersByIds = async (
+  userIds: (string | number)[],
+  tenantCode = (typeof process !== 'undefined' && process.env.TENANT_CODE_NAME) || 'brac'
+): Promise<UserSearchResponse> => {
+  try {
+    const queryParams = new URLSearchParams({
+      tenant_code: tenantCode,
+      type: 'all',
+      page: '1',
+      limit: Math.max(userIds.length, 1).toString(),
+    });
+
+    const endpoint = `${API_ENDPOINTS.USERS_LIST}?${queryParams.toString()}`;
+    const requestBody = {
+      user_ids: userIds.map((id) => (typeof id === 'string' && /^\d+$/.test(id) ? Number(id) : id)),
+    };
+
+    const response = await api.post<UserSearchResponse>(endpoint, requestBody);
+    return response.data;
+  } catch (error: any) {
+    throw error;
+  }
+};
+
+/**
+ * Hydrates user details for a list of items having a `userId` property.
+ * Fetches user profile data from the users service and attaches it as `userDetails`.
+ * 
+ * @param dataList - List of objects to hydrate (each must have a `userId` property)
+ */
+export const hydrateUserDetails = async (dataList: any[]): Promise<void> => {
+  const userIds = dataList.map((item: any) => item.userId).filter(Boolean);
+  if (userIds.length > 0) {
+    const usersRes = await getUsersByIds(userIds);
+    if (usersRes?.result?.data) {
+      dataList.forEach((item: any) => {
+        const uData = usersRes.result.data.find((user: any) => String(user.id) === String(item.userId));
+        item.userDetails = uData || null;
+      });
+    }
+  }
+};
