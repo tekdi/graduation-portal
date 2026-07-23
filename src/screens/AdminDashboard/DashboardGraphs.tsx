@@ -1,6 +1,28 @@
 import React, { useState } from 'react';
-import { ScrollView, Switch } from 'react-native';
-import { VStack, HStack, Box, Card, Heading, Text } from '@ui';
+import {
+  ScrollView,
+  Switch,
+  Platform,
+  Share,
+  Modal,
+  ActivityIndicator,
+} from 'react-native';
+
+import {
+  VStack,
+  HStack,
+  Box,
+  Card,
+  Heading,
+  Text,
+  Button,
+  ButtonText,
+  LucideIcon,
+  useToast,
+  Toast,
+  ToastTitle,
+  Menu,
+} from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import DataTable from '@components/DataTable';
 import SimpleLineChart from '@components/charts/SimpleLineChart';
@@ -9,6 +31,11 @@ import SimplePieChart from '@components/charts/SimplePieChart';
 import SimpleMultiLineChart from '@components/charts/SimpleMultiLineChart';
 import SimpleGroupedBarChart from '@components/charts/SimpleGroupedBarChart';
 import { usePlatform } from '@utils/platform';
+import {
+  downloadReactElement,
+  downloadGraphCards,
+} from '@utils/downloadGraphCards';
+import { captureAndSaveNative } from '@utils/nativeDownloadCapture';
 import type {
   DashboardGraphBlock,
   DashboardGraphReportSectionBlock,
@@ -21,7 +48,9 @@ interface DashboardGraphsProps {
   fallbackPlaceholderKey: string; // translation key
 }
 
-const GraphStatCard: React.FC<{ card: DashboardGraphStatCard }> = ({ card }) => {
+const GraphStatCard: React.FC<{ card: DashboardGraphStatCard }> = ({
+  card,
+}) => {
   const valueStr = String(card.value ?? '');
   // Keep large font for numeric KPIs (e.g., "2,718") but use 18px for text values (e.g., "Monthly tracking")
   const isNumericLike = /^[\d,.\s%]+$/.test(valueStr.trim());
@@ -33,7 +62,6 @@ const GraphStatCard: React.FC<{ card: DashboardGraphStatCard }> = ({ card }) => 
       borderRadius="$lg"
       px="$4"
       py="$4"
-    
     >
       <Text fontSize="$sm" color="$textMutedForeground">
         {card.title}
@@ -53,7 +81,13 @@ const GraphStatCard: React.FC<{ card: DashboardGraphStatCard }> = ({ card }) => 
             py="$1"
             borderRadius="$sm"
           >
-            <Text fontSize="$xs" fontWeight="$semibold" color={card.badgeTextColor ? (card.badgeTextColor as any) : '$white'}>
+            <Text
+              fontSize="$xs"
+              fontWeight="$semibold"
+              color={
+                card.badgeTextColor ? (card.badgeTextColor as any) : '$white'
+              }
+            >
               {card.badgeText}
             </Text>
           </Box>
@@ -68,27 +102,41 @@ const GraphStatCard: React.FC<{ card: DashboardGraphStatCard }> = ({ card }) => 
   );
 };
 
-const ReportSection: React.FC<{
+const ReportSectionCard: React.FC<{
   block: DashboardGraphReportSectionBlock;
   fallbackPlaceholderKey: string;
-}> = ({ block, fallbackPlaceholderKey }) => {
+  trendEnabled: boolean;
+  onTrendChange?: (val: boolean) => void;
+  isDownloadView?: boolean;
+  isGenerating?: boolean;
+}> = ({
+  block,
+  fallbackPlaceholderKey,
+  trendEnabled,
+  onTrendChange,
+  isDownloadView = false,
+  isGenerating = false,
+}) => {
   const { t } = useLanguage();
   const { isMobile } = usePlatform();
-  const [trendEnabled, setTrendEnabled] = useState<boolean>(
-    block.headerToggle?.defaultValue ?? true
-  );
-  const variant = block.headerToggle ? (trendEnabled ? block.trend : block.summary) : undefined;
+  const variant = block.headerToggle
+    ? trendEnabled
+      ? block.trend
+      : block.summary
+    : undefined;
 
   const resolvedStatLayout = variant?.statLayout ?? block.statLayout;
-  const resolvedStatBarBg = variant?.statBarBg ?? block.statBarBg;
   const resolvedStatPosition = variant?.statPosition ?? block.statPosition;
   const resolvedStatCards = variant?.statCards ?? block.statCards;
   const resolvedExtras = variant?.extras ?? block.extras;
-  const resolvedChartLayout = variant?.chartLayout ?? block.chartLayout ?? 'single';
+  const resolvedChartLayout =
+    variant?.chartLayout ?? block.chartLayout ?? 'single';
 
   const resolvedCharts = (() => {
-    if (variant && 'chart' in variant && variant.chart === null) return [] as any[];
-    const vCharts = variant?.charts && variant.charts.length > 0 ? variant.charts : undefined;
+    if (variant && 'chart' in variant && variant.chart === null)
+      return [] as any[];
+    const vCharts =
+      variant?.charts && variant.charts.length > 0 ? variant.charts : undefined;
     const vChart = variant?.chart ?? undefined;
     if (vCharts) return vCharts;
     if (vChart) return [vChart];
@@ -96,8 +144,12 @@ const ReportSection: React.FC<{
     return [block.chart];
   })();
 
-  const extrasTop = (resolvedExtras || []).filter(e => (e as any).placement !== 'bottom');
-  const extrasBottom = (resolvedExtras || []).filter(e => (e as any).placement === 'bottom');
+  const extrasTop = (resolvedExtras || []).filter(
+    e => (e as any).placement !== 'bottom',
+  );
+  const extrasBottom = (resolvedExtras || []).filter(
+    e => (e as any).placement === 'bottom',
+  );
 
   const renderExtra = (extra: DashboardGraphExtraBlock) => {
     if (extra.kind === 'kpiRow') {
@@ -113,11 +165,21 @@ const ReportSection: React.FC<{
           borderColor="$borderLight200"
         >
           {extra.title ? (
-            <Text fontSize="$sm" fontWeight="$semibold" color="$textForeground" mb="$3">
+            <Text
+              fontSize="$sm"
+              fontWeight="$semibold"
+              color="$textForeground"
+              mb="$3"
+            >
               {extra.title}
             </Text>
           ) : null}
-          <HStack space="lg" alignItems="flex-start" justifyContent="space-between" flexWrap="wrap">
+          <HStack
+            space="lg"
+            alignItems="flex-start"
+            justifyContent="space-between"
+            flexWrap="wrap"
+          >
             {extra.items.map(it => (
               <VStack key={it.id} space="xs" flex={1} minWidth={160}>
                 <Text fontSize="$xs" color="$textMutedForeground">
@@ -126,7 +188,9 @@ const ReportSection: React.FC<{
                 <Text
                   fontSize="$sm"
                   fontWeight="$semibold"
-                  color={it.valueColor ? (it.valueColor as any) : '$textForeground'}
+                  color={
+                    it.valueColor ? (it.valueColor as any) : '$textForeground'
+                  }
                 >
                   {it.value}
                 </Text>
@@ -157,19 +221,32 @@ const ReportSection: React.FC<{
               borderWidth={1}
               borderColor="$borderLight200"
             >
-              <Text fontSize="$sm" fontWeight="$semibold" color="$textForeground" mb="$2">
+              <Text
+                fontSize="$sm"
+                fontWeight="$semibold"
+                color="$textForeground"
+                mb="$2"
+              >
                 {col.title}
               </Text>
               <VStack space="xs">
                 {col.items.map(item => (
-                  <HStack key={item.id} justifyContent="space-between" alignItems="center">
+                  <HStack
+                    key={item.id}
+                    justifyContent="space-between"
+                    alignItems="center"
+                  >
                     <Text fontSize="$xs" color="$textMutedForeground">
                       {item.label}
                     </Text>
                     <Text
                       fontSize="$xs"
                       fontWeight="$semibold"
-                      color={item.valueColor ? (item.valueColor as any) : '$textForeground'}
+                      color={
+                        item.valueColor
+                          ? (item.valueColor as any)
+                          : '$textForeground'
+                      }
                     >
                       {item.value}
                     </Text>
@@ -194,24 +271,49 @@ const ReportSection: React.FC<{
           borderWidth={1}
           borderColor="$borderLight200"
         >
-          <Text fontSize="$sm" fontWeight="$semibold" color="$textForeground" mb="$3">
+          <Text
+            fontSize="$sm"
+            fontWeight="$semibold"
+            color="$textForeground"
+            mb="$3"
+          >
             {extra.title}
           </Text>
-          <HStack space="lg" alignItems="flex-start" justifyContent="space-between" flexWrap="wrap">
+          <HStack
+            space="lg"
+            alignItems="flex-start"
+            justifyContent="space-between"
+            flexWrap="wrap"
+          >
             {extra.items.map(it => (
-              <VStack key={it.id} space="xs" flex={1} minWidth={180} alignItems="center">
+              <VStack
+                key={it.id}
+                space="xs"
+                flex={1}
+                minWidth={180}
+                alignItems="center"
+              >
                 <Text fontSize="$xs" color="$textMutedForeground">
                   {it.label}
                 </Text>
                 <Text
                   fontSize="$lg"
                   fontWeight="$semibold"
-                  color={it.valueColor ? (it.valueColor as any) : '$textForeground'}
+                  color={
+                    it.valueColor ? (it.valueColor as any) : '$textForeground'
+                  }
                 >
                   {it.value}
                 </Text>
                 {it.subtitle ? (
-                  <Text fontSize="$xs" color={it.subtitleColor ? (it.subtitleColor as any) : '$textMutedForeground'}>
+                  <Text
+                    fontSize="$xs"
+                    color={
+                      it.subtitleColor
+                        ? (it.subtitleColor as any)
+                        : '$textMutedForeground'
+                    }
+                  >
                     {it.subtitle}
                   </Text>
                 ) : null}
@@ -235,7 +337,12 @@ const ReportSection: React.FC<{
           borderColor="$borderLight200"
         >
           {extra.title ? (
-            <Text fontSize="$sm" fontWeight="$semibold" color="$textForeground" mb="$2">
+            <Text
+              fontSize="$sm"
+              fontWeight="$semibold"
+              color="$textForeground"
+              mb="$2"
+            >
               {extra.title}
             </Text>
           ) : null}
@@ -272,7 +379,12 @@ const ReportSection: React.FC<{
           borderColor="transparent"
         >
           {extra.title ? (
-            <Text fontSize="$sm" fontWeight="$semibold" color="$textForeground" mb="$3">
+            <Text
+              fontSize="$sm"
+              fontWeight="$semibold"
+              color="$textForeground"
+              mb="$3"
+            >
               {extra.title}
             </Text>
           ) : null}
@@ -287,7 +399,9 @@ const ReportSection: React.FC<{
                 px="$4"
                 py="$4"
                 borderWidth={1}
-                borderColor={it.borderColor ? (it.borderColor as any) : '$borderLight200'}
+                borderColor={
+                  it.borderColor ? (it.borderColor as any) : '$borderLight200'
+                }
               >
                 <Text
                   fontSize="$xs"
@@ -299,7 +413,9 @@ const ReportSection: React.FC<{
                 <Text
                   fontSize="$lg"
                   fontWeight="$semibold"
-                  color={it.valueColor ? (it.valueColor as any) : '$textForeground'}
+                  color={
+                    it.valueColor ? (it.valueColor as any) : '$textForeground'
+                  }
                   mt="$2"
                   textAlign={it.align === 'center' ? 'center' : 'left'}
                 >
@@ -317,7 +433,11 @@ const ReportSection: React.FC<{
                     <Text
                       fontSize="$xs"
                       fontWeight="$semibold"
-                      color={it.badgeTextColor ? (it.badgeTextColor as any) : '$white'}
+                      color={
+                        it.badgeTextColor
+                          ? (it.badgeTextColor as any)
+                          : '$white'
+                      }
                     >
                       {it.badgeText}
                     </Text>
@@ -347,7 +467,6 @@ const ReportSection: React.FC<{
         flex: col.flex,
         width: col.width,
         align: col.align,
-        // Force 14px table typography in graphs tab (match UI requirement)
         render:
           col.key === 'change'
             ? (item: any) => (
@@ -372,16 +491,20 @@ const ReportSection: React.FC<{
               ),
       }));
 
-      const rows = (extra.rows || []).map((r, idx) => ({ __rowKey: (r as any).__rowKey ?? idx, ...r }));
+      const rows = (extra.rows || []).map((r, idx) => ({
+        __rowKey: (r as any).__rowKey ?? idx,
+        ...r,
+      }));
 
       return (
-        <Box
-          key={extra.id}
-          mt="$3"
-          width="100%"
-        >
+        <Box key={extra.id} mt="$3" width="100%">
           {extra.title ? (
-            <Text fontSize="$sm" fontWeight="$semibold" color="$textForeground" mb="$3">
+            <Text
+              fontSize="$sm"
+              fontWeight="$semibold"
+              color="$textForeground"
+              mb="$3"
+            >
               {extra.title}
             </Text>
           ) : null}
@@ -393,12 +516,10 @@ const ReportSection: React.FC<{
             showHeader={extra.showHeader ?? true}
             minWidth={extra.minWidth ?? 900}
             _css={{
-              // Remove outer border + rounding (match "flat" table request)
               _table: {
                 borderRadius: 0,
                 borderWidth: 0,
               },
-              // Remove header background tint and header rounding
               _header: {
                 _tableHeader: {
                   bg: '$white' as const,
@@ -429,7 +550,12 @@ const ReportSection: React.FC<{
           borderColor="$borderLight200"
         >
           {extra.title ? (
-            <Text fontSize="$sm" fontWeight="$semibold" color="$textForeground" mb="$2">
+            <Text
+              fontSize="$sm"
+              fontWeight="$semibold"
+              color="$textForeground"
+              mb="$2"
+            >
               {extra.title}
             </Text>
           ) : null}
@@ -443,72 +569,88 @@ const ReportSection: React.FC<{
     return null;
   };
 
-  const StatContent = resolvedStatCards && resolvedStatCards.length > 0 ? (
-    resolvedStatLayout === 'bar' ? (
-      <Box mt="$3" width="100%">
-        <HStack space="md" alignItems="stretch" justifyContent="space-between" flexWrap="wrap">
-          {resolvedStatCards.map(sc => {
-            const valueStr = String(sc.value ?? '');
-            const isNumericLike = /^[\d,.\s%]+$/.test(valueStr.trim());
-            return (
-              <Box
-                key={sc.id}
-                flex={1}
-                minWidth={220}
-                bg="$bgSidebar"
-                borderRadius="$lg"
-                px="$6"
-                py="$5"
-              >
-                <Text fontSize="$sm" color="$textMutedForeground">
-                  {sc.title}
-                </Text>
-                <Text
-                  fontSize={isNumericLike ? '$4xl' : '$lg'}
-                  fontWeight={isNumericLike ? '$semibold' : '$normal'}
-                  color={sc.valueColor ? (sc.valueColor as any) : '$textForeground'}
-                  mt="$2"
+  const StatContent =
+    resolvedStatCards && resolvedStatCards.length > 0 ? (
+      resolvedStatLayout === 'bar' ? (
+        <Box mt="$3" width="100%">
+          <HStack
+            space="md"
+            alignItems="stretch"
+            justifyContent="space-between"
+            flexWrap="wrap"
+          >
+            {resolvedStatCards.map(sc => {
+              const valueStr = String(sc.value ?? '');
+              const isNumericLike = /^[\d,.\s%]+$/.test(valueStr.trim());
+              return (
+                <Box
+                  key={sc.id}
+                  flex={1}
+                  minWidth={220}
+                  bg="$bgSidebar"
+                  borderRadius="$lg"
+                  px="$6"
+                  py="$5"
                 >
-                  {valueStr}
-                </Text>
-                {sc.badgeText ? (
-                  <Box
-                    alignSelf="flex-start"
-                    bg={sc.badgeBg ? (sc.badgeBg as any) : '#16A34A'}
-                    px="$3"
-                    py="$1.5"
-                    borderRadius="$sm"
+                  <Text fontSize="$sm" color="$textMutedForeground">
+                    {sc.title}
+                  </Text>
+                  <Text
+                    fontSize={isNumericLike ? '$4xl' : '$lg'}
+                    fontWeight={isNumericLike ? '$semibold' : '$normal'}
+                    color={
+                      sc.valueColor ? (sc.valueColor as any) : '$textForeground'
+                    }
                     mt="$2"
                   >
-                    <Text
-                      fontSize="$xs"
-                      fontWeight="$semibold"
-                      color={sc.badgeTextColor ? (sc.badgeTextColor as any) : '$white'}
+                    {valueStr}
+                  </Text>
+                  {sc.badgeText ? (
+                    <Box
+                      alignSelf="flex-start"
+                      bg={sc.badgeBg ? (sc.badgeBg as any) : '#16A34A'}
+                      px="$3"
+                      py="$1.5"
+                      borderRadius="$sm"
+                      mt="$2"
                     >
-                      {sc.badgeText}
-                    </Text>
-                  </Box>
-                ) : null}
-              </Box>
-            );
-          })}
+                      <Text
+                        fontSize="$xs"
+                        fontWeight="$semibold"
+                        color={
+                          sc.badgeTextColor
+                            ? (sc.badgeTextColor as any)
+                            : '$white'
+                        }
+                      >
+                        {sc.badgeText}
+                      </Text>
+                    </Box>
+                  ) : null}
+                </Box>
+              );
+            })}
+          </HStack>
+        </Box>
+      ) : (
+        <HStack space="md" flexWrap="wrap" mt="$3">
+          {resolvedStatCards.map(sc => (
+            <GraphStatCard key={sc.id} card={sc} />
+          ))}
         </HStack>
-      </Box>
-    ) : (
-      <HStack space="md" flexWrap="wrap" mt="$3">
-        {resolvedStatCards.map(sc => (
-          <GraphStatCard key={sc.id} card={sc} />
-        ))}
-      </HStack>
-    )
-  ) : null;
+      )
+    ) : null;
 
   const renderChart = (chart: any, idx: number) => {
     return (
       <Box key={`${block.id}-chart-${idx}`} mt="$3" width="100%">
-        {/* Keep chart title label (do not render title inside chart components to avoid duplicates) */}
         {chart?.title ? (
-          <Text fontSize="$sm" fontWeight="$semibold" color="$textForeground" mb="$2">
+          <Text
+            fontSize="$sm"
+            fontWeight="$semibold"
+            color="$textForeground"
+            mb="$2"
+          >
             {chart.title}
           </Text>
         ) : null}
@@ -591,32 +733,50 @@ const ReportSection: React.FC<{
 
   return (
     <Card
-      p={isMobile ? '$5' : '$6'}
+      p={isMobile && !isDownloadView ? '$5' : '$6'}
       borderRadius="$xl"
       borderWidth={1}
       borderColor="$borderColor"
       variant="ghost"
       bg="$white"
+      nativeID={`card-${block.id}`}
     >
       <VStack space="xs" width="100%">
-        <HStack alignItems="flex-start" justifyContent="space-between" flexWrap="wrap">
+        <HStack
+          alignItems="flex-start"
+          justifyContent="space-between"
+          flexWrap="wrap"
+        >
           <VStack space="xs" flex={1} minWidth={240}>
             <Heading size="sm" fontWeight="$normal">
               {t(block.sectionTitle)}
             </Heading>
             {block.sectionMeta ? (
-              <Text fontSize="$sm" color="$textMutedForeground" fontWeight="$medium">
+              <Text
+                fontSize="$sm"
+                color="$textMutedForeground"
+                fontWeight="$medium"
+              >
                 {t(block.sectionMeta)}
               </Text>
             ) : null}
           </VStack>
 
-          {block.headerToggle ? (
-            <HStack alignItems="center" space="sm" mt={isMobile ? '$3' : '$0'}>
-              <Text fontSize="$sm" color="$textMutedForeground" fontWeight="$medium">
+          {block.headerToggle && !isDownloadView ? (
+            <HStack
+              alignItems="center"
+              space="sm"
+              mt={isMobile ? '$3' : '$0'}
+              display={isGenerating ? 'none' : 'flex'}
+            >
+              <Text
+                fontSize="$sm"
+                color="$textMutedForeground"
+                fontWeight="$medium"
+              >
                 {t(block.headerToggle.labelKey)}
               </Text>
-              <Switch value={trendEnabled} onValueChange={setTrendEnabled} />
+              <Switch value={trendEnabled} onValueChange={onTrendChange} />
             </HStack>
           ) : null}
         </HStack>
@@ -626,7 +786,7 @@ const ReportSection: React.FC<{
         {extrasTop.map(renderExtra)}
 
         {resolvedChartLayout === 'twoColumn' && resolvedCharts.length === 2 ? (
-          isMobile ? (
+          isMobile && !isDownloadView ? (
             <VStack space="lg" width="100%">
               {renderChart(resolvedCharts[0], 0)}
               {renderChart(resolvedCharts[1], 1)}
@@ -650,6 +810,261 @@ const ReportSection: React.FC<{
         {resolvedStatPosition === 'bottom' ? StatContent : null}
       </VStack>
     </Card>
+  );
+};
+
+const ReportSection: React.FC<{
+  block: DashboardGraphReportSectionBlock;
+  fallbackPlaceholderKey: string;
+  showDownloadAll?: boolean;
+  onDownloadAll?: (format: 'pdf' | 'jpg') => void;
+  isGeneratingAll?: boolean;
+}> = ({
+  block,
+  fallbackPlaceholderKey,
+  showDownloadAll,
+  onDownloadAll,
+  isGeneratingAll,
+}) => {
+  const { t } = useLanguage();
+  const [trendEnabled, setTrendEnabled] = useState<boolean>(
+    block.headerToggle?.defaultValue ?? true,
+  );
+
+  const toast = useToast();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const cardRef = React.useRef<any>(null);
+
+  const handleDownloadClick = async (format: 'pdf' | 'jpg') => {
+    setIsGenerating(true);
+    try {
+      const titleStr = t(block.sectionTitle) || 'graph';
+      const sanitizedTitle = titleStr.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+
+      let elementToPass: React.ReactElement;
+      if (block.headerToggle) {
+        elementToPass = (
+          <VStack space="lg" width="100%">
+            <ReportSectionCard
+              key="trend"
+              block={block}
+              fallbackPlaceholderKey={fallbackPlaceholderKey}
+              trendEnabled={true}
+              isDownloadView={true}
+            />
+            <ReportSectionCard
+              key="summary"
+              block={block}
+              fallbackPlaceholderKey={fallbackPlaceholderKey}
+              trendEnabled={false}
+              isDownloadView={true}
+            />
+          </VStack>
+        );
+      } else {
+        elementToPass = (
+          <ReportSectionCard
+            block={block}
+            fallbackPlaceholderKey={fallbackPlaceholderKey}
+            trendEnabled={trendEnabled}
+            isDownloadView={true}
+          />
+        );
+      }
+
+      // Call our unified download function
+      await downloadReactElement(
+        elementToPass,
+        format === 'pdf' ? 'pdf' : 'jpg',
+        sanitizedTitle,
+        cardRef,
+      );
+
+      toast.show({
+        placement: 'top right',
+        render: ({ id }) => (
+          <Toast
+            nativeID={`toast-${id}`}
+            action="success"
+            variant="outline"
+            bg="$white"
+            hardShadow="5"
+            borderColor="$gray300"
+          >
+            <HStack space="md" alignItems="center">
+              <LucideIcon name="CheckCircle" size={20} color="$success500" />
+              <ToastTitle
+                color="$textPrimary"
+                fontSize="$sm"
+                fontWeight="$bold"
+              >
+                {t('common.success') || 'Download completed successfully!'}
+              </ToastTitle>
+            </HStack>
+          </Toast>
+        ),
+      });
+    } catch (err) {
+      console.error('Download error:', err);
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return (
+    <VStack space="xs" width="100%" alignItems="stretch">
+      <HStack
+        space="sm"
+        alignSelf="flex-end"
+        mr="$2"
+        mb="$2"
+        flexWrap="wrap"
+        display={isGenerating || isGeneratingAll ? 'none' : 'flex'}
+      >
+        {showDownloadAll && onDownloadAll && (
+          <Menu
+            placement="bottom right"
+            onSelect={key => {
+              if (key === 'pdf') onDownloadAll('pdf');
+              if (key === 'jpg') onDownloadAll('jpg');
+            }}
+            trigger={(triggerProps: any) => (
+              <Button
+                size="sm"
+                variant="outline"
+                action="primary"
+                borderColor="$primary500"
+                disabled={isGeneratingAll}
+                {...triggerProps}
+              >
+                <HStack space="xs" alignItems="center">
+                  {isGeneratingAll ? (
+                    <ButtonText color="$primary500">
+                      {t('common.loading') || 'Loading...'}
+                    </ButtonText>
+                  ) : (
+                    <>
+                      <LucideIcon
+                        name="Download"
+                        size={14}
+                        color="$primary500"
+                      />
+                      <ButtonText color="$primary500">
+                        {t('common.downloadAllGraphs') || 'Download All Graphs'}
+                      </ButtonText>
+                    </>
+                  )}
+                </HStack>
+              </Button>
+            )}
+            items={[
+              {
+                key: 'pdf',
+                label: 'common.downloadAsPdf',
+                textValue: 'Download as PDF',
+                iconName: 'FileText1',
+              },
+              {
+                key: 'jpg',
+                label: 'common.downloadAsJpg',
+                textValue: 'Download as JPG',
+                iconName: 'Image',
+              },
+            ]}
+          />
+        )}
+        <Menu
+          placement="bottom right"
+          onSelect={key => {
+            if (key === 'pdf') handleDownloadClick('pdf');
+            if (key === 'jpg') handleDownloadClick('jpg');
+          }}
+          trigger={(triggerProps: any) => (
+            <Button
+              size="sm"
+              variant="outline"
+              action="primary"
+              borderColor="$primary500"
+              disabled={isGenerating}
+              {...triggerProps}
+            >
+              <HStack space="xs" alignItems="center">
+                {isGenerating ? (
+                  <ButtonText color="$primary500">
+                    {t('common.loading') || 'Loading...'}
+                  </ButtonText>
+                ) : (
+                  <>
+                    <LucideIcon name="Download" size={14} color="$primary500" />
+                    <ButtonText color="$primary500">
+                      {t('common.downloadAs') || 'Download As'}
+                    </ButtonText>
+                  </>
+                )}
+              </HStack>
+            </Button>
+          )}
+          items={[
+            {
+              key: 'pdf',
+              label: 'common.downloadAsPdf',
+              textValue: 'Download as PDF',
+              iconName: 'FileText1',
+            },
+            {
+              key: 'jpg',
+              label: 'common.downloadAsJpg',
+              textValue: 'Download as JPG',
+              iconName: 'Image',
+            },
+          ]}
+        />
+      </HStack>
+      <Box ref={cardRef} collapsable={false}>
+        <ReportSectionCard
+          block={block}
+          fallbackPlaceholderKey={fallbackPlaceholderKey}
+          trendEnabled={trendEnabled}
+          onTrendChange={setTrendEnabled}
+          isGenerating={isGenerating || isGeneratingAll}
+        />
+      </Box>
+
+      {/* Full Screen Loading Overlay */}
+      <Modal visible={isGenerating} transparent={true} animationType="fade">
+        <Box
+          flex={1}
+          bg="rgba(0,0,0,0.6)"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Box
+            bg="$white"
+            p="$6"
+            borderRadius="$lg"
+            alignItems="center"
+            shadowColor="$black"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.25}
+            shadowRadius={3.84}
+            elevation={5}
+          >
+            <ActivityIndicator size="large" color="#16A34A" />
+            <Text
+              mt="$4"
+              fontSize="$md"
+              fontWeight="$semibold"
+              color="$textForeground"
+            >
+              {t('common.generatingFile') || 'Generating File...'}
+            </Text>
+            <Text mt="$1" fontSize="$sm" color="$textMutedForeground">
+              {t('common.pleaseWait') || 'Please wait, this may take a moment.'}
+            </Text>
+          </Box>
+        </Box>
+      </Modal>
+    </VStack>
   );
 };
 
@@ -684,6 +1099,63 @@ const DashboardGraphs: React.FC<DashboardGraphsProps> = ({
     );
   }
 
+  const toast = useToast();
+  const [isGeneratingAll, setIsGeneratingAll] = useState(false);
+  const allCardsRef = React.useRef<any>(null);
+
+  const handleDownloadAll = async (format: 'pdf' | 'jpg') => {
+    setIsGeneratingAll(true);
+    try {
+      const sanitizedTitle = 'all_dashboard_graphs';
+
+      await new Promise(resolve => setTimeout(resolve, 100)); // allow React to hide elements
+
+      if (Platform.OS === 'web') {
+        const elementIds = blocks.map(block => `card-${block.id}`);
+        await downloadGraphCards({
+          elementIds,
+          format,
+          filename: sanitizedTitle,
+        });
+      } else {
+        await captureAndSaveNative(allCardsRef, format, sanitizedTitle);
+      }
+
+      toast.show({
+        placement: 'top right',
+        render: ({ id }) => (
+          <Toast
+            nativeID={`toast-${id}`}
+            action="success"
+            variant="outline"
+            bg="$white"
+            hardShadow="5"
+            borderColor="$gray300"
+          >
+            <HStack space="md" alignItems="center">
+              <LucideIcon name="CheckCircle" size={20} color="$success500" />
+              <ToastTitle
+                color="$textPrimary"
+                fontSize="$sm"
+                fontWeight="$bold"
+              >
+                {t('common.success') || 'Download completed successfully!'}
+              </ToastTitle>
+            </HStack>
+          </Toast>
+        ),
+      });
+    } catch (err) {
+      console.error('Download error:', err);
+    } finally {
+      setIsGeneratingAll(false);
+    }
+  };
+
+  const firstReportSectionIndex = blocks.findIndex(
+    b => b.kind === 'reportSection',
+  );
+
   return (
     <ScrollView showsVerticalScrollIndicator={true} style={{ width: '100%' }}>
       <VStack
@@ -693,98 +1165,216 @@ const DashboardGraphs: React.FC<DashboardGraphsProps> = ({
         py={isMobile ? '$0' : '$2'}
         px={isMobile ? '$0' : '$2'}
       >
-        {blocks.map(block => (
-          block.kind === 'reportSection' ? (
-            <ReportSection
-              key={block.id}
-              block={block}
-              fallbackPlaceholderKey={fallbackPlaceholderKey}
+        {firstReportSectionIndex === -1 && (
+          <HStack space="xs" alignSelf="flex-end" mb="$2" flexWrap="wrap">
+            <Menu
+              placement="bottom right"
+              onSelect={key => {
+                if (key === 'pdf') handleDownloadAll('pdf');
+                if (key === 'jpg') handleDownloadAll('jpg');
+              }}
+              trigger={(triggerProps: any) => (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  action="primary"
+                  borderColor="$primary500"
+                  disabled={isGeneratingAll}
+                  {...triggerProps}
+                >
+                  <HStack space="xs" alignItems="center">
+                    {isGeneratingAll ? (
+                      <ButtonText color="$primary500">
+                        {t('common.loading') || 'Loading...'}
+                      </ButtonText>
+                    ) : (
+                      <>
+                        <LucideIcon
+                          name="Download"
+                          size={14}
+                          color="$primary500"
+                        />
+                        <ButtonText color="$primary500">
+                          {t('common.downloadAllGraphs') ||
+                            'Download All Graphs'}
+                        </ButtonText>
+                      </>
+                    )}
+                  </HStack>
+                </Button>
+              )}
+              items={[
+                {
+                  key: 'pdf',
+                  label: 'common.downloadAsPdf',
+                  textValue: 'Download as PDF',
+                  iconName: 'FileText1',
+                },
+                {
+                  key: 'jpg',
+                  label: 'common.downloadAsJpg',
+                  textValue: 'Download as JPG',
+                  iconName: 'Image',
+                },
+              ]}
             />
-          ) : block.kind === 'groupHeader' ? (
-            (() => {
-              const accent = getGroupHeaderAccent(block as any);
-              const titleStr = t((block as any).title);
-              return (
-              <Box
-                key={block.id}
-                    width="100%"
-                bg={(block as any).bg ? ((block as any).bg as any) : '$backgroundLight50'}
-                borderRadius="$lg"
-                    px="$6"
-                    py="$5"
-                borderWidth={1}
-                borderColor="$borderLight200"
-                    position="relative"
-                    overflow="hidden"
-                    minHeight={64}
-                    justifyContent="center"
-                  >
-                    {/* Left accent bar (like reference) */}
+          </HStack>
+        )}
+
+        <Box ref={allCardsRef} collapsable={false}>
+          <VStack space="lg" width="100%">
+            {blocks.map((block, index) =>
+              block.kind === 'reportSection' ? (
+                <ReportSection
+                  key={block.id}
+                  block={block}
+                  fallbackPlaceholderKey={fallbackPlaceholderKey}
+                  showDownloadAll={index === firstReportSectionIndex}
+                  onDownloadAll={handleDownloadAll}
+                  isGeneratingAll={isGeneratingAll}
+                />
+              ) : block.kind === 'groupHeader' ? (
+                (() => {
+                  const accent = getGroupHeaderAccent(block as any);
+                  const titleStr = t((block as any).title);
+                  return (
                     <Box
-                      position="absolute"
-                      left={0}
-                      top={0}
-                      bottom={0}
-                      width={4}
-                      bg={accent as any}
-                    />
-                    <Text
-                      fontSize="$sm"
-                      fontWeight="$semibold"
-                      color={accent as any}
-                      letterSpacing={0.5 as any}
+                      key={block.id}
+                      nativeID={`card-${block.id}`}
+                      width="100%"
+                      bg={
+                        (block as any).bg
+                          ? ((block as any).bg as any)
+                          : '$backgroundLight50'
+                      }
+                      borderRadius="$lg"
+                      px="$6"
+                      py="$5"
+                      borderWidth={1}
+                      borderColor="$borderLight200"
+                      position="relative"
+                      overflow="hidden"
+                      minHeight={64}
+                      justifyContent="center"
                     >
-                      {String(titleStr || '').toUpperCase()}
-                    </Text>
-              </Box>
-              );
-            })()
-          ) : (
-            <Card key={block.id} p="$4" borderRadius="$lg" borderWidth={1} borderColor="$borderLight200">
-              <VStack space="sm" width="100%">
-                {'title' in block && block.title ? <Heading size="md">{t(block.title as any)}</Heading> : null}
-                {'description' in block && block.description ? (
-                  <Text fontSize="$sm" color="$textMutedForeground">
-                    {t(block.description as any)}
-                  </Text>
-                ) : null}
+                      {/* Left accent bar (like reference) */}
+                      <Box
+                        position="absolute"
+                        left={0}
+                        top={0}
+                        bottom={0}
+                        width={4}
+                        bg={accent as any}
+                      />
+                      <Text
+                        fontSize="$sm"
+                        fontWeight="$semibold"
+                        color={accent as any}
+                        letterSpacing={0.5 as any}
+                      >
+                        {String(titleStr || '').toUpperCase()}
+                      </Text>
+                    </Box>
+                  );
+                })()
+              ) : (
+                <Card
+                  key={block.id}
+                  nativeID={`card-${block.id}`}
+                  p="$4"
+                  borderRadius="$lg"
+                  borderWidth={1}
+                  borderColor="$borderLight200"
+                >
+                  <VStack space="sm" width="100%">
+                    {'title' in block && block.title ? (
+                      <Heading size="md">{t(block.title as any)}</Heading>
+                    ) : null}
+                    {'description' in block && block.description ? (
+                      <Text fontSize="$sm" color="$textMutedForeground">
+                        {t(block.description as any)}
+                      </Text>
+                    ) : null}
 
-                <Box width="100%" mt="$2">
-                  {block.kind === 'line' ? (
-                    <SimpleLineChart
-                      data={block.data}
-                      title={t(block.title)}
-                      color={block.color}
-                      yAxisLabel={block.yAxisLabel}
-                      valueLabel={block.valueLabel}
-                    />
-                  ) : null}
+                    <Box width="100%" mt="$2">
+                      {block.kind === 'line' ? (
+                        <SimpleLineChart
+                          data={block.data}
+                          title={t(block.title)}
+                          color={block.color}
+                          yAxisLabel={block.yAxisLabel}
+                          valueLabel={block.valueLabel}
+                        />
+                      ) : null}
 
-                  {block.kind === 'bar' ? (
-                    <SimpleBarChart
-                      data={block.data}
-                      title={t(block.title)}
-                      orientation={(block as any).orientation}
-                      height={(block as any).height}
-                    />
-                  ) : null}
+                      {block.kind === 'bar' ? (
+                        <SimpleBarChart
+                          data={block.data}
+                          title={t(block.title)}
+                          orientation={(block as any).orientation}
+                          height={(block as any).height}
+                        />
+                      ) : null}
 
-                  {block.kind === 'pie' ? (
-                    <SimplePieChart data={block.data} title={t(block.title)} />
-                  ) : null}
+                      {block.kind === 'pie' ? (
+                        <SimplePieChart
+                          data={block.data}
+                          title={t(block.title)}
+                        />
+                      ) : null}
 
-                  {block.kind === 'placeholder' ? (
-                    <Text>{t(block.placeholderTextKey || fallbackPlaceholderKey)}</Text>
-                  ) : null}
-                </Box>
-              </VStack>
-            </Card>
-          )
-        ))}
+                      {block.kind === 'placeholder' ? (
+                        <Text>
+                          {t(
+                            block.placeholderTextKey || fallbackPlaceholderKey,
+                          )}
+                        </Text>
+                      ) : null}
+                    </Box>
+                  </VStack>
+                </Card>
+              ),
+            )}
+          </VStack>
+        </Box>
       </VStack>
+
+      {/* Full Screen Loading Overlay for all */}
+      <Modal visible={isGeneratingAll} transparent={true} animationType="fade">
+        <Box
+          flex={1}
+          bg="rgba(0,0,0,0.6)"
+          justifyContent="center"
+          alignItems="center"
+        >
+          <Box
+            bg="$white"
+            p="$6"
+            borderRadius="$lg"
+            alignItems="center"
+            shadowColor="$black"
+            shadowOffset={{ width: 0, height: 2 }}
+            shadowOpacity={0.25}
+            shadowRadius={3.84}
+            elevation={5}
+          >
+            <ActivityIndicator size="large" color="#16A34A" />
+            <Text
+              mt="$4"
+              fontSize="$md"
+              fontWeight="$semibold"
+              color="$textForeground"
+            >
+              {t('common.generatingFile') || 'Generating File...'}
+            </Text>
+            <Text mt="$1" fontSize="$sm" color="$textMutedForeground">
+              {t('common.pleaseWait') || 'Please wait, this may take a moment.'}
+            </Text>
+          </Box>
+        </Box>
+      </Modal>
     </ScrollView>
   );
 };
 
 export default DashboardGraphs;
-
