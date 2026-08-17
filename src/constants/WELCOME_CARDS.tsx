@@ -21,7 +21,7 @@ export const WELCOME_CARDS: FeatureCardData[] = [
     navigationUrl: 'dashboard',
     isDisabled: false,
     pressableActionText: 'welcome.getStarted',
-    isComingSoon: true,
+    isComingSoon: false,
   },
   {
     id: 'learning-progress',
@@ -34,5 +34,5 @@ export const WELCOME_CARDS: FeatureCardData[] = [
     pressableActionText: 'welcome.getStarted',
     isComingSoon: true,
   },
-  
+
 ];

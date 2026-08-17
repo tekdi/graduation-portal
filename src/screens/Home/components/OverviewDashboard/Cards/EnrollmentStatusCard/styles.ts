@@ -1,25 +1,33 @@
-export const tasksOverviewCardStyles = {
-  container: {
+export const enrollmentStatusStyles = {
+  card: {
     bg: '$white',
     borderRadius: '$xl',
-    p: '$4',
+    p: '$5',
     borderWidth: 1,
     borderColor: '$borderColor',
     shadowColor: '$shadowColor',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 3,
     elevation: 2,
+    '$web-boxShadow': '0px 1px 3px rgba(0, 0, 0, 0.1)' as const,
+    h: '$full',
   },
   header: {
     space: 'sm',
     alignItems: 'center',
-    mb: '$4',
+    mb: '$8',
+  },
+  cardtitle: {
+    fontSize: 16,
+    fontWeight: "$normal",
   },
   iconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: '$md',
+    padding: 8,
+    borderRadius: 8,
     bg: '$primary100',
     justifyContent: 'center',
     alignItems: 'center',
@@ -27,15 +35,14 @@ export const tasksOverviewCardStyles = {
   content: {
     space: 'md',
   },
-  metricRow: {
+  statusItem: {
+    space: 'xs',
+  },
+  statusRow: {
     justifyContent: 'space-between',
     alignItems: 'center',
-  },
-  progressSection: {
-    space: 'sm',
   },
   progressBar: {
     borderRadius: '$full',
   },
 } as const;
-

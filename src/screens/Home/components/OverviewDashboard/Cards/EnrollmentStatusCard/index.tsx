@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack, HStack, Text, Progress, ProgressFilledTrack } from '@ui';
 import { LucideIcon } from '@ui';
-import { enrollmentStatusCardStyles } from './Styles';
+import { enrollmentStatusStyles } from './styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 interface EnrollmentStatus {
@@ -22,23 +22,21 @@ const EnrollmentStatusCard: React.FC<EnrollmentStatusCardProps> = ({
     { label: 'Completed', count: 7, percentage: 25 },
   ],
 }) => {
-  const total = statuses.reduce((sum, status) => sum + status.count, 0);
-
   return (
-    <Box {...enrollmentStatusCardStyles.container}>
-      <HStack {...enrollmentStatusCardStyles.header}>
-        <Box {...enrollmentStatusCardStyles.iconContainer}>
+    <Box {...enrollmentStatusStyles.card}>
+      <HStack {...enrollmentStatusStyles.header}>
+        <Box {...enrollmentStatusStyles.iconContainer}>
           <LucideIcon name="User" size={20} color="$primary500" />
         </Box>
-        <Text {...TYPOGRAPHY.h4} color="$textPrimary">
+        <Text {...enrollmentStatusStyles.cardtitle} color="$textPrimary">
           Enrollment Status
         </Text>
       </HStack>
-      
-      <VStack {...enrollmentStatusCardStyles.content}>
+
+      <VStack {...enrollmentStatusStyles.content}>
         {statuses.map((status, index) => (
-          <VStack key={index} {...enrollmentStatusCardStyles.statusItem}>
-            <HStack {...enrollmentStatusCardStyles.statusRow}>
+          <VStack key={index} {...enrollmentStatusStyles.statusItem}>
+            <HStack {...enrollmentStatusStyles.statusRow}>
               <Text {...TYPOGRAPHY.bodySmall} color="$textSecondary">
                 {status.label}
               </Text>
@@ -51,7 +49,7 @@ const EnrollmentStatusCard: React.FC<EnrollmentStatusCardProps> = ({
               w="$full"
               h="$1.5"
               bg="$progressBarBackground"
-              {...enrollmentStatusCardStyles.progressBar}
+              {...enrollmentStatusStyles.progressBar}
             >
               <ProgressFilledTrack bg="$blue500" />
             </Progress>
@@ -63,4 +61,3 @@ const EnrollmentStatusCard: React.FC<EnrollmentStatusCardProps> = ({
 };
 
 export default EnrollmentStatusCard;
-

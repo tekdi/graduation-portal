@@ -56,7 +56,7 @@ export const LC_MENU_OPTIONS: MenuItemData[] = [
     iconColor: theme.tokens.colors.textForegroundColor,
     showDividerAfter: false,
     route: 'dashboard', // Navigation route for dashboard menu item
-    isComingSoon: true,
+    isComingSoon: false,
   },
   // {
   //   key: 'sessions-support',

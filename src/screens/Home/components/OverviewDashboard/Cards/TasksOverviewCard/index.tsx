@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, VStack, HStack, Text, Progress, ProgressFilledTrack } from '@ui';
 import { LucideIcon } from '@ui';
-import { tasksOverviewCardStyles } from './Styles';
+import { tasksOverviewStyles } from './styles';
 import { TYPOGRAPHY } from '@constants/TYPOGRAPHY';
 
 interface TasksOverviewCardProps {
@@ -15,23 +15,23 @@ const TasksOverviewCard: React.FC<TasksOverviewCardProps> = ({
   completedTasks = 806,
   recentActivity = 0,
 }) => {
-  const completionPercentage = totalTasks > 0 
-    ? Math.round((completedTasks / totalTasks) * 100) 
+  const completionPercentage = totalTasks > 0
+    ? Math.round((completedTasks / totalTasks) * 100)
     : 0;
 
   return (
-    <Box {...tasksOverviewCardStyles.container}>
-      <HStack {...tasksOverviewCardStyles.header}>
-        <Box {...tasksOverviewCardStyles.iconContainer}>
+    <Box {...tasksOverviewStyles.card}>
+      <HStack {...tasksOverviewStyles.header}>
+        <Box {...tasksOverviewStyles.iconContainer}>
           <LucideIcon name="Target" size={20} color="$primary500" />
         </Box>
-        <Text {...TYPOGRAPHY.h4} color="$textPrimary">
+        <Text {...tasksOverviewStyles.cardtitle} color="$textPrimary">
           Tasks Overview
         </Text>
       </HStack>
-      
-      <VStack {...tasksOverviewCardStyles.content}>
-        <HStack {...tasksOverviewCardStyles.metricRow}>
+
+      <VStack {...tasksOverviewStyles.content}>
+        <HStack {...tasksOverviewStyles.metricRow}>
           <Text {...TYPOGRAPHY.bodySmall} color="$textSecondary">
             Total Tasks
           </Text>
@@ -40,8 +40,8 @@ const TasksOverviewCard: React.FC<TasksOverviewCardProps> = ({
           </Text>
         </HStack>
 
-        <VStack {...tasksOverviewCardStyles.progressSection}>
-          <HStack {...tasksOverviewCardStyles.metricRow}>
+        <VStack {...tasksOverviewStyles.progressSection}>
+          <HStack {...tasksOverviewStyles.metricRow}>
             <Text {...TYPOGRAPHY.bodySmall} color="$textSecondary">
               Completed Tasks
             </Text>
@@ -54,13 +54,13 @@ const TasksOverviewCard: React.FC<TasksOverviewCardProps> = ({
             w="$full"
             h="$1.5"
             bg="$progressBarBackground"
-            {...tasksOverviewCardStyles.progressBar}
+            {...tasksOverviewStyles.progressBar}
           >
             <ProgressFilledTrack bg="$blue500" />
           </Progress>
         </VStack>
 
-        <HStack {...tasksOverviewCardStyles.metricRow}>
+        <HStack {...tasksOverviewStyles.metricRow}>
           <Text {...TYPOGRAPHY.bodySmall} color="$textSecondary">
             Recent Activity (30 days)
           </Text>
@@ -74,4 +74,3 @@ const TasksOverviewCard: React.FC<TasksOverviewCardProps> = ({
 };
 
 export default TasksOverviewCard;
-

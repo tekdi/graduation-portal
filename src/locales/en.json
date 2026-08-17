@@ -2690,5 +2690,367 @@
         "successMsg": "Resource deleted successfully!"
       }
     }
+  },
+  "requestorDashboard": {
+    "pageHeader": {
+      "title": "Dashboard",
+      "description": "Welcome back, Lerato Mokoena! Here's your overview."
+    },
+    "tabs": {
+      "overview": "Overview",
+      "outcomes": "Outcomes",
+      "graduationCriteria": "Graduation Criteria"
+    },
+    "filters": {
+      "allTime": "All Time",
+      "allStatuses": "All Statuses",
+      "allGender": "All Gender",
+      "timeOptions": {
+        "last7Days": "Last 7 Days",
+        "last30Days": "Last 30 Days",
+        "last90Days": "Last 90 Days",
+        "thisYear": "This Year"
+      },
+      "statusOptions": {
+        "active": "Active",
+        "completed": "Completed",
+        "draft": "Draft"
+      },
+      "genderOptions": {
+        "male": "Male",
+        "female": "Female",
+        "other": "Other"
+      }
+    },
+    "overview": {
+      "metrics": {
+        "totalCaseload": "Total Caseload",
+        "activeParticipants": "Active Participants",
+        "completed": "Completed",
+        "averageProgress": "Average Progress"
+      },
+      "performanceActivityReport": {
+        "title": "Performance & Activity Report",
+        "description": "Key field metrics achieved by the coach",
+        "tabs": {
+          "weekly": "Weekly",
+          "monthly": "Monthly"
+        },
+        "metrics": {
+          "participantsOnboarded": {
+            "label": "Participants Onboarded",
+            "subLabelWeekly": "New this week",
+            "subLabelMonthly": "New this month"
+          },
+          "idpsDeveloped": {
+            "label": "IDPs Developed",
+            "subLabel": "Intervention plans set"
+          },
+          "individualCheckIns": {
+            "label": "Individual Check-ins",
+            "subLabel": "Visits logged"
+          },
+          "groupCheckIns": {
+            "label": "Group Check-ins",
+            "subLabel": "Sessions completed"
+          },
+          "midlineSurveys": {
+            "label": "Midline Surveys",
+            "subLabel": "Surveys completed"
+          },
+          "endlineSurveys": {
+            "label": "Endline Surveys",
+            "subLabel": "Surveys completed"
+          },
+          "bigPushFacilitated": {
+            "label": "Big Push Facilitated",
+            "subLabel": "Asset grants distributed"
+          },
+          "bigPushValue": {
+            "label": "Big Push Value",
+            "subLabel": "Total grant worth"
+          },
+          "interventionsScheduled": {
+            "label": "Interventions Scheduled",
+            "subLabel": "Planned milestones"
+          },
+          "interventionsCompleted": {
+            "label": "Interventions Completed",
+            "subLabel": "Milestones met"
+          },
+          "slowClimbers": {
+            "label": "Slow Climbers",
+            "subLabel": "Active (Progress < 50%)"
+          },
+          "fastClimbers": {
+            "label": "Fast Climbers",
+            "subLabel": "Active (Progress >= 50%)"
+          }
+        }
+      }
+    },
+    "outcomes": {
+      "title": "Viewing outcome indicators for:",
+      "participantPlaceholder": "Select a participant...",
+      "selectParticipantMessage": "Select a participant above to view their individual outcome indicators.",
+      "searchPlaceholder": "Search participants...",
+      "noParticipantFound": "No participant found",
+      "searchParticipant": "Search participant...",
+      "senseOfAgency": {
+        "title": "Sense of Agency & Control",
+        "description": "Participant self-assessment"
+      },
+      "participantStatus": {
+        "monthlyIncome": {
+          "label": "Current Monthly Income",
+          "supportingText": "144.5% from baseline"
+        },
+        "currentSavings": {
+          "label": "Current Savings",
+          "supportingText": "221.3% from baseline"
+        },
+        "igaStatus": {
+          "label": "IGA Status",
+          "supportingText": "Small business - retail"
+        },
+        "selfEfficacyScore": {
+          "label": "Self-Efficacy Score",
+          "supportingText": "Baseline: 45/100"
+        },
+        "savingsFrequency": {
+          "label": "Savings Frequency"
+        },
+        "savingsLocation": {
+          "label": "Savings Location"
+        },
+        "recordKeeping": {
+          "label": "Record Keeping"
+        },
+        "debtStatus": {
+          "label": "Debt Status"
+        }
+      },
+      "incomeSavings": {
+        "incomeTrend": {
+          "title": "Income Trend Over Time",
+          "description": "Monthly income progression"
+        },
+        "savingsTrend": {
+          "title": "Savings Trend Over Time",
+          "description": "Monthly savings progression"
+        }
+      },
+      "incomeSelfEfficacy": {
+        "incomeSources": {
+          "title": "Income Sources Breakdown",
+          "description": "Current month income by source"
+        },
+        "selfEfficacy": {
+          "title": "Self-Efficacy Progress",
+          "description": "Score progression over program"
+        }
+      },
+      "profitabilityAgency": {
+        "profitability": {
+          "title": "Business Profitability Trend",
+          "description": "Monthly profit progression"
+        },
+        "agency": {
+          "title": "Sense of Agency & Control",
+          "description": "Participant self-assessment"
+        }
+      },
+      "graduationCriteria": {
+        "overallProgramGraduationRate": {
+          "title": "Overall Program Graduation Rate",
+          "description": "Calculated from total completed and exited program participants.",
+          "formula": "Formula: Graduated / Total Exits",
+          "subText": "(11 out of 13 exited participants graduated)",
+          "readyRate": "READY RATE",
+          "totalExits": "TOTAL EXITS"
+        },
+        "metrics": {
+          "coachWorkload": {
+            "label": "COACH WORKLOAD",
+            "value": "36",
+            "description": "Total assigned active participants"
+          },
+          "readyToGraduate": {
+            "label": "READY TO GRADUATE",
+            "value": "14 (39%)",
+            "description": "Met 10 to 12 graduation indicators (out of 12)"
+          },
+          "nearReady": {
+            "label": "NEAR READY",
+            "value": "6 (17%)",
+            "description": "Met 7 to 9 graduation indicators (out of 12)"
+          },
+          "notReady": {
+            "label": "NOT READY",
+            "value": "16 (44%)",
+            "description": "Met less than 7 graduation indicators (out of 12)"
+          }
+        }
+      }
+    },
+    "graduationCriteria": {
+      "overallProgramGraduationRate": {
+        "title": "Overall Program Graduation Rate",
+        "formula": "Ready to Graduate ÷ Total Exits",
+        "subText": "of participants are ready to graduate",
+        "description": "Calculated from total completed and exited program participants.",
+        "readyRate": "Ready to Graduate",
+        "totalExits": "Total Exits"
+      },
+      "metrics": {
+        "coachWorkload": {
+          "label": "Coach Workload",
+          "value": "36",
+          "description": "Total assigned active participants"
+        },
+        "readyToGraduate": {
+          "label": "Ready to Graduate",
+          "value": "14 (39%)",
+          "description": "Met 10 to 12 graduation indicators (out of 12)"
+        },
+        "nearReady": {
+          "label": "Near Ready",
+          "value": "6 (17%)",
+          "description": "Met 7 to 9 graduation indicators (out of 12)"
+        },
+        "notReady": {
+          "label": "Not Ready",
+          "value": "16 (44%)",
+          "description": "Met less than 7 graduation indicators (out of 12)"
+        }
+      },
+      "readinessStatus": {
+        "title": "Readiness Status Distribution",
+        "description": "Participant breakdown across the 3 graduation readiness tiers",
+        "readyToGraduateTier": "Ready to Graduate (10-12 indicators met)",
+        "readyToGraduateCount": "14 participants (39%)",
+        "nearReadyTier": "Near Ready (7-9 indicators met)",
+        "nearReadyCount": "6 participants (17%)",
+        "notReadyTier": "Not Ready (< 7 indicators met)",
+        "notReadyCount": "16 participants (44%)"
+      },
+      "programExit": {
+        "title": "Program Exit Distribution",
+        "description": "Breakdown across 3 exit categories (% and # of participants)",
+        "graduated": "Graduated",
+        "failedToGraduate": "Failed to Graduate",
+        "droppedOff": "Dropped Off",
+        "totalProgramExits": "TOTAL PROGRAM EXITS",
+        "formula": "FORMULA: GRADUATED / TOTAL EXITS",
+        "overallRate": "Overall Graduation Rate = 85%",
+        "totalValue": "13"
+      },
+      "timeline": {
+        "title": "Graduation Rate Timeline (Last 6 Months)",
+        "description": "Tracking trends for Graduated, Failed to Graduate, and Dropped Off participants",
+        "countsInPercent": "Counts in % trends"
+      },
+      "rate": {
+        "title": "Graduation Rate",
+        "subtitle": "{{graduated}} of {{total}} active participants have graduated",
+        "notOnboarded": "Not Onboarded",
+        "onboarded": "Onboarded",
+        "inProgress": "In Progress",
+        "graduated": "Graduated",
+        "droppedOff": "Dropped Off",
+        "totalParticipants": "Total Participants",
+        "notGraduated": "Not Graduated"
+      },
+      "indicatorsTitle": "Graduation Indicators",
+      "indicators": {
+        "achieved": "Achieved",
+        "onTrack": "On Track",
+        "atRisk": "At Risk",
+        "livelihoods": "Livelihoods",
+        "financialInclusion": "Financial Inclusion",
+        "socialEmpowerment": "Social Empowerment",
+        "genderEquality": "Gender Equality",
+        "activeIGA": "Active Income Generating Activity",
+        "businessProfitability": "Business Profitability",
+        "participantIncome": "Participant Income",
+        "assetAccumulation": "Asset Accumulation",
+        "savingsAmount": "Savings Amount",
+        "savingsFrequency": "Savings Frequency",
+        "financialRecordKeeping": "Financial Record Keeping",
+        "responsibleCreditUsage": "Responsible Credit Usage",
+        "selfEsteemConfidence": "Self-Esteem & Confidence",
+        "agencyControl": "Agency & Control",
+        "attitudesViolenceGBV": "Attitudes Toward Violence (GBV)",
+        "decisionMakingGenderEquality": "Decision-Making & Gender Equality"
+      },
+      "checklist": {
+        "readinessTitle": "Individual Graduation Readiness",
+        "title": "Graduation Criteria",
+        "subtitle": "12 indicators across 4 pillars · Track participant's progress toward graduation",
+        "emptyStateMessage": "Select a participant above to view their individual graduation checklist.",
+        "viewingReadinessLabel": "Viewing individual readiness for:",
+        "categorySummary": "{{achieved}} achieved · {{onTrack}} on track · {{atRisk}} at risk",
+        "toAchieveLabel": "To Achieve:",
+        "graduationLogicLabel": "Graduation Logic",
+        "graduationLogicInfo": "For a participant to graduate, they must meet the required indicators under livelihoods and financial inclusion, plus at least 4 other indicators.",
+        "activeIGA": {
+          "desc": "The participant is engaged in employment or running a business for at least 12 consecutive months by the programme endline."
+        },
+        "businessProfitability": {
+          "desc": "The business is profitable in at least 8 of the final 12 months before the programme endline, including the last two survey periods."
+        },
+        "participantIncome": {
+          "desc": "The participant's monthly income is R5,001 or higher in at least 8 of the final 12 months before the programme endline, including the last two survey periods."
+        },
+        "assetAccumulation": {
+          "desc": "The number and total value of the participant's assets increase by at least 20% between baseline and programme endline."
+        },
+        "savingsAmount": {
+          "desc": "The participant has total savings of at least R4,606 (equivalent to one month's National Minimum Wage) by the programme endline."
+        },
+        "savingsFrequency": {
+          "desc": "The participant saves at least once per month in the final 12 months before the programme endline."
+        },
+        "financialRecordKeeping": {
+          "desc": "The participant maintains written or digital financial records for both their household and business at the programme endline."
+        },
+        "responsibleCreditUsage": {
+          "desc": "The participant has no loans from loan sharks, payday lenders, or other informal/unreputable lenders during the final 4 months before the programme endline."
+        },
+        "selfEsteemConfidence": {
+          "desc": "The participant achieves a composite score of at least 0.6 (out of 1.0) at the programme endline."
+        },
+        "agencyControl": {
+          "desc": "The participant achieves a composite score of at least 0.6 (out of 1.0) at the programme endline."
+        },
+        "attitudesViolenceGBV": {
+          "desc": "The participant achieves a composite score of at least 0.6 (out of 1.0) at the programme endline."
+        },
+        "decisionMakingGenderEquality": {
+          "desc": "The participant achieves a composite score of at least 0.6 (out of 1.0) at the programme endline."
+        }
+      },
+      "filters": {
+        "allGenders": "All Genders",
+        "allPathways": "All Pathways",
+        "allPillars": "All Pillars",
+        "reset": "Reset",
+        "genderOptions": {
+          "male": "Male",
+          "female": "Female",
+          "other": "Other"
+        },
+        "pathwayOptions": {
+          "agriculture": "Agriculture",
+          "business": "Business",
+          "vocational": "Vocational"
+        },
+        "pillarOptions": {
+          "financial": "Financial",
+          "social": "Social",
+          "economic": "Economic"
+        }
+      }
+    }
   }
 }

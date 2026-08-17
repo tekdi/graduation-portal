@@ -11,6 +11,21 @@ interface MetricCardProps {
   iconColor?: string;
 }
 
+const getIconBgColor = (color: string) => {
+  switch (color) {
+    case '$primary500':
+      return '$primary100';
+    case '$info100':
+      return '$blue50';
+    case '$success600':
+      return '$success100';
+    case '$blue500':
+      return '$blue100';
+    default:
+      return `${color}20`;
+  }
+};
+
 const MetricCard: React.FC<MetricCardProps> = ({
   title,
   value,
@@ -21,12 +36,12 @@ const MetricCard: React.FC<MetricCardProps> = ({
     <Box {...metricCardStyles.container}>
       <HStack {...metricCardStyles.content}>
         {icon && (
-          <Box {...metricCardStyles.iconContainer} bg={`${iconColor}20`}>
-            <LucideIcon name={icon} size={24} color={iconColor} />
+          <Box {...metricCardStyles.iconContainer} bg={getIconBgColor(iconColor)}>
+            <LucideIcon name={icon} size={20} color={iconColor} />
           </Box>
         )}
         <VStack {...metricCardStyles.textContainer}>
-          <Text {...TYPOGRAPHY.bodySmall} color="$textSecondary">
+          <Text {...metricCardStyles.titletext} color="$textSecondary">
             {title}
           </Text>
           <Text {...metricCardStyles.valueText}>{value}</Text>

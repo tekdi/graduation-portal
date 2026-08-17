@@ -1,75 +1,73 @@
 export const dashboardStyles = {
-  scrollView: {
-    p: '$4',
+  container: {
+    flex: 1,
+    bg: '$backgroundColor',
+  },
+  pageHeaderTitle: {
+    color: '$primary500' as const,
+    fontSize: '$3xl' as const,
+    fontWeight: '$bold' as const,
+    pb: 8 as const,
+  },
+  pageHeaderSubtitle: {
+    color: '$textMutedForeground' as const,
+    fontSize: 16 as const,
+    mt: '$1' as const,
+  },
+  contentWrapper: {
     bg: '$backgroundColor',
     flex: 1,
   },
   mainVStack: {
-    space: 'lg',
+    space: 'lg' as const,
+    px: '$4' as const,
+    py: '$4' as const,
+    $md: {
+      px: '$6' as const,
+      py: '$6' as const,
+    },
   },
   contentContainer: {
-    space: 'lg',
-  },
-  metricsRow: {
-    flexWrap: 'wrap',
-    gap: '$4',
-    $md: {
-      flexWrap: 'nowrap',
-    },
-  },
-  cardsRow: {
-    flexWrap: 'wrap',
-    gap: '$4',
-    $md: {
-      flexWrap: 'nowrap',
-    },
-  },
-  cardColumn: {
-    flex: 1,
-    minWidth: '100%',
-    $md: {
-      minWidth: '48%',
-    },
+    space: 'lg' as const,
   },
   placeholderBox: {
-    p: '$8',
-    bg: '$white',
-    borderRadius: '$xl',
+    p: '$8' as const,
+    bg: '$white' as const,
+    borderRadius: '$xl' as const,
     borderWidth: 1,
-    borderColor: '$borderColor',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderColor: '$borderColor' as const,
+    alignItems: 'center' as const,
+    justifyContent: 'center' as const,
     minHeight: 200,
   },
   titleText: {
-    fontSize: '$2xl',
-    fontWeight: '$bold',
+    fontSize: '$2xl' as const,
+    fontWeight: '$bold' as const,
   },
   welcomeText: {
-    color: '$textLight500',
+    color: '$textLight500' as const,
   },
   statsHStack: {
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap' as const,
+    justifyContent: 'space-between' as const,
   },
   sectionsContainer: {
-    flexWrap: 'wrap',
-    space: 'lg',
+    flexWrap: 'wrap' as const,
+    space: 'lg' as const,
   },
   sectionBox: {
     flex: 1,
-    w: '100%',
+    w: '100%' as const,
   },
   sectionTitle: {
-    fontWeight: '$bold',
-    mb: '$2',
+    fontWeight: '$bold' as const,
+    mb: '$2' as const,
   },
-  // Quick Actions Card
   quickActionsCard: {
     borderWidth: 1,
-    borderColor: '$borderLight300',
-    rounded: '$2xl',
-    p: '$4',
-    bg: '$backgroundLight0',
+    borderColor: '$borderLight300' as const,
+    rounded: '$2xl' as const,
+    p: '$4' as const,
+    bg: '$backgroundLight0' as const,
   },
 } as const;

@@ -16,6 +16,7 @@ import {
   Platform,
   Pressable,
   ScrollView,
+  TextInput,
   TouchableWithoutFeedback,
 } from 'react-native';
 
@@ -42,6 +43,7 @@ type Option = {
   name?: string;
   nativeName?: string;
   isRTL?: boolean;
+  status?: string;
 };
 
 type RawOption =
@@ -50,6 +52,7 @@ type RawOption =
     label?: string;
     name?: string;
     value: string | null;
+    status?: string;
   }
   | Option;
 
@@ -79,6 +82,8 @@ type SelectProps = {
   /** Opt-in multi-select mode: `value`/`onChange` become array-valued, a checkbox
    * appears beside every option, and picking one doesn't close the dropdown. */
   multiple?: boolean;
+  showSearch?: boolean;
+  searchPlaceholder?: string;
 };
 
 const DROPDOWN_Z = 100000;
@@ -155,6 +160,7 @@ function normalizeOptions(
         return {
           value: optionValue,
           name: optionName,
+          status: 'status' in e ? (e as any).status : undefined,
         };
       }
 
@@ -210,11 +216,33 @@ function WebSelect({
   disabled = false,
   isReadOnly = false,
   multiple = false,
+  showSearch = false,
+  searchPlaceholder,
 }: SelectProps) {
+  const [open, setOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [hoveredValue, setHoveredValue] = useState<string | null>(null);
+
   const normalizedOptions = useMemo(
     () => normalizeOptions(options),
     [options],
   );
+
+  useEffect(() => {
+    if (!open) {
+      setSearchText('');
+      setHoveredValue(null);
+    }
+  }, [open]);
+
+  const filteredOptions = useMemo(() => {
+    if (!showSearch || !searchText) return normalizedOptions;
+    const q = searchText.toLowerCase();
+    return normalizedOptions.filter((opt) => {
+      const label = opt.nativeName || opt.name || opt.value || '';
+      return label.toLowerCase().includes(q);
+    });
+  }, [showSearch, searchText, normalizedOptions]);
 
   const valueArray = useMemo(
     () => (multiple && Array.isArray(value) ? value : []),
@@ -279,15 +307,12 @@ function WebSelect({
   const writingDirection =
     I18nManager.isRTL ? 'rtl' : 'ltr';
 
-  const listId = useId().replace(
+  const listId = String(useId()).replace(
     /:/g,
     '',
   );
 
   const triggerRef = useRef<any>(null);
-
-  const [open, setOpen] =
-    useState(false);
 
   const [pos, setPos] =
     useState<DropdownPosition>({
@@ -441,7 +466,7 @@ function WebSelect({
       bg,
       borderColor,
       size,
-      borderRadius,
+      borderRadius as any,
     ) as any;
 
   const dropdown = open ? (
@@ -459,7 +484,7 @@ function WebSelect({
           right: 0,
           bottom: 0,
           zIndex: DROPDOWN_Z - 1,
-        }}
+        } as any}
       />
     <Box
       id={`select-list-${listId}`}
@@ -478,12 +503,47 @@ function WebSelect({
         overflow: 'hidden',
         boxShadow:
           '0 4px 16px rgba(0,0,0,0.12)',
-      }}
+      } as any}
     >
+      {showSearch && (
+        <Box
+          p="$2"
+          borderBottomWidth={1}
+          borderColor="$borderColor"
+        >
+          <HStack
+            alignItems="center"
+            borderWidth={1}
+            borderColor="$borderColor"
+            borderRadius={6}
+            px="$3"
+            bg="$backgroundLight50"
+            h={36}
+          >
+            <LucideIcon name="Search" size={14} color="$textMutedForeground" />
+            <input
+              placeholder={searchPlaceholder || i18n.t('requestorDashboard.outcomes.searchParticipant', 'Search participant...')}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
+              style={{
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                background: 'transparent',
+                fontSize: '14px',
+                fontFamily: 'Inter',
+                paddingLeft: '8px',
+                color: '#1F2937',
+              }}
+            />
+          </HStack>
+        </Box>
+      )}
+
       <ScrollView
         nestedScrollEnabled
         style={{
-          maxHeight: pos.maxHeight,
+          maxHeight: showSearch ? pos.maxHeight - 52 : pos.maxHeight,
         }}
       >
         {multiple && (
@@ -528,8 +588,14 @@ function WebSelect({
           </Pressable>
         )}
 
-        {normalizedOptions.map(
-          (option, index) => {
+        {filteredOptions.length === 0 ? (
+          <Box py="$4" px="$3" alignItems="center">
+            <Text fontSize="$sm" fontFamily="Inter" color="$textMutedForeground">
+              {i18n.t('requestorDashboard.outcomes.noParticipantFound', 'No participant found')}
+            </Text>
+          </Box>
+        ) : (
+          filteredOptions.map((option, index) => {
             const label =
               option.nativeName ||
               option.name ||
@@ -545,6 +611,7 @@ function WebSelect({
                   option.value ??
                   index.toString()
                 }
+                style={{ width: '100%' }}
                 onPress={() => {
                   if (multiple) {
                     toggleMultiValue(option.value);
@@ -556,30 +623,58 @@ function WebSelect({
                     setOpen(false);
                   }
                 }}
+                // @ts-ignore
+                onMouseEnter={() => setHoveredValue(option.value)}
+                onMouseLeave={() => setHoveredValue(null)}
               >
                 <HStack
                   alignItems="center"
-                  justifyContent="space-between"
                   py="$2.5"
                   px="$3"
+                  style={{ width: '100%' }}
                   bg={
                     isSelected
+                      ? '$background100'
+                      : hoveredValue === option.value
                       ? '$background50'
                       : 'transparent'
                   }
                 >
+                  {!multiple && (
+                    <Box w="$5" h="$5" justifyContent="center" alignItems="center" mr="$2">
+                      {isSelected && (
+                        <LucideIcon
+                          name="Check"
+                          size={16}
+                          color="$textForeground"
+                        />
+                      )}
+                    </Box>
+                  )}
 
-                  <Text
-                    flex={1}
-                    fontSize="$sm"
-                    fontFamily="Inter"
-                    color="$textForeground"
-                    style={{
-                      writingDirection,
-                    }}
-                  >
-                    {label}
-                  </Text>
+                  <HStack flex={1} justifyContent="space-between" alignItems="center">
+                    <Text
+                      fontSize="$sm"
+                      fontFamily="Inter"
+                      color="$textForeground"
+                      style={{
+                        writingDirection,
+                      }}
+                    >
+                      {label}
+                    </Text>
+
+                    {option.status && (
+                      <Text
+                        fontSize="$xs"
+                        fontFamily="Inter"
+                        color="$textMutedForeground"
+                        mr="$2"
+                      >
+                        {option.status}
+                      </Text>
+                    )}
+                  </HStack>
 
                   {multiple && (
                     <Checkbox
@@ -600,24 +695,10 @@ function WebSelect({
                       </CheckboxIndicator>
                     </Checkbox>
                   )}
-
-                  {!multiple &&
-                    (isSelected ? (
-                      <LucideIcon
-                        name="Check"
-                        size={18}
-                        color="$textForeground"
-                      />
-                    ) : (
-                      <Box
-                        w="$4"
-                        h="$4"
-                      />
-                    ))}
                 </HStack>
               </Pressable>
             );
-          },
+          })
         )}
       </ScrollView>
     </Box>
@@ -707,11 +788,31 @@ function NativeSelect({
   disabled = false,
   isReadOnly = false,
   multiple = false,
+  showSearch = false,
+  searchPlaceholder,
 }: SelectProps) {
+  const [open, setOpen] = useState(false);
+  const [searchText, setSearchText] = useState('');
+
   const normalizedOptions = useMemo(
     () => normalizeOptions(options),
     [options],
   );
+
+  useEffect(() => {
+    if (!open) {
+      setSearchText('');
+    }
+  }, [open]);
+
+  const filteredOptions = useMemo(() => {
+    if (!showSearch || !searchText) return normalizedOptions;
+    const q = searchText.toLowerCase();
+    return normalizedOptions.filter((opt) => {
+      const label = opt.nativeName || opt.name || opt.value || '';
+      return label.toLowerCase().includes(q);
+    });
+  }, [showSearch, searchText, normalizedOptions]);
 
   const valueArray = useMemo(
     () => (multiple && Array.isArray(value) ? value : []),
@@ -774,9 +875,6 @@ function NativeSelect({
 
   const writingDirection =
     I18nManager.isRTL ? 'rtl' : 'ltr';
-
-  const [open, setOpen] =
-    useState(false);
 
   const [dropdownLayout, setDropdownLayout] =
     useState({
@@ -1005,7 +1103,7 @@ function NativeSelect({
       bg,
       borderColor,
       size,
-      borderRadius,
+      borderRadius as any,
     ) as any;
 
   const animatedStyle = {
@@ -1127,12 +1225,49 @@ function NativeSelect({
                   animatedStyle,
                 ]}
               >
+                {showSearch && (
+                  <Box
+                    p="$2"
+                    borderBottomWidth={1}
+                    borderColor="$borderColor"
+                  >
+                    <HStack
+                      alignItems="center"
+                      borderWidth={1}
+                      borderColor="$borderColor"
+                      borderRadius={6}
+                      px="$3"
+                      bg="$backgroundLight50"
+                      h={36}
+                    >
+                      <LucideIcon name="Search" size={14} color="$textMutedForeground" />
+                      <TextInput
+                        placeholder={searchPlaceholder || i18n.t('requestorDashboard.outcomes.searchParticipant', 'Search participant...')}
+                        value={searchText}
+                        onChangeText={setSearchText}
+                        placeholderTextColor="#9CA3AF"
+                        style={{
+                          flex: 1,
+                          borderWidth: 0,
+                          fontSize: 14,
+                          fontFamily: 'Inter',
+                          paddingLeft: 8,
+                          color: '#1F2937',
+                        }}
+                      />
+                    </HStack>
+                  </Box>
+                )}
+
                 <ScrollView
                   nestedScrollEnabled
                   keyboardShouldPersistTaps="handled"
                   showsVerticalScrollIndicator={
                     false
                   }
+                  style={{
+                    maxHeight: showSearch ? dropdownLayout.maxHeight - 52 : dropdownLayout.maxHeight,
+                  }}
                 >
                   {multiple && (
                     <Pressable onPress={toggleSelectAll}>
@@ -1177,11 +1312,14 @@ function NativeSelect({
                     </Pressable>
                   )}
 
-                  {normalizedOptions.map(
-                    (
-                      option,
-                      index,
-                    ) => {
+                  {filteredOptions.length === 0 ? (
+                    <Box py="$4" px="$3" alignItems="center">
+                      <Text fontSize="$sm" fontFamily="Inter" color="$textMutedForeground">
+                        {i18n.t('requestorDashboard.outcomes.noParticipantFound', 'No participant found')}
+                      </Text>
+                    </Box>
+                  ) : (
+                    filteredOptions.map((option, index) => {
                       const label =
                         option.nativeName ||
                         option.name ||
@@ -1194,6 +1332,7 @@ function NativeSelect({
                       return (
                         <Pressable
                           key={`${option.value}-${index}`}
+                          style={{ width: '100%' }}
                           onPress={() =>
                             handleSelect(
                               option.value,
@@ -1204,13 +1343,49 @@ function NativeSelect({
                             px="$3"
                             py="$3"
                             alignItems="center"
-                            justifyContent="space-between"
+                            style={{ width: '100%' }}
                             bg={
                               isSelected
                                 ? '$background50'
                                 : '$white'
                             }
                           >
+                            {!multiple && (
+                              <Box w="$5" h="$5" justifyContent="center" alignItems="center" mr="$2">
+                                {isSelected && (
+                                  <LucideIcon
+                                    name="Check"
+                                    size={16}
+                                    color="$textForeground"
+                                  />
+                                )}
+                              </Box>
+                            )}
+
+                            <HStack flex={1} justifyContent="space-between" alignItems="center">
+                              <Text
+                                fontSize="$sm"
+                                fontFamily="Inter"
+                                color="$textForeground"
+                                style={{
+                                  writingDirection,
+                                }}
+                              >
+                                {label}
+                              </Text>
+
+                              {option.status && (
+                                <Text
+                                  fontSize="$xs"
+                                  fontFamily="Inter"
+                                  color="$textMutedForeground"
+                                  mr="$2"
+                                >
+                                  {option.status}
+                                </Text>
+                              )}
+                            </HStack>
+
                             {multiple && (
                               <Checkbox
                                 value={option.value}
@@ -1230,30 +1405,10 @@ function NativeSelect({
                                 </CheckboxIndicator>
                               </Checkbox>
                             )}
-
-                            <Text
-                              flex={1}
-                              fontSize="$sm"
-                              fontFamily="Inter"
-                              color="$textForeground"
-                              style={{
-                                writingDirection,
-                              }}
-                            >
-                              {label}
-                            </Text>
-
-                            {!multiple && isSelected ? (
-                              <LucideIcon
-                                name="Check"
-                                size={18}
-                                color="$textForeground"
-                              />
-                            ) : null}
                           </HStack>
                         </Pressable>
                       );
-                    },
+                    })
                   )}
                 </ScrollView>
               </Animated.View>
