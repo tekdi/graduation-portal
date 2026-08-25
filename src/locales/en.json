@@ -2570,7 +2570,11 @@
         "decline": "Decline",
         "acceptSchedule": "Accept & Schedule",
         "acceptRequest": "Accept Request",
-        "viewFullDetails": "View Full Details"
+        "viewFullDetails": "View Full Details",
+        "openFullWizard": "Open Full Wizard"
+      },
+      "badges": {
+        "sessionForm": "Session Form"
       },
       "titles": {
         "header": "Support Requests",
@@ -2597,6 +2601,8 @@
       },
       "labels": {
         "request": "Request:",
+        "requested": "Requested",
+        "prefilledFromRequest": "Pre-filled details from request by",
         "coach": "Coach",
         "yourQuestion": "Your Question or Request",
         "selectReason": "Select Reason",

@@ -356,18 +356,80 @@ export const acceptAndScheduleSupportRequest = async (
   payload: AcceptAndSchedulePayload
 ): Promise<{ success: boolean; message: string }> => {
   try {
-    if (API_ENDPOINTS && (API_ENDPOINTS as any).SERVICE_PROVIDER_ACCEPT_REQUEST) {
-      const response = await api.post((API_ENDPOINTS as any).SERVICE_PROVIDER_ACCEPT_REQUEST, payload);
-      return response.data;
-    }
-  } catch (error) {
-    console.warn('Backend API unavailable, using simulated success for Accept & Schedule:', error);
-  }
+    const raw = payload.raw || {};
+    const meta = raw.meta || {};
 
-  return {
-    success: true,
-    message: 'Support request accepted and scheduled successfully.',
-  };
+    const requestId = String(payload.requestId || raw.id || raw._id || raw.request_session_id || '');
+
+    // Convert date and time to start_date (epoch seconds)
+    let startDateEpoch: number = Math.floor(Date.now() / 1000);
+    if (payload.date && payload.time) {
+      const parsedStart = moment(`${payload.date} ${payload.time}`, 'YYYY-MM-DD HH:mm');
+      if (parsedStart.isValid()) {
+        startDateEpoch = parsedStart.unix();
+      }
+    } else if (raw.start_date) {
+      const num = Number(raw.start_date);
+      startDateEpoch = !Number.isNaN(num) && String(raw.start_date).length <= 10 ? num : Math.floor(num / 1000);
+    }
+
+    const durationHours = DURATION_HOURS[payload.duration] ?? 3;
+    const endDateEpoch = startDateEpoch + Math.floor(durationHours * 3600);
+
+    const rawDeliveryMode = payload.delivery_mode || meta.delivery_mode || 'offline';
+    const capitalizedDeliveryMode =
+      rawDeliveryMode.charAt(0).toUpperCase() + rawDeliveryMode.slice(1).toLowerCase();
+
+    const provinces = payload.province
+      ? [payload.province]
+      : Array.isArray(meta.provinces) && meta.provinces.length > 0
+        ? meta.provinces
+        : [];
+
+    const sites = Array.isArray(meta.sites) ? meta.sites : [];
+
+    const categories = payload.category
+      ? [payload.category]
+      : Array.isArray(meta.categories) && meta.categories.length > 0
+        ? meta.categories
+        : [];
+
+    const apiPayload = {
+      request_session_id: requestId,
+      type: raw.type || 'public',
+      title: payload.title || raw.title || '',
+      support_offering_type: 'training_session',
+      description: payload.description || raw.description || meta.description || '',
+      start_date: startDateEpoch,
+      end_date: endDateEpoch,
+      delivery_mode: capitalizedDeliveryMode,
+      idp_training_task: payload.category || meta.idp_training_task || categories[0] || '',
+      can_be_copied: false,
+      certificate_provided: true,
+      provinces,
+      sites,
+      categories,
+      learning_objectives: payload.targetAudience || meta.learning_objectives || payload.description || '',
+      meeting_info: {
+        link: payload.meetingLink || meta.meeting_info?.link || '',
+      },
+    };
+
+    const endpoint = API_ENDPOINTS.REQUEST_SESSIONS_ACCEPT;
+    const response = await api.post(endpoint, apiPayload, {
+      headers: {
+        timezone: 'Asia/Calcutta',
+      },
+    });
+
+    return {
+      success: true,
+      message: response.data?.message || 'Support request accepted and scheduled successfully.',
+    };
+  } catch (error: any) {
+    console.error('[SupportRequests] Error in acceptAndScheduleSupportRequest:', error);
+    throw error;
+  }
 };
 
 /**
