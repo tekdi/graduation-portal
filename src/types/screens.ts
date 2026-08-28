@@ -64,6 +64,9 @@ export interface InterventionPlanProps {
   onTaskCompletionChange?: (areAllCompleted: boolean) => void;
   /** Called with the latest full project/task tree after a task action succeeds, so the caller can keep its own project data (the source InterventionPlan re-initializes from on remount) in sync. */
   onProjectDataChange?: (project: ProjectData) => void;
+  allowEditTaskIds?: string [];
+  showAddCustomTask?: boolean;
+  isLoading?: boolean;
 }
 
 export interface TemplateData {
@@ -93,8 +96,8 @@ export interface ParticipantHeaderProps {
   onStatusUpdate?: (newStatus: string) => void;
   projectData?: ProjectData | null;
   onParticipantRefresh?: () => Promise<string | undefined> | string | undefined;
-  solutions?: any[];
   isHideSecondButton?: Boolean;
+  endLineConfigData?: any;
 }
 
 export type SubCategory = {

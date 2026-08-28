@@ -15,6 +15,7 @@ import { useNavigation } from '@react-navigation/native';
 import { sortTasksWithChildren } from '@utils/helper';
 import { useOfflineSync } from '@contexts/OfflineSyncContext';
 import { refreshOfflineProjectFromServer } from '../../../services/offlineCacheUpdateService';
+import logger from '@utils/logger';
 
 const InterventionPlan: React.FC<InterventionPlanProps> = ({
   mode,
@@ -25,6 +26,9 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   onProgressChange,
   onTaskCompletionChange,
   onProjectDataChange,
+  allowEditTaskIds,
+  showAddCustomTask,
+  isLoading
 }) => {
   const { t } = useLanguage();
   const { user } = useAuth();
@@ -91,8 +95,8 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
   };
 
   // Handle successful IDP creation
-  const handleIdpCreationSuccess = useCallback((newProjectId: string) => {
-    if (onIdpCreation) {
+  const handleIdpCreationSuccess = useCallback((newProjectId?: string) => {
+    if (onIdpCreation && newProjectId) {
       onIdpCreation(newProjectId);
     }
 
@@ -211,7 +215,7 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
 
   if(projectData && (!config?.mode || !projectSortData)){
     if(!config?.mode) {
-      console.log(`config is not defined`,config);
+      logger.log(`config is not defined`,config);
     }
     return;
   }
@@ -262,7 +266,9 @@ const InterventionPlan: React.FC<InterventionPlanProps> = ({
     return (
       <Box flex={1} mt="$1">
         <ProjectPlayer
-          config={mode ? {...config,mode} : config}
+          config={mode ? {...config,mode,isLoading} : {...config,isLoading}}
+          allowEditTaskIds={allowEditTaskIds}
+          showAddCustomTask={showAddCustomTask}
           data={projectPlayerData}
           onTaskUpdate={handleTaskUpdate}
           onProgressChange={onProgressChange}
@@ -284,7 +290,9 @@ export default memo(
       prevProps.participantProfile?.status ===
         nextProps.participantProfile?.status &&
       prevProps.projectData === nextProps.projectData &&
-      prevProps.projectUnavailableOffline === nextProps.projectUnavailableOffline
+      prevProps.projectUnavailableOffline === nextProps.projectUnavailableOffline &&
+      prevProps.mode === nextProps.mode &&
+      prevProps.isLoading === nextProps.isLoading
     );
   },
 );

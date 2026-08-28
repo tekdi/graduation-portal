@@ -79,6 +79,8 @@ const ProjectPlayer: React.FC<ProjectPlayerProps> = ({
   onTaskCompletionChange,
   onProgressChange,
   getProjectData,
+  allowEditTaskIds,
+  showAddCustomTask,
 }) => {
   const {
     projectData: loadedProject,
@@ -120,12 +122,19 @@ const ProjectPlayer: React.FC<ProjectPlayerProps> = ({
       offlineKeyPrefix={data?.offlineKeyPrefix ?? ''}
       participantId={data?.participantId ?? ''}
       initialAddedToPlanTasks={data?.initialAddedToPlanTasks}
+      allowEditTaskIds={allowEditTaskIds}
+      showAddCustomTask={showAddCustomTask}
     >
       <TaskCompletionTracker
         onTaskCompletionChange={onTaskCompletionChange}
         onProgressChange={onProgressChange}
       />
-      <ProjectComponent />
+      {config.isLoading === false
+        ? <ProjectComponent />
+        : <Box flex={1} alignItems="center" justifyContent="center">
+          <Spinner size="large" />
+        </Box>
+      }
     </ProjectProvider>
   );
 };
