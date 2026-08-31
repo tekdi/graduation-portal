@@ -242,6 +242,19 @@ module.exports = (env = {}, argv = {}) => {
       port: 3000,
       hot: true,
       historyApiFallback: true,
+      proxy: [
+        {
+          context: (pathname) => pathname.startsWith('/qeditor'),
+          target: allEnvVars.QUESTION_EDITOR_URL || 'http://localhost:3456',
+          pathRewrite: { '^/qeditor': '' },
+          changeOrigin: true,
+          on: {
+            error: (err, req, res) => {
+              console.error('[qeditor proxy] Error:', err.message);
+            },
+          },
+        },
+      ],
       client: {
         overlay: {
           errors: true,

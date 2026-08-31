@@ -8,6 +8,7 @@ import { DashboardCard, cardViewDataMap, individualIndicatorTopicCards } from '@
 import Breadcrumb, { BreadcrumbItem } from '@components/Breadcrumb';
 import CardView from './CardView';
 import { usePlatform } from '@utils/platform';
+import { useDashboardCardData } from '@hooks/useDashboardCardData';
 
 interface DashboardCardsProps {
   cards: DashboardCard[];
@@ -21,15 +22,15 @@ interface DashboardCardsProps {
  * Displays a horizontal stack of indicator cards for the admin dashboard
  * Optionally displays an info card above the cards
  */
-const DashboardCards: React.FC<DashboardCardsProps> = ({ 
-  cards, 
-  userId = '',
+const DashboardCards: React.FC<DashboardCardsProps> = ({
+  cards,
+  userId: _userId = '',
   infoHeadingKey,
   infoDescriptionKey,
 }) => {
   const { t } = useLanguage();
   const navigation = useNavigation();
-  const { isMobile } = usePlatform();
+  const { isMobile, isWeb } = usePlatform();
   const [hoveredCardId, setHoveredCardId] = useState<string | null>(null);
   const [currentCards, setCurrentCards] = useState<DashboardCard[]>(cards);
   const [breadcrumbItems, setBreadcrumbItems] = useState<BreadcrumbItem[]>([]);
@@ -37,13 +38,9 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
   const [individualPathway, setIndividualPathway] = useState<string>('');
   const [individualParticipant, setIndividualParticipant] = useState<string>('');
 
-  // Get card view data from constants
-  const cardViewData = useMemo(() => {
-    if (selectedCardView) {
-      return cardViewDataMap[selectedCardView] || null;
-    }
-    return null;
-  }, [selectedCardView]);
+  // Fetch live card data from snapshot-service.
+  // data is null while loading and when no snapshot data is available — never shows dummy values.
+  const { data: cardViewData, loading: cardDataLoading, error: cardDataError } = useDashboardCardData(selectedCardView);
 
   const isIndividualIndicatorsScreen = useMemo(() => {
     const last = breadcrumbItems[breadcrumbItems.length - 1];
@@ -385,29 +382,33 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
     }
   };
 
-  // Calculate card width based on number of cards
+  // Calculate card width for flex layout (non–desktop-web uses flex; desktop web with 4+ uses grid instead)
   const getCardWidth = (totalCards: number) => {
-    // On mobile, always use 100% width
     if (isMobile) {
       return '100%';
     }
-    
+
     if (totalCards === 1) {
       return '100%';
-    } else if (totalCards === 2) {
-      return 'calc(50% - 8px)'; // 50% each with gap
-    } else if (totalCards === 3) {
-      return 'calc(33.333% - 10.67px)'; // 100/3 with gap
-    } else if (totalCards >= 4) {
-      return 'calc(25% - 12px)'; // 4 per row, remaining wrap
     }
-    return 'calc(25% - 12px)'; // Default: 4 per row
+    if (totalCards === 2) {
+      return 'calc(50% - 8px)';
+    }
+    if (totalCards === 3) {
+      return 'calc(33.333% - 10.67px)';
+    }
+    // 4+ in flex: account for gap $4 (16px) × 3 gaps between 4 columns
+    return 'calc((100% - 48px) / 4)';
   };
 
   const cardWidth = getCardWidth(currentCards.length);
 
-  // Show CardView if a card view is selected
-  if (selectedCardView && cardViewData) {
+  /** Desktop web: exactly 4 columns when there are at least 4 cards (avoids flex % + gap rounding issues). */
+  const desktopFourColumnGrid =
+    isWeb && !isMobile && currentCards.length >= 4;
+
+  // Show CardView panel whenever a card is selected (handles loading, no-data, and data states)
+  if (selectedCardView) {
     const isIndividualCardView = selectedCardView.startsWith('individual-');
     const selectedPathwayName =
       pathwayOptions.find(o => o.value === individualPathway)?.name ?? individualPathway;
@@ -430,7 +431,55 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
           />
         )}
 
-        {/* CardView */}
+        {/* Live-data loading indicator */}
+        {cardDataLoading && (
+          <HStack space="xs" alignItems="center" px="$1">
+            <Badge bg="$primary100" borderRadius="$full" px="$3" py="$1">
+              <BadgeText color="$primary700" fontSize="$xs">
+                {t('common.loadingLiveData') || 'Loading live data…'}
+              </BadgeText>
+            </Badge>
+          </HStack>
+        )}
+
+        {/* No Data state — shown when loading is complete but no snapshot data exists */}
+        {!cardDataLoading && !cardViewData && (
+          <Card
+            size="md"
+            variant="outline"
+            borderColor="$borderColor"
+            borderRadius="$xl"
+            p="$10"
+            alignItems="center"
+            justifyContent="center"
+            minHeight={260}
+          >
+            <VStack space="md" alignItems="center">
+              <Box
+                borderWidth={2}
+                borderColor="$textMutedForeground"
+                borderRadius="$full"
+                width={48}
+                height={48}
+                alignItems="center"
+                justifyContent="center"
+              >
+                <LucideIcon name="Database" size={22} color="$textMutedForeground" />
+              </Box>
+              <Text fontSize="$md" fontWeight="$medium" color="$textMutedForeground">
+                {t('common.noData') || 'No Data Available'}
+              </Text>
+              <Text fontSize="$sm" color="$textMutedForeground" textAlign="center" maxWidth={400}>
+                {cardDataError
+                  ? cardDataError
+                  : (t('common.noDataDescription') || 'No snapshot data has been computed for this indicator yet. Run the snapshot pipeline to populate this view.')}
+              </Text>
+            </VStack>
+          </Card>
+        )}
+
+        {/* CardView — only rendered when real data is available */}
+        {cardViewData && (
         <CardView
           cardViewId={selectedCardView}
           tabs={cardViewData.tabs}
@@ -490,6 +539,7 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
             ) : null
           }
         />
+        )}
       </VStack>
     );
   }
@@ -714,18 +764,36 @@ const DashboardCards: React.FC<DashboardCardsProps> = ({
 
       {/* Indicator Cards */}
       {!isIndividualIndicatorsScreen ? (
-      <HStack {...dashboardCardsStyles.cardsContainer}>
+      <HStack
+        {...dashboardCardsStyles.cardsContainer}
+        {...(desktopFourColumnGrid
+          ? {
+              $web: {
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+              },
+            }
+          : {})}
+      >
       {currentCards.map(card => (
         <Pressable
           key={card.id}
           {...dashboardCardsStyles.pressable}
-          style={{
-            flexBasis: cardWidth,
-            width: cardWidth,
-            maxWidth: cardWidth,
-            flexShrink: 0,
-            flexGrow: 0,
-          } as any}
+          style={
+            desktopFourColumnGrid
+              ? ({
+                  width: '100%',
+                  maxWidth: '100%',
+                  minWidth: 0,
+                } as any)
+              : ({
+                  flexBasis: cardWidth,
+                  width: cardWidth,
+                  maxWidth: cardWidth,
+                  flexShrink: 0,
+                  flexGrow: 0,
+                } as any)
+          }
           onPress={() => handleCardPress(card)}
         >
           <Card 

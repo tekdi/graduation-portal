@@ -22,15 +22,21 @@ export const REPORT_FEEDBACK_MENU_ITEM: SidebarMenuItem = {
   icon: 'MessageSquare',
   href: process.env.REPORT_FEEDBACK_FORM_URL || 'https://forms.gle/12ZsUZs9wn2hHtfh9',
 };
-
-export const MAIN_MENU_ITEMS: SidebarMenuItem[] = [
-  // Dashboard is hidden from menu but still accessible via /admin-dashboard URL
+// Dashboard is hidden from menu but still accessible via /admin-dashboard URL
   // {
   //   key: 'dashboard',
   //   label: 'admin.dashboard',
   //   icon: 'LayoutDashboard', // Lucide icon name
   //   route: 'admin-dashboard',
   // },
+export const MAIN_MENU_ITEMS: SidebarMenuItem[] = [
+  //Dashboard is hidden from menu but still accessible via /admin-dashboard URL
+  {
+    key: 'dashboard',
+    label: 'admin.dashboard',
+    icon: 'LayoutDashboard', // Lucide icon name
+    route: 'admin-dashboard',
+  },
   {
     key: 'user-management',
     label: 'admin.menu.userManagement',
@@ -43,12 +49,12 @@ export const MAIN_MENU_ITEMS: SidebarMenuItem[] = [
     icon: 'UserCheck', // Lucide icon name - distinct from Users icon
     route: 'assign-users',
   },
-  // {
-  //   key: 'template-management',
-  //   label: 'admin.menu.templateManagement',
-  //   icon: 'FileText', // Lucide icon name
-  //   route: 'template-management',
-  // },
+  {
+    key: 'observation-editor',
+    label: 'admin.menu.observationEditor',
+    icon: 'ClipboardEdit',
+    route: 'observation-editor',
+  },
   // {
   //   key: 'audit-log',
   //   label: 'admin.menu.auditLog',

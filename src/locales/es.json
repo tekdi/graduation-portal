@@ -59,7 +59,11 @@
       "uploadUsers": "Cargar Usuarios",
       "createUser": "Crear Usuario",
       "main": "Principal",
-      "quickActions": "Acciones Rápidas"
+      "quickActions": "Acciones Rápidas",
+      "observationEditor": "Editor de Plantillas de Observación"
+    },
+    "observationEditor": {
+      "description": "Edite plantillas de formularios de observación y gestione preguntas y lógica condicional."
     }
   },
   "brand": {

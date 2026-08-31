@@ -311,7 +311,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
   const playerConfigMemoized = React.useMemo(
     () => ({
       // @ts-ignore - process.env is injected by webpack DefinePlugin on web
-      baseURL: `${process.env.API_BASE_URL}/api`,
+      baseURL: `${process.env.API_BASE_URL}`,
       fileSizeLimit: 50,
       userAuthToken: token,
       solutionType: 'observation' as const,

@@ -1,4 +1,4 @@
-const prefix = '/api';
+const prefix = '';
 export const API_ENDPOINTS = {
   LOGIN: `${prefix}/user/v1/account/login`,
   ADMIN_LOGIN: `${prefix}/user/v1/admin/login`,
@@ -31,4 +31,29 @@ export const API_ENDPOINTS = {
   PROGRAM_USERS_SEARCH: `${prefix}/project/v1/programUsers/search`, // Search program users (LCs, participants, etc.),
   UPDATE_ENTITY:`${prefix}/project/v1/programUsers/updateEntityProfile`,
   GENERATE_CERTIFICATE: (projectId: string) => `${prefix}/project/v1/userProjects/update/${projectId}`,
+};
+
+// ─── Question Editor endpoints (proxied via /qeditor → question-editor server) ──
+export const QE_ENDPOINTS = {
+  SOLUTIONS:                 '/qeditor/api/solutions',
+  SOLUTION_DETAIL:           (id: string) => `/qeditor/api/solutions/${id}`,
+  SOLUTION_IMPACT:           (id: string) => `/qeditor/api/solutions/${id}/impact`,
+  UPDATE_QUESTION:           (id: string) => `/qeditor/api/questions/${id}`,
+  UPDATE_DEPENDENCY:         (id: string) => `/qeditor/api/questions/${id}/dependency`,
+  DELETE_QUESTION:           (id: string) => `/qeditor/api/questions/${id}`,
+  // Section-based add/reorder (replaces criteria-based endpoints)
+  ADD_QUESTION:              (solutionId: string, ecm: string, code: string) =>
+                               `/qeditor/api/solutions/${solutionId}/sections/${ecm}/${code}/questions`,
+  REORDER_QUESTIONS:         (solutionId: string, ecm: string, code: string) =>
+                               `/qeditor/api/solutions/${solutionId}/sections/${ecm}/${code}/reorder`,
+};
+
+// ─── Snapshot-service endpoints (port 3001) ───────────────────────────────────
+// These are relative paths appended to SNAPSHOT_SERVICE_URL by snapshotApi.ts
+export const SNAPSHOT_ENDPOINTS = {
+  PARTICIPANT_ENROLLMENT: '/api/v1/dashboard/output/participant-enrollment',
+  DROP_OUTS:              '/api/v1/dashboard/output/drop-outs',
+  OUTPUT_PILLAR_CARD:     (pillarId: string) => `/api/v1/dashboard/output/pillar/${pillarId}`,
+  OUTCOME_CARD:           (cardId: string) => `/api/v1/dashboard/outcome/${cardId}`,
+  OUTCOME_SUMMARY:        '/api/v1/dashboard/outcome',
 };
