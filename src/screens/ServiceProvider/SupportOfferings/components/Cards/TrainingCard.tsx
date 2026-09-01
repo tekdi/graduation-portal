@@ -395,11 +395,11 @@ const Card: React.FC<CardProps> = ({
           <HStack {...styles.trainingMetaItemHStack}>
             <LucideIcon name="MapPin" {...styles.cardMetaIconProps} />
             <Text {...styles.cardMetaSmText}>{provinces?.find((e: any) => e._id === item.provinces?.[0] || e._id === item?.meta?.provinces?.[0])?.name || '-'}</Text>
-            {!!(item?.sites || item?.meta?.sites) &&
+            {/* {!!(item?.sites || item?.meta?.sites) &&
               <Text {...styles.cardMetaSmText}>
                 {sites?.filter((e: any) => item?.sites?.includes(e._id) || item?.meta?.sites?.includes(e._id))?.map(e => e.name).join(", ") || '-'}
               </Text>
-            }
+            } */}
           </HStack>
 
           {(deliveryMode === 'online' || deliveryMode === 'hybrid') && (
@@ -436,6 +436,19 @@ const Card: React.FC<CardProps> = ({
           footer(item)
         ) : (
           <HStack {...styles.requestedByRowHStack}>
+            {(item.mentor_name || (item as any).meta?.mentor_name) && (
+              <Text {...styles.cardRequestedByText}>
+                {t('supportProvider.supportOfferings.cards.requestedByPrefix', 'Requested by: ')}
+                <Text fontWeight="$normal" color="$textPrimary" fontSize={'$xs'}>
+                  {item.mentor_name || (item as any).meta?.mentor_name}
+                </Text>
+                {(() => {
+                  const org = item.organization || (item as any).meta?.organization;
+                  const orgName = typeof org === 'object' ? org?.name : org;
+                  return orgName ? ` (${orgName})` : '';
+                })()}
+              </Text>
+            )}
             <HStack {...styles.badgeContentHStack}>
               {/* DRAFT */}
               {currentStatus === SESSION_STATUS.DRAFT && (

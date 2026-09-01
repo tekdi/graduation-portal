@@ -1,7 +1,8 @@
 import React, { useCallback, useState } from 'react';
-import { Card, Container, Loader, VStack, useAlert } from '@ui';
+import { Button, ButtonIcon, ButtonText, Card, Container, Loader, VStack, useAlert } from '@ui';
 import styles from '../styles';
 import SPTitleHeader from '@components/Header/SPTitleHeader';
+import LucideIcon from '@components/ui/LucideIcon';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import SchemaFormRenderer from '@components/SchemaFormRenderer';
 import { TRAINING_FORM_SCHEMA } from '@constants/TRAINING_FORM_SCHEMA';
@@ -13,6 +14,7 @@ import {
   getDeliveryModes,
   createSession,
   getSessionDetails,
+  deleteSession,
   MentoringOption,
 } from '../../../../services/mentoringService';
 import NotFound from '@components/NotFound';
@@ -43,7 +45,7 @@ const App = (): React.JSX.Element => {
   const [lodingButton, setLodingButton] = useState<false | "saveDraft" | "submit">(false);
   const { showAlert } = useAlert();
   const { isCardAllowed, allowedSubOptions } = useProfileCompletion();
-  const isAllowed = Boolean( isCardAllowed(SUPPORT_CATEGORIES.TRAINING));
+  const isAllowed = Boolean(isCardAllowed(SUPPORT_CATEGORIES.TRAINING));
 
   const { optionsMap } = useTrainingFormOptions({
     values,
@@ -160,6 +162,23 @@ const App = (): React.JSX.Element => {
     }
   };
 
+
+  const handleDiscard = async () => {
+    try {
+      await deleteSession(sessionId);
+      showAlert('success', t('supportProvider.createSupport.training.discardSuccess', 'Draft discarded successfully!'));
+      // @ts-ignore
+      navigation.navigate('opportunities');
+    } catch (error: any) {
+      logger.error('Error discarding draft session:', error);
+      const errMsg =
+        error?.data?.message ||
+        error?.message ||
+        t('supportProvider.createSupport.errors.discardFailed', 'Something went wrong while discarding. Please try again.');
+      showAlert('error', errMsg);
+    }
+  };
+
   const handleBackPress = () => {
     if (navigation.canGoBack && navigation.canGoBack()) {
       navigation.goBack();
@@ -213,6 +232,14 @@ const App = (): React.JSX.Element => {
             saveDraftButtonProps={{ _icon: { color: "$textForeground" } }}
             submitButtonProps={{ bg: "green", icon: "Check", _icon: { color: "$white" } }}
             submitButtonText={t("supportProvider.supportOfferings.buttonTexts.publishSupport")}
+            extraButton={
+              modeType === FORM_MODE.EDIT ? (
+                <Button variant="outlineghost" onPress={handleDiscard} isDisabled={!!lodingButton}>
+                  <ButtonIcon as={LucideIcon} name="X" />
+                  <ButtonText>{t('supportProvider.createSupport.training.discard', 'Discard Draft')}</ButtonText>
+                </Button>
+              ) : undefined
+            }
           />
         </Card>
       </Container>

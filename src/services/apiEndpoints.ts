@@ -44,7 +44,7 @@ export const API_ENDPOINTS = {
   MENTORING_PROFILE_CREATE: `${prefix}/mentoring/v1/profile/create`,
   MENTORING_PROFILE_UPDATE: `${prefix}/mentoring/v1/profile/update`,
   MENTORING_CREATE_SESSION: `${prefix}/mentoring/v1/sessions/update?notifyUser=false`,
-  MENTORING_UPDATE_SESSION: (sessionId: string | number) => `${prefix}/mentoring/v1/sessions/update/${sessionId}`,
+  MENTORING_DELETE_SESSION: (sessionId: string | number) => `${prefix}/mentoring/v1/sessions/update/${sessionId}`,
   MENTORING_DETAILS_SESSION: (sessionId: string | number) => `${prefix}/mentoring/v1/sessions/details/${sessionId}?get_mentees=true`,
   USER_SESSIONS_LIST: `${prefix}/mentoring/v1/sessions/list`,
   // Session requests raised against a Service Provider's mentoring sessions.

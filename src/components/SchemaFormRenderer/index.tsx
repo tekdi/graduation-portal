@@ -197,6 +197,12 @@ export interface SchemaFormRendererProps {
    * validation, or the Submit/Save Draft flows.
    */
   customButton?: React.ReactNode;
+  /**
+   * An additional button rendered in the footer alongside Save Draft/Submit.
+   * Only rendered when `saveDraft` is true.
+   * The caller is fully responsible for its label, variant, and onPress logic.
+   */
+  extraButton?: React.ReactNode;
   showPreviousButton?: boolean;
   showContinueButton?: boolean;
   showSaveDraftButton?: boolean;
@@ -1428,7 +1434,7 @@ const FieldRenderer: React.FC<FieldRendererProps> = ({
             >
               {triggerLabel}
             </Text>
-            {maxFileSize && 
+            {maxFileSize &&
               <Text
                 {...TYPOGRAPHY.caption}
                 color="$gray300"
@@ -1984,6 +1990,7 @@ const StepFooter: React.FC<{
   onSubmit: () => void;
   t: (key: string, fallback?: string) => string;
   customButton?: React.ReactNode;
+  extraButton?: React.ReactNode;
   showPreviousButton?: boolean;
   showContinueButton?: boolean;
   showSaveDraftButton?: boolean;
@@ -2007,6 +2014,7 @@ const StepFooter: React.FC<{
   onSubmit,
   t,
   customButton,
+  extraButton,
   showPreviousButton,
   showContinueButton,
   showSaveDraftButton,
@@ -2040,6 +2048,7 @@ const StepFooter: React.FC<{
     )}
     <HStack space="sm">
       {customButton}
+      {!!onSaveDraft && extraButton}
       {(showSaveDraftButton ?? true) && !!onSaveDraft && (
         <Button
           variant="outlineghost"
@@ -2213,6 +2222,7 @@ const SchemaFormRenderer: React.FC<SchemaFormRendererProps> = ({
   _input,
   uploadService,
   customButton,
+  extraButton,
   showPreviousButton,
   showContinueButton,
   showSaveDraftButton,
@@ -2566,6 +2576,7 @@ const SchemaFormRenderer: React.FC<SchemaFormRendererProps> = ({
           onSubmit={handleSubmit}
           t={t}
           customButton={customButton}
+          extraButton={extraButton}
           showPreviousButton={showPreviousButton}
           showContinueButton={showContinueButton}
           showSaveDraftButton={showSaveDraftButton}
@@ -2858,7 +2869,7 @@ function formatFieldValueForDisplay(
   if (!isValuePresent(rawValue) && field?.defaultValue) {
     rawValue = field.defaultValue;
   }
-  
+
   const resolveLabel = (v: any): string => {
     if (field?.displayFormat) {
       const [type, format] = field?.displayFormat?.split("@")
@@ -2875,9 +2886,9 @@ function formatFieldValueForDisplay(
     return option?.label || String(v);
   };
 
-  if(field?.type === FORM_FIELD_TYPES.GROUP) {
-    let newValue:string[] = []
-    field?.fields?.forEach((item:FormField | undefined) => newValue.push(item?.name && values[item?.name] ? resolveLabel(values[item?.name]) : '-'))
+  if (field?.type === FORM_FIELD_TYPES.GROUP) {
+    let newValue: string[] = []
+    field?.fields?.forEach((item: FormField | undefined) => newValue.push(item?.name && values[item?.name] ? resolveLabel(values[item?.name]) : '-'))
     return newValue.join(" ")
   }
 
