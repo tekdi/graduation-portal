@@ -41,6 +41,8 @@ const CheckInsList = lazyScreen(() => import('../screens/ParticipantDetail/Check
 const SessionsSupportScreen = lazyScreen(() => import('../screens/SessionsSupport'));
 const RequestSupportSessionScreen = lazyScreen(() => import('../screens/SessionsSupport/RequestSession'));
 const CreateSupportSessionScreen = lazyScreen(() => import('../screens/SessionsSupport/CreateSession'));
+const SessionDetailsScreen = lazyScreen(() => import('../screens/SessionsSupport/SessionDetails'));
+const RequestDetailsScreen = lazyScreen(() => import('../screens/SessionsSupport/RequestDetails'));
 const TemplateManagementScreen = lazyScreen(() => import('../screens/TemplateManagement'));
 const CsvImportTemplates = lazyScreen(() => import('../screens/CsvImportTemplates'));
 const PasswordPolicy = lazyScreen(() => import('../screens/PasswordPolicy'));
@@ -123,7 +125,7 @@ const getAccessPages = (
           path: '/csv-templates',
           component: CsvImportTemplates,
         },
-       {
+        {
           name: 'ProfilePermissions',
           path: '/profile-permissions',
           component: ProfilePermissions,
@@ -206,6 +208,9 @@ const getAccessPages = (
         { name: 'sessions-support', path: '/sessions-support', component: SessionsSupportScreen },
         { name: 'sessions-support/request', path: '/sessions-support/request', component: RequestSupportSessionScreen },
         { name: 'sessions-support/create', path: '/sessions-support/create', component: CreateSupportSessionScreen },
+        { name: 'sessions-support-create-session', path: '/sessions-support/:type/:id', component: CreateSupportSessionScreen },
+        { name: 'session-details', path: '/sessions-support/:sessionId', component: SessionDetailsScreen },
+        { name: 'request-details', path: '/sessions-support/:requestId', component: RequestDetailsScreen },
         { name: 'project', path: '/project', component: ProjectPlayer },
       ];
     default:

@@ -1,7 +1,22 @@
 import { DEFAULT_PROVINCE_OPTIONS, DEFAULT_SITE_OPTIONS } from './SUPPORT_PROVIDER_CARDS';
 
-export const DEFAULT_PATHWAY_OPTIONS = [
+export const PATHWAY_TAGS = [
   { label: 'All Pathways', value: 'all-pathways' }
+];
+
+export const DEFAULT_PILLAR_OPTIONS = [
+  { label: 'All Pillars', value: 'all-pillars' }
+];
+
+export const DEFAULT_TYPE_OPTIONS = [
+  { label: 'All Types', value: 'all-types' }
+];
+
+export const DEFAULT_STATUS_OPTIONS = [
+  { label: 'All Statuses', value: 'all-statuses' },
+  { label: 'Upcoming', value: 'Upcoming' },
+  { label: 'In Progress', value: 'In progress' },
+  { label: 'Draft', value: 'Draft' }
 ];
 
 export const DEFAULT_FORMAT_OPTIONS = [
@@ -16,7 +31,25 @@ export const REQUESTOR_FILTERS = [
     attr: 'pathway',
     type: 'select' as const,
     placeholder: 'All Pathways',
-    data: DEFAULT_PATHWAY_OPTIONS,
+    data: PATHWAY_TAGS,
+  },
+  {
+    attr: 'pillar',
+    type: 'select' as const,
+    placeholder: 'All Pillars',
+    data: DEFAULT_PILLAR_OPTIONS,
+  },
+  {
+    attr: 'type',
+    type: 'select' as const,
+    placeholder: 'All Types',
+    data: DEFAULT_TYPE_OPTIONS,
+  },
+  {
+    attr: 'status',
+    type: 'select' as const,
+    placeholder: 'All Statuses',
+    data: DEFAULT_STATUS_OPTIONS,
   },
   {
     attr: 'format',

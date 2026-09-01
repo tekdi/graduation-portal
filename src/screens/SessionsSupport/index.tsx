@@ -1,14 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, ButtonIcon, ButtonText, Container, HStack, LucideIcon, Pressable, Text, VStack, useAlert } from '@ui';
+import { Box, Button, ButtonIcon, ButtonText, Container, HStack, LucideIcon, Pressable, Text, VStack, useAlert, Badge, BadgeText, Spinner } from '@ui';
 import { useLanguage } from '@contexts/LanguageContext';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import PageHeader from '@components/PageHeader';
-import {
-  REQUEST_SUPPORT_OPTIONS,
-  getSupportOfferingTabs,
-  DEFAULT_PROVINCE_OPTIONS,
-  DEFAULT_SITE_OPTIONS,
-} from '@constants/SUPPORT_PROVIDER_CARDS';
+import MyRequests from './MyRequests';
+import { REQUEST_SUPPORT_OPTIONS, getSupportOfferingTabs, DEFAULT_PROVINCE_OPTIONS, DEFAULT_SITE_OPTIONS, FORM_MODE } from '@constants/SUPPORT_PROVIDER_CARDS';
 import { TabButton } from '@components/Tabs';
 import FilterButton from '@components/Filter';
 import TrainingCard from '../ServiceProvider/SupportOfferings/components/Cards/TrainingCard';
@@ -16,16 +12,17 @@ import AdditionalServicesCard from '../ServiceProvider/SupportOfferings/componen
 import AssetCard from '../ServiceProvider/SupportOfferings/components/Cards/AssetCard';
 import { getProvincesList, getSitesByProvince } from '../../services/usersService';
 import { getTrainingSessions, getAdditionalServices, getAssets } from '../../services/SupportOfferingsServices/supportOfferingsService';
-import { getRequestSessionsList } from '../../services/SessionSupportServices/sessionRequestorService';
+import { getRequestSessionsList, requestorAssignMenteesToSession, getMyRequestsList } from '../../services/SessionSupportServices/sessionRequestorService';
 import type { ProvinceEntity } from '@app-types/Users';
-import { getSessionCategories, getDeliveryModes } from '../../services/mentoringService';
-import { DEFAULT_PATHWAY_OPTIONS, DEFAULT_FORMAT_OPTIONS } from '../../constants/REQUESTOR_CONSTANTS';
+import { getSessionCategories, getDeliveryModes, getSessionTypesByPillar } from '../../services/mentoringService';
+import { getProjectCategoryList } from '../../services/projectService';
+import { PATHWAY_TAGS, DEFAULT_FORMAT_OPTIONS, DEFAULT_PILLAR_OPTIONS, DEFAULT_TYPE_OPTIONS, DEFAULT_STATUS_OPTIONS } from '../../constants/REQUESTOR_CONSTANTS';
 import { RequestorFilter } from './RequestorFilter';
 import styles from './styles';
 import supportOfferingsStyles from '../ServiceProvider/SupportOfferings/styles';
 import { RequestFooter } from './RequestorFooter';
-import AssignParticipantsModal from './components/modals/AssignParticipantsModal';
-import LcMySessionTab from './components/LcMySessionTab';
+import AssignParticipantsModal from './modals/AssignParticipantsModal';
+import LcMySessionTab from './MyTraining&Sessions/LcMySessionTab';
 
 const SessionsSupportScreen: React.FC = () => {
   const { t } = useLanguage();
@@ -42,22 +39,33 @@ const SessionsSupportScreen: React.FC = () => {
     setIsAssignModalOpen(true);
   };
 
-  const handleConfirmAssignment = (selectedIds: string[]) => {
-    showAlert(
-      'success',
-      t(
-        'lc.sessionsSupport.alerts.assignSuccess',
-        { count: selectedIds.length },
-        `${selectedIds.length} participant(s) assigned to session successfully.`
-      )
-    );
+  const handleConfirmAssignment = async (selectedIds: string[]): Promise<boolean> => {
+    if (!selectedSession) return false;
+    const sessionId = selectedSession.id || selectedSession._id;
+    try {
+      await requestorAssignMenteesToSession(sessionId, selectedIds);
+      showAlert(
+        'success',
+        t(
+          'lc.sessionsSupport.alerts.assignSuccess',
+          { count: selectedIds.length, defaultValue: `${selectedIds.length} participant(s) assigned to session successfully.` }
+        )
+      );
+      return true;
+    } catch (err: any) {
+      console.error('Error assigning participants:', err);
+      const errMsg = err?.response?.data?.message || err?.message || 'Failed to assign participants to session.';
+      showAlert('error', errMsg);
+      return false;
+    }
   };
 
   // Listing state, filters, and tabs reused from SupportOfferings logic
   const [activeTab, setActiveTab] = useState('sessions');
-  const [activeSubTab, setActiveSubTab] = useState('browse_sessions');
+  const [activeSubTab, setActiveSubTab] = useState<string>('browse_sessions');
+  const [refreshRequests, setRefreshRequests] = useState<number>(0);
 
-  // Capture newly created session from navigation params (passed back by CreateSession)
+  // Capture newly created session or request from navigation params
   useEffect(() => {
     const params = route?.params as any;
     if (params?.newSession) {
@@ -73,15 +81,26 @@ const SessionsSupportScreen: React.FC = () => {
       // Clear the param so re-visits don't re-add it
       navigation.setParams({ newSession: undefined } as any);
     }
+    if (params?.activeSubTab) {
+      setActiveTab('sessions');
+      setActiveSubTab(params.activeSubTab);
+      if (params.refreshRequests) {
+        setRefreshRequests(params.refreshRequests);
+      }
+      navigation.setParams({ activeSubTab: undefined, refreshRequests: undefined } as any);
+    }
   }, [route?.params]);
 
 
   const [filters, setFilters] = useState<Record<string, any>>({});
   const [provincesList, setProvincesList] = useState<ProvinceEntity[]>([]);
   const [provinceOptions, setProvinceOptions] = useState(DEFAULT_PROVINCE_OPTIONS);
-  const [allSiteOptions, setAllSiteOptions] = useState();
+  const [allSiteOptions, setAllSiteOptions] = useState<any[]>([]);
   const [siteOptions, setSiteOptions] = useState(DEFAULT_SITE_OPTIONS);
-  const [pathwayOptions, setPathwayOptions] = useState(DEFAULT_PATHWAY_OPTIONS);
+  const [pathwayOptions, setPathwayOptions] = useState(PATHWAY_TAGS);
+  const [pillarOptions, setPillarOptions] = useState(DEFAULT_PILLAR_OPTIONS);
+  const [typeOptions, setTypeOptions] = useState(DEFAULT_TYPE_OPTIONS);
+  const [statusOptions, setStatusOptions] = useState(DEFAULT_STATUS_OPTIONS);
   const [formatOptions, setFormatOptions] = useState(DEFAULT_FORMAT_OPTIONS);
 
   const [items, setItems] = useState<any[]>([]);
@@ -143,10 +162,11 @@ const SessionsSupportScreen: React.FC = () => {
     let isMounted = true;
     const fetchFilterData = async () => {
       try {
-        const [provincesData, categoriesData, deliveryModesData] = await Promise.all([
+        const [provincesData, categoriesData, deliveryModesData, projectCategoriesData] = await Promise.all([
           getProvincesList().catch(() => []),
           getSessionCategories().catch(() => []),
           getDeliveryModes().catch(() => []),
+          getProjectCategoryList().catch(() => []),
         ]);
 
         if (isMounted) {
@@ -158,21 +178,38 @@ const SessionsSupportScreen: React.FC = () => {
               { label: 'All Provinces', value: 'all-provinces' },
               ...provincesData.map((p: any) => ({
                 label: p.metaInformation?.name || p.name || p.title || p.label,
-                value: p.externalId || p._id || p.id || p.value,
+                value: p._id || p.id || p.value,
               })),
             ];
             setProvinceOptions(dynamicProvinces);
           }
 
-          if (categoriesData && categoriesData.length > 0) {
+          if (projectCategoriesData && projectCategoriesData.length > 0) {
+            const uniquePathwaysMap = new Map<string, { label: string; value: string }>();
+            projectCategoriesData.forEach((c: any) => {
+              const label = String(c.name || c.label || c.title || c.value || '').trim();
+              const value = c.value || c._id || c.id || c.externalId || label;
+              if (label && !uniquePathwaysMap.has(label)) {
+                uniquePathwaysMap.set(label, { label, value });
+              }
+            });
+
             const dynamicPathways = [
               { label: 'All Pathways', value: 'all-pathways' },
+              ...Array.from(uniquePathwaysMap.values()),
+            ];
+            setPathwayOptions(dynamicPathways);
+          }
+
+          if (categoriesData && categoriesData.length > 0) {
+            const dynamicPillars = [
+              { label: 'All Pillars', value: 'all-pillars' },
               ...categoriesData.map((c: any) => ({
                 label: c.label || c.name || c.value,
                 value: c.value,
               })),
             ];
-            setPathwayOptions(dynamicPathways);
+            setPillarOptions(dynamicPillars);
           }
 
           if (deliveryModesData && deliveryModesData.length > 0) {
@@ -234,7 +271,7 @@ const SessionsSupportScreen: React.FC = () => {
             { label: 'All Sites', value: 'all-sites' },
             ...fetchedSites.map((s: any) => ({
               label: s.metaInformation?.name || s.name || s.title || s.label,
-              value: s.externalId || s._id || s.id || s.value,
+              value: s._id || s.id || s.value,
             })),
           ];
 
@@ -254,37 +291,85 @@ const SessionsSupportScreen: React.FC = () => {
     };
   }, [filters.province, provincesList]);
 
+  // Fetch dynamic types based on selected pillar filter
+  useEffect(() => {
+    let isMounted = true;
+    const fetchTypesData = async () => {
+      const selectedPillar = filters.pillar;
+
+      if (!selectedPillar || selectedPillar === 'all-pillars') {
+        if (isMounted) {
+          setTypeOptions(DEFAULT_TYPE_OPTIONS);
+        }
+        return;
+      }
+
+      try {
+        const typesData = await getSessionTypesByPillar(selectedPillar);
+        if (isMounted) {
+          const dynamicTypes = [
+            { label: 'All Types', value: 'all-types' },
+            ...typesData.map((t: any) => ({
+              label: t.label || t.name || t.value,
+              value: t.value || t._id || t.id,
+            })),
+          ];
+          setTypeOptions(dynamicTypes);
+        }
+      } catch (err) {
+        console.error('Error fetching session types by pillar:', err);
+        if (isMounted) {
+          setTypeOptions(DEFAULT_TYPE_OPTIONS);
+        }
+      }
+    };
+
+    fetchTypesData();
+    return () => {
+      isMounted = false;
+    };
+  }, [filters.pillar]);
+
   // Reset page when tab or filters change
   useEffect(() => {
     setPage(1);
-  }, [activeTab, filters.search, filters.status, filters.province, filters.site, filters.pathway, filters.format]);
+  }, [activeTab, filters.search, filters.status, filters.province, filters.site, filters.pathway, filters.pillar, filters.type, filters.format]);
 
   // Reset page and filters when active sub-tab changes
   useEffect(() => {
     setPage(1);
     setFilters({});
+    setItems([]);
   }, [activeSubTab]);
 
   // Fetch listing data
   useEffect(() => {
-    if (activeSubTab !== 'browse_sessions') {
+    if (activeSubTab !== 'browse_sessions' && activeSubTab !== 'my_requests' && activeSubTab !== 'my_sessions') {
       return;
     }
     let isMounted = true;
     const fetchData = async () => {
       try {
         setLoading(true);
-        const params = {
+        const params: any = {
           page,
           limit,
           search: filters.search,
           status: filters.status,
-          province: filters.province,
-          site: filters.site,
           pathway: filters.pathway,
+          pillar: filters.pillar,
+          type: filters.type,
           format: filters.format,
           isSessionsSupport: true,
         };
+
+        if (filters.province && filters.province !== 'all-provinces') {
+          params.provinces = filters.province;
+        }
+
+        if (filters.site && filters.site !== 'all-sites') {
+          params.sites = filters.site;
+        }
 
         let fetchedData: any[] = [];
         let totalCount = 0;
@@ -293,13 +378,31 @@ const SessionsSupportScreen: React.FC = () => {
           let result;
           if (activeSubTab === 'browse_sessions') {
             result = await getRequestSessionsList(params);
+            fetchedData = result?.result?.data || [];
+            totalCount = result?.result?.count ?? result?.total ?? result?.count ?? (result?.result?.total ?? fetchedData.length);
+            setCounts((prev) => ({ ...prev, sessions: totalCount }));
+          } else if (activeSubTab === 'my_requests') {
+            result = await getMyRequestsList(params);
+            const rawList = Array.isArray(result) ? result : (result?.result?.data || result?.result || []);
+            fetchedData = rawList.map((item: any) => {
+              const session = item.session || item.session_details || {};
+              return {
+                ...item,
+                title: item.title || session.title || 'Untitled Request',
+                status: item.status || 'REQUESTED',
+                start_date: item.start_date || session.start_date,
+                end_date: item.end_date || session.end_date,
+                seats_limit: item.seats_limit || session.seats_limit || item.max_participants || session.max_participants,
+                seats_remaining: item.seats_remaining ?? session.seats_remaining ?? item.seats_limit ?? session.seats_limit,
+                delivery_mode: item.delivery_mode || session.delivery_mode,
+              };
+            });
+            totalCount = result?.result?.count ?? result?.total ?? result?.count ?? (result?.result?.total ?? fetchedData.length);
           } else {
-            result = await getTrainingSessions(params);
+            result = await getRequestSessionsList(params);
+            fetchedData = result?.result?.data || [];
+            totalCount = result?.result?.count ?? result?.total ?? result?.count ?? (result?.result?.total ?? fetchedData.length);
           }
-
-          fetchedData = result?.result?.data || [];
-          totalCount = result?.result?.count ?? result?.total ?? result?.count ?? (result?.result?.total ?? fetchedData.length);
-          setCounts((prev) => ({ ...prev, sessions: totalCount }));
 
         } else if (activeTab === 'additional_services') {
           const res = await getAdditionalServices(params);
@@ -314,6 +417,13 @@ const SessionsSupportScreen: React.FC = () => {
         }
 
         if (isMounted) {
+          if (activeSubTab === 'my_sessions') {
+            if (page === 1) {
+              setMySessions(fetchedData);
+            } else {
+              setMySessions((prev) => [...prev, ...fetchedData]);
+            }
+          }
           if (page === 1) {
             setItems(fetchedData);
           } else {
@@ -340,7 +450,7 @@ const SessionsSupportScreen: React.FC = () => {
     return () => {
       isMounted = false;
     };
-  }, [activeTab, activeSubTab, filters.search, filters.status, filters.province, filters.site, filters.pathway, filters.format, page, limit]);
+  }, [activeTab, activeSubTab, filters.search, filters.status, filters.province, filters.site, filters.pathway, filters.format, page, limit, refreshRequests]);
 
   const handleSelectOption = (route: string) => {
     setIsDropdownOpen(false);
@@ -476,8 +586,12 @@ const SessionsSupportScreen: React.FC = () => {
                 provinceOptions={provinceOptions}
                 siteOptions={siteOptions}
                 pathwayOptions={pathwayOptions}
+                pillarOptions={pillarOptions}
+                typeOptions={typeOptions}
+                statusOptions={statusOptions}
                 formatOptions={formatOptions}
                 shouldDisableSite={!filters.province || filters.province === 'all-provinces'}
+                shouldDisableType={!filters.pillar || filters.pillar === 'all-pillars'}
               />
               <Text {...styles.sessionsFoundText}>
                 {total} {t('lc.sessionsSupport.sessionsFound')}
@@ -525,39 +639,29 @@ const SessionsSupportScreen: React.FC = () => {
                     key={session.id || session._id || idx}
                     item={session}
                     isFirst={idx === 0}
+                    onAssignParticipants={handleAssignSessionClick}
+                    onEditSession={(sessionId) => {
+                      (navigation as any).navigate('sessions-support-create-session', {
+                        type: FORM_MODE.EDIT,
+                        id: sessionId,
+                      });
+                    }}
+                    isShowLoadMore={idx === mySessions.length - 1 && isShowLoadMore}
+                    onLoadMoreItems={onLoadMoreItems}
+                    isLoadingMore={_loading && page > 1}
                   />
                 ))}
               </VStack>
-            ) : (
-              <Box {...styles.emptyStateContainer}>
-                <VStack {...styles.emptyStateVStack}>
-                  <Box {...styles.emptyStateIconContainer}>
-                    <LucideIcon name="Clock" size={30} color="$textMutedForeground" />
-                  </Box>
-                  <Text {...styles.emptyStateTitle}>
-                    {t('lc.sessionsSupport.emptyState.title', 'No history yet')}
-                  </Text>
-                  <Text {...styles.emptyStateDescription}>
-                    {t('lc.sessionsSupport.emptyState.description', 'Completed support will appear here')}
-                  </Text>
-                </VStack>
-              </Box>
-            )
-          ) : (
-            <Box {...styles.emptyStateContainer}>
-              <VStack {...styles.emptyStateVStack}>
-                <Box {...styles.emptyStateIconContainer}>
-                  <LucideIcon name="Clock" size={30} color="$textMutedForeground" />
-                </Box>
-                <Text {...styles.emptyStateTitle}>
-                  {t('lc.sessionsSupport.emptyState.title', 'No history yet')}
-                </Text>
-                <Text {...styles.emptyStateDescription}>
-                  {t('lc.sessionsSupport.emptyState.description', 'Completed support will appear here')}
-                </Text>
-              </VStack>
-            </Box>
-          )}
+            ) : null
+          ) : activeSubTab === 'my_requests' ? (
+            <MyRequests
+              items={items}
+              _loading={_loading}
+              isShowLoadMore={isShowLoadMore}
+              onLoadMoreItems={onLoadMoreItems}
+              isLoadingMore={_loading && page > 1}
+            />
+          ) : null}
         </VStack>
       </Container>
 

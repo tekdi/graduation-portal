@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Box, Card, Container, HStack, Loader, Text, VStack, useAlert } from '@ui';
 import PageHeader from '@components/PageHeader';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import SchemaFormRenderer from '@components/SchemaFormRenderer';
 import { TRAINING_FORM_SCHEMA, CREATE_SESSION_HIDE_FIELDS } from '@constants/TRAINING_FORM_SCHEMA';
 import { useLanguage } from '@contexts/LanguageContext';
@@ -13,10 +13,11 @@ import {
   getSessionTypesByPillar,
   getDeliveryModes,
   createSession,
+  getSessionDetails,
   MentoringOption,
 } from '../../../services/mentoringService';
 import { valueMapping } from '@utils/supportProvider';
-import { CERTIFICATE_OPTIONS, RECURRING_OPTIONS } from '@constants/SUPPORT_PROVIDER_CARDS';
+import { CERTIFICATE_OPTIONS, RECURRING_OPTIONS, FORM_MODE } from '@constants/SUPPORT_PROVIDER_CARDS';
 
 const DELIVERY_MODE_ICONS: Record<string, string> = {
   offline: 'MapPin',
@@ -29,6 +30,8 @@ import styles from '../styles';
 
 const CreateSessionScreen = (): React.JSX.Element => {
   const navigation = useNavigation();
+  const route = useRoute() as any;
+  const { type: modeType, id: sessionId } = route.params || {};
   const { t } = useLanguage();
   const [provinces, setProvinces] = useState<any[]>([]);
   const [pillers, setPillers] = useState<MentoringOption[]>([]);
@@ -63,6 +66,15 @@ const CreateSessionScreen = (): React.JSX.Element => {
         setPillers(resCategories.status === 'fulfilled' ? resCategories.value || [] : []);
         setTargetAudience(resTarget.status === 'fulfilled' ? resTarget.value || [] : []);
         setDeliveryModes(resDeliveryModes.status === 'fulfilled' ? resDeliveryModes.value || [] : []);
+
+        if (sessionId && modeType === FORM_MODE.EDIT) {
+          const rawResponse = await getSessionDetails(sessionId);
+          const rawData = rawResponse?.result;
+          if (rawData) {
+            const formattedValues: any = valueMapping(rawData, true, {}, 'training');
+            setValues(formattedValues);
+          }
+        }
       } catch (error: any) {
         console.error('Error loading form data:', error);
       } finally {
@@ -71,7 +83,7 @@ const CreateSessionScreen = (): React.JSX.Element => {
     };
 
     init();
-  }, []);
+  }, [sessionId, modeType]);
 
   const handleFieldChange = useCallback(
     (name: string, value: string, other?: any) => {
@@ -95,6 +107,10 @@ const CreateSessionScreen = (): React.JSX.Element => {
     try {
       setValues(formValues);
       const payload: any = valueMapping({ ...formValues, isDraft }, false, optionsMap);
+      if (sessionId && modeType === FORM_MODE.EDIT) {
+        payload.id = sessionId;
+        payload._id = sessionId;
+      }
 
       const result = await createSession(payload);
 
@@ -106,7 +122,7 @@ const CreateSessionScreen = (): React.JSX.Element => {
 
       // Build a session object from the form values to immediately show in My Sessions
       const newSession = {
-        id: result?.data?._id || result?.data?.id || result?._id || result?.id || `local-${Date.now()}`,
+        id: sessionId || result?.data?._id || result?.data?.id || result?._id || result?.id || `local-${Date.now()}`,
         title: formValues.title || formValues.idp_training_task_label || '',
         status: isDraft ? 'DRAFT' : 'UPCOMING',
         start_date: formValues.start_date,
@@ -157,7 +173,7 @@ const CreateSessionScreen = (): React.JSX.Element => {
   return (
     <VStack flex={1}>
       <PageHeader
-        title={headerTitle}
+        title={headerTitle as any}
         backButtonText={t('supportProvider.createSupport.changeType', 'Change Type')}
         onBackPress={handleBackPress}
       />

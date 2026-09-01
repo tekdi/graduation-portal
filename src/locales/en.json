@@ -2200,7 +2200,7 @@
       "observation": "Observation",
       "template": "Develop Intervention Plan",
       "participants": "Participants",
-      "sessions-support": "Sessions & Support",
+      "sessions-support": "Support & Interventions",
       "project": "Project",
       "home": "Home"
     },
@@ -2212,22 +2212,94 @@
       "serviceProviders": "Service Providers"
     },
     "sessionsSupport": {
-      "subtitle": "Browse sessions, additional services, and assets available in your province and site",
+      "subtitle": "Browse trainings and sessions, additional services, and assets available in your province and site",
       "createSession": "Create A Session",
       "requestSupport": "Request New Support",
       "sessionsFound": "sessions found",
+      "tabs": {
+        "browseSessions": "Browse Trainings & Sessions",
+        "myRequests": "My Requests",
+        "mySessions": "My Trainings & Sessions",
+        "history": "History"
+      },
       "mySessionCard": {
         "assignParticipants": "Assign Participants",
-        "manageSession": "Manage Session",
+        "editSession": "Edit Session",
         "participants": "participants"
       },
       "mySessionsDescription": "Sessions created and conducted by you.",
-      "emptyState": {
-        "title": "No history yet",
-        "description": "Completed support will appear here"
+      "assignParticipantsModal": {
+        "eligibleParticipants": "eligible participants",
+        "selected": "selected",
+        "clear": "Clear",
+        "assignSession": "Assign Session",
+        "cancel": "Cancel",
+        "noResultsFound": "No results found"
       },
       "alerts": {
         "assignSuccess": "{{count}} participant(s) assigned to session successfully."
+      },
+      "sessionDetails": {
+        "aboutThisSession": "About This Session",
+        "learningObjectives": "Learning Objectives",
+        "assignParticipants": "Assign Participants",
+        "assignSubtitle": "Select participants from your active caseload to assign them to this session.",
+        "dateTime": "Date & Time",
+        "duration": "Duration",
+        "format": "Format",
+        "capacity": "Capacity",
+        "spotsRemaining": "spots remaining",
+        "providedBy": "Provided by:",
+        "backToSessions": "Back to Sessions",
+        "selectParticipants": "Select participants from your active caseload to assign them to this session.",
+        "enrolled": "enrolled",
+        "durationValueHours": "{{count}} hours",
+        "durationValueMinutes": "{{count}} minutes",
+        "durationValueHoursMinutes": "{{hours}} hours {{minutes}} minutes"
+      },
+      "requestDetails": {
+        "title": "Request Details",
+        "idLabel": "ID: {{id}}",
+        "statusLabel": "STATUS",
+        "requestedOnLabel": "REQUESTED ON",
+        "typeLabel": "Type",
+        "providerLabel": "Provider",
+        "titleLabel": "Title",
+        "notesUpdatesLabel": "Notes / Updates",
+        "submittedInfoLabel": "Submitted Information",
+        "pillarLabel": "Pillar",
+        "trainingSessionLabel": "Training / Session",
+        "descriptionLabel": "Description",
+        "targetAudienceLabel": "Target Audience",
+        "certificateProvidedLabel": "Certificate Provided",
+        "maxCapacityLabel": "Max Capacity",
+        "startDateLabel": "Start Date & Time",
+        "endDateLabel": "End Date & Time",
+        "formatLabel": "Format",
+        "venueLabel": "Venue",
+        "sessionType": "Session",
+        "notFound": "Request not found.",
+        "statusAccepted": "Accepted",
+        "statusDeclined": "Declined",
+        "statusRequested": "Requested",
+        "yes": "Yes",
+        "no": "No",
+        "participant": "Participant",
+        "dateTimeFormat": "{{date}} at {{time}}"
+      },
+      "assignParticipantsModal": {
+        "assignButtonText": "Assign ({{count}})",
+        "cancel": "Cancel"
+      },
+      "confirmAssignment": {
+        "title": "Confirm Assignment",
+        "subtitle": "You are about to assign the following participants to this session:",
+        "participantsCount": "{{count}} Participants:",
+        "cancel": "Cancel",
+        "confirm": "Confirm Assignment",
+        "inPerson": "In-person",
+        "online": "Online",
+        "hybrid": "Hybrid"
       }
     },
     "createSession": {
@@ -2425,8 +2497,8 @@
     "taskConflictReasonMultiple": "Multiple differences detected."
   },
   "schemaformrenderer": {
-    "file" : {
-      "fileSize" : "Max {{ size }} MB"
+    "file": {
+      "fileSize": "Max {{ size }} MB"
     }
   },
   "supportProvider": {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, HStack, VStack, Text, Button, ButtonText, Badge, BadgeText, LucideIcon } from '@ui';
+import { Box, HStack, VStack, Text, Button, ButtonText, Badge, BadgeText, Spinner, LucideIcon } from '@ui';
 import moment from 'moment';
 import { useLanguage } from '@contexts/LanguageContext';
 import styles from '../styles';
@@ -18,6 +18,11 @@ interface LcMySessionTabProps {
     [key: string]: any;
   };
   isFirst?: boolean;
+  onAssignParticipants?: (item: any) => void;
+  onEditSession?: (sessionId: string) => void;
+  isShowLoadMore?: boolean;
+  onLoadMoreItems?: () => void;
+  isLoadingMore?: boolean;
 }
 
 const getStatusColors = (status: string) => {
@@ -59,19 +64,41 @@ const resolveStatus = (item: LcMySessionTabProps['item']): string => {
   return 'Upcoming';
 };
 
-const LcMySessionTab: React.FC<LcMySessionTabProps> = ({ item, isFirst }) => {
+const LcMySessionTab: React.FC<LcMySessionTabProps> = ({
+  item,
+  isFirst,
+  onAssignParticipants,
+  onEditSession,
+  isShowLoadMore,
+  onLoadMoreItems,
+  isLoadingMore = false,
+}) => {
   const { t } = useLanguage();
   const statusLabel = resolveStatus(item);
   const statusColors = getStatusColors(statusLabel);
 
-  // Date display
-  const displayDate = item.start_date
-    ? moment(
-      typeof item.start_date === 'number' || !isNaN(Number(item.start_date))
-        ? Number(item.start_date) * 1000
-        : item.start_date
-    ).format('D MMM YYYY')
-    : '--';
+  // Date & Time display matching Browse Trainings & Sessions card format
+  const displayDateTime = (() => {
+    if (!item.start_date) return '--';
+    const startNum = Number(item.start_date);
+    const startMs = !isNaN(startNum)
+      ? (startNum < 10000000000 ? startNum * 1000 : startNum)
+      : new Date(item.start_date).getTime();
+
+    const startFormatted = moment(startMs).format('ddd, D MMM YYYY HH:mm');
+
+    if (item.end_date) {
+      const endNum = Number(item.end_date);
+      const endMs = !isNaN(endNum)
+        ? (endNum < 10000000000 ? endNum * 1000 : endNum)
+        : new Date(item.end_date).getTime();
+
+      const endFormatted = moment(endMs).format('HH:mm');
+      return `${startFormatted} - ${endFormatted}`;
+    }
+
+    return startFormatted;
+  })();
 
   // Duration display
   const displayDuration = (() => {
@@ -139,10 +166,10 @@ const LcMySessionTab: React.FC<LcMySessionTabProps> = ({ item, isFirst }) => {
 
           {/* ROW 2: Metadata */}
           <HStack {...styles.mySessionCardMetaRow}>
-            {/* Date */}
+            {/* Date & Time */}
             <HStack {...styles.mySessionCardMetaItem}>
               <LucideIcon name="Calendar" size={12} color="$textSecondary" />
-              <Text {...styles.mySessionCardMetaText}>{displayDate}</Text>
+              <Text {...styles.mySessionCardMetaText}>{displayDateTime}</Text>
             </HStack>
 
             {/* Duration */}
@@ -167,20 +194,39 @@ const LcMySessionTab: React.FC<LcMySessionTabProps> = ({ item, isFirst }) => {
 
           {/* FOOTER: Action Buttons */}
           <HStack {...styles.mySessionCardFooter}>
-            <Button variant="outlineghost" {...styles.mySessionCardAssignBtn} onPress={() => { }}>
+            <Button variant="outlineghost" {...styles.mySessionCardAssignBtn} onPress={() => onAssignParticipants?.(item)}>
               <ButtonText {...styles.mySessionCardAssignBtnText}>
                 {t('lc.sessionsSupport.mySessionCard.assignParticipants')}
               </ButtonText>
             </Button>
 
-            <Button {...styles.mySessionCardManageBtn} variant="solid" onPress={() => { }}>
+            <Button {...styles.mySessionCardManageBtn} variant="solid" onPress={() => {
+              const sessionId = item.id || item._id;
+              if (sessionId) {
+                onEditSession?.(sessionId);
+              }
+            }}>
               <ButtonText {...styles.mySessionCardManageBtnText}>
-                {t('lc.sessionsSupport.mySessionCard.manageSession')}
+                {t('lc.sessionsSupport.mySessionCard.editSession')}
               </ButtonText>
             </Button>
           </HStack>
         </VStack>
       </Box>
+
+      {isShowLoadMore && (
+        <Box alignItems="center" mt="$4" width="100%">
+          {!isLoadingMore ? (
+            <Button onPress={onLoadMoreItems}>
+              <ButtonText>
+                {t('supportProvider.supportOfferings.buttonTexts.loadMoreSessions', 'Load More Sessions')}
+              </ButtonText>
+            </Button>
+          ) : (
+            <Spinner />
+          )}
+        </Box>
+      )}
     </VStack>
   );
 };

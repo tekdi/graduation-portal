@@ -27,7 +27,7 @@ export const sessionsSupportStyles = {
   createSessionBtn: {
     variant: 'outline' as const,
     bg: '$white',
-    // borderColor: '$borderColor',
+    borderColor: '$borderColor',
     px: '$4',
     py: '$2.5',
     borderRadius: '$lg',
@@ -39,10 +39,10 @@ export const sessionsSupportStyles = {
     elevation: 4,
     sx: {
       _hover: {
-        borderColor: '$borderColor !important',
+        borderColor: 'transparent !important',
       },
       _focus: {
-        borderColor: '$borderColor !important',
+        borderColor: 'transparent !important',
       },
     },
   },
@@ -197,7 +197,8 @@ export const sessionsSupportStyles = {
   requestorFooterOrgText: {
     fontSize: '$xs' as const,
     color: '$textPrimary' as const,
-    fontWeight: '$normal' as const,
+    fontWeight: '$semibold' as const,
+    letterSpacing: '$sm',
   },
   requestorFooterProvinceText: {
     fontSize: '$xs' as const,
@@ -253,7 +254,7 @@ export const sessionsSupportStyles = {
     fontSize: '$xs !important' as const,
     lineHeight: 14 as const,
     fontWeight: '$semibold' as const,
-    color: '$white' as const,
+    color: '$white !important' as const,
   },
   sessionsFoundText: {
     fontSize: '$sm',
@@ -277,37 +278,6 @@ export const sessionsSupportStyles = {
     paddingLeft: 16,
     paddingRight: 16,
   } as const,
-  emptyStateContainer: {
-    borderWidth: 1,
-    borderColor: '$borderLight200',
-    borderRadius: 16,
-    py: '$10',
-    px: '$4',
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-    bg: '$white',
-  },
-  emptyStateVStack: {
-    alignItems: 'center' as const,
-    space: 'md' as const,
-  },
-  emptyStateIconContainer: {
-    alignItems: 'center' as const,
-    justifyContent: 'center' as const,
-    w: '$12',
-    h: '$12',
-  },
-  emptyStateTitle: {
-    fontSize: '$md',
-    fontWeight: '$semibold' as const,
-    color: '$textPrimary',
-    textAlign: 'center' as const,
-  },
-  emptyStateDescription: {
-    fontSize: '$sm',
-    color: '$textSecondary',
-    textAlign: 'center' as const,
-  },
   // AssignParticipantsModal styles
   assignParticipantsFooterContainer: {
     space: 'md' as const,
@@ -320,23 +290,27 @@ export const sessionsSupportStyles = {
     bg: '$white',
     borderRadius: '$lg',
     px: '$5',
-    py: '$2.5',
+    py: '$2',
+    flex: 1,
   },
   assignParticipantsCancelButtonText: {
     color: '$textForegroundColor',
     fontSize: '$sm',
     fontWeight: '$semibold',
+    textAlign: 'center' as const,
   },
   assignParticipantsConfirmButton: {
     bg: '$primary500',
     borderRadius: '$lg',
     px: '$5',
-    py: '$2.5',
+    py: '$2',
+    flex: 1,
   },
   assignParticipantsConfirmButtonText: {
     color: '$white',
     fontSize: '$sm',
     fontWeight: '$semibold',
+    textAlign: 'center' as const,
   },
   assignParticipantsModalBodyProps: {
     flex: 1,
@@ -349,25 +323,44 @@ export const sessionsSupportStyles = {
   assignParticipantsSearchInput: {
     variant: 'outline' as const,
     size: 'md' as const,
-    borderColor: '$borderColor',
+    borderColor: '$borderLight300 !important',
     borderRadius: 10,
     bg: '$white',
     alignItems: 'center' as const,
     px: '$3',
     mb: '$2',
+    borderWidth: 1,
+    sx: {
+      _focus: {
+        borderColor: '$borderLight300 !important',
+        _web: {
+          boxShadow: 'none !important',
+          borderColor: '$borderLight300 !important',
+        },
+      },
+      _hover: {
+        borderColor: '$borderLight300 !important',
+      },
+    },
   },
   assignParticipantsCountHeaderHStack: {
     justifyContent: 'space-between' as const,
     alignItems: 'center' as const,
-    px: '$1',
+    p: '$3',
+    bg: '$gray50 !important',
+    borderColor: '$borderColor',
+    borderWidth: 1,
+    borderRadius: 10,
   },
   assignParticipantsCountLeftHStack: {
     alignItems: 'center' as const,
     space: 'xs' as const,
+    fontWeight: '$semibold' as const,
+    color: '$black !important',
   },
   assignParticipantsCountLeftText: {
     fontSize: '$sm',
-    fontWeight: '$semibold',
+    fontWeight: '$normal' as const,
     color: '$textMuted',
   },
   assignParticipantsCountRightHStack: {
@@ -376,13 +369,13 @@ export const sessionsSupportStyles = {
   },
   assignParticipantsCountRightText: {
     fontSize: '$sm',
-    fontWeight: '$semibold',
-    color: '$textMuted',
+    fontWeight: '$normal' as const,
+    color: '$primary500',
   },
   assignParticipantsClearAllText: {
     fontSize: '$sm',
-    fontWeight: '$semibold',
-    color: '$primary500',
+    fontWeight: '$normal' as const,
+    color: '$textMuted',
   },
   assignParticipantsFlatList: {
     maxHeight: 320,
@@ -470,6 +463,12 @@ export const sessionsSupportStyles = {
   assignParticipantsFooterLoadingContainer: {
     py: '$4',
     alignItems: 'center' as const,
+  },
+  assignParticipantsDivider: {
+    width: 1,
+    height: 14,
+    bg: '$borderLight300',
+    mx: '$3',
   },
 
   // My Session Card styles
@@ -583,6 +582,394 @@ export const sessionsSupportStyles = {
   mySessionsListVStack: {
     space: 'md' as const,
     width: '100%' as const,
+  },
+  // Session Details styles
+  detailsScreenRoot: {
+    flex: 1,
+    bg: '$backgroundLight50',
+  },
+  detailsNotFoundContainer: {
+    flex: 1,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    p: '$4' as const,
+  },
+  detailsHeaderTitle: {
+    fontSize: '$3xl',
+    fontWeight: '700' as const,
+    color: '$textPrimary',
+    mb: '$3',
+    mt: '$3',
+  },
+  detailsHeaderSubtitle: {
+    fontSize: '$md',
+    color: '$textSecondary',
+    fontWeight: '$normal' as const,
+  },
+  detailsHeaderLeftSection: {
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start' as const,
+    gap: 8,
+  },
+  detailsHeaderBackButton: {
+    px: '$4 !important',
+    py: '$2 !important',
+    gap: 8,
+    sx: {
+      _hover: {
+        bg: '$primary100 !important',
+        _text: {
+          color: '$black !important',
+        },
+        _icon: {
+          color: '$black !important',
+        },
+      },
+    },
+  },
+  detailsMainContainer: {
+    px: '$4',
+    py: '$6',
+    '$md-px': '$6',
+    alignSelf: 'center' as const,
+    width: '100%' as const,
+    maxWidth: 1200,
+  },
+  detailsLayoutWrapper: {
+    width: '100%' as const,
+    justifyContent: 'center' as const,
+    alignItems: 'flex-start' as const,
+    gap: 24,
+  },
+  detailsRightCol: {
+    flex: 1,
+    space: 'md' as const,
+    width: '100%' as const,
+  },
+  detailsLeftCol: {
+    width: '100%' as const,
+    '$md-width': 360,
+    space: 'md' as const,
+  },
+  detailsContentCard: {
+    bg: '$white',
+    borderWidth: 1,
+    borderColor: '$borderLight200',
+    borderRadius: 16,
+    p: '$6',
+    shadowColor: '$shadowColor',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+    '$web-boxShadow': '0px 1px 3px rgba(0, 0, 0, 0.1)' as const,
+  },
+  detailsCardHeader: {
+    fontSize: '$md',
+    fontWeight: '700' as const,
+    color: '$textPrimary',
+    mb: '$4',
+  },
+  detailsCardBodyText: {
+    fontSize: '$sm',
+    color: '$textSecondary',
+    lineHeight: '$md',
+  },
+  detailsLearningObjectiveItem: {
+    alignItems: 'flex-start' as const,
+    space: 'sm' as const,
+    mb: '$2',
+  },
+  detailsLearningObjectiveBullet: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    mt: 8,
+  },
+  detailsLearningObjectiveText: {
+    fontSize: '$sm',
+    color: '$textPrimary',
+    flex: 1,
+  },
+  detailsAssignBox: {
+    bg: '#ece6e6ff',
+    borderColor: '#e6c1caff',
+    borderWidth: 1,
+    borderRadius: '$xl',
+    p: '$6',
+    flexDirection: 'row' as const,
+    justifyContent: 'space-between' as const,
+    alignItems: 'center' as const,
+    flexWrap: 'wrap' as const,
+    gap: '$6',
+    shadowColor: '$shadowColor',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+    '$web-boxShadow': '0px 1px 3px rgba(0, 0, 0, 0.1)' as const,
+  },
+  detailsAssignTextWrapper: {
+    flex: 1,
+    minWidth: 240,
+    space: 'xs' as const,
+  },
+  detailsAssignHeaderHStack: {
+    alignItems: 'center' as const,
+    space: 'xs' as const,
+    gap: '$3',
+  },
+  detailsAssignIconProps: {
+    size: 20,
+    color: '#8B2842',
+  },
+  detailsAssignTitle: {
+    fontSize: '$md',
+    fontWeight: '700' as const,
+    color: '$textPrimary',
+  },
+  detailsAssignSubtitle: {
+    fontSize: '$md',
+    color: '$textSecondary',
+    py: '$2',
+  },
+  detailsAssignButton: {
+    bg: '$primary500',
+    borderRadius: '$xl',
+    px: '$3',
+    py: '$1.5',
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: '$2',
+  },
+  detailsAssignIconProps1: {
+    size: 18,
+    color: '#fff',
+  },
+  detailsAssignButtonText: {
+    color: '$white',
+    fontSize: '$sm',
+    fontWeight: '$semibold',
+  },
+  detailsInfoCard: {
+    bg: '$white',
+    borderWidth: 1,
+    borderColor: '$borderLight200',
+    borderRadius: 16,
+    p: '$6',
+    space: 'lg' as const,
+    shadowColor: '$shadowColor',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+    '$web-boxShadow': '0px 1px 3px rgba(0, 0, 0, 0.1)' as const,
+  },
+  detailsInfoItem: {
+    alignItems: 'flex-start' as const,
+    space: 'md' as const,
+    mb: '$2',
+  },
+  detailsIconWrapper: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    bg: '$primary100',
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+  },
+  detailsIconProps: {
+    size: 20,
+    color: '#8B2842',
+  },
+  detailsItemLabel: {
+    fontSize: '$xs',
+    color: '$textMuted',
+    fontWeight: '$medium' as const,
+    letterSpacing: '$md',
+  },
+  detailsItemValue: {
+    fontWeight: '600' as const,
+    color: '$textPrimary',
+    fontSize: '$sm',
+    mt: '$0.5',
+  },
+  detailsDateTimeIconWrapper: {
+    width: 38,
+    height: 38,
+    borderRadius: 10,
+    bg: '$primary100',
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+  },
+  detailsDateTimeIconProps: {
+    size: 20,
+    color: '#8B2842',
+  },
+  detailsDateTimeLabel: {
+    fontSize: '$xs',
+    color: '$textMuted',
+    fontWeight: '$medium' as const,
+    letterSpacing: '$md',
+  },
+  detailsDateValue: {
+    fontWeight: '600' as const,
+    color: '$textPrimary',
+    fontSize: '$sm',
+    mt: '$0.5',
+  },
+  detailsTimeValue: {
+    fontWeight: '$normal' as const,
+    color: '$textSecondary',
+    fontSize: '$xs',
+    mt: '$2',
+  },
+  detailsVirtualLinkText: {
+    fontSize: '$sm',
+    fontWeight: '600' as const,
+    color: '#8B2842',
+    textDecorationLine: 'underline' as const,
+    mt: '$0.5',
+  },
+  detailsCapacityText: {
+    fontSize: '$sm',
+    fontWeight: '600' as const,
+    color: '$textPrimary',
+    mt: '$0.5',
+  },
+  detailsSpotsText: {
+    fontSize: '$xs',
+    fontWeight: '600' as const,
+    color: '$green500',
+    mt: '$0.5',
+  },
+  detailsTagsWrapper: {
+    flexDirection: 'row' as const,
+    flexWrap: 'wrap' as const,
+    gap: '$2',
+    borderTopWidth: 1,
+    borderColor: '$borderColor',
+    pt: '$4',
+    mt: '$2',
+  },
+  detailsTagBadge: {
+    bg: 'transparent',
+    borderColor: '$borderColor',
+    borderWidth: 1,
+    borderRadius: '$full',
+    px: '$3',
+    py: '$1',
+  },
+  detailsTagBadgeText: {
+    fontSize: '$xs',
+    color: '$textPrimary',
+    fontWeight: '$medium' as const,
+    sx: {
+      _text: {
+        color: '$primary500 !important',
+      },
+    },
+  },
+  // ConfirmAssignment Modal styles
+  confirmAssignmentContainer: {
+    space: 'md' as const,
+    width: '100%' as const,
+  },
+  confirmAssignmentSubtitleText: {
+    fontSize: '$sm',
+    color: '$textSecondary',
+    lineHeight: '$md',
+    mb: '$4',
+  },
+  confirmAssignmentSessionBox: {
+    bg: '#F8FAFC',
+    borderWidth: 1,
+    borderColor: '$borderLight200',
+    borderRadius: 16,
+    px: '$5',
+    py: '$4',
+    width: '100%' as const,
+    mb: '$5',
+  },
+  confirmAssignmentSessionName: {
+    fontSize: '$md',
+    fontWeight: '$bold' as const,
+    color: '$textPrimary',
+    mb: '$1.5',
+  },
+  confirmAssignmentSessionMeta: {
+    fontSize: '$xs',
+    color: '$textMuted',
+  },
+  confirmAssignmentSectionHeader: {
+    fontSize: '$sm',
+    fontWeight: '$bold' as const,
+    color: '$textPrimary',
+    mb: '$3',
+  },
+  confirmAssignmentParticipantList: {
+    width: '100%' as const,
+    maxHeight: 200,
+    mb: '$6',
+  },
+  confirmAssignmentParticipantRow: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    py: '$2',
+    width: '100%' as const,
+    gap: '$3',
+  },
+  confirmAssignmentParticipantNameTextContainer: {
+    flexDirection: 'row' as const,
+    alignItems: 'center' as const,
+    gap: '$1.5',
+  },
+  confirmAssignmentParticipantName: {
+    fontSize: '$sm',
+    fontWeight: '$medium' as const,
+    color: '$textPrimary',
+  },
+  confirmAssignmentParticipantId: {
+    fontSize: '$sm',
+    color: '$textMutedForeground',
+    fontWeight: '$normal' as const,
+  },
+  confirmAssignmentFooter: {
+    flexDirection: 'row' as const,
+    justifyContent: 'flex-end' as const,
+    gap: '$3',
+    width: '100%' as const,
+    mt: '$2',
+  },
+  confirmAssignmentCancelButton: {
+    borderColor: '$borderColor',
+    bg: '$white',
+    borderRadius: '$lg',
+    py: "$2 !important"
+  },
+  confirmAssignmentCancelButtonText: {
+    color: '$textForegroundColor',
+    fontSize: '$sm',
+    fontWeight: '$semibold',
+  },
+  confirmAssignmentConfirmButton: {
+    bg: '$primary500',
+    borderRadius: '$lg',
+    py: "$2 !important"
+  },
+  confirmAssignmentConfirmButtonText: {
+    color: '$white',
+    fontSize: '$sm',
+    fontWeight: '$semibold',
   },
 } as const;
 

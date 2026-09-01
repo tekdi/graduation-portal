@@ -11,8 +11,12 @@ interface RequestorFilterProps {
   provinceOptions: any[];
   siteOptions: any[];
   pathwayOptions: any[];
+  pillarOptions?: any[];
+  typeOptions?: any[];
+  statusOptions?: any[];
   formatOptions: any[];
   shouldDisableSite?: boolean;
+  shouldDisableType?: boolean;
 }
 
 export const RequestorFilter: React.FC<RequestorFilterProps> = ({
@@ -21,8 +25,12 @@ export const RequestorFilter: React.FC<RequestorFilterProps> = ({
   provinceOptions,
   siteOptions,
   pathwayOptions,
+  pillarOptions,
+  typeOptions,
+  statusOptions,
   formatOptions,
   shouldDisableSite,
+  shouldDisableType,
 }) => {
   const [dropdownFilters, setDropdownFilters] = useState<Record<string, any>>({});
   const [searchQuery, setSearchQuery] = useState(filters.search || '');
@@ -40,12 +48,21 @@ export const RequestorFilter: React.FC<RequestorFilterProps> = ({
       if (item.attr === 'pathway') {
         return { ...item, data: pathwayOptions };
       }
+      if (item.attr === 'pillar') {
+        return { ...item, data: pillarOptions || item.data };
+      }
+      if (item.attr === 'type') {
+        return { ...item, data: typeOptions || item.data, disabled: shouldDisableType };
+      }
+      if (item.attr === 'status') {
+        return { ...item, data: statusOptions || item.data };
+      }
       if (item.attr === 'format') {
         return { ...item, data: formatOptions };
       }
       return item;
     });
-  }, [provinceOptions, siteOptions, pathwayOptions, formatOptions, shouldDisableSite]);
+  }, [provinceOptions, siteOptions, pathwayOptions, pillarOptions, typeOptions, statusOptions, formatOptions, shouldDisableSite, shouldDisableType,]);
 
   const handleSearch = (text: string) => {
     setSearchQuery(text);

@@ -14,30 +14,28 @@ export const RequestFooter: React.FC<RequestFooterProps> = ({ item, onAssignSess
   const navigation = useNavigation();
 
   const sessionId = item?.id || item?._id || '';
-  const orgName = (typeof item?.organization === 'object'
-    ? item.organization?.name || item.organization?.organization_code
-    : item?.organization) || item?.organization_code || '';
+  const mentorName = item?.mentor_name || '';
   const provinceName = (Array.isArray(item?.provinces) ? item.provinces[0] : item?.provinces) || '';
 
   const handleViewDetails = () => {
     // @ts-ignore
-    navigation.navigate('SessionDetails', { sessionId });
+    navigation.navigate('session-details', { sessionId });
   }
-  const handleAssignSession = () => {
-    if (onAssignSession) {
-      onAssignSession(item);
-    } else {
-      // @ts-ignore
-      navigation.navigate('AssignSession', { sessionId });
-    }
-  }
+  // const handleAssignSession = () => {
+  //   if (onAssignSession) {
+  //     onAssignSession(item);
+  //   } else {
+  //     // @ts-ignore
+  //     navigation.navigate('AssignSession', { sessionId });
+  //   }
+  // }
 
   return (
     <HStack {...styles.requestorFooter}>
       <Text {...styles.requestorFooterText}>
         {t('supportProvider.supportOfferings.cards.providedBy', 'Provided by:')}{' '}
-        <Text {...styles.requestorFooterOrgText} fontWeight="700">
-          {orgName}
+        <Text {...styles.requestorFooterOrgText}>
+          {mentorName}
         </Text>
         {provinceName ? (
           <Text {...styles.requestorFooterProvinceText}>{` • ${provinceName}`}</Text>
@@ -55,7 +53,7 @@ export const RequestFooter: React.FC<RequestFooterProps> = ({ item, onAssignSess
           </ButtonText>
         </Button>
 
-        <Button
+        {/* <Button
           variant="solid"
           {...styles.requestorFooterAssignButton}
           onPress={handleAssignSession}
@@ -63,7 +61,7 @@ export const RequestFooter: React.FC<RequestFooterProps> = ({ item, onAssignSess
           <ButtonText {...(styles.requestorFooterAssignText as any)}>
             {t('supportProvider.supportOfferings.cards.assignSession', 'Assign Session')}
           </ButtonText>
-        </Button>
+        </Button> */}
       </HStack>
     </HStack>
   );

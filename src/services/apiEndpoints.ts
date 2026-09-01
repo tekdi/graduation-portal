@@ -52,4 +52,5 @@ export const API_ENDPOINTS = {
   REQUEST_SESSIONS_LIST: `${prefix}/mentoring/v1/requestSessions/list`,
   REQUEST_SESSION_CREATE: `${prefix}/mentoring/v1/requestSessions/create`,
   REQUEST_SESSIONS_ACCEPT: `${prefix}/mentoring/v1/requestSessions/accept?SkipValidation=true`,
+  REQUESTOR_ASSIGN_MENTEES: (sessionId: string | number) => `${prefix}/mentoring/v1/sessions/addMentees/${sessionId}`,
 };
