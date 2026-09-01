@@ -67,6 +67,7 @@ export default function SupportRequestsModals({
       if (selectedItem?.id) {
         await acceptAndScheduleSupportRequest({
           requestId: selectedItem.id,
+          raw: selectedItem.raw,
           ...data,
         });
         onClose();

@@ -33,6 +33,7 @@ const App = (): React.JSX.Element => {
   const route = useRoute<any>();
   const modeType: String = route.params?.type;
   const sessionId = route.params?.id;
+  const prefillValues = route.params?.prefill;
   const { t } = useLanguage();
   const [provinces, setProvinces] = useState<any[]>([]);
   const [pillers, setPillers] = useState<MentoringOption[]>([]);
@@ -88,6 +89,8 @@ const App = (): React.JSX.Element => {
           const formattedValues: any = valueMapping(rawData, true, {}, 'training'); // Reverse mapping to form values
           setValues(formattedValues);
         }
+      } else if (modeType === FORM_MODE.CREATE && prefillValues) {
+        setValues((prev: any) => ({ ...prev, ...prefillValues }));
       }
     } catch (error: any) {
       logger.error('Error loading form data:', error);
@@ -95,7 +98,7 @@ const App = (): React.JSX.Element => {
     } finally {
       setIsLoading(false);
     }
-  }, [sessionId, modeType]);
+  }, [sessionId, modeType, prefillValues]);
 
   useFocusEffect(
     useCallback(() => {

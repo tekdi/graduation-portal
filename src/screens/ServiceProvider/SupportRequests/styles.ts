@@ -361,7 +361,7 @@ export default {
   modalFooterRow: {
     space: 'sm',
     width: '$full',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     alignItems: 'center',
   } as const,
   modalCancelText: {
@@ -537,7 +537,7 @@ export default {
   } as const,
   modalPropsLg: {
     size: 'lg',
-    maxWidth: 680,
+    maxWidth: 860,
   } as const,
   viewDetailsModalProps: {
     size: 'lg',
@@ -723,5 +723,61 @@ export default {
     size: 'sm',
     bg: 'transparent',
     borderColor: '$borderLight200',
+  } as const,
+
+  // ─── Accept & Schedule modal (redesigned) ────────────────────────────────
+  acceptScheduleHeaderCol: {
+    space: 'xs',
+    flex: 1,
+  } as const,
+  sessionFormBadge: {
+    alignSelf: 'flex-start',
+    bg: '$blue50',
+    borderWidth: 1,
+    borderColor: '$blue200',
+    px: '$2.5',
+    py: '$0.5',
+    borderRadius: '$md',
+  } as const,
+  sessionFormBadgeText: {
+    fontSize: '$xs',
+    fontWeight: '$bold',
+    color: '$blue700',
+  } as const,
+  acceptScheduleSubtitleText: {
+    fontSize: '$sm',
+    color: '$textDark500',
+  } as const,
+  acceptScheduleTitleText: {
+    fontSize: '$lg',
+    fontWeight: '$bold',
+    color: '$textDark900',
+  } as const,
+  summaryBarRow: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  } as const,
+  summaryBarText: {
+    fontSize: '$sm',
+    color: '$blue800',
+    flex: 1,
+  } as const,
+  summaryBarTextBold: {
+    fontWeight: '$bold',
+  } as const,
+  openWizardBtn: {
+    borderWidth: 1,
+    borderColor: '$blue200',
+    bg: '$white',
+    px: '$3',
+    py: '$1.5',
+    borderRadius: '$lg',
+    sx: { ':active': { bg: '$blue50' } },
+  } as const,
+  openWizardBtnText: {
+    fontSize: '$xs',
+    fontWeight: '$bold',
+    color: '$blue700',
   } as const,
 };
