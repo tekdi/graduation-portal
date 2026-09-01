@@ -14,58 +14,58 @@ import {
 } from '../../../../services/mentoringService';
 import { SUPPORT_CATEGORIES } from '@constants/SUPPORT_PROVIDER_CARDS';
 
-  // Sub-option entries can be plain ids (freshly selected from the <Select>) or
-  // full { value, label } option objects (as returned by the mentoring API).
-  export type OptionValue = string | { value: string; label: string };
+// Sub-option entries can be plain ids (freshly selected from the <Select>) or
+// full { value, label } option objects (as returned by the mentoring API).
+export type OptionValue = string | { value: string; label: string };
 
-  export interface SupportCategoryItem {
-    id: string;
-    categoryName: string;
-    trainingData?: {
-      socialEmpowerment: OptionValue[];
-      financialInclusion: OptionValue[];
-      livelihoods: OptionValue[];
-    };
-    linkageData?: {
-      specialAttention: OptionValue[];
-      immediateAttention: OptionValue[];
-    };
-    assetsData?: {
-      assetTypes: OptionValue[];
-    };
-    othersData?: string;
-  }
-
-  interface SupportCategoriesProps {
-    value: SupportCategoryItem[];
-    onChange: (value: SupportCategoryItem[]) => void;
-    mode: 'preview' | 'edit';
-    t: any;
-  }
-
-  export const isTrainingCategory = (cat?: string) => {
-    return cat === SUPPORT_CATEGORIES.TRAINING;
+export interface SupportCategoryItem {
+  id: string;
+  categoryName: string;
+  trainingData?: {
+    socialEmpowerment: OptionValue[];
+    financialInclusion: OptionValue[];
+    livelihoods: OptionValue[];
   };
-
-  export const isLinkageCategory = (cat?: string) => {
-    return cat === SUPPORT_CATEGORIES.ADDITIONAL_SERVICE;
+  linkageData?: {
+    specialAttention: OptionValue[];
+    immediateAttention: OptionValue[];
   };
-
-  export const isAssetCategory = (cat?: string) => {
-    return cat === SUPPORT_CATEGORIES.ASSET;
+  assetsData?: {
+    assetTypes: OptionValue[];
   };
+  othersData?: string;
+}
 
-  // Dynamic Options fetched directly from API/DB, grouped into a single state object
-  type OptionItem = { value: string; label: string };
-  interface CategoryOptionsState {
-    categoryOpts: OptionItem[];
-    socialEmpowermentOpts: OptionItem[];
-    financialInclusionOpts: OptionItem[];
-    livelihoodsOpts: OptionItem[];
-    specialAttentionOpts: OptionItem[];
-    immediateAttentionOpts: OptionItem[];
-    assetTypesOpts: OptionItem[];
-  }
+interface SupportCategoriesProps {
+  value: SupportCategoryItem[];
+  onChange: (value: SupportCategoryItem[]) => void;
+  mode: 'preview' | 'edit';
+  t: any;
+}
+
+export const isTrainingCategory = (cat?: string) => {
+  return cat === SUPPORT_CATEGORIES.TRAINING;
+};
+
+export const isLinkageCategory = (cat?: string) => {
+  return cat === SUPPORT_CATEGORIES.ADDITIONAL_SERVICE;
+};
+
+export const isAssetCategory = (cat?: string) => {
+  return cat === SUPPORT_CATEGORIES.ASSET;
+};
+
+// Dynamic Options fetched directly from API/DB, grouped into a single state object
+type OptionItem = { value: string; label: string };
+interface CategoryOptionsState {
+  categoryOpts: OptionItem[];
+  socialEmpowermentOpts: OptionItem[];
+  financialInclusionOpts: OptionItem[];
+  livelihoodsOpts: OptionItem[];
+  specialAttentionOpts: OptionItem[];
+  immediateAttentionOpts: OptionItem[];
+  assetTypesOpts: OptionItem[];
+}
 
 export const SupportCategories: React.FC<SupportCategoriesProps> = ({
   value = [],
@@ -185,13 +185,13 @@ export const SupportCategories: React.FC<SupportCategoriesProps> = ({
   }, [selectedCategory]);
 
   const categoryOptions = useMemo(() => {
-    return optionsState.categoryOpts.filter(opt => {
+    return optionsState?.categoryOpts?.filter(opt => {
       if (selectedCategory && opt.value === selectedCategory) {
         return true;
       }
       return !value.some(item => item.categoryName === opt.value);
     });
-  }, [value, selectedCategory, optionsState.categoryOpts]);
+  }, [value, selectedCategory, optionsState?.categoryOpts]);
 
   // Helper to resolve the display label for an entry that may already be a
   // full { value, label } option object, or just a plain id/label string.
@@ -199,7 +199,7 @@ export const SupportCategories: React.FC<SupportCategoriesProps> = ({
     if (entry && typeof entry === 'object') {
       return entry.label ?? entry.value ?? '';
     }
-    const found = optionsList.find(opt => opt.value === entry || opt.label === entry);
+    const found = optionsList?.find(opt => opt.value === entry || opt.label === entry);
     return found ? found.label : entry;
   };
 
