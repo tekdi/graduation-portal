@@ -2425,8 +2425,8 @@
     "taskConflictReasonMultiple": "Multiple differences detected."
   },
   "schemaformrenderer": {
-    "file" : {
-      "fileSize" : "Max {{ size }} MB"
+    "file": {
+      "fileSize": "Max {{ size }} MB"
     }
   },
   "supportProvider": {
@@ -2435,7 +2435,7 @@
     },
     "menu": {
       "dashboard": "Dashboard",
-      "mySupportOfferings": "My Support Offerings",
+      "mySupportOfferings": "My Support Interventions",
       "requests": "Requests",
       "materialsLibrary": "Materials Library",
       "profile": "Profile"
@@ -2443,7 +2443,7 @@
     "pageTitle": {
       "dashboard": "Dashboard",
       "dashboard1": "Dashboard",
-      "opportunities": "My Support Offerings",
+      "opportunities": "My Support Interventions",
       "create-opportunity": "Create New Support",
       "create-training-session": "Create Training Session",
       "create-additional-service": "Create Additional Service",
@@ -2453,7 +2453,7 @@
       "profile": "Organisation Profile"
     },
     "supportOfferings": {
-      "title": "My Support Offerings",
+      "title": "My Support Interventions",
       "subtitle": "Manage all published support — training sessions, services, and assets",
       "createNew": "Create New",
       "tabs": {
