@@ -236,12 +236,12 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
                 required: false,
                 label: { key: 'phoneNumber', fallback: 'Phone Number' },
                 placeholder: { key: 'phoneNumberPlaceholder', fallback: '000 000 0000' },
-                inputProps: { keyboardType: 'phone-pad', maxLength: 10 },
+                inputProps: { keyboardType: 'phone-pad', maxLength: 9 },
                 validation: [
                   {
                     rule: 'pattern',
-                    value: '^[0-9]{9,10}$',
-                    message: { key: 'errors.phoneInvalid', fallback: 'Phone number must be 9 or 10 digits' },
+                    value: '^[0-9]{9}$',
+                    message: { key: 'errors.phoneInvalid', fallback: 'Phone number must be 9 digits' },
                   },
                 ],
               },
@@ -271,12 +271,12 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
                 label: { key: 'alternativePhone', fallback: 'Alternative Phone' },
                 placeholder: { key: 'alternativePhonePlaceholder', fallback: '000 000 0000' },
                 _input: INPUT_STYLE,
-                inputProps: { keyboardType: 'phone-pad', maxLength: 10 },
+                inputProps: { keyboardType: 'phone-pad', maxLength: 9 },
                 validation: [
                   {
                     rule: 'pattern',
-                    value: '^[0-9]{9,10}$',
-                    message: { key: 'errors.altPhoneInvalid', fallback: 'Alt phone number must be 9 or 10 digits' },
+                    value: '^[0-9]{9}$',
+                    message: { key: 'errors.altPhoneInvalid', fallback: 'Alt phone number must be 9 digits' },
                   },
                 ],
               },
