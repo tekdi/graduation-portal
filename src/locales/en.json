@@ -237,7 +237,8 @@
       "observation": "Observation",
       "template": "Develop Intervention Plan",
       "participants": "Participants",
-      "project": "Project"
+      "project": "Project",
+      "review-requests": "Review Requests"
     },
     "home": "Home",
     "dashboard": "Dashboards",
