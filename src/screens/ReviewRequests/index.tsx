@@ -35,7 +35,6 @@ const DEFAULT_PAGE_SIZE = 10;
 const TYPE_FILTER_DATA = [
   { labelKey: 'admin.reviewRequests.filters.pathwaySwitch', value: 'USER_PROJECT_TEMPLATE_CHANGE' },
   { labelKey: 'admin.reviewRequests.filters.dropoutRequest', value: 'PROGRAM_USER_DROPPING_OUT' },
-  { labelKey: 'admin.reviewRequests.filters.allTypes', value: 'all' },
 ];
 
 const ReviewRequestsScreen = (): React.JSX.Element => {
