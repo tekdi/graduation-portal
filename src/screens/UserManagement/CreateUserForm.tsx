@@ -39,9 +39,8 @@ export const CreateUserForm = React.memo<CreateUserFormProps>(({
         row.fields.forEach(initializeField);
       });
     });
-    return vals;
+    return {...vals, isParticipant: 'false'};
   }, []);
-
   const [values, setValues] = useState<Record<string, string>>(initialValues);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -85,7 +84,7 @@ export const CreateUserForm = React.memo<CreateUserFormProps>(({
       if (name === 'roleId') {
         const selectedRole = roles.find((r: any) => r.id.toString() === value);
         const roleTitle = (selectedRole?.title || '').toLowerCase();
-        next.isParticipant = roleTitle === 'user' ? 'true' : 'false';
+        next.isParticipant = roleTitle === 'tenant_admin' ? 'true' : 'false';
       }
       return next;
     });
@@ -121,7 +120,7 @@ export const CreateUserForm = React.memo<CreateUserFormProps>(({
       if (error?.statusCode === 406 || error?.statusCode === 422) {
         type = 'warning';
       }
-      //console.log(error?.data, error?.error, error?.statusCode, "errorssagarold")
+     
       showAlert(type, errMsg, { placement: 'bottom' });
       setErrors({
         ...errors,
@@ -134,7 +133,7 @@ export const CreateUserForm = React.memo<CreateUserFormProps>(({
       setIsSubmitting(false);
     }
   }, [values, optionsMap, roles, showAlert, t, onSuccess]);
-  //console.log(errors, "errorssagar")
+
   const firstNameRef = useRef<any>(null);
 
   useEffect(() => {
@@ -358,7 +357,7 @@ export const mapFormValuesToPayload = (
   if (values.gender && values.gender.trim()) {
     payload.gender = values.gender;
   }
-  if (values.siteId && values.siteId.trim()) {
+  if (values.siteId && values.siteId) {
     payload.site = values.siteId;
   }
   if (values.provinceId && values.provinceId.trim()) {

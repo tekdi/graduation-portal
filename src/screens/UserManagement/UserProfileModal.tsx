@@ -327,7 +327,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       provinceId,
       siteId,
       location,
-      isParticipant: roleTitle === 'user' ? 'true' : 'false',
+      isParticipant: roleTitle === 'tenant_admin' ? 'true' : 'false',
     };
   };
 
@@ -338,7 +338,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       setErrors({});
       getUserProfile(user.id)
         .then(profile => {
-          //console.log('PROFILE API =>', profile);
           setSelectedUserProfile(profile);
 
           // If this profile's actual role isn't in the (possibly restricted)
@@ -357,7 +356,6 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
           }
 
           const mapped = mapUserToFormValues(user, profile);
-          //console.log('MAPPED VALUES =>', mapped);
           setValues(mapped);
           initialValuesRef.current = mapped;
 
@@ -429,7 +427,7 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
       if (name === 'roleId') {
         const selectedRole = effectiveRoles.find((r: any) => r.id.toString() === value);
         const roleTitle = (selectedRole?.title || '').toLowerCase();
-        updated.isParticipant = roleTitle === 'user' ? 'true' : 'false';
+        updated.isParticipant = roleTitle === 'tenant_admin' ? 'true' : 'false';
       }
 
       return updated;

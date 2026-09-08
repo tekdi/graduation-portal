@@ -8,7 +8,7 @@
  */
 
 import { FormSection } from "@components/SchemaFormRenderer/type";
-
+import { FORM_FIELD_TYPES } from "@components/SchemaFormRenderer/type";
 // ─── Schema ───────────────────────────────────────────────────────────────────
 
 export const INPUT_STYLE = {
@@ -361,7 +361,7 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
           {
             name: 'organisationId',
             type: 'select',
-            required: true,
+            required: false,
             label: { key: 'organization', fallback: 'Organization' },
             placeholder: { key: 'organizationPlaceholder', fallback: 'Select organization' },
             optionsSource: 'organisations',
@@ -372,7 +372,7 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
           {
             name: 'positionId',
             type: 'select',
-            required: true,
+            required: false,
             label: { key: 'position', fallback: 'Position' },
             placeholder: { key: 'positionPlaceholder', fallback: 'Select position' },
             optionsSource: 'positions',
@@ -404,19 +404,25 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
           {
             name: 'provinceId',
             type: 'select',
-            required: false,
+            required: true,
             label: { key: 'province', fallback: 'Province' },
             placeholder: { key: 'provincePlaceholder', fallback: 'Select province' },
             optionsSource: 'provinces',
-            visibleIf: [
-              { name: 'isParticipant', operator: '!=', value: 'true' }
+            validation: [
+              {
+                rule: 'required',
+                message: {
+                  key: 'errors.provinceRequired',
+                  fallback: 'Province is required',
+                },
+              },
             ],
-            validation: [],
           },
+
           {
             name: 'siteId',
-            type: 'select',
-            required: false,
+            type: FORM_FIELD_TYPES.MULTISELECT,
+            required: true,
             dependsOn: 'provinceId',
             disabledWhen: { field: 'provinceId', empty: true },
             label: { key: 'site', fallback: 'Site' },
@@ -424,27 +430,20 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
             placeholderWhenReady: { key: 'sitePlaceholderReady', fallback: 'Select site' },
             optionsSource: 'sites',
             visibleIf: [
-              { name: 'isParticipant', operator: '!=', value: 'true' }
-            ],
-            validation: [],
-          },
-          {
-            name: 'provinceId',
-            type: 'select',
-            required: true,
-            label: { key: 'province', fallback: 'Province' },
-            placeholder: { key: 'provincePlaceholder', fallback: 'Select province' },
-            optionsSource: 'provinces',
-            visibleIf: [
-              { name: 'isParticipant', operator: '===', value: 'true' }
+              {
+                name: 'isParticipant',
+                operator: '===',
+                value: 'true',
+              },
             ],
             validation: [
-              { rule: 'required', message: { key: 'errors.provinceRequired', fallback: 'Province is required' } },
+              { rule: 'required', message: { key: 'errors.siteRequired', fallback: 'Site is required' } },
             ],
           },
+
           {
             name: 'siteId',
-            type: 'select',
+            type: FORM_FIELD_TYPES.SELECT,
             required: true,
             dependsOn: 'provinceId',
             disabledWhen: { field: 'provinceId', empty: true },
@@ -453,7 +452,11 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
             placeholderWhenReady: { key: 'sitePlaceholderReady', fallback: 'Select site' },
             optionsSource: 'sites',
             visibleIf: [
-              { name: 'isParticipant', operator: '===', value: 'true' }
+              {
+                name: 'isParticipant',
+                operator: '===',
+                value: 'false',
+              },
             ],
             validation: [
               { rule: 'required', message: { key: 'errors.siteRequired', fallback: 'Site is required' } },
