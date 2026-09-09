@@ -403,9 +403,6 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
             label: { key: 'organization', fallback: 'Organization' },
             placeholder: { key: 'organizationPlaceholder', fallback: 'Select organization' },
             optionsSource: 'organisations',
-            validation: [
-              { rule: 'required', message: { key: 'errors.organizationRequired', fallback: 'Organization is required' } },
-            ],
           },
           {
             name: 'positionId',
@@ -414,9 +411,6 @@ export const CREATE_USER_FORM_SCHEMA: FormSection[] = [
             label: { key: 'position', fallback: 'Position' },
             placeholder: { key: 'positionPlaceholder', fallback: 'Select position' },
             optionsSource: 'positions',
-            validation: [
-              { rule: 'required', message: { key: 'errors.positionRequired', fallback: 'Position is required' } },
-            ],
           },
         ],
       },
