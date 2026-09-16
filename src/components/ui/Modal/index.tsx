@@ -126,69 +126,69 @@ const Modal: React.FC<ModalProps> = ({
           headerDescription ||
           headerIcon ||
           showCloseButton) && (
-          <ModalHeader
-            borderBottomWidth={0}
-            padding="$6"
-            paddingBottom="$4"
-            {...headerProps}
-          >
-            <HStack space="md" alignItems={headerAlignment} flex={1}>
-              {headerContent ? (
-                headerContent
-              ) : (
-                <>
-                  {/* Header Icon Section */}
-                  {headerIcon && (
-                    <Box {...profileStyles.headerIconContainer}>
-                      {headerIcon}
-                    </Box>
-                  )}
+            <ModalHeader
+              borderBottomWidth={0}
+              padding="$6"
+              paddingBottom="$4"
+              {...headerProps}
+            >
+              <HStack space="md" alignItems={headerAlignment} flex={1}>
+                {headerContent ? (
+                  headerContent
+                ) : (
+                  <>
+                    {/* Header Icon Section */}
+                    {headerIcon && (
+                      <Box {...profileStyles.headerIconContainer}>
+                        {headerIcon}
+                      </Box>
+                    )}
 
-                  {/* Title and Description */}
-                  {(headerTitle || headerDescription) && (
-                    <VStack flex={1} space="xs">
-                      {headerTitle && (
-                        <Heading
-                          {...TYPOGRAPHY.h3}
-                          color={theme.tokens.colors.textPrimary}
-                        >
-                          {typeof headerTitle === 'string'
-                            ? t(headerTitle)
-                            : headerTitle}
-                        </Heading>
-                      )}
-                      {headerDescription && (
-                        <Text
-                          {...TYPOGRAPHY.paragraph}
-                          color={theme.tokens.colors.textSecondary}
-                          fontSize="$sm"
-                        >
-                          {typeof headerDescription === 'string'
-                            ? t(headerDescription)
-                            : headerDescription}
-                        </Text>
-                      )}
-                    </VStack>
-                  )}
-                </>
+                    {/* Title and Description */}
+                    {(headerTitle || headerDescription) && (
+                      <VStack flex={1} space="xs">
+                        {headerTitle && (
+                          <Heading
+                            {...TYPOGRAPHY.h3}
+                            color={theme.tokens.colors.textPrimary}
+                          >
+                            {typeof headerTitle === 'string'
+                              ? t(headerTitle)
+                              : headerTitle}
+                          </Heading>
+                        )}
+                        {headerDescription && (
+                          <Text
+                            {...TYPOGRAPHY.paragraph}
+                            color={theme.tokens.colors.textSecondary}
+                            fontSize="$sm"
+                          >
+                            {typeof headerDescription === 'string'
+                              ? t(headerDescription)
+                              : headerDescription}
+                          </Text>
+                        )}
+                      </VStack>
+                    )}
+                  </>
+                )}
+              </HStack>
+
+              {/* Close Button */}
+              {showCloseButton && (
+                <Pressable
+                  onPress={handleClose}
+                  disabled={confirmLoading}
+                  accessibilityLabel={t('common.close')}
+                  accessibilityRole="button"
+                  {...commonModalCloseButtonStyles}
+                >
+                  <GluestackIcon as={CloseIcon} size="md" color="$textLight600" />
+                </Pressable>
               )}
-            </HStack>
-
-            {/* Close Button */}
-            {showCloseButton && (
-              <Pressable
-                onPress={handleClose}
-                disabled={confirmLoading}
-                accessibilityLabel={t('common.close')}
-                accessibilityRole="button"
-                {...commonModalCloseButtonStyles}
-              >
-                <GluestackIcon as={CloseIcon} size="md" color="$textLight600" />
-              </Pressable>
-            )}
-            {headerRightContent && headerRightContent}
-          </ModalHeader>
-        )}
+              {headerRightContent && headerRightContent}
+            </ModalHeader>
+          )}
 
         {/* Flexible Body Content */}
         <ModalBody
