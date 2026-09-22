@@ -118,8 +118,24 @@ export default function ParticipantDetail() {
     : t('lc.pageTitle.participant-detail');
   useDocumentTitle(pageTitle);
 
-  const showOnboardingProject =
-    (participant?.accountUserStatus === USER_STATUS.INACTIVE && !participant?.idpProjectId)
+  let showOnboardingProject;
+
+  // If the participant has a pending dropout request
+  const isDropoutRequestSentForApproval = Boolean(
+    participant?.pendingChangeRequest?.some(
+      (request: any) => request.action === 'PROGRAM_USER_DROPPING_OUT' && request.status === 'PENDING'
+    )
+  );
+
+  // If the participant has a pending IDP request
+  const isIDPRequestSentForApproval = Boolean(
+    participant?.pendingChangeRequest?.some(
+      (request: any) => request.action === 'USER_PROJECT_TEMPLATE_CHANGE' && request.status === 'PENDING'
+    )
+  );
+
+  showOnboardingProject = (isDropoutRequestSentForApproval) ? "dropout" 
+      : (participant?.accountUserStatus === USER_STATUS.INACTIVE && !participant?.idpProjectId)
       ? "user-inactive"
       : (status === STATUS.DROPOUT && !participant?.idpProjectId)
       ? "dropout"
@@ -396,6 +412,7 @@ export default function ParticipantDetail() {
   if (!participant) {
     return <NotFound message="participantDetail.notFound.title" />;
   }
+
   return (
     <Box flex={1} bg="$accent100">
       {/* Participant Header with status-based variations */}
@@ -421,7 +438,7 @@ export default function ParticipantDetail() {
         // @ts-ignore
         onParticipantRefresh={fetchEntityDetails}
         solutions={solutions}
-        isHideSecondButton={!!(!participant?.onBoardedProjectId && !targetingCriteria && (showOnboardingProject !== "not_enrolled" || isdminPanalAccess))}
+        isHideSecondButton={isDropoutRequestSentForApproval || !!(!participant?.onBoardedProjectId && !targetingCriteria && (showOnboardingProject !== "not_enrolled" || isdminPanalAccess))}
       />
 
       {/* Offline Data Available banner — only while online, for a participant with offline data. */}
@@ -504,7 +521,7 @@ export default function ParticipantDetail() {
               onTaskCompletionChange={setAreAllTasksCompleted}
               projectData={projectData}
               projectUnavailableOffline={projectUnavailableOffline}
-              {...((isdminPanalAccess || participant?.accountUserStatus === USER_STATUS.INACTIVE) ? {mode:MODE.readOnlyMode?.mode}:{})}
+              {...((isdminPanalAccess || participant?.accountUserStatus === USER_STATUS.INACTIVE || isDropoutRequestSentForApproval) ? {mode:MODE.readOnlyMode?.mode}:{})}
             />
           </>
         ) : (
@@ -566,7 +583,7 @@ export default function ParticipantDetail() {
                     onProgressChange={handleProgressChange}
                     projectData={projectData}
                     projectUnavailableOffline={projectUnavailableOffline}
-                    {...(isdminPanalAccess || participant?.accountUserStatus === USER_STATUS.INACTIVE ? {mode:MODE.readOnlyMode?.mode}:{})}
+                    {...(isdminPanalAccess || participant?.accountUserStatus === USER_STATUS.INACTIVE || isDropoutRequestSentForApproval || isIDPRequestSentForApproval ? {mode:MODE.readOnlyMode?.mode}:{})}
                   />
                 </Box>
               )}
