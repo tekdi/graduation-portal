@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Box,
   HStack,
@@ -82,6 +82,17 @@ const Card: React.FC<CardProps> = ({ item, provinces, sites, footer }) => {
     (item as any)?.seats_limit ??
     (item as any)?.meta?.requests ??
     undefined;
+
+  // requestsCount falls back to capacity (seats_limit), so the cancel warning uses the actually assigned count
+  const seatsLimit = (item as any)?.seats_limit;
+  const seatsRemaining = (item as any)?.seats_remaining;
+  const assignedCount = useMemo(
+    () =>
+      seatsLimit !== undefined && seatsRemaining !== undefined
+        ? Math.max(0, Number(seatsLimit || 0) - Number(seatsRemaining || 0))
+        : undefined,
+    [seatsLimit, seatsRemaining]
+  );
 
   const { requesterName, requesterOrgName } = useRequesterInfo(item as any);
 
@@ -222,8 +233,8 @@ const Card: React.FC<CardProps> = ({ item, provinces, sites, footer }) => {
         title={item.title}
         statusLabel={statusTag}
         participantsInfo={
-          requestsCount !== undefined
-            ? `${requestsCount} ${t('supportProvider.supportOfferings.cancelModal.assignedParticipants', 'assigned participants')}`
+          assignedCount !== undefined
+            ? `${assignedCount} ${t('supportProvider.supportOfferings.cancelModal.assignedParticipants', 'assigned participants')}`
             : undefined
         }
         supportTypeLabel={t('supportProvider.supportOfferings.cancelModal.additionalServiceType', 'Additional Service')}
