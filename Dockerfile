@@ -39,7 +39,7 @@ RUN corepack enable
 COPY --from=builder /app/package.json /app/yarn.lock ./
 
 # Install only production dependencies
-RUN yarn install --frozen-lockfile --production && \
+RUN yarn install && \
     yarn cache clean
 
 # Copy server
