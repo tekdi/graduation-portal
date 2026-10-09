@@ -15,7 +15,8 @@ import {
 import { useProjectContext, useProjectStable } from '../../context/ProjectContext';
 import ProjectInfoCard from './ProjectInfoCard';
 import TaskComponent from './TaskComponent';
-import AddCustomTaskModal from '../Task/AddCustomTaskModal';
+// import AddCustomTaskModal from '../Task/AddCustomTaskModal';
+import ScheduleInterventionModal from '../Task/ScheduleInterventionModal';
 import { projectComponentStyles } from './Styles';
 import { useLanguage } from '@contexts/LanguageContext';
 import { LucideIcon } from '@ui';
@@ -148,6 +149,9 @@ const ProjectContent = memo<ProjectContentProps>(({
         ))
       )}
 
+      {/* Shared by the top "Add Custom Task" button (ProjectComponent) and the one below. */}
+      <ScheduleInterventionModal isOpen={isModalOpen} onClose={handleCloseModal} />
+
       {showPillarFeatures && (
         <Box>
           {/* @ts-ignore */}
@@ -155,11 +159,11 @@ const ProjectContent = memo<ProjectContentProps>(({
             <ButtonIcon as={LucideIcon} name="Plus" />
             <ButtonText>{t('projectPlayer.addCustomTask')}</ButtonText>
           </Button>
-          <AddCustomTaskModal
+          {/* <AddCustomTaskModal
             isOpen={isModalOpen}
             onClose={handleCloseModal}
             mode="add"
-          />
+          /> */}
         </Box>
       )}
     </VStack>

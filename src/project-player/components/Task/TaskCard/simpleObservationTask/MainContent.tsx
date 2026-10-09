@@ -62,6 +62,10 @@ export interface MainContentProps {
   // External injections (e.g. edit/delete actions from CustomTaskManager)
   extraActions?: React.ReactNode;
   isSyncTaskId?: boolean;
+
+  // Session / training tasks
+  isSessionTask?: boolean;
+  sessionStatus?: 'attended' | 'scheduled' | 'missed' | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -76,7 +80,7 @@ const MainContent = memo<MainContentProps>(({
   showCheckbox, onCheckboxChange,
   showActionButton, actionIconName, handleAcceptTask, handleRejectTask,
   handleTaskClick, handleTitlePress, handleOpenPreviewModal,
-  t, extraActions, isSyncTaskId,
+  t, extraActions, isSyncTaskId, isSessionTask = false, sessionStatus = null,
 }) => {
   // showAsCard === isChildOfProject by definition
   const showAsCard = isChildOfProject;
@@ -134,6 +138,8 @@ const MainContent = memo<MainContentProps>(({
       evidenceRequiredText={t('projectPlayer.evidenceRequired')}
       completeFormText={t('projectPlayer.completeFormToMarkDone')}
       uploadEvidenceText={t('projectPlayer.uploadEvidenceToMarkDone')}
+      sessionStatus={sessionStatus}
+      sessionBadgeText={sessionStatus ? t(`projectPlayer.${sessionStatus}`) : undefined}
       fileText={t('projectPlayer.file')}
       filesText={t('projectPlayer.files')}
     />
@@ -162,6 +168,13 @@ const MainContent = memo<MainContentProps>(({
       isCompleted={isCompleted}
       uploadText={t('projectPlayer.upload')}
       completeFormText={t('projectPlayer.viewForm')}
+      isSessionTask={isSessionTask}
+      sessionStatus={sessionStatus}
+      sessionLabels={{
+        schedule: t('projectPlayer.schedule'),
+        update: t('projectPlayer.update'),
+        attended: t('projectPlayer.attended'),
+      }}
     />
   );
 
