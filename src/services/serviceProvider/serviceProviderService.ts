@@ -474,6 +474,53 @@ export const getRequestSessionDetails = async (requestId: string | number): Prom
   }
 };
 
+export interface DashboardScopeCounts {
+  needed: number;
+  // null when a province or site filter is applied, commitments are not captured per location
+  committed: number | null;
+  approved: number;
+  delivered: number;
+}
+
+export interface DashboardScope extends DashboardScopeCounts {
+  commitments?: {
+    sessions_committed: number;
+    services_committed: number;
+    assets_committed: number;
+  };
+  // Keyed by support category: training, additional_service, asset
+  categories?: Record<string, DashboardScopeCounts>;
+  // Keyed by province id
+  provinces?: Record<string, { delivered: number }>;
+  // Asset requests and published assets count and value (estimated value x quantity),
+  // pool = published - (delivered + approved + pending)
+  assets?: Record<'approved' | 'delivered' | 'pending' | 'published', { count: number; value: number }> & {
+    pool: number;
+  };
+}
+
+export interface DashboardScopeFilters {
+  province?: string;
+  site?: string;
+  type?: string;
+}
+
+/**
+ * Fetch the dashboard scope numbers (needed, committed, approved, delivered) of the logged in
+ * Service Provider. Returns null when the request fails so the dashboard can show a fallback.
+ */
+export const getDashboardScope = async (
+  filters: DashboardScopeFilters = {}
+): Promise<DashboardScope | null> => {
+  try {
+    const response = await api.get(API_ENDPOINTS.SP_DASHBOARD_SCOPE, { params: filters });
+    return response.data?.result ?? null;
+  } catch (error) {
+    console.warn('[getDashboardScope] Failed to fetch dashboard scope:', error);
+    return null;
+  }
+};
+
 /**
  * Decline a support request with reason and details
  */
