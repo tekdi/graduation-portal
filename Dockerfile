@@ -1,3 +1,4 @@
+
 # ============================================================
 # Stage 1: Build
 # ============================================================
@@ -5,14 +6,15 @@ FROM node:22.21.1-alpine AS builder
 
 WORKDIR /app
 
-# Enable Corepack/Yarn
 RUN corepack enable
 
-# Copy dependency files first for Docker layer caching
+# Copy dependency manifests for better layer caching
 COPY package.json yarn.lock ./
 
-# Install all dependencies required for the build
-RUN yarn install --frozen-lockfile
+# Install build dependencies with a longer timeout
+RUN yarn install --frozen-lockfile \
+    --network-timeout 300000 \
+    --network-concurrency 4
 
 # Copy application source
 COPY . .
@@ -32,30 +34,26 @@ WORKDIR /app
 RUN addgroup -S appgroup && \
     adduser -S appuser -G appgroup
 
-# Enable Corepack
 RUN corepack enable
 
-# Copy dependency files
+# Copy dependency manifests
 COPY --from=builder /app/package.json /app/yarn.lock ./
 
-# Install only production dependencies
-RUN yarn install && \
+# Install production dependencies deterministically
+RUN yarn install --frozen-lockfile --production=true \
+    --network-timeout 300000 \
+    --network-concurrency 4 && \
     yarn cache clean
 
-# Copy server
+# Copy server and frontend build
 COPY --from=builder /app/server.js ./server.js
-
-# Copy frontend build
 COPY --from=builder /app/dist ./dist
-
-# Copy entrypoint
 COPY --from=builder /app/entrypoint.sh /entrypoint.sh
 
 # Set permissions
 RUN chmod 755 /entrypoint.sh && \
     chown -R appuser:appgroup /app /entrypoint.sh
 
-# Don't run application as root
 USER appuser
 
 EXPOSE 3000
