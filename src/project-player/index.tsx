@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useMemo, memo } from 'react';
 import { ProjectProvider, useProjectContext } from './context/ProjectContext';
 import { useProjectLoader } from './hooks/useProjectLoader';
 import ProjectComponent from './components/ProjectComponent';
+import AttendedSessionTaskSync from './components/Task/TaskCard/AttendedSessionTaskSync';
 import { Box, Spinner } from '@gluestack-ui/themed';
 import {
   ProjectPlayerProps,
@@ -125,6 +126,7 @@ const ProjectPlayer: React.FC<ProjectPlayerProps> = ({
         onTaskCompletionChange={onTaskCompletionChange}
         onProgressChange={onProgressChange}
       />
+      <AttendedSessionTaskSync />
       <ProjectComponent />
     </ProjectProvider>
   );

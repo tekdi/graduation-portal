@@ -187,7 +187,7 @@ export const getSessionDetails = async (sessionId: string | number): Promise<any
  */
 export const getEnrolledMentees = async (sessionId: string | number): Promise<any[]> => {
   try {
-    const response = await api.get(API_ENDPOINTS.MENTORING_ENROLLED_MENTEES(sessionId));
+    const response = await api.get(API_ENDPOINTS.SESSION_ENROLLED_MENTEES(sessionId));
     return response.data?.result || [];
   } catch (error: any) {
     return [];

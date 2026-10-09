@@ -223,20 +223,20 @@ export interface AttendedSessionItem {
 }
 
 /**
- * Get the sessions a mentee has attended or missed.
+ * Get the sessions a mentee is enrolled in.
  * Endpoint: GET /mentoring/v1/mentees/sessions?menteeId=&scope=attended|missed
  *
  * @param menteeId - Mentee (participant) user id
- * @param scope - 'attended' or 'missed'
+ * @param scope - 'attended' or 'missed'. When omitted the upcoming sessions are returned.
  */
 export const getMenteeSessions = async (
   menteeId: string | number,
-  scope: 'attended' | 'missed',
+  scope?: 'attended' | 'missed',
   page = 1,
   limit = 10
 ): Promise<{ data: any[]; count: number }> => {
   const response = await api.get(API_ENDPOINTS.SESSION_MENTEES_SESSIONS, {
-    params: { menteeId, scope, page, limit },
+    params: { menteeId, ...(scope ? { scope } : {}), page, limit },
   });
   const result = response?.data?.result;
   const data = Array.isArray(result?.data) ? result.data : [];
