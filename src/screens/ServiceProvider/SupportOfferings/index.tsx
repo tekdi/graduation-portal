@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Box, Button, ButtonIcon, ButtonText, Container, HStack, LucideIcon, Spinner, Text, VStack } from '@ui';
 import styles from './styles';
 import SPTitleHeader from '@components/Header/SPTitleHeader';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { useLanguage } from '@contexts/LanguageContext';
 import { useAuth } from '@contexts/AuthContext';
 import { useProfileCompletion } from '@hooks';
@@ -46,8 +46,19 @@ const DEFAULT_SITE_OPTIONS = [{ label: 'All Sites', value: 'all-sites' },];
 
 const App = (): React.JSX.Element => {
   const navigation = useNavigation();
+  const route = useRoute() as any;
   const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('sessions');
+
+  // Open the tab requested by the caller (e.g. Dashboard "Manage Offering" -> assets), then clear
+  // the param so re-visits keep the user's own tab choice.
+  useEffect(() => {
+    const requestedTab = route?.params?.activeTab;
+    if (requestedTab) {
+      setActiveTab(requestedTab);
+      navigation.setParams({ activeTab: undefined } as any);
+    }
+  }, [route?.params?.activeTab]);
   const [filters, setFilters] = useState<Record<string, any>>({});
   const { user } = useAuth() || {};
   const { allowedProvinces, allowedSites, isProfileLoading } = useProfileCompletion();
