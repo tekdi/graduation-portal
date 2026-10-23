@@ -258,7 +258,7 @@ const Card: React.FC<CardProps> = ({
   // Counts come from the sessions list API; fall back to the assigned count when absent
   const enrolledCount = (item as any).enrolled_mentees_count ?? confirmedPresent;
   const presentCount = (item as any).present_mentees_count ?? 0;
-  // Stays visible until at least one attendee is marked present
+  // Attendance can be marked only once: completing the session sets its status to COMPLETED
   const canConfirmAttendance = hasEnded && enrolledCount > 0 && presentCount <= 0;
   const spotsText = expectedParticipants > 0 ? ` (${seatsRemaining} spots)` : '';
 
@@ -541,15 +541,6 @@ const Card: React.FC<CardProps> = ({
                 <Text {...styles.cardSectionTitleText}>
                   {t('supportProvider.supportOfferings.cards.attendance', 'Attendance')}
                 </Text>
-
-                {canConfirmAttendance && (
-                  <Button variant="solid"  {...styles.confirmAttendanceBtn} onPress={handleOpenCompleteModal}  >
-                    <ButtonIcon as={LucideIcon} name="Check" {...styles.cardWhiteIconProps} />
-                    <ButtonText {...(styles.confirmAttendanceBtnText as any)}>
-                      {t('supportProvider.supportOfferings.cards.confirmAttendance', 'Confirm Attendance')}
-                    </ButtonText>
-                  </Button>
-                )}
               </HStack>
 
               <Box {...styles.attendanceBox}>

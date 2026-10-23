@@ -296,6 +296,9 @@ const App = (): React.JSX.Element => {
           ? {
             ...subItem,
             materials: result?.resources,
+            status: result?.status ?? subItem.status,
+            present_mentees_count: result?.present_mentees_count ?? subItem.present_mentees_count,
+            seats_remaining: result?.seats_remaining ?? subItem.seats_remaining,
           }
           : subItem
       )
