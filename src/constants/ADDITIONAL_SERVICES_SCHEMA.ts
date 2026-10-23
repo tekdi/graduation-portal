@@ -502,7 +502,6 @@ export const ADDITIONAL_SERVICES_SCHEMA = (hideFields: string[] = [], originalSt
 };
 
 export const REQUEST_ADDITIONAL_SERVICE_HIDE_FIELDS: string[] = [
-  'seats_limit',
   'location',
   'learning_objectives',
   'resources',

@@ -752,7 +752,6 @@ export const LIVELIHOOD_CATEGORY_TASK_IDS: string[] = [
 export const REQUEST_SESSION_HIDE_FIELDS: string[] = [
   'recommended_for',
   'certificate_provided',
-  'seats_limit',
   'can_be_copied',
   'resources',
   'delivery_mode',
@@ -766,6 +765,14 @@ export const CREATE_SESSION_HIDE_FIELDS: string[] = [
   'can_be_copied',
   'recommended_for',
   'certificate_provided'
+];
+
+// SP "Accept & Schedule": the request form's fields plus the scheduling fields
+// SP fills in (capacity, format, venue / link).
+export const ACCEPT_SESSION_HIDE_FIELDS: string[] = [
+  'recommended_for',
+  'can_be_copied',
+  'resources',
 ];
 
 export const schema = (

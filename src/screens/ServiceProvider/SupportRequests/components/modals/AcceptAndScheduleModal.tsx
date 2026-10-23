@@ -6,41 +6,81 @@ import modalStyles from '../../styles';
 import { useLanguage } from '@contexts/LanguageContext';
 import SchemaFormRenderer, { getValidationIssues, ValidationPopup } from '@components/SchemaFormRenderer';
 import type { ValidationIssue } from '@components/SchemaFormRenderer';
-import {
-  ACCEPT_AND_SCHEDULE_FORM_SCHEMA,
-  ACCEPT_ASSET_REQUEST_FORM_SCHEMA,
-  ACCEPT_ADDITIONAL_SERVICE_FORM_SCHEMA,
-  DURATION_OPTIONS,
-} from '@constants/ACCEPT_AND_SCHEDULE_FORM_SCHEMA';
+import type { FormSection, FormField } from '@components/SchemaFormRenderer/type';
+import { TRAINING_FORM_SCHEMA, ACCEPT_SESSION_HIDE_FIELDS } from '@constants/TRAINING_FORM_SCHEMA';
+import { ADDITIONAL_SERVICES_SCHEMA, REQUEST_ADDITIONAL_SERVICE_HIDE_FIELDS } from '@constants/ADDITIONAL_SERVICES_SCHEMA';
+import { ASSET_SCHEMA, REQUEST_ASSET_HIDE_FIELDS } from '@constants/ASSET_SCHEMA';
+import { SUPPORT_CATEGORIES } from '@constants/SUPPORT_PROVIDER_CARDS';
 import { getProvincesList, getSitesByProvince } from '../../../../../services/usersService';
-import { getSessionCategories, getDeliveryModes } from '../../../../../services/mentoringService';
+import {
+  getSessionCategories,
+  getDeliveryModes,
+  getAdditionalServiceCategories,
+  getLivelihoodCategoriesOptions,
+  getAssetTypesOptions,
+} from '../../../../../services/mentoringService';
+import { valueMapping } from '@utils/supportProvider';
+import { useTrainingFormOptions } from '@hooks';
 // import { useNavigation } from '@react-navigation/native';
 import moment from 'moment';
 
 const BASE_PATH = 'supportProvider.supportRequests';
+
+const toList = (val: any): any[] => (Array.isArray(val) ? val : val ? [val] : []);
+const unwrap = (val: any) => (val && typeof val === 'object' ? val.value ?? val.label : val);
+
+// Request start/end can be unix seconds, ms or an ISO string; datetime fields expect 'YYYY-MM-DDTHH:mm:ss'
+const toDateTime = (val: any): string => {
+  if (!val) return '';
+  const num = Number(val);
+  const m = Number.isNaN(num) ? moment(val) : moment(num > 1e12 ? num : num * 1000);
+  return m.isValid() ? m.format('YYYY-MM-DDTHH:mm:ss') : '';
+};
+
+// Older asset requests stored option labels ("Cash"), so match on value or label
+const matchOptionValue = (options: any[], raw: any): string => {
+  const key = String(unwrap(raw) ?? '').toLowerCase();
+  if (!key) return '';
+  const found = options.find(
+    (o) => String(o.value).toLowerCase() === key || String(o.label).toLowerCase() === key,
+  );
+  return found ? found.value : String(unwrap(raw));
+};
+
+// The request forms are multi-step; accept shows their sections on one page, without the Review tab
+const toSinglePage = (schema: FormSection[]): FormSection[] =>
+  schema.filter((tab: any) => tab.id !== 'review').flatMap((tab: any) => tab.children || []);
+
+// Same helper as the asset form: lets one field show a live-computed value
+const patchField = (schema: FormSection[], fieldName: string, patcher: (field: FormField) => FormField): FormSection[] =>
+  schema.map((node) => ({
+    ...node,
+    rows: node.rows?.map((row) => ({
+      ...row,
+      fields: row.fields.map((f) => (f.name === fieldName ? patcher(f) : f)),
+    })),
+    children: node.children ? patchField(node.children, fieldName, patcher) : node.children,
+  }));
 export interface AcceptAndScheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
   item?: any;
   onSubmit?: (data: {
     requestId: string | number;
-    province: string;
-    sites: string[];
-    category: string;
-    idp_tasks: string[];
-    title: string;
-    description: string;
-    targetAudience: string;
-    date: string;
-    time: string;
-    duration: string;
-    delivery_mode: string;
+    province?: string;
+    sites?: string[];
+    categories?: string[];
+    idp_tasks?: string[];
+    title?: string;
+    description?: string;
+    targetAudience?: string;
+    delivery_mode?: string;
     start_date?: string;
     end_date?: string;
-    capacity: string;
-    location: string;
-    meetingLink: string;
-    notes: string;
+    capacity?: string;
+    estimatedValue?: string;
+    location?: string;
+    meetingLink?: string;
   }) => void;
 }
 
@@ -57,67 +97,103 @@ export default function AcceptAndScheduleModal({
   const [sites, setSites] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
   const [deliveryModes, setDeliveryModes] = useState<any[]>([]);
+  const [livelihoodCategories, setLivelihoodCategories] = useState<any[]>([]);
+  const [assetTypes, setAssetTypes] = useState<any[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [popupIssues, setPopupIssues] = useState<ValidationIssue[]>([]);
 
   const isAsset = item?.type === 'assets';
   const isService = item?.type === 'additional_services';
-  const formSchema = isAsset
-    ? ACCEPT_ASSET_REQUEST_FORM_SCHEMA
+  const formType = isAsset
+    ? SUPPORT_CATEGORIES.ASSET
     : isService
-      ? ACCEPT_ADDITIONAL_SERVICE_FORM_SCHEMA
-      : ACCEPT_AND_SCHEDULE_FORM_SCHEMA;
+      ? SUPPORT_CATEGORIES.ADDITIONAL_SERVICE
+      : SUPPORT_CATEGORIES.TRAINING;
+
+  // Same schema as the LC request form, so accept shows exactly the fields that were requested
+  const formSchema = useMemo(
+    () =>
+      toSinglePage(
+        isAsset
+          ? ASSET_SCHEMA(REQUEST_ASSET_HIDE_FIELDS)
+          : isService
+            ? ADDITIONAL_SERVICES_SCHEMA(REQUEST_ADDITIONAL_SERVICE_HIDE_FIELDS)
+            : TRAINING_FORM_SCHEMA(ACCEPT_SESSION_HIDE_FIELDS),
+      ),
+    [isAsset, isService],
+  );
 
   const coachName = item?.coach || '';
   const hubName = item?.hub && item.hub !== '-' ? ` (${item.hub} Hub)` : '';
 
-  const [values, setValues] = useState<Record<string, any>>({
-    province: '',
-    sites: [] as string[],
-    category: '',
-    idp_tasks: [] as string[],
-    title: '',
-    description: '',
-    targetAudience: '',
-    date: '',
-    time: '',
-    duration: DURATION_OPTIONS[2].value,
-    delivery_mode: 'online',
-    start_date: '',
-    end_date: '',
-    capacity: '',
-    location: '',
-    meetingLink: '',
-    notes: '',
-  });
+  const [values, setValues] = useState<Record<string, any>>({});
+
+  // Asset: fill the "Total Asset Fund Breakdown" note from value x quantity, like the asset form does
+  const renderSchema = useMemo(() => {
+    if (!isAsset) return formSchema;
+    const perParticipant = Number(values.estimatedValue);
+    const quantity = Number(values.availableQuantity);
+    const hasFund = !!perParticipant && !!quantity;
+    const breakdownText = hasFund
+      ? t(
+        'supportProvider.assetForm.step1.totalFundBreakdown',
+        `R ${perParticipant.toLocaleString()} per participant × ${quantity} funded participants`,
+      )
+      : '';
+    const availableText = hasFund ? `R ${(perParticipant * quantity).toLocaleString()}` : '';
+    const withFund = patchField(formSchema, 'totalFundBreakdown', (field) => ({
+      ...field,
+      subTitle: { ...field.subTitle, fallback: breakdownText } as any,
+      badge: field.badge
+        ? { ...field.badge, value: { ...field.badge.value, fallback: availableText } }
+        : field.badge,
+    }));
+    // Shorter label so it fits on one line next to Available Quantity in the modal
+    return patchField(withFund, 'estimatedValue', (field) => ({
+      ...field,
+      label: { key: 'estimatedValueAccept', fallback: 'Estimated Value per Participant (R)' },
+    }));
+  }, [isAsset, formSchema, values.estimatedValue, values.availableQuantity, t]);
 
   useEffect(() => {
     const fetchOptions = async () => {
       try {
-        const [provs, cats, modes] = await Promise.all([
+        const [provs, cats, modes, livelihoods, types] = await Promise.all([
           getProvincesList(),
-          getSessionCategories(),
+          isService ? getAdditionalServiceCategories() : getSessionCategories(),
           getDeliveryModes(),
+          getLivelihoodCategoriesOptions(),
+          isAsset ? getAssetTypesOptions() : Promise.resolve([]),
         ]);
 
         setProvinces(provs || []);
         setCategories(cats || []);
         setDeliveryModes(modes || []);
+        setLivelihoodCategories(livelihoods || []);
+        setAssetTypes(types || []);
       } catch (error) {
         console.error('[AcceptAndScheduleModal] Error fetching options:', error);
       }
     };
 
     fetchOptions();
-  }, []);
+  }, [isAsset, isService]);
 
-  // Fetch sites whenever the selected province changes - mirrors the Training/Additional
-  // Service request forms' province -> site cascading pattern.
+  // Training / Additional Service options (sites, session types) follow the request forms' own hook
+  const { optionsMap: trainingOptionsMap } = useTrainingFormOptions({
+    values,
+    provinces,
+    pillers: categories,
+    deliveryModes,
+    livelihoodCategories,
+  });
+
+  // Asset form uses `province` / `site`, so it loads its sites itself, same as the asset request form
   useEffect(() => {
     let isCurrent = true;
 
     const fetchSites = async () => {
-      if (!values.province) {
+      if (!isAsset || !values.province) {
         setSites([]);
         return;
       }
@@ -136,92 +212,74 @@ export default function AcceptAndScheduleModal({
     return () => {
       isCurrent = false;
     };
-  }, [values.province]);
+  }, [isAsset, values.province]);
 
+  // Pre-fill every field with what the LC entered on the request
   useEffect(() => {
     if (!item) return;
 
-    const rawStartDate = item.raw?.session?.start_date ?? item.raw?.start_date;
-    let date = '';
-    let time = '';
+    const raw = item.raw || {};
+    const meta = raw.meta || {};
+    // Request without dates: same default range SP Create uses (toDatePayload: now .. now + 4 years, none for training)
+    const defaultDates = valueMapping({}, false, {}, formType);
+    const startDate = toDateTime(raw.session?.start_date ?? raw.start_date) || toDateTime(defaultDates.start_date);
+    const endDate = toDateTime(raw.session?.end_date ?? raw.end_date) || toDateTime(defaultDates.end_date);
+    const title = raw.title || item.title || '';
+    const description = raw.description || raw.agenda || item.justification || '';
 
-    if (rawStartDate) {
-      const startMoment = moment(rawStartDate * 1000);
-
-      if (startMoment.isValid()) {
-        date = startMoment.format('YYYY-MM-DD');
-        time = startMoment.format('HH:mm');
-      }
+    if (isAsset) {
+      setValues({
+        province: unwrap(toList(meta.provinces ?? meta.province)[0]) || '',
+        site: toList(meta.sites ?? meta.site).map(unwrap).filter(Boolean),
+        assetType: matchOptionValue(assetTypes, meta.assetType ?? toList(meta.asset_types)[0]),
+        livelihoodCategory: matchOptionValue(
+          livelihoodCategories,
+          meta.livelihoodCategory ?? toList(meta.livelihood_categories)[0] ?? toList(meta.categories)[0],
+        ),
+        assetTitle: title,
+        assetDescription: meta.assetDescription || description,
+        estimatedValue: String(meta.estimatedValue ?? meta.estimated_value ?? ''),
+        availableQuantity: String(meta.quantity ?? ''),
+        startDate,
+        endDate,
+      });
+    } else {
+      // Same API -> form mapping the edit / copy screens use for these forms
+      setValues({
+        ...valueMapping(
+          {
+            ...meta,
+            title,
+            description,
+            // Older training requests store the type as idp_training_task
+            idp_tasks: raw.idp_tasks ?? meta.idp_tasks ?? meta.idp_training_task,
+          },
+          true,
+          {},
+          formType,
+        ),
+        start_date: startDate,
+        end_date: endDate,
+      });
     }
-
-    if (!date && item.preferredDate && item.preferredDate !== '-') {
-      const parsedDate = moment(item.preferredDate, 'DD MMM YYYY');
-
-      if (parsedDate.isValid()) {
-        date = parsedDate.format('YYYY-MM-DD');
-      }
-    }
-
-    if (!time && item.preferredTime && item.preferredTime !== '-') {
-      const parsedTime = moment(item.preferredTime, 'hh:mm A');
-
-      if (parsedTime.isValid()) {
-        time = parsedTime.format('HH:mm');
-      }
-    }
-
-    // The original LC request can carry multiple sites (multiselect on the request form) -
-    // pre-fill all of them here rather than dropping down to just one.
-    const requestedSites: string[] = Array.isArray(item.raw?.meta?.sites)
-      ? item.raw.meta.sites
-      : (item.raw?.meta?.site ? [item.raw.meta.site] : []);
-
-    // Requests store idp_tasks as string[] (top-level or under meta); the accept API requires it
-    const rawTasks = item.raw?.idp_tasks ?? item.raw?.meta?.idp_tasks ?? [];
-    const requestedTasks: string[] = (Array.isArray(rawTasks) ? rawTasks : [rawTasks])
-      .map((task: any) => task?.value ?? task)
-      .filter(Boolean);
-
-    const toDateTime = (v: any) => {
-      if (!v) return '';
-      const n = Number(v);
-      const m = Number.isNaN(n) ? moment(v) : moment(n > 1e12 ? n : n * 1000);
-      return m.isValid() ? m.format('YYYY-MM-DDTHH:mm:ss') : '';
-    };
-    const rawEndDate = item.raw?.session?.end_date ?? item.raw?.end_date;
-    const startDateTime = toDateTime(rawStartDate) || (date ? `${date}T${time || '00:00'}:00` : '');
-    const endDateTime = toDateTime(rawEndDate);
-
-    setValues({
-      province: item.raw?.meta?.provinces?.[0] || item.raw?.meta?.province || '',
-      sites: requestedSites,
-      category: item.raw?.meta?.categories?.[0] || '',
-      idp_tasks: requestedTasks,
-      title: item.title || '',
-      description: item.raw?.description || item.justification || '',
-      targetAudience: item.raw?.targetAudience || '',
-      date: date || moment().format('YYYY-MM-DD'),
-      time: time || moment().format('HH:mm'),
-      duration: DURATION_OPTIONS[2].value,
-      delivery_mode: item?.type === 'assets' || item?.type === 'additional_services' ? 'offline' : item.raw?.delivery_mode || 'online',
-      start_date: startDateTime,
-      end_date: endDateTime,
-      capacity: item?.type === 'assets' && item.raw?.meta?.quantity ? String(item.raw.meta.quantity) : '',
-      estimatedValue: item.raw?.meta?.estimatedValue ? String(item.raw.meta.estimatedValue) : '',
-      location: '',
-      meetingLink: '',
-      notes: '',
-    });
 
     setErrors({});
-  }, [item, t]);
+  }, [item, isAsset, formType, assetTypes, livelihoodCategories]);
 
-  const handleFieldChange = useCallback((name: string, value: any) => {
+  // Same dependent-field resets as the request forms
+  const handleFieldChange = useCallback((name: string, value: any, other?: any) => {
     setValues(prev => {
       const next = { ...prev, [name]: value };
-      // Site options depend on province - clear the stale selection when province changes.
-      if (name === 'province') {
-        next.sites = [];
+      if (name === 'province') next.site = [];
+      if (name === 'provinces') next.sites = [];
+      if (name === 'categories') {
+        next.idp_tasks = isService ? [] : '';
+        next.livelihoodCategory = '';
+        if (!isService) next.title = '';
+      }
+      if (name === 'idp_tasks' && !isService) {
+        next.title = other?.label;
+        next.livelihoodCategory = '';
       }
       return next;
     });
@@ -233,39 +291,71 @@ export default function AcceptAndScheduleModal({
       delete next[name];
       return next;
     });
-  }, []);
+  }, [isService]);
 
   const optionsMap = useMemo(
-    () => ({
-      provinces: provinces.map(p => ({
-        value: p._id || p.id || p.value,
-        label: p.name || p.title || p.label,
-      })),
-      sites: sites.map(s => ({
-        value: s._id || s.id || s.value,
-        label: s.name || s.title || s.label,
-      })),
-      pillars: categories.map(c => ({
-        value: c.value || c._id || c.id,
-        label: c.label || c.name || c.title,
-      })),
-      formatOptions: deliveryModes.map(m => ({
-        value: m.value || m._id || m.id,
-        label: m.label || m.name || m.title || m.value,
-      })),
-      assetFormatOptions: [{ value: 'offline', label: t(`${BASE_PATH}.labels.offline`, 'Offline') }],
-      durationOptions: DURATION_OPTIONS.map(opt => ({
-        value: opt.value,
-        label: t(opt.label) || opt.value,
-      })),
-    }),
-    [provinces, sites, categories, deliveryModes, t]
+    () =>
+      isAsset
+        ? {
+          provinces: provinces.map(p => ({
+            value: p._id || p.id || p.value,
+            label: p.name || p.title || p.label,
+          })),
+          sites: sites.map(s => ({
+            value: s._id || s.id || s.value,
+            label: s.name || s.title || s.label,
+          })),
+          assetTypes,
+          livelihoodCategories,
+        }
+        : trainingOptionsMap,
+    [isAsset, provinces, sites, assetTypes, livelihoodCategories, trainingOptionsMap]
   );
 
+  // Form values -> the accept API payload (see acceptAndScheduleSupportRequest)
+  const buildAcceptData = () => {
+    const rawStart = values.start_date || values.startDate;
+    const start = rawStart || moment().format('YYYY-MM-DDTHH:mm:ss');
+    const end = values.end_date || values.endDate || moment(start).add(2, 'hours').format('YYYY-MM-DDTHH:mm:ss');
+
+    if (isAsset) {
+      return {
+        province: values.province,
+        sites: toList(values.site),
+        title: values.assetTitle,
+        description: values.assetDescription,
+        start_date: start,
+        end_date: end,
+        delivery_mode: 'offline',
+        capacity: values.availableQuantity ? String(values.availableQuantity) : undefined,
+        estimatedValue: values.estimatedValue ? String(values.estimatedValue) : undefined,
+        assetType: values.assetType,
+        livelihoodCategory: values.livelihoodCategory,
+      };
+    }
+
+    // Reuses the request forms' form -> payload mapping for title, idp_tasks and categories
+    const mapped = valueMapping({ ...values }, false, optionsMap, formType);
+    return {
+      province: toList(mapped.provinces)[0],
+      sites: toList(values.sites),
+      categories: toList(mapped.categories).filter(Boolean),
+      idp_tasks: toList(mapped.idp_tasks),
+      title: mapped.title,
+      description: values.description,
+      targetAudience: values.learning_objectives,
+      start_date: start,
+      end_date: end,
+      delivery_mode: isService ? 'offline' : values.delivery_mode,
+      capacity: values.seats_limit ? String(values.seats_limit) : undefined,
+      location: values.location,
+      meetingLink: values.meeting_link,
+      ...(!isService ? { certificate_provided: values.certificate_provided === 'true' } : {}),
+    };
+  };
+
   function handleConfirmAndSchedule() {
-    // Assets and Additional Services are always offline, even if the locked field's state was never filled
-    const submitValues = isAsset || isService ? { ...values, delivery_mode: 'offline' } : values;
-    const { errors: validationErrors, issues } = getValidationIssues(formSchema, submitValues, optionsMap, t);
+    const { errors: validationErrors, issues } = getValidationIssues(formSchema, values, optionsMap, t);
     if (issues.length > 0) {
       setErrors(validationErrors);
       setPopupIssues(issues);
@@ -273,7 +363,7 @@ export default function AcceptAndScheduleModal({
     }
 
     setErrors({});
-    onSubmit?.({ ...submitValues, requestId: item?.id } as any);
+    onSubmit?.({ ...buildAcceptData(), requestId: item?.id } as any);
     onClose();
   }
 
@@ -382,8 +472,8 @@ export default function AcceptAndScheduleModal({
       bodyProps={{ p: 0 }}>
       <Box px="$6" py="$2">
         <SchemaFormRenderer
-          schema={formSchema}
-          values={isAsset || isService ? { ...values, delivery_mode: 'offline' } : values}
+          schema={renderSchema}
+          values={values}
           errors={errors}
           optionsMap={optionsMap}
           onFieldChange={handleFieldChange}

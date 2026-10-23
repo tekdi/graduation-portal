@@ -55,33 +55,25 @@ export interface AcceptAndSchedulePayload {
   province?: string;
   sites?: string[];
   category?: string;
+  categories?: string[];
   idp_tasks?: string[];
   title?: string;
   description?: string;
   targetAudience?: string;
   recommended_for?: string[];
-  date: string;
-  time: string;
-  duration: string;
   start_date?: string;
   end_date?: string;
   delivery_mode?: string;
   capacity?: string;
   estimatedValue?: string;
-  location: string;
+  certificate_provided?: boolean;
+  assetType?: string;
+  livelihoodCategory?: string;
+  location?: string;
   meetingLink?: string;
   notes?: string;
   raw?: any;
 }
-
-/** Duration option values (as used by ACCEPT_AND_SCHEDULE_FORM_SCHEMA) -> hours to add to start_date. */
-const DURATION_HOURS: Record<string, number> = {
-  '1_hour': 1,
-  '1.5_hours': 1.5,
-  '2_hours': 2,
-  '3_hours': 3,
-  full_day: 8,
-};
 
 export interface RequestInfoPayload {
   requestId: string | number;
@@ -374,23 +366,10 @@ export const getSupportRequests = async (
 export const acceptAndScheduleSupportRequest = async (
   payload: AcceptAndSchedulePayload
 ): Promise<{ success: boolean; message: string; result?: string }> => {
-  // Build start_date unix timestamp from date + time strings
-  const startMoment = moment(
-    `${payload.date} ${payload.time}`,
-    'YYYY-MM-DD HH:mm'
-  );
   const isService = payload.support_offering_type === 'additional_service';
-  let startDate = startMoment.isValid() ? Math.floor(startMoment.valueOf() / 1000) : 0;
-
-  // Build end_date by adding the duration in hours
-  const durationHours = DURATION_HOURS[payload.duration] ?? 2;
-  let endDate = startDate + Math.round(durationHours * 3600);
-
-  // Additional Services carry explicit start/end date-times instead of date + time + duration
-  if (isService && payload.start_date && payload.end_date) {
-    startDate = moment(payload.start_date).unix();
-    endDate = moment(payload.end_date).unix();
-  }
+  // Start / end come as date-times from the request form fields
+  const startDate = payload.start_date ? moment(payload.start_date).unix() : 0;
+  const endDate = payload.end_date ? moment(payload.end_date).unix() : 0;
 
   const isAsset = payload.support_offering_type === 'asset';
 
@@ -405,7 +384,7 @@ export const acceptAndScheduleSupportRequest = async (
     end_date: endDate,
     delivery_mode: isAsset || isService ? 'offline' : (payload.delivery_mode || 'online'),
     can_be_copied: false,
-    certificate_provided: false,
+    certificate_provided: payload.certificate_provided ?? false,
     recommended_for: payload.recommended_for?.length ? payload.recommended_for : ['user'],
     ...(isAsset
       ? {
@@ -416,7 +395,7 @@ export const acceptAndScheduleSupportRequest = async (
         }
       : isService
         ? { description: payload.description || '', meeting_info: {} }
-        : { description: payload.description || '', meeting_info: { link: payload.meetingLink || '' } }),
+        : { description: payload.description || '', meeting_info: { link: payload.meetingLink || '', location: payload.location || '' } }),
   };
 
   if (payload.province) {
@@ -427,7 +406,9 @@ export const acceptAndScheduleSupportRequest = async (
     body.sites = payload.sites;
   }
 
-  if (payload.category) {
+  if (payload.categories?.length) {
+    body.categories = payload.categories;
+  } else if (payload.category) {
     body.categories = [payload.category];
   }
 
@@ -446,6 +427,13 @@ export const acceptAndScheduleSupportRequest = async (
       ...(payload.capacity ? { quantity: Number(payload.capacity) } : {}),
       ...(payload.estimatedValue ? { estimated_value: payload.estimatedValue } : {}),
     };
+    // Same asset fields the SP "Create Asset" form saves, so the accepted asset keeps its type and livelihood
+    body.categories = [SUPPORT_OFFERING_TYPE_VALUES.ASSET, payload.livelihoodCategory].filter(Boolean);
+    body.asset_types = payload.assetType ? [payload.assetType] : [];
+    body.livelihood_categories = payload.livelihoodCategory ? [payload.livelihoodCategory] : [];
+    if (payload.estimatedValue) {
+      body.estimated_value = payload.estimatedValue;
+    }
   } else {
     if (payload.targetAudience) {
       body.learning_objectives = payload.targetAudience;

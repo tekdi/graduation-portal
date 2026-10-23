@@ -155,6 +155,7 @@ export function requestSessionPayloadMapping(formValues: any, optionMap: any = {
     idp_tasks: toIdpTasksPayload(formValues.idp_tasks),
     description: formValues.description,
     learning_objectives: formValues.learning_objectives,
+    ...(formValues.seats_limit ? { seats_limit: Number(formValues.seats_limit) } : {}),
     // Leave dates out when not entered - the provider sets them when accepting the request
     ...(formValues.start_date ? { start_date: moment(formValues.start_date).unix() } : {}),
     ...(formValues.end_date ? { end_date: moment(formValues.end_date).unix() } : {}),
