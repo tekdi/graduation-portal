@@ -265,11 +265,6 @@ export const ProvinceCoverage: React.FC<ProvinceCoverageProps> = ({
                   <Text {...styles.cardTitleText}>
                     {item.provinceName || provinces.find(p => (p.externalId === item.provinceId || p._id === item.provinceId || p.id === item.provinceId))?.name || item.provinceId}
                   </Text>
-                  <Badge {...styles.cardBadge}>
-                    <BadgeText {...styles.blueBadgeText}>
-                      {`${item.siteIds.length} ${item.siteIds.length === 1 ? 'site' : 'sites'}`}
-                    </BadgeText>
-                  </Badge>
                 </HStack>
                 {isEdit && (
                   <HStack style={{ gap: 12, alignItems: 'center' }}>
