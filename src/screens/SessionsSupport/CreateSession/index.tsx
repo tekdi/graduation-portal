@@ -14,6 +14,7 @@ import {
   getDeliveryModes,
   getLivelihoodCategoriesOptions,
   createSession,
+  updateSessionWithResources,
   getSessionDetails,
   MentoringOption,
 } from '../../../services/mentoringService';
@@ -45,6 +46,7 @@ const CreateSessionScreen = (): React.JSX.Element => {
   const { showAlert } = useAlert();
   // Saved start time in edit mode, so the min lead time check only runs when it is changed
   const originalStartDateRef = useRef<string | undefined>(undefined);
+  const originalResourcesRef = useRef<any[]>([]);
 
   const { allowedProvinces, allowedSites, isProfileLoading } = useProfileCompletion();
 
@@ -83,6 +85,10 @@ const CreateSessionScreen = (): React.JSX.Element => {
         if (sessionId && modeType === FORM_MODE.EDIT) {
           const rawResponse = await getSessionDetails(sessionId);
           const rawData = rawResponse?.result;
+          if (!rawData) {
+            showAlert('error', rawResponse?.error?.message || t('lc.createSession.errors.loadFailed', 'Failed to load session details. Please try again.'));
+          }
+          originalResourcesRef.current = Array.isArray(rawData?.resources) ? rawData.resources : [];
           if (rawData) {
             const formattedValues: any = valueMapping(rawData, true, {}, 'training');
             // Drafts carry an auto-filled start time, so they must always pass the lead time check on publish
@@ -128,12 +134,9 @@ const CreateSessionScreen = (): React.JSX.Element => {
       setValues(formValues);
       setLodingButton(isDraft ? 'saveDraft' : 'submit');
       const payload: any = valueMapping({ ...formValues, isDraft , recommended_for: 'user'}, false, optionsMap);
-      if (sessionId && modeType === FORM_MODE.EDIT) {
-        payload.id = sessionId;
-        payload._id = sessionId;
-      }
-
-      const result = await createSession(payload);
+      const result = sessionId && modeType === FORM_MODE.EDIT
+        ? await updateSessionWithResources(sessionId, payload, originalResourcesRef.current)
+        : await createSession(payload);
 
       const successMsg = isDraft
         ? t('supportProvider.createSupport.training.alerts.draftSaved', 'Draft saved successfully!')
@@ -143,7 +146,7 @@ const CreateSessionScreen = (): React.JSX.Element => {
 
       // Build a session object from the form values to immediately show in My Sessions
       const newSession = {
-        id: sessionId || result?.data?._id || result?.data?.id || result?._id || result?.id || `local-${Date.now()}`,
+        id: result?.result?.id,
         title: formValues.title || formValues.idp_training_task_label || '',
         status: isDraft ? 'DRAFT' : 'UPCOMING',
         start_date: formValues.start_date,
