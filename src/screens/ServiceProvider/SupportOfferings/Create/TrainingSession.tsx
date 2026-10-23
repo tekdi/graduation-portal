@@ -22,7 +22,7 @@ import {
 } from '../../../../services/mentoringService';
 import NotFound from '@components/NotFound';
 import { uploadService, valueMapping, applyDraftDefaults, TRAINING_DRAFT_CONFIG } from '@utils/supportProvider';
-import { FORM_MODE, SESSION_STATUS, SUPPORT_CATEGORIES } from '@constants/SUPPORT_PROVIDER_CARDS';
+import { FORM_MODE, SESSION_STATUS, SUPPORT_CATEGORIES, SUPPORT_OFFERING_TABS } from '@constants/SUPPORT_PROVIDER_CARDS';
 import logger from '@utils/logger';
 import { useTrainingFormOptions, useProfileCompletion } from '@hooks';
 
@@ -181,7 +181,7 @@ const App = (): React.JSX.Element => {
 
       showAlert('success', successMsg);
       // @ts-ignore
-      navigation.navigate('opportunities');
+      navigation.navigate('opportunities', { activeTab: SUPPORT_OFFERING_TABS.SESSIONS });
     } catch (error: any) {
       logger.error('Error saving training session:', error);
       // Show specific API error message if available, otherwise generic message

@@ -26,6 +26,7 @@ import {
   ADDITIONAL_SERVICE_FORM_FIELDS as FORM_FIELDS,
   SUPPORT_PROVIDER_ROUTES as ROUTES,
   SESSIONS_SUPPORT_TABS,
+  SUPPORT_OFFERING_TABS,
   BUTTON_LOADING_STATE,
 } from '@constants/SUPPORT_PROVIDER_CARDS';
 import { ROLE_NAMES } from '@constants/ROLES';
@@ -183,7 +184,7 @@ const App = (): React.JSX.Element => {
 
         showAlert('success', successMsg);
         // @ts-ignore
-        navigation.navigate(ROUTES.OPPORTUNITIES);
+        navigation.navigate(ROUTES.OPPORTUNITIES, { activeTab: SUPPORT_OFFERING_TABS.ADDITIONAL_SERVICES });
       }
     } catch (error: any) {
       logger.error('Error saving additional service:', error);

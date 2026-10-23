@@ -20,6 +20,7 @@ import {
   SUPPORT_PROVIDER_ROUTES as ROUTES,
   ASSET_FORM_FIELDS as FORM_FIELDS,
   ASSET_SESSIONS_SUPPORT_TABS as SESSIONS_SUPPORT_TABS,
+  SUPPORT_OFFERING_TABS,
 } from '@constants/SUPPORT_PROVIDER_CARDS';
 import { ROLE_NAMES } from '@constants/ROLES';
 import moment from 'moment';
@@ -255,7 +256,7 @@ const App = (): React.JSX.Element => {
             : t('supportProvider.assetForm.requestSuccessMessage'),
         );
         // @ts-ignore
-        navigation.navigate(ROUTES.CREATE_OPPORTUNITY);
+        navigation.navigate(ROUTES.OPPORTUNITIES, { activeTab: SUPPORT_OFFERING_TABS.ASSETS });
       }
     } catch (err: any) {
       const errMsg = err?.data?.message || err?.message || t('common.somethingWentWrong');
