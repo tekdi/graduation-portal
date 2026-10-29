@@ -4,6 +4,12 @@ export default {
     py: '$6',
     '$md-px': '$6',
   } as const,
+  // Gluestack `Input` is borderless by default; restore the standard form-field border
+  input: {
+    borderWidth: 1,
+    borderColor: '$borderColor',
+    borderRadius: 10,
+  } as const,
   title: {
     fontSize: 24,
     fontWeight: '700',
@@ -393,7 +399,6 @@ export default {
     flexWrap: 'wrap' as const,
     alignItems: 'center' as const,
     columnGap: 24 as const,
-    rowGap: 8 as const,
   } as const,
   trainingParticipantsRowHStack: {
     width: '100%' as const,
@@ -614,6 +619,22 @@ export default {
     space: 'xs' as const,
     alignItems: 'center' as const,
   } as const,
+  assetLocationHStack: {
+    space: 'xs' as const,
+    alignItems: 'center' as const,
+    // Keep the whole item together so it wraps to the next line as one unit
+    flexShrink: 0,
+    maxWidth: '100%' as const,
+    marginBottom: '$1' as const,
+  } as const,
+  assetSectorWrapHStack: {
+    flexShrink: 1,
+    flexWrap: 'wrap' as const,
+    columnGap: 4 as const,
+  } as const,
+  assetLocationText: {
+    flexShrink: 1,
+  } as const,
   pressableInnerHStack: {
     space: 'xs' as const,
     alignItems: 'center' as const,
@@ -636,6 +657,7 @@ export default {
   } as const,
   headerMetaHStack: {
     columnGap: 24 as const,
+    rowGap: 8 as const,
     alignItems: 'center' as const,
     flexWrap: 'wrap' as const,
     width: '100%' as const,

@@ -173,6 +173,7 @@ const RequestSessionScreen = (): React.JSX.Element => {
             values={values}
             t={t}
             onFieldChange={handleFieldChange}
+            _input={styles.input}
             disableStepNavigation
             _formContainer={FORM_CARD_PROPS}
             onSubmit={(formValues) => handleSave(formValues, false)}

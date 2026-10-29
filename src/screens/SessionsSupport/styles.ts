@@ -1,4 +1,10 @@
 export const sessionsSupportStyles = {
+  // Gluestack `Input` is borderless by default; restore the standard form-field border
+  input: {
+    borderWidth: 1,
+    borderColor: '$borderColor',
+    borderRadius: 10,
+  } as const,
   container: {
     flex: 1,
   },
