@@ -29,6 +29,11 @@ interface LcMySessionTabProps {
   onLoadMoreItems?: () => void;
   isLoadingMore?: boolean;
   hideSchedule?: boolean;
+  // IDP flow: show a single Assign button that enrolls the task's participant directly
+  assignMode?: boolean;
+  onDirectAssign?: (item: any) => boolean | void | Promise<boolean | void>;
+  // Parent already assigned the IDP participant here (e.g. auto-assign after creating the session)
+  isAssigned?: boolean;
 }
 
 /**
@@ -73,6 +78,9 @@ const LcMySessionTab: React.FC<LcMySessionTabProps> = ({
   onLoadMoreItems,
   isLoadingMore = false,
   hideSchedule = false,
+  assignMode = false,
+  onDirectAssign,
+  isAssigned: isAssignedByParent = false,
 }) => {
   const { t } = useLanguage();
   const { showAlert } = useAlert();
@@ -177,6 +185,26 @@ const LcMySessionTab: React.FC<LcMySessionTabProps> = ({
   };
 
   const isDraft = statusLabel === SESSION_STATUS_LABEL.DRAFT;
+  const [isAssigning, setIsAssigning] = useState(false);
+  // After a successful assign the button stays on this page as a disabled "Assigned"
+  const [isAssignedHere, setIsAssigned] = useState(false);
+  const isAssigned = isAssignedHere || isAssignedByParent;
+  const canDirectAssign =
+    assignMode &&
+    !hasEnded &&
+    !isDraft &&
+    statusLabel !== SESSION_STATUS_LABEL.CANCELLED &&
+    (seatsRemaining > 0 || isAssigned);
+  const handleDirectAssign = async () => {
+    if (isAssigned) return;
+    setIsAssigning(true);
+    try {
+      const assigned = await onDirectAssign?.(item);
+      if (assigned) setIsAssigned(true);
+    } finally {
+      setIsAssigning(false);
+    }
+  };
   // Draft can always be edited; published only while upcoming with no participants assigned yet
   // const canEditSession = statusLabel === 'Upcoming' && assignedCount <= 0;
   const canEditSession = isDraft || (statusLabel === SESSION_STATUS_LABEL.UPCOMING && assignedCount <= 0);
@@ -259,7 +287,23 @@ const LcMySessionTab: React.FC<LcMySessionTabProps> = ({
           {/* FOOTER: Action Buttons */}
           <HStack {...styles.mySessionCardFooter}>
             {/* Only shown when an assign handler is passed (History renders these cards read-only); hidden for drafts */}
-            {onAssignParticipants && !hasEnded && !isDraft && (
+            {canDirectAssign && (
+              <Button
+                {...styles.mySessionCardManageBtn}
+                variant="solid"
+                isDisabled={isAssigning || isAssigned}
+                opacity={isAssigned ? 0.6 : 1}
+                onPress={handleDirectAssign}
+              >
+                <ButtonText {...styles.mySessionCardManageBtnText}>
+                  {isAssigned
+                    ? t('lc.sessionsSupport.mySessionCard.assigned', 'Assigned')
+                    : t('lc.sessionsSupport.mySessionCard.assign', 'Assign')}
+                </ButtonText>
+              </Button>
+            )}
+
+            {!assignMode && onAssignParticipants && !hasEnded && !isDraft && (
               <Button variant="outlineghost" {...styles.mySessionCardAssignBtn} onPress={() => onAssignParticipants(item)}>
                 <ButtonText {...styles.mySessionCardAssignBtnText}>
                   {t('lc.sessionsSupport.mySessionCard.assignParticipants')}
@@ -267,7 +311,7 @@ const LcMySessionTab: React.FC<LcMySessionTabProps> = ({
               </Button>
             )}
 
-            {canConfirmAttendance && (
+            {!assignMode && canConfirmAttendance && (
               <Button {...styles.mySessionCardManageBtn} variant="solid" onPress={handleOpenCompleteModal}>
                 <ButtonText {...styles.mySessionCardManageBtnText}>
                   {t('supportProvider.supportOfferings.cards.confirmAttendance', 'Confirm Attendance')}
@@ -275,7 +319,7 @@ const LcMySessionTab: React.FC<LcMySessionTabProps> = ({
               </Button>
             )}
 
-            {canEditSession && (
+            {!assignMode && canEditSession && (
               <Button {...styles.mySessionCardManageBtn} variant="solid" onPress={() => {
                 const sessionId = item.id || item._id;
                 if (sessionId) {
