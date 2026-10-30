@@ -292,6 +292,8 @@ export default memo(
       prevProps.projectData === nextProps.projectData &&
       prevProps.projectUnavailableOffline === nextProps.projectUnavailableOffline &&
       prevProps.mode === nextProps.mode &&
+      prevProps.allowEditTaskIds === nextProps.allowEditTaskIds &&
+      prevProps.showAddCustomTask === nextProps.showAddCustomTask &&
       prevProps.isLoading === nextProps.isLoading
     );
   },

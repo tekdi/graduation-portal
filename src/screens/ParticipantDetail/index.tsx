@@ -370,7 +370,7 @@ export default function ParticipantDetail() {
       const isProgressReady = updatedProgress && updatedProgress >= GRADUATION_READINESS_PROGRESS_THRESHOLD;
       const submissionsCount = isProgressReady ? (endLineSolution?.entity?.submissionsCount || 1) : 0;
       const isSubmissionCompleted = endLineSolution?.entity?.status === ENTITY_STATUS.COMPLETED;
-      if (isProgressReady && ((submissionsCount === 1 && isSubmissionCompleted) || (submissionsCount === 2 && !isSubmissionCompleted))) {
+      if (isProgressReady && submissionsCount === 1 && isSubmissionCompleted) {
         setEndLineConfigData(pre => {
           const allowEditTaskIds : string[] = getCustomTaskIds(projectData?.tasks || [])
           return {
@@ -382,13 +382,12 @@ export default function ParticipantDetail() {
             isLoading: false
           }
         })
-      } else if (isProgressReady && submissionsCount === 2 && isSubmissionCompleted) {
-        setEndLineConfigData(pre => ({
-          ...pre,
+      } else if (isProgressReady && submissionsCount === 2) {
+        setEndLineConfigData({
           mode: MODE.readOnlyMode?.mode,
           solution:endLineSolution,
           isLoading: false
-        }))
+        })
       } else {
         setEndLineConfigData({isLoading: updatedProgress === undefined,solution:endLineSolution});
       }

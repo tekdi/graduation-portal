@@ -10,7 +10,7 @@ import type {
 } from '@app-types/participant';
 import type { ObservationFormData } from '@app-types/offline';
 import { getObservationEntities, getTargetedSolutions } from '../../../services/solutionService';
-import { FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
+import { ENDLINE_KEYWORD, FILTER_KEYWORDS } from '@constants/LOG_VISIT_CARDS';
 import logger from '@utils/logger';
 import { isWeb } from '@utils/platform';
 import dataService from '../../../services/dataService';
@@ -202,7 +202,7 @@ const AssessmentSurveys: React.FC<AssessmentSurveysProps> = ({
               participantId={participant?.id || ''}
               participantStatus={participant?.status}
               participantAccountUserStatus={participant?.accountUserStatus}
-              isReadOnly={isReadOnly}
+              isReadOnly={card.keywords?.includes(ENDLINE_KEYWORD) && (card.entity.submissionsCount > 2 ||(card.entity.submissionsCount === 2 && card.entity.status === "completed")) ? true : isReadOnly}
             />
           ))
         ) : (
