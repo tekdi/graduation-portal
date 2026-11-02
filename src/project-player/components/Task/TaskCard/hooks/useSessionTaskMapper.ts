@@ -48,6 +48,8 @@ const templateIdsFor = (session: any): string[] => {
  *   already carries a different session, a custom task is created in the same pillar instead.
  * - idp_tasks is 'custom': a custom task is created in the pillar whose
  *   projectTemplateDetails.externalId equals the session category (upper case).
+ * - an idp_tasks entry that matches no task in the project: a custom task is created in the pillar for
+ *   the session category (CATEGORY_TO_TEMPLATE_IDS), e.g. SOCIAL_PROTECTION for special/immediate attention.
  * - Custom tasks are only ever added to pillars that are not completed.
  * Runs once, as soon as the project has loaded, and returns true when it has finished (or had nothing
  * to do) so the caller can hold back rendering the task cards until then.
@@ -128,16 +130,21 @@ export function useSessionTaskMapper(): boolean {
             });
           };
 
+          // Pillar for the session's category (via CATEGORY_TO_TEMPLATE_IDS); home for custom tasks.
+          const categoryPillar = () => {
+            const pillarTemplateId = (p: any) => String(p.projectTemplateDetails?.externalId ?? '').toUpperCase();
+            return templateIdsFor(session).map((id) => pillars.find((p) => pillarTemplateId(p) === id)).find(Boolean);
+          };
+
           const idpTasks: string[] = [].concat(idpTasksOf(session)).map(unwrap).filter(Boolean);
           if (idpTasks[0] === CUSTOM_IDP_TASK) {
-            const templateIds = templateIdsFor(session);
-            const pillarTemplateId = (p: any) => String(p.projectTemplateDetails?.externalId ?? '').toUpperCase();
-            addCustom(
-              templateIds.map((id) => pillars.find((p) => pillarTemplateId(p) === id)).find(Boolean),
-              'custom',
-            );
+            addCustom(categoryPillar(), 'custom');
             return;
           }
+          // idp_tasks not present in the project (e.g. SP_TASK_8 / SE_TASK_12 not in this IDP): one custom
+          // task in the session's category pillar instead.
+          const projectTaskIds = new Set(pillars.flatMap((p) => tasksOf(p).map((t) => t.externalId)));
+          if (idpTasks.some((id) => !projectTaskIds.has(id))) addCustom(categoryPillar(), 'missing');
           if (__DEV__) console.log('[SessionTaskMapper] session', sid, { idp_tasks: idpTasksOf(session), categories: session?.categories });
           idpTasks.forEach((externalId) => {
             pillars.forEach((pillar) =>
