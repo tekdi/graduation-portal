@@ -249,7 +249,8 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
       // onStatusUpdate?.(STATUS.COMPLETED);
       // showAlert('success',t('participantDetail.header.projectCompleteSuccess'));
       // @ts-ignore
-      navigation.push('observation', { id: participantId, solutionId: solution.solutionId, submissionNumber: 1 });
+      const submissionNumber = solution?.entity?.submissionsCount === 1 && solution?.entity?.status === ENTITY_STATUS.COMPLETED ? undefined : solution?.entity?.submissionsCount >= 2 ? 2 : 1 ;
+      navigation.push('observation', { id: participantId, solutionId: solution.solutionId, ...(submissionNumber ? {submissionNumber} : {}) });
     } catch (error) {
       showAlert('error', t('participantDetail.header.projectCompleteFailure'))
       console.log('error', error);
@@ -604,7 +605,7 @@ const ParticipantHeader: React.FC<ParticipantHeaderProps> = ({
           <ButtonIcon as={LucideIcon} name="Check" />
         )}
         <ButtonText>
-          {t('participantDetail.header.complete')} {endLineConfigData?.solution?.name}
+          {t('participantDetail.header.complete')} {endLineConfigData?.solution?.entity?.submissionsCount < 2 && endLineConfigData?.solution?.entity?.status != ENTITY_STATUS.COMPLETED ? `First` : 'Second'} {endLineConfigData?.solution?.name}
         </ButtonText>
       </Button>
     ) : null;

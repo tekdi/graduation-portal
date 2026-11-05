@@ -17,7 +17,7 @@ import { LucideIcon } from '@ui';
 import { assessmentSurveyCardStyles } from './Styles';
 import { CARD_STATUS, STATUS, USER_STATUS } from '@constants/app.constant';
 import logger from '@utils/logger';
-import { CERTIFICATE_KEYWORD, ICONS } from '@constants/LOG_VISIT_CARDS';
+import { CERTIFICATE_KEYWORD, ENDLINE_KEYWORD, ICONS } from '@constants/LOG_VISIT_CARDS';
 
 interface IconMeta {
   icon: string;
@@ -53,7 +53,8 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
   const shouldShowViewButton =
     entity?.status &&
     (isReadOnlyParticipant ||
-      (hasSubmittedData && !entity?.allowMultipleAssessemts));
+      (hasSubmittedData && !entity?.allowMultipleAssessemts) ||
+      (card?.keywords?.includes(ENDLINE_KEYWORD) && entity?.submissionsCount >= 2));
   const shouldShowActionButton = !!entity?.status;
   const canOpenCardFromPressable =
     !entity?.status && !!navigationUrl && !isReadOnlyParticipant;
@@ -66,7 +67,8 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
 
     if (
       isReadOnlyParticipant &&
-      entity?.allowMultipleAssessemts
+      entity?.allowMultipleAssessemts &&
+      !(card?.keywords?.includes(ENDLINE_KEYWORD) && entity?.submissionsCount >= 2)
     ) {
       if(participantId) {
         // @ts-ignore
@@ -77,8 +79,8 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
       }
       return;
     }
-    let submissionNumber = entity?.submissionsCount || 1;
-    if(entity?.allowMultipleAssessemts) {
+    let submissionNumber = card?.keywords?.includes(ENDLINE_KEYWORD) && entity?.submissionsCount >= 2 ? 2 : entity?.submissionsCount || 1;
+    if(entity?.allowMultipleAssessemts && !(card?.keywords?.includes(ENDLINE_KEYWORD) && entity?.submissionsCount >= 2)) {
       submissionNumber = null;
     }
     // @ts-ignore
