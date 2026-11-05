@@ -212,6 +212,7 @@ const CreateSessionScreen = (): React.JSX.Element => {
             values={values}
             t={t}
             onFieldChange={handleFieldChange}
+            _input={styles.input}
             onSubmit={(formValues) => handleSave(formValues, false)}
             onSaveDraft={(formValues) => handleSave(formValues, true)}
             draftRequiredFields={TRAINING_DRAFT_CONFIG.requiredFields}

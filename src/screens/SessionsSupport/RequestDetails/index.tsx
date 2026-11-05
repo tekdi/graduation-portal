@@ -295,7 +295,7 @@ export const RequestDetailsScreen: React.FC = () => {
     return options.find((o) => String(o.value).toLowerCase() === val)?.label;
   };
   const pillarLabel = storedCategories.map((c) => findLabel(pillarOptions, c)).find(Boolean);
-  const livelihoodLabel = storedCategories.map((c) => findLabel(livelihoodOptions, c)).find(Boolean);
+  const livelihoodLabel = storedCategories.map((c) => findLabel(livelihoodOptions, c)).filter(Boolean).join(', ');
   const pillar = pillarLabel || displayValue(storedCategories[0] || sessionObj.category || requestItem.category || requestItem.pillar);
   const trainingArea = displayValue(sessionObj.title || requestItem.title || requestItem.training_session);
   const description = displayValue(sessionObj.description || requestItem.description || requestItem.agenda);

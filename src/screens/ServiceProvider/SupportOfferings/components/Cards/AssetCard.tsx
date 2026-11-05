@@ -156,28 +156,37 @@ const Card: React.FC<CardProps> = ({ item: initialItem, provinces, sites, onView
         {/* ROW 3 - METADATA */}
         <HStack {...styles.headerMetaHStack}>
           {item.sector ? (
-            <HStack {...styles.trainingMetaItemHStack}>
-              <LucideIcon name="Package" {...styles.cardMetaIconProps} />
-              <Text {...styles.cardMetaSmText}>{item.sector}</Text>
+            <HStack {...styles.assetLocationHStack} alignItems="flex-start">
+              <Box marginTop={2}>
+                <LucideIcon name="Package" {...styles.cardMetaIconProps} />
+              </Box>
+              {/* Each category stays on one line; a whole label moves to the next line when it doesn't fit */}
+              <HStack {...styles.assetSectorWrapHStack}>
+                {item.sector.split(', ').map((label: string, index: number, labels: string[]) => (
+                  <Text key={`${label}-${index}`} {...styles.cardMetaSmText}>
+                    {index < labels.length - 1 ? `${label},` : label}
+                  </Text>
+                ))}
+              </HStack>
             </HStack>
           ) : null}
 
           {item.value ? (
-            <HStack {...styles.trainingMetaItemHStack}>
+            <HStack {...styles.assetLocationHStack}>
               <LucideIcon name="Banknote" {...styles.cardMetaIconProps} />
               <Text {...styles.cardValueBoldSmText}>{item.value}</Text>
             </HStack>
           ) : null}
 
           {claimed !== undefined ? (
-            <HStack {...styles.trainingMetaItemHStack}>
+            <HStack {...styles.assetLocationHStack}>
               <LucideIcon name="Users" {...styles.cardMetaIconProps} />
               <Text {...styles.cardMetaSmText}>
                 {`${claimed} / ${item.seats_limit} claimed (${item.seats_remaining} spots left)`}
               </Text>
             </HStack>
           ) : item.requests ? (
-            <HStack {...styles.trainingMetaItemHStack}>
+            <HStack {...styles.assetLocationHStack}>
               <LucideIcon name="Users" {...styles.cardMetaIconProps} />
               <Text {...styles.cardMetaSmText}>{item.requests}</Text>
             </HStack>
@@ -192,9 +201,9 @@ const Card: React.FC<CardProps> = ({ item: initialItem, provinces, sites, onView
           ) : null}
 
           {locationValue ? (
-            <HStack {...styles.trainingMetaItemHStack}>
+            <HStack {...styles.assetLocationHStack}>
               <LucideIcon name="MapPin" {...styles.cardMetaIconProps} />
-              <Text {...styles.cardMetaSmText}>
+              <Text {...styles.cardMetaSmText} {...styles.assetLocationText}>
                 {locationValue}{siteNames ? ` • ${siteNames}` : ''}
               </Text>
             </HStack>
