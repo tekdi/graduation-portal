@@ -119,6 +119,7 @@ const SimpleObservationTask: React.FC<SimpleObservationTaskProps> = ({
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [isStatusUpdating, setIsStatusUpdating] = useState(false);
+  const [showOutsideSessionConfirm, setShowOutsideSessionConfirm] = useState(false);
 
   // ── Derived values ────────────────────────────────────────────────────────
 
@@ -236,9 +237,15 @@ const SimpleObservationTask: React.FC<SimpleObservationTaskProps> = ({
     }
   }, [isEdit, isReadOnly, isObservationTask, isSessionTask, isCompleted, supportOfferingType, task._id, task.solutionDetails, participantId, projectDataRef, navigation, showAlert, t, setIsStatusUpdating,handleCheckFirstTaskComplete]);
 
-  const handleCheckboxChange = useCallback(async (checked: boolean, checkFirstTaskComplete?: any) => {
+  const handleCheckboxChange = useCallback(async (checked: boolean, checkFirstTaskComplete?: any, skipSessionConfirm?: boolean) => {
     if (!isEdit) return;
     if(!handleCheckFirstTaskComplete(checkFirstTaskComplete === false ? checkFirstTaskComplete : handleTitlePressRef.current)) return;
+
+    // Completing a session task that was never scheduled through the platform: confirm first.
+    if (checked && isSessionTask && !hasMappedSession && !skipSessionConfirm) {
+      setShowOutsideSessionConfirm(true);
+      return;
+    }
 
     setIsStatusUpdating(true);
     try {
@@ -246,13 +253,19 @@ const SimpleObservationTask: React.FC<SimpleObservationTaskProps> = ({
     } finally {
       setIsStatusUpdating(false);
     }
-  }, [isEdit, task._id, parentIndex, index, handleStatusChange, handleCheckFirstTaskComplete]);
+  }, [isEdit, task._id, parentIndex, index, handleStatusChange, handleCheckFirstTaskComplete, isSessionTask, hasMappedSession]);
 
   const handleTitlePress = useCallback(async ({ checkFirstTaskComplete }: { checkFirstTaskComplete?: any }) => {
     if (!isManualToggleDisabled) handleCheckboxChange(!isCompleted, checkFirstTaskComplete);
   }, [isManualToggleDisabled, handleCheckboxChange, isCompleted]);
 
   handleTitlePressRef.current = handleTitlePress;
+
+  const handleOutsideSessionConfirm = useCallback(() => {
+    setShowOutsideSessionConfirm(false);
+    handleCheckboxChange(true, false, true);
+  }, [handleCheckboxChange]);
+  const handleOutsideSessionCancel = useCallback(() => setShowOutsideSessionConfirm(false), []);
 
   const updateEntityFile = useCallback(async (data: any) => {
     if (data?.success) {
@@ -363,6 +376,19 @@ const SimpleObservationTask: React.FC<SimpleObservationTaskProps> = ({
         isOpen={showPreviewModal} onClose={handleClosePreviewModal}
         taskName={task?.name} attachments={task?.attachments || []}
       />
+      <Modal
+        isOpen={showOutsideSessionConfirm}
+        onClose={handleOutsideSessionCancel}
+        headerTitle={t('projectPlayer.confirmSessionCompleteTitle')}
+        headerAlignment="baseline"
+        size="lg"
+        confirmButtonText={t('projectPlayer.confirmSessionCompleteConfirm')}
+        cancelButtonText={t('projectPlayer.confirmSessionCompleteCancel')}
+        onConfirm={handleOutsideSessionConfirm}
+        onCancel={handleOutsideSessionCancel}
+      >
+        <Text style={{ margin: 2, lineHeight: 22 }}>{t('projectPlayer.confirmSessionCompleteSubtitle')}</Text>
+      </Modal>
       <Modal
         isOpen={!!showConfirmModal}
         onClose={setShowConfirmModal}
