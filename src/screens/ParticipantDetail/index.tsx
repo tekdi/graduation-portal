@@ -29,7 +29,6 @@ import type {
 import { Loader } from '@ui';
 import {
   ENTITY_STATUS,
-  GRADUATION_READINESS_PROGRESS_THRESHOLD,
   PARTICIPANT_DETAILS_TABS, STATUS, USER_STATUS } from '@constants/app.constant';
 import { useAuth, useIsdminPanalAccess, User } from '@contexts/AuthContext';
 import DownloadFormsCard from './ParticipantHeader/DownloadFormsCard';
@@ -367,24 +366,23 @@ export default function ParticipantDetail() {
   useEffect(() => {
     const init = () => {
       const endLineSolution = solutions.find(item => item?.keywords?.includes(ENDLINE_KEYWORD))
-      const isProgressReady = updatedProgress && updatedProgress >= GRADUATION_READINESS_PROGRESS_THRESHOLD;
-      const submissionsCount = isProgressReady ? (endLineSolution?.entity?.submissionsCount || 1) : 0;
+      const submissionsCount = endLineSolution?.entity?.submissionsCount || 0;
       const isSubmissionCompleted = endLineSolution?.entity?.status === ENTITY_STATUS.COMPLETED;
-      if (isProgressReady && ((submissionsCount === 1 && isSubmissionCompleted) || (submissionsCount === 2 && !isSubmissionCompleted))) {
-        setEndLineConfigData(pre => {
-          const allowEditTaskIds : string[] = getCustomTaskIds(projectData?.tasks || [])
-          return {
-            ...pre,
-            allowEditTaskIds,
-            ...(allowEditTaskIds.length > 0 ? {showAddCustomTask:Boolean(allowEditTaskIds)} : {}),
-            mode: MODE.readOnlyMode?.mode,
-            solution:endLineSolution,
-            isLoading: false
-          }
-        })
-      } else if (isProgressReady && submissionsCount === 2 && isSubmissionCompleted) {
+      if (submissionsCount >= 2 && isSubmissionCompleted) {
         setEndLineConfigData(pre => ({
           ...pre,
+          allowEditTaskIds: [],
+          showAddCustomTask: false,
+          mode: MODE.readOnlyMode?.mode,
+          solution:endLineSolution,
+          isLoading: false
+        }))
+      } else if (submissionsCount >= 1 && (isSubmissionCompleted || submissionsCount >= 2)) {
+        // Pre-assigned tasks are locked; custom tasks and Add Custom Task stay available
+        setEndLineConfigData(pre => ({
+          ...pre,
+          allowEditTaskIds: getCustomTaskIds(projectData?.tasks || []),
+          showAddCustomTask: true,
           mode: MODE.readOnlyMode?.mode,
           solution:endLineSolution,
           isLoading: false
@@ -633,6 +631,11 @@ export default function ParticipantDetail() {
                     onProjectDataChange={setProjectData}
                     projectUnavailableOffline={projectUnavailableOffline}
                     {...endLineConfigData}
+                    // InterventionPlan is memoized on projectData, so derive the editable custom task ids in the
+                    // same render as projectData; otherwise newly added custom tasks stay locked until refresh
+                    {...(endLineConfigData?.showAddCustomTask ? {allowEditTaskIds: getCustomTaskIds(projectData?.tasks || [])} : {})}
+                    // Hold rendering until the endline submission count is known, so tasks never flash editable
+                    isLoading={endLineConfigData ? endLineConfigData.isLoading : participant?.status === STATUS.IN_PROGRESS}
                     {...(isdminPanalAccess || participant?.accountUserStatus === USER_STATUS.INACTIVE || isDropoutRequestSentForApproval || isIDPRequestSentForApproval ? {mode:MODE.readOnlyMode?.mode}:{})}
                   />
                 </Box>

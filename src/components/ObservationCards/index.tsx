@@ -17,7 +17,7 @@ import { LucideIcon } from '@ui';
 import { assessmentSurveyCardStyles } from './Styles';
 import { CARD_STATUS, STATUS, USER_STATUS } from '@constants/app.constant';
 import logger from '@utils/logger';
-import { CERTIFICATE_KEYWORD, ICONS } from '@constants/LOG_VISIT_CARDS';
+import { CERTIFICATE_KEYWORD, ENDLINE_KEYWORD, ICONS } from '@constants/LOG_VISIT_CARDS';
 
 interface IconMeta {
   icon: string;
@@ -50,9 +50,13 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
     isReadOnlyParticipant = participantStatus === STATUS.GRADUATED || participantStatus === STATUS.DROPOUT || participantStatus === STATUS.NOT_ELIGIBLE || participantAccountUserStatus === USER_STATUS.INACTIVE;
   }
   const hasSubmittedData = entity?.status === CARD_STATUS.COMPLETED;
+  // Endline allows at most 2 submissions; once the 2nd is completed it is view-only
+  const isEndlineLocked =
+    !!card?.keywords?.includes(ENDLINE_KEYWORD) && (entity?.submissionsCount ?? 0) >= 2 && hasSubmittedData;
   const shouldShowViewButton =
     entity?.status &&
     (isReadOnlyParticipant ||
+      isEndlineLocked ||
       (hasSubmittedData && !entity?.allowMultipleAssessemts));
   const shouldShowActionButton = !!entity?.status;
   const canOpenCardFromPressable =
@@ -78,7 +82,7 @@ export const AssessmentCard: React.FC<AssessmentSurveyCardProps> = ({
       return;
     }
     let submissionNumber = entity?.submissionsCount || 1;
-    if(entity?.allowMultipleAssessemts) {
+    if(entity?.allowMultipleAssessemts && !isEndlineLocked) {
       submissionNumber = null;
     }
     // @ts-ignore

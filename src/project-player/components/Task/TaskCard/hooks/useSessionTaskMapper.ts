@@ -55,7 +55,9 @@ const templateIdsFor = (session: any): string[] => {
  * to do) so the caller can hold back rendering the task cards until then.
  */
 export function useSessionTaskMapper(): boolean {
-  const { projectData, updateTasks, addTask, mode, config } = useProjectContext();
+  const { projectData, updateTasks, addTask, mode, config, showAddCustomTask } = useProjectContext();
+  // After the first Endline the plan is read-only but custom tasks may still be added (not pre-assigned task updates).
+  const customOnly = mode !== 'edit' && showAddCustomTask === true;
   const routeId = (useRoute().params as any)?.id;
   // The mentoring service knows the participant by their user id, not the route (entity) id.
   const participantId = config?.profileInfo?.userId ?? routeId;
@@ -69,7 +71,7 @@ export function useSessionTaskMapper(): boolean {
     startedRef.current = true;
 
     const pillars = pillarsOf(projectData);
-    if (mode !== 'edit' || !participantId || pillars.length === 0) {
+    if ((mode !== 'edit' && !customOnly) || !participantId || pillars.length === 0) {
       setReady(true);
       return;
     }
@@ -177,9 +179,9 @@ export function useSessionTaskMapper(): boolean {
         });
 
         if (__DEV__) console.log('[SessionTaskMapper] planned', { updates: updates.length, customTasks: customTasks.length });
-        if (updates.length === 0 && customTasks.length === 0) return;
+        if ((customOnly || updates.length === 0) && customTasks.length === 0) return;
         const entityId = (projectData as any)?.entityInformation?.externalId ?? routeId;
-        if (updates.length) await updateTasks(updates, entityId);
+        if (updates.length && !customOnly) await updateTasks(updates, entityId);
         for (const { pillar, task } of customTasks) await addTask(pillar._id, task);
       } catch (e) {
         if (__DEV__) console.log('[SessionTaskMapper] failed', e);
@@ -187,7 +189,7 @@ export function useSessionTaskMapper(): boolean {
         if (mountedRef.current) setReady(true);
       }
     })();
-  }, [mode, participantId, projectData, config?.isLoading, updateTasks, addTask, routeId]);
+  }, [mode, customOnly, participantId, projectData, config?.isLoading, updateTasks, addTask, routeId]);
 
   return ready;
 }

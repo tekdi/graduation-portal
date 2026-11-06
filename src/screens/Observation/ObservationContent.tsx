@@ -130,8 +130,20 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
       }
       let observationSubmissionsLast;
       let observationSolution: any = null;
+      let newSubmissionPending = false;
       if(submissionNumberInput) {
         observationSubmissionsLast = observationSubmissions.result.find((submissionItem: any) => submissionItem.submissionNumber == submissionNumberInput);
+        // The next sequential submission (e.g. #2 after a completed #1) does not exist yet;
+        // it is created by getObservationSolution below, same as the no-submissionNumber flow.
+        const maxSubmissionNumber = Math.max(0, ...observationSubmissions.result.map((submissionItem: any) => Number(submissionItem.submissionNumber) || 0));
+        const isNextSubmission = Number(submissionNumberInput) === maxSubmissionNumber + 1;
+        if(!observationSubmissionsLast && isNextSubmission) {
+          const previousSubmission = observationSubmissions.result.find((submissionItem: any) => submissionItem.submissionNumber == maxSubmissionNumber);
+          if(previousSubmission?.status === CARD_STATUS.COMPLETED) {
+            observationSubmissionsLast = previousSubmission;
+            newSubmissionPending = true;
+          }
+        }
         if(!observationSubmissionsLast && submissionNumberInput !== 1) {
           showAlert( 'error', t('logVisit.thisFormNotFound', { submissionNumberInput }),
             {duration: 10000},
@@ -152,7 +164,7 @@ const ObservationContent: React.FC<ObservationContentProps> = ({
         });
       }
 
-      setSubmission(observationSubmissionsLast);
+      setSubmission(newSubmissionPending ? {status:CARD_STATUS.IN_PROGRESS} : observationSubmissionsLast);
       let numsub;
       if(submissionNumberInput) {
         numsub = submissionNumberInput;
