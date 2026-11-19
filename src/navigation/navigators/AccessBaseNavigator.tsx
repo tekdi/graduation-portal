@@ -43,7 +43,7 @@ const createScreenWithLayout = (
 
 function titleNamespaceForRole(role?: string): 'admin' | 'lc' {
   const r = role?.toLowerCase();
-  if (r === 'admin' || r === 'supervisor') {
+  if (r === 'admin' || r === 'supervisor' || r === 'report_manager') {
     return 'admin';
   }
   return 'lc';
