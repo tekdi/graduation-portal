@@ -5,7 +5,6 @@ import DeclineModal from './DeclineModal';
 import AcceptAndScheduleModal from './AcceptAndScheduleModal';
 import {
   acceptAndScheduleSupportRequest,
-  requestMoreInfoForSupportRequest,
   declineSupportRequest,
 } from '../../../../../services/serviceProvider';
 
@@ -31,19 +30,6 @@ export default function SupportRequestsModals({
   onOpenModal,
   onSuccess,
 }: SupportRequestsModalsProps): React.JSX.Element {
-  const handleRequestInfoSubmit = async (message: string) => {
-    if (selectedItem?.id) {
-      const res = await requestMoreInfoForSupportRequest({
-        requestId: selectedItem.id,
-        message,
-      });
-      if (res.success) {
-        onClose();
-      } else {
-        throw new Error(res.message || 'Failed to request additional information');
-      }
-    }
-  };
 
   const handleDeclineSubmit = async (reason: string, details: string) => {
     try {
@@ -100,7 +86,6 @@ export default function SupportRequestsModals({
         isOpen={activeModal === 'request_info'}
         onClose={onClose}
         item={selectedItem}
-        onSubmit={handleRequestInfoSubmit}
       />
 
       {/* Decline Modal */}

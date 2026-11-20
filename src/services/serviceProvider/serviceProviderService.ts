@@ -37,6 +37,7 @@ export interface SupportRequestItem {
   hub?: string;
   email?: string;
   phone?: string;
+  phoneCode?: string;
   justification?: string;
   participantDetails?: string;
   raw?: any;
@@ -149,6 +150,7 @@ const mapRequestSessionItem = (
     justification: meta.learning_objectives || item.agenda || undefined,
     email: item.user_details?.email || item.user?.email || undefined,
     phone: item.user_details?.phone || item.user?.phone || undefined,
+    phoneCode: item.user_details?.phone_code || item.user?.phone_code || undefined,
     raw: item,
   } as SupportRequestItem;
 };

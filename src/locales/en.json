@@ -3095,6 +3095,7 @@
         "viewDetails": "View Details",
         "requestDetails": "Request Details",
         "requestInfo": "Request More Information",
+        "requestInfoDescription": "These are the details of the coach who raised this request.",
         "decline": "Decline Request",
         "acceptSchedule": "Accept & Schedule Training",
         "acceptAssetRequest": "Accept Asset Request",
@@ -3117,6 +3118,10 @@
       "labels": {
         "request": "Request:",
         "coach": "Coach",
+        "coachName": "Coach Name",
+        "phone": "Phone Number",
+        "email": "Email",
+        "site": "Site",
         "yourQuestion": "Your Question or Request",
         "selectReason": "Select Reason",
         "reasonDetails": "Reason Details",
