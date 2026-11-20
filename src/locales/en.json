@@ -1265,6 +1265,7 @@
       "createUser": "Create User",
       "lctosupervisior": "Coach to Supervisor",
       "participanttolc": "Participant to Coach",
+      "participantreassign": "Participant Reassign",
       "exportCSV": "Export CSV",
       "uploadUsers": "Upload Users",
       "uploadUsersDescription": "Choose how you would like to add users to the system.",
@@ -1532,6 +1533,43 @@
       "participantsAssignedSuccess": "{{count}} participant(s) assigned to {{lc}}.",
       "participantsAssignmentError": "Could not assign participants. Try again.",
       "participants": "Participants",
+      "participantReassign": {
+        "step1Title": "Step 1: Filter & Select Assigned Participants",
+        "step1Description": "Narrow down participants by current province, site, currently assigned Linkage Champion, or name.",
+        "province": "Province",
+        "site": "Site / District",
+        "fromCurrentLC": "From Current Linkage Champion",
+        "allLCs": "All Linkage Champions",
+        "lcOption": "{{name}} ({{count}} assigned)",
+        "searchLabel": "Search Participant",
+        "searchPlaceholder": "Name, email, or ID",
+        "showingAssigned": "Showing {{count}} assigned participant(s)",
+        "participant": "Participant",
+        "currentLC": "Current Linkage Champion",
+        "siteAndProvince": "Site & Province",
+        "pathway": "Pathway",
+        "quickAction": "Quick Action",
+        "reassign": "Reassign",
+        "step2": {
+          "title": "Step 2: Destination LC & Transfer Policy",
+          "description": "Select the target Linkage Champion to receive the selected participants and configure handover requirements.",
+          "targetLC": "Target Linkage Champion (Destination)",
+          "targetLCPlaceholder": "Select destination Linkage Champion",
+          "lcOption": "{{name}} — {{site}} ({{count}} active participants)",
+          "lcOptionNoSite": "{{name}} ({{count}} active participants)",
+          "reason": "Reason for Reassignment",
+          "proceed": "Proceed to Reassign {{count}} Participants to Target LC",
+          "reasons": {
+            "workloadRebalancing": "Workload Rebalancing (Equitable Caseload Distribution)",
+            "lcLeaveResignation": "LC Leave of Absence / Resignation",
+            "participantRelocation": "Participant Relocation / Site Change",
+            "coachingFit": "Coaching Fit / Participant Request",
+            "performanceRealignment": "Performance Realignment",
+            "programRestructuring": "Program Restructuring / Cohort Rotation",
+            "other": "Other (Specify Custom Reason)"
+          }
+        }
+      },
       "status": {
         "assigned": "Assigned",
         "unassigned": "Unassigned"

@@ -20,6 +20,7 @@ import { theme } from '@config/theme';
 import { getLinkageChampions, assignLCsToSupervisor, getMappedLCsForSupervisor, getParticipants, assignParticipantsToLC, getMappedParticipantsForLC, getSupervisorsByProvince } from '../../services/assignUsersService';
 import { getInitials } from '@utils/helper';
 import { useIsSupervisor, useAuth } from '../../contexts/AuthContext';
+import ParticipantReassign from './ParticipantReassign';
 
 // Type declaration for process.env (injected by webpack DefinePlugin on web, available in React Native)
 declare const process:
@@ -34,7 +35,7 @@ const AssignUsersScreen = () => {
  const { t } = useLanguage();
  const { user } = useAuth();
  const isSupervisor = useIsSupervisor();
- type AssignTab = 'LC_TO_SUPERVISOR' | 'PARTICIPANT_TO_LC';
+ type AssignTab = 'LC_TO_SUPERVISOR' | 'PARTICIPANT_TO_LC' | 'PARTICIPANT_REASSIGN';
 
  // Supervisors default to PARTICIPANT_TO_LC, others default to LC_TO_SUPERVISOR
  const [activeTab, setActiveTab] = useState<AssignTab>(
@@ -944,6 +945,21 @@ return (
               {t('admin.actions.participanttolc')}
             </Text>
           </Button>
+
+          <Button
+            {...(activeTab === 'PARTICIPANT_REASSIGN'
+              ? titleHeaderStyles.solidButton
+              : titleHeaderStyles.outlineButton)}
+            onPress={() => setActiveTab('PARTICIPANT_REASSIGN')}
+          >
+            <Text
+              {...(activeTab === 'PARTICIPANT_REASSIGN'
+                ? titleHeaderStyles.solidButtonText
+                : titleHeaderStyles.outlineButtonText)}
+            >
+              {t('admin.actions.participantreassign')}
+            </Text>
+          </Button>
         </HStack>
       )}
     />
@@ -1157,6 +1173,8 @@ return (
         )}
       </>
     )}
+
+    {activeTab === 'PARTICIPANT_REASSIGN' && <ParticipantReassign />}
    </VStack>
  );
 };
