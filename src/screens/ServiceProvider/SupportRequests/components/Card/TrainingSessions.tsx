@@ -12,6 +12,7 @@ import ActionButtons from "./FooterButtons";
 import CardBadges from "./CardBadges";
 import cardStyles from '../../styles';
 import { useLanguage } from '@contexts/LanguageContext';
+import emptyStyles from '../../../../SessionsSupport/MyRequests/styles';
 
 const BASE_PATH = 'supportProvider.supportRequests';
 
@@ -160,6 +161,22 @@ export default function TrainingSessionsCard({
   onAcceptAndSchedule,
 }: ListCardProps): React.ReactElement {
   const displayItems = items;
+  const { t } = useLanguage();
+
+  if (displayItems.length === 0) {
+    return (
+      <Box {...emptyStyles.emptyStateContainer}>
+        <VStack {...emptyStyles.emptyStateVStack}>
+          <Box {...emptyStyles.emptyStateIconContainer}>
+            <LucideIcon name="Clock" size={30} color="$textMutedForeground" />
+          </Box>
+          <Text {...emptyStyles.emptyStateTitle}>
+            {t('lc.sessionsSupport.emptyState.title', 'No Sessions Found')}
+          </Text>
+        </VStack>
+      </Box>
+    );
+  }
 
   return (
     <VStack {...cardStyles.cardListContainer}>
