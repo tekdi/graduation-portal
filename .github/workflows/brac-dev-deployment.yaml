@@ -3,7 +3,7 @@ name: Dev Build & Deploy Graduation Portal (BRAC)
 on:
   push:
     branches:
-      - release-1.0.0
+      - release-1.0.0-hotfix-1
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
