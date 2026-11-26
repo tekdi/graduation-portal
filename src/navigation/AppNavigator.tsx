@@ -25,7 +25,7 @@ const lazyScreen = (
   loader: () => Promise<{ default: ScreenComponent }>,
 ): ScreenComponent => lazy(loader) as unknown as ScreenComponent;
 
-const HomeScreen = lazyScreen(() => import('../screens/Home'));
+const LcDashboardScreen = lazyScreen(() => import('../screens/LcDashboard'));
 const UserManagementScreen = lazyScreen(() => import('../screens/UserManagement'));
 const SelectLanguageScreen = lazyScreen(() => import('../screens/Language/Index'));
 const WelcomePage = lazyScreen(() => import('../screens/Welcome'));
@@ -45,6 +45,7 @@ const AuditLogScreen = lazyScreen(() => import('../screens/AuditLog'));
 const AssignUsersScreen = lazyScreen(() => import('../screens/AssignUsers'));
 const ReviewRequestsScreen = lazyScreen(() => import('../screens/ReviewRequests'));
 const AdminDashboard = lazyScreen(() => import('../screens/AdminDashboard'));
+const ParticipantsReport = lazyScreen(() => import('../screens/ParticipantsReport'));
 const ProfilePermissions = lazyScreen(() => import('../screens/ProfilePermissions'));
 const ForgotPasswordScreen = lazyScreen(() => import('../screens/Auth/ForgotPasswordScreen'));
 
@@ -100,6 +101,7 @@ const getAccessPages = (
           component: UserManagementScreen,
         },
         { name: 'admin-dashboard', path: '/admin-dashboard', component: AdminDashboard },
+        { name: 'participants-report', path: '/participants-report', component: ParticipantsReport },
         {
           name: 'template-management',
           path: '/template-managemnt',
@@ -142,6 +144,7 @@ const getAccessPages = (
           component: UserManagementScreen,
         },
         { name: 'admin-dashboard', path: '/admin-dashboard', component: AdminDashboard },
+        { name: 'participants-report', path: '/participants-report', component: ParticipantsReport },
         {
           name: 'assign-users',
           path: '/assign-users',
@@ -171,11 +174,16 @@ const getAccessPages = (
         { name: 'check-ins-list', path: '/participants/:id/check-ins-list/:solutionId?', component: CheckInsList },
         { name: 'observation', path: '/participants/:id/observation/:solutionId/:submissionNumber?', component: Observation },
       ];
+    case 'report_manager':
+      // Reports and dashboards only, no user management or other admin pages
+      return [
+        { name: 'participants-report', path: '/', component: ParticipantsReport },
+      ];
     case 'lc':
       return [
         { name: 'welcome', component: WelcomePage },
         { name: 'select-language', component: SelectLanguageScreen },
-        { name: 'dashboard', component: HomeScreen },
+        { name: 'dashboard', component: LcDashboardScreen },
         { name: 'participant-detail', path: '/participants/:id', component: ParticipantDetail },
         { name: 'log-visit', path: '/participants/:id/log-visit', component: LogVisit },
         { name: 'check-ins-list', path: '/participants/:id/check-ins-list/:solutionId?', component: CheckInsList },

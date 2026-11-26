@@ -12,12 +12,12 @@ import { syncLibraryMasterData } from '../services/libraryDataService';
 import offlineStorage from '../services/offlineStorage';
 import { STORAGE_KEYS } from '@constants/STORAGE_KEYS';
 import { getToken, removeToken } from '../services/api';
-import { ADMIN_ROLES, SUPERVISOR_ROLES, LC_ROLES, MENTOR_ROLES } from '@constants/ROLES';
+import { ADMIN_ROLES, SUPERVISOR_ROLES, REPORT_MANAGER_ROLES, LC_ROLES, MENTOR_ROLES } from '@constants/ROLES';
 import { isNative } from '@utils/platform';
 import { useLanguage } from './LanguageContext';
 // import { setupTabCloseHandler } from '@utils/tabCloseHandler';
 
-export type UserRole = 'Admin' | 'Supervisor' | 'LC' | 'Mentor';
+export type UserRole = 'Admin' | 'Supervisor' | 'report_manager' | 'LC' | 'Mentor';
 
 export interface User {
   id: string;
@@ -82,6 +82,19 @@ const determineUserRole = (
   if (supervisorOrganizations.length > 0) {
     logger.info('User has supervisor role based on organizations');
     return 'Supervisor';
+  }
+
+  // Report Manager only views reports and dashboards
+  const reportManagerOrganizations = userData.organizations.filter((org: any) => {
+    if (!org?.roles || !Array.isArray(org.roles)) {
+      return false;
+    }
+    return org.roles.some((role: any) => REPORT_MANAGER_ROLES.includes(role?.title));
+  });
+
+  if (reportManagerOrganizations.length > 0) {
+    logger.info('User has report manager role based on organizations');
+    return 'report_manager';
   }
 
   // Check for mentor roles (mentor)
