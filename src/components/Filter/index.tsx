@@ -17,6 +17,8 @@ interface FilterButtonProps {
   hideTitleHeader?: boolean; // Hide top Filter title & icon header row
   _container?: any; // Custom container styling overrides
   _input?: any; // Custom input field styling overrides
+  showLabels?: boolean; // Show a label above each field (uses item.nameKey / item.name)
+  searchAtEnd?: boolean; // Render the search field after the other filters
   initialValue?: Record<string, any>; // Pre-seed filter values (e.g. a locked default for a specific role)
 }
 
@@ -29,6 +31,8 @@ export default function FilterButton({
   _container,
   _input,
   initialValue,
+  showLabels = false,
+  searchAtEnd = false,
 
   // disabled prop is passed via data items - Used for district filter when no province selected
 }: FilterButtonProps) {
@@ -299,7 +303,7 @@ export default function FilterButton({
             placeholder={getPlaceholder()}
             disabled={item.disabled}
             size="sm"
-            bg={filterStyles.input.bg}
+            bg={item.bg ?? filterStyles.input.bg}
             borderColor={filterStyles.input.borderColor}
             borderRadius={filterStyles.input.borderRadius}
             modalTitle={getPlaceholder()}
@@ -350,13 +354,44 @@ export default function FilterButton({
         width="$full"
         $md-width="auto"
       >
-        {/* <Text {...filterStyles.label}>
-          {item.nameKey ? t(item.nameKey) : item.name}
-        </Text> */}
+        {showLabels && (
+          <Text {...filterStyles.label}>
+            {item.nameKey ? t(item.nameKey) : item.name}
+          </Text>
+        )}
         {renderInputField()}
       </VStack>
     );
   };
+
+  const searchBlock = (
+    <>
+      {searchItem && (
+          <VStack
+            {...(showLabels ? filterStyles.roleContainer : {})}
+            minWidth={showLabels ? undefined : '$56'}
+            flex={1}
+          >
+            {showLabels && (
+              <Text {...filterStyles.label}>
+                {searchItem.nameKey ? t(searchItem.nameKey) : searchItem.name}
+              </Text>
+            )}
+            <SearchBar
+              key={`search-${clearCount}`}
+              placeholder={
+                searchItem.placeholderKey
+                  ? t(searchItem.placeholderKey)
+                  : (searchItem.placeholder || t('admin.filters.searchPlaceholder'))
+              }
+              onSearch={handleSearch}
+              debounceMs={500}
+              defaultValue={searchKey}
+            />
+          </VStack>
+        )}
+    </>
+  );
 
   return (
     <VStack {...filterStyles.container} {..._container}>
@@ -376,24 +411,10 @@ export default function FilterButton({
 
       {/* Filters Row - Includes search bar if present */}
       <HStack {...filterStyles.filterFieldsContainer}>
-        {/* Search Bar - Only show if there's a search field in data, placed first */}
-        {searchItem && (
-          <Box minWidth="$56" flex={1}>
-            <SearchBar
-              key={`search-${clearCount}`}
-              placeholder={
-                searchItem.placeholderKey
-                  ? t(searchItem.placeholderKey)
-                  : (searchItem.placeholder || t('admin.filters.searchPlaceholder'))
-              }
-              onSearch={handleSearch}
-              debounceMs={500}
-              defaultValue={searchKey}
-            />
-          </Box>
-        )}
+        {!searchAtEnd && searchBlock}
         {/* Render filter items, excluding the search item */}
         {data.filter((item: any) => item.type !== 'search').map((item: any) => renderFilterItem(item))}
+        {searchAtEnd && searchBlock}
       </HStack>
     </VStack>
   );

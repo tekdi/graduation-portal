@@ -23,10 +23,10 @@ declare const process: {
  * @returns A promise resolving to the supervisors response from the API
  */
 export const getSupervisorsByProvince = async (
-  params?: { provinceId?: string; page?: number; limit?: number, search?:string }
+  params?: { provinceId?: string; siteId?: string; page?: number; limit?: number, search?:string }
 ): Promise<UserSearchResponse> => {
   try {
-    const { provinceId, page = 1, limit = 100, search = "" } = params || {};
+    const { provinceId, siteId, page = 1, limit = 100, search = "" } = params || {};
     
     // Build query string
     const queryParams = new URLSearchParams({
@@ -45,6 +45,10 @@ export const getSupervisorsByProvince = async (
       requestBody.meta = {
         province: provinceId,
     };
+    }
+    // Optional site filter (same meta.site the users list API accepts)
+    if (siteId && !String(siteId).startsWith('all-')) {
+      requestBody.meta = { ...(requestBody.meta || {}), site: siteId };
     }
     
     // POST request to fetch supervisors

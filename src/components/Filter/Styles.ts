@@ -31,6 +31,12 @@ export const filterStyles = {
     },
     justifyContent: 'space-between' as const,
   },
+  label: {
+    fontSize: '$sm' as const,
+    fontWeight: '$medium' as const,
+    color: '$textForeground' as const,
+    mb: '$2' as const,
+  },
   roleContainer: {
     flex: 1,
     minWidth: '100%' as const,
